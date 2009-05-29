@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension
+		id="org.phpsrc.eclipse.pti.tools.codesniffer.validator.phpToolCodeSnifferMarker"
+		name="PHP CodeSniffer"
+		point="org.eclipse.core.resources.markers">
+		<persistent value="true"/>
+		<attribute name="lineNumber"/>
+		<attribute name="charStart"/>
+		<attribute name="charEnd"/>
+		<attribute name="message"/>
+		<attribute name="priority"/>
+		<attribute name="severity"/>
+		<super type="org.eclipse.core.resources.problemmarker"/>
+ 	</extension> 
+	<extension
+		id="CodeSnifferValidatorForPHP"
+		name="PHP CodeSniffer Validator (for PHP Files)"
+		point="org.eclipse.wst.validation.validatorV2">
+		<validator
+			build="false"
+			class="org.phpsrc.eclipse.pti.tools.codesniffer.validator.PHPCodeSnifferValidator"
+			manual="true"
+			markerId="org.phpsrc.eclipse.pti.tools.codesniffer.validator.phpToolCodeSnifferMarker"
+			sourceid="org.eclipse.php.core.phpsource"
+			version="1">
+			<include>
+				<rules>
+					<contentType id="org.eclipse.wst.html.core.htmlsource"></contentType>
+					<fileext caseSensitive="false" ext="php" />
+					<fileext caseSensitive="false" ext="php4" />
+					<fileext caseSensitive="false" ext="inc" />
+					<fileext caseSensitive="false" ext="php5" />
+					<fileext caseSensitive="false" ext="tpl" />
+				</rules>
+			</include>
+			<group id="org.eclipse.wst.sse.core.structuredModelGroup" />
+		</validator>
+	</extension>
+	<extension
+		point="org.eclipse.ui.preferencePages">
+		<page
+			category="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
+			class="org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences.PHPCodeSnifferPreferencePage"
+			id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences.PHPCodeSnifferPreferencePage"
+			name="CodeSniffer">
+		</page>
+	</extension>
+	<extension point="org.eclipse.ui.propertyPages">
+		<page
+			category="org.phpsrc.eclipse.pti.ui.propertyPages.PHPToolsPreferencePage"
+			class="org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences.PHPCodeSnifferPreferencePage"
+			id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.propertyPages.PHPCodeSnifferPreferencePage"
+			name="CodeSniffer">
+			<enabledWhen>
+				<adapt type="org.eclipse.core.resources.IProject">
+				</adapt>
+			</enabledWhen>
+			<filter name="nature" value="org.eclipse.php.core.PHPNature" />
+		</page>
+	</extension>
+	<extension point="org.eclipse.ui.popupMenus">
+		<objectContribution
+			id="org.phpsrc.eclipse.pti.ui.phpToolsCodeSnifferObjectContribution"
+			objectClass="org.eclipse.dltk.core.IModelElement">
+			<action
+				id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.object.ValidateFilesAction"
+				label="PHP CodeSniffer"
+				style="push"
+				menubarPath="phptools/tools"
+				class="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.ValidateFilesAction"
+				enablesFor="+">
+			</action>
+			<enablement>
+				<or>
+					<objectState name="extension" value="php"/>
+					<objectState name="extension" value="php4"/>
+					<objectState name="extension" value="php5"/>
+				</or>
+			</enablement>
+		</objectContribution>
+		<viewerContribution
+			id="org.phpsrc.eclipse.pti.ui.phpToolsCodeSnifferEditorContribution"
+			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
+			<action
+				id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.editor.ValidateFilesAction"
+				label="PHP CodeSniffer"
+				style="push"
+				menubarPath="phptools/tools"
+				class="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.ValidateFilesAction"
+				enablesFor="*">
+			</action>
+		</viewerContribution>
+	</extension>
+</plugin>
