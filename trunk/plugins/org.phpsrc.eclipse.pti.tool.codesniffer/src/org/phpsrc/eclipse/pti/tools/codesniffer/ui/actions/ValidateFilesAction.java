@@ -81,7 +81,6 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 			for (IResource file : files) {
 				validateFile(file);
 			}
-			files = null;
 		}
 	}
 
@@ -97,10 +96,11 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 	}
 
 	protected void validateFile(final IResource resource) {
-		Job job = new Job("PHP CodeSniffer") {
+		Job job = new Job("PHP CodeSniffer: " + resource.getName()) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				monitor.beginTask("Validate " + resource.getName(), 1);
+				
+				monitor.beginTask("Validating " + resource.getProjectRelativePath().toString(), IProgressMonitor.UNKNOWN);
 
 				PHPCodeSnifferValidator validator = new PHPCodeSnifferValidator();
 				validator.validate(resource, IResourceDelta.NO_CHANGE, new ValidationState(), monitor);
