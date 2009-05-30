@@ -63,6 +63,10 @@ public class Logger {
 		_log(level, message, exception);
 	}
 
+	public static void logException(Throwable exception) {
+		_log(ERROR, exception.getMessage(), exception);
+	}
+
 	public static void logException(String message, Throwable exception) {
 		_log(ERROR, message, exception);
 	}

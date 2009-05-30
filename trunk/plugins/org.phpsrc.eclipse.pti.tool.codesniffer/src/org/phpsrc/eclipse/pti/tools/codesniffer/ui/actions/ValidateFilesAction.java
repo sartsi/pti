@@ -29,17 +29,22 @@ package org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.dltk.core.IOpenable;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.php.internal.core.phpModel.PHPModelUtil;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -48,13 +53,13 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.wst.validation.ValidationState;
 import org.phpsrc.eclipse.pti.tools.codesniffer.validator.PHPCodeSnifferValidator;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class ValidateFilesAction implements IObjectActionDelegate, IEditorActionDelegate {
 	private IResource[] files;
 
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		ISelection selection = targetPart.getSite().getSelectionProvider().getSelection();
-
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 			files = new IResource[structuredSelection.size()];
@@ -64,11 +69,14 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 			Iterator<?> iterator = structuredSelection.iterator();
 			while (iterator.hasNext()) {
 				Object entry = iterator.next();
-				if (entry instanceof ISourceModule) {
-					try {
+				try {
+					if (entry instanceof ISourceModule) {
 						resources.add(((ISourceModule) entry).getCorrespondingResource());
-					} catch (ModelException e) {
+					} else if (entry instanceof IOpenable) {
+						resources.add(((IOpenable) entry).getCorrespondingResource());
 					}
+				} catch (ModelException e) {
+					Logger.logException(e);
 				}
 			}
 
@@ -79,7 +87,7 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 	public void run(IAction action) {
 		if (files != null) {
 			for (IResource file : files) {
-				validateFile(file);
+				validateResouce(file);
 			}
 		}
 	}
@@ -95,21 +103,42 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 		}
 	}
 
-	protected void validateFile(final IResource resource) {
-		Job job = new Job("PHP CodeSniffer: " + resource.getName()) {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				
-				monitor.beginTask("Validating " + resource.getProjectRelativePath().toString(), IProgressMonitor.UNKNOWN);
+	protected void validateResouce(IResource resource) {
+		if (resource instanceof IContainer) {
+			validateContainer((IContainer) resource);
+		} else if (resource instanceof IFile) {
+			validateFile((IFile) resource);
+		}
+	}
 
-				PHPCodeSnifferValidator validator = new PHPCodeSnifferValidator();
-				validator.validate(resource, IResourceDelta.NO_CHANGE, new ValidationState(), monitor);
-
-				return Status.OK_STATUS;
+	protected void validateContainer(final IContainer folder) {
+		try {
+			IResource[] members = folder.members();
+			for (IResource member : members) {
+				validateResouce(member);
 			}
-		};
+		} catch (CoreException e) {
+			Logger.logException(e);
+		}
+	}
 
-		job.setUser(false);
-		job.schedule();
+	protected void validateFile(final IFile file) {
+		if (PHPModelUtil.isPhpFile(file)) {
+			Job job = new Job("PHP CodeSniffer: " + file.getName()) {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					monitor.beginTask("Validating " + file.getProjectRelativePath().toString(),
+							IProgressMonitor.UNKNOWN);
+
+					PHPCodeSnifferValidator validator = new PHPCodeSnifferValidator();
+					validator.validate(file, IResourceDelta.NO_CHANGE, new ValidationState(), monitor);
+
+					return Status.OK_STATUS;
+				}
+			};
+
+			job.setUser(false);
+			job.schedule();
+		}
 	}
 }
