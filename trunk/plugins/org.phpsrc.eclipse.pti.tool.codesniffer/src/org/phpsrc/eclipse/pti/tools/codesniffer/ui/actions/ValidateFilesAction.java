@@ -52,6 +52,8 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.wst.validation.ValidationState;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferencesFactory;
 import org.phpsrc.eclipse.pti.tools.codesniffer.validator.PHPCodeSnifferValidator;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
@@ -59,6 +61,8 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 	private IResource[] files;
 
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+		String actionText = "PHP CodeSniffer";
+
 		ISelection selection = targetPart.getSite().getSelectionProvider().getSelection();
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection structuredSelection = (IStructuredSelection) selection;
@@ -71,7 +75,15 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 				Object entry = iterator.next();
 				try {
 					if (entry instanceof ISourceModule) {
-						resources.add(((ISourceModule) entry).getCorrespondingResource());
+						IFile file = (IFile) ((ISourceModule) entry).getCorrespondingResource();
+
+						if (PHPModelUtil.isPhpFile(file)) {
+							if (structuredSelection.size() == 1) {
+								PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.forFile(file);
+								actionText += " (" + prefs.getStandardName() + ")";
+							}
+							resources.add(((ISourceModule) entry).getCorrespondingResource());
+						}
 					} else if (entry instanceof IOpenable) {
 						resources.add(((IOpenable) entry).getCorrespondingResource());
 					}
@@ -82,6 +94,8 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 
 			files = resources.toArray(new IResource[0]);
 		}
+
+		action.setText(actionText);
 	}
 
 	public void run(IAction action) {
@@ -123,22 +137,19 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 	}
 
 	protected void validateFile(final IFile file) {
-		if (PHPModelUtil.isPhpFile(file)) {
-			Job job = new Job("PHP CodeSniffer: " + file.getName()) {
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					monitor.beginTask("Validating " + file.getProjectRelativePath().toString(),
-							IProgressMonitor.UNKNOWN);
+		Job job = new Job("PHP CodeSniffer: " + file.getName()) {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				monitor.beginTask("Validating " + file.getProjectRelativePath().toString(), IProgressMonitor.UNKNOWN);
 
-					PHPCodeSnifferValidator validator = new PHPCodeSnifferValidator();
-					validator.validate(file, IResourceDelta.NO_CHANGE, new ValidationState(), monitor);
+				PHPCodeSnifferValidator validator = new PHPCodeSnifferValidator();
+				validator.validate(file, IResourceDelta.NO_CHANGE, new ValidationState(), monitor);
 
-					return Status.OK_STATUS;
-				}
-			};
+				return Status.OK_STATUS;
+			}
+		};
 
-			job.setUser(false);
-			job.schedule();
-		}
+		job.setUser(false);
+		job.schedule();
 	}
 }

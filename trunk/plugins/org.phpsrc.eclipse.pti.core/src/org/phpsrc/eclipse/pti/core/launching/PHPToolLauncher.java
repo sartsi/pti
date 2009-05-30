@@ -144,6 +144,9 @@ public class PHPToolLauncher {
 						PHPDebugUIMessages.launch_failure_no_config, null));
 			}
 		} catch (CoreException ce) {
+			if (printOutput)
+				Logger.logToConsole(ce.getMessage());
+
 			final IStatus stat = ce.getStatus();
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {

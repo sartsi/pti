@@ -31,13 +31,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.dltk.compiler.problem.DefaultProblem;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.ProblemSeverities;
@@ -48,7 +44,8 @@ import org.phpsrc.eclipse.pti.core.php.inifile.INIFileUtil;
 import org.phpsrc.eclipse.pti.core.php.source.ISourceFile;
 import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
-import org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences.PHPCodeSnifferPreferenceNames;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferencesFactory;
 
 public class PHPCodeSniffer extends AbstractPHPTool {
 
@@ -145,41 +142,12 @@ public class PHPCodeSniffer extends AbstractPHPTool {
 
 	private PHPToolLauncher getProjectPHPToolLauncher(IProject project) {
 
-		Preferences prefs = PHPCodeSnifferPlugin.getDefault().getPluginPreferences();
+		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.forProject(project);
 
-		String phpExecutableId = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_PHP_EXECUTABLE);
+		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
+				getCommandLineArgs(prefs.getStandard(), prefs.getTabWidth()), getPHPINIEntries());
 
-		// Check first the standard path. Is it not empty we have a custom
-		// standard, so we must use the path instead of the name.
-		String standard = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH);
-		if (standard == null || standard.equals("")) {
-			standard = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_NAME);
-		}
-
-		int tabWidth = prefs.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH);
-		boolean printOutput = prefs.getBoolean(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
-
-		IScopeContext[] preferenceScopes = createPreferenceScopes(project);
-		if (preferenceScopes[0] instanceof ProjectScope) {
-			IEclipsePreferences node = preferenceScopes[0].getNode(PHPCodeSnifferPlugin.PLUGIN_ID);
-			if (node != null) {
-				phpExecutableId = node.get(PHPCodeSnifferPreferenceNames.PREF_PHP_EXECUTABLE, phpExecutableId);
-
-				String projectStandard = node.get(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH, null);
-				if (projectStandard == null || projectStandard.equals(""))
-					projectStandard = node.get(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_NAME, null);
-				if (projectStandard != null && !projectStandard.equals(""))
-					standard = projectStandard;
-
-				tabWidth = node.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH, tabWidth);
-				printOutput = node.getBoolean(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT, printOutput);
-			}
-		}
-
-		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(phpExecutableId), getScriptFile(),
-				getCommandLineArgs(standard, tabWidth), getPHPINIEntries());
-
-		launcher.setPrintOuput(printOutput);
+		launcher.setPrintOuput(prefs.isPrintOutput());
 
 		return launcher;
 	}

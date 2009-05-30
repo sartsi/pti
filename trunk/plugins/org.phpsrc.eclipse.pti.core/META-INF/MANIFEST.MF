@@ -26,6 +26,7 @@ Export-Package: org.phpsrc.eclipse.pti.core,
  org.phpsrc.eclipse.pti.core.launching,
  org.phpsrc.eclipse.pti.core.php.inifile,
  org.phpsrc.eclipse.pti.core.php.source,
+ org.phpsrc.eclipse.pti.core.preferences,
  org.phpsrc.eclipse.pti.core.tools,
  org.phpsrc.eclipse.pti.ui,
  org.phpsrc.eclipse.pti.ui.preferences

@@ -30,11 +30,7 @@ import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.php.internal.debug.core.preferences.PHPexeItem;
 import org.eclipse.php.internal.debug.core.preferences.PHPexes;
@@ -69,12 +65,5 @@ public abstract class AbstractPHPTool {
 		}
 
 		return null;
-	}
-
-	protected static IScopeContext[] createPreferenceScopes(IProject project) {
-		if (project != null) {
-			return new IScopeContext[] { new ProjectScope(project), new InstanceScope(), new DefaultScope() };
-		}
-		return new IScopeContext[] { new InstanceScope(), new DefaultScope() };
 	}
 }
