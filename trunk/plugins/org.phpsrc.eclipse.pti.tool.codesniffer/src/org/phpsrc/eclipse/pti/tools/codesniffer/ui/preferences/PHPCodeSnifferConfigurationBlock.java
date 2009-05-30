@@ -66,6 +66,7 @@ import org.phpsrc.eclipse.pti.ui.preferences.AbstractPHPToolConfigurationBlock;
 public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurationBlock {
 
 	private static final Key PREF_PHP_EXECUTABLE = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_PHP_EXECUTABLE);
+	private static final Key PREF_DEBUG_PRINT_OUTPUT = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
 	private static final Key PREF_CUSTOM_STANDARD_NAMES = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_CUSTOM_STANDARD_NAMES);
 	private static final Key PREF_CUSTOM_STANDARD_PATHS = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_CUSTOM_STANDARD_PATHS);
 	private static final Key PREF_DEFAULT_STANDARD_NAME = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_NAME);
@@ -215,7 +216,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 	}
 
 	public PHPCodeSnifferConfigurationBlock(IStatusChangeListener context, IProject project,
-		IWorkbenchPreferenceContainer container) {
+			IWorkbenchPreferenceContainer container) {
 		super(context, project, getKeys(), container);
 
 		StandardAdapter adapter = new StandardAdapter();
@@ -248,7 +249,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 
 	private static Key[] getKeys() {
 		return new Key[] { PREF_PHP_EXECUTABLE, PREF_CUSTOM_STANDARD_NAMES, PREF_CUSTOM_STANDARD_PATHS,
-			PREF_DEFAULT_STANDARD_NAME, PREF_DEFAULT_STANDARD_PATH, PREF_DEFAULT_TAB_WITH };
+				PREF_DEFAULT_STANDARD_NAME, PREF_DEFAULT_STANDARD_PATH, PREF_DEFAULT_TAB_WITH };
 	}
 
 	@Override
@@ -421,6 +422,11 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 	@Override
 	protected Key getPHPExecutableKey() {
 		return PREF_PHP_EXECUTABLE;
+	}
+
+	@Override
+	protected Key getDebugPrintOutputKey() {
+		return PREF_DEBUG_PRINT_OUTPUT;
 	}
 
 	/*

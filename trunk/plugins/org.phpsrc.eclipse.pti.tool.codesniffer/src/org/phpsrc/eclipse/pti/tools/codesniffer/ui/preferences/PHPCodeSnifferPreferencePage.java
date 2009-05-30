@@ -36,8 +36,8 @@ import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 
 public class PHPCodeSnifferPreferencePage extends PropertyAndPreferencePage {
 
-	public static final String PREF_ID = "org.phpsrc.ecliphpse.tools.codesniffer.ui.preferences.StandardPreferencePage"; //$NON-NLS-1$
-	public static final String PROP_ID = "org.phpsrc.ecliphpse.tools.codesniffer.ui.propertyPages.StandardPreferencePage"; //$NON-NLS-1$
+	public static final String PREF_ID = "org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences.StandardPreferencePage"; //$NON-NLS-1$
+	public static final String PROP_ID = "org.phpsrc.eclipse.pti.tools.codesniffer.ui.propertyPages.StandardPreferencePage"; //$NON-NLS-1$
 
 	private PHPCodeSnifferConfigurationBlock fConfigurationBlock;
 
@@ -55,7 +55,7 @@ public class PHPCodeSnifferPreferencePage extends PropertyAndPreferencePage {
 	public void createControl(Composite parent) {
 		IWorkbenchPreferenceContainer container = (IWorkbenchPreferenceContainer) getContainer();
 		fConfigurationBlock = new PHPCodeSnifferConfigurationBlock(getNewStatusChangedListener(), getProject(),
-			container);
+				container);
 
 		super.createControl(parent);
 	}

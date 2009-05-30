@@ -58,10 +58,10 @@ import org.eclipse.php.internal.debug.core.preferences.PHPDebuggersRegistry;
 import org.eclipse.php.internal.debug.core.preferences.PHPexeItem;
 import org.eclipse.php.internal.debug.ui.PHPDebugUIMessages;
 import org.eclipse.php.internal.debug.ui.PHPDebugUIPlugin;
-import org.eclipse.php.internal.ui.Logger;
 import org.eclipse.swt.widgets.Display;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPToolLauncher {
 
@@ -71,6 +71,8 @@ public class PHPToolLauncher {
 	private final IPath phpScript;
 	private final String commandLineArgs;
 	private final INIFileEntry[] iniEntries;
+
+	private boolean printOutput = false;
 
 	public PHPToolLauncher(PHPexeItem phpExe, IPath phpScript) {
 		this(phpExe, phpScript, "");
@@ -96,7 +98,7 @@ public class PHPToolLauncher {
 			String phpFileLocation = null;
 			IProject project = file.getProject();
 			IContentType contentType = Platform.getContentTypeManager().getContentType(
-				ContentTypeIdForPHP.ContentTypeID_PHP);
+					ContentTypeIdForPHP.ContentTypeID_PHP);
 			if (contentType.isAssociatedWith(file.getName())) {
 				IPath location = file.getLocation();
 				// check for non null values - EFS issues
@@ -110,11 +112,11 @@ public class PHPToolLauncher {
 			if (phpFileLocation == null) {
 				// Could not find target to launch
 				throw new CoreException(new Status(IStatus.ERROR, PHPDebugUIPlugin.ID, IStatus.OK,
-					PHPDebugUIMessages.launch_failure_no_target, null));
+						PHPDebugUIMessages.launch_failure_no_target, null));
 			}
 
 			ILaunchConfiguration config = findLaunchConfiguration(project, phpScript.toOSString(), phpScript
-				.toOSString(), phpExe, ILaunchManager.RUN_MODE, getPHPExeLaunchConfigType());
+					.toOSString(), phpExe, ILaunchManager.RUN_MODE, getPHPExeLaunchConfigType());
 
 			if (config != null) {
 				ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
@@ -124,23 +126,29 @@ public class PHPToolLauncher {
 				wc.setAttribute(IDebugParametersKeys.EXE_CONFIG_PROGRAM_ARGUMENTS, arguments);
 				config = wc.doSave();
 
+				if (printOutput)
+					Logger.logToConsole(phpExe.getExecutable().toString() + " " + arguments);
+
 				PHPToolExecutableLauncher php = new PHPToolExecutableLauncher();
 				IProcess process = php.launch(config);
 				IStreamsProxy proxy = process.getStreamsProxy();
 				String output = proxy.getOutputStreamMonitor().getContents();
 
+				if (printOutput)
+					Logger.logToConsole(output);
+
 				return output;
 			} else {
 				// Could not find launch configuration
 				throw new CoreException(new Status(IStatus.ERROR, PHPDebugUIPlugin.ID, IStatus.OK,
-					PHPDebugUIMessages.launch_failure_no_config, null));
+						PHPDebugUIMessages.launch_failure_no_config, null));
 			}
 		} catch (CoreException ce) {
 			final IStatus stat = ce.getStatus();
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					ErrorDialog.openError(PHPToolCorePlugin.getActiveWorkbenchShell(), "Error",
-						"Unable to validate file.", stat);
+							"Unable to validate file.", stat);
 				}
 			});
 		}
@@ -160,20 +168,19 @@ public class PHPToolLauncher {
 	 * @return a re-useable config or <code>null</code> if none
 	 */
 	protected ILaunchConfiguration findLaunchConfiguration(IProject phpProject, String phpPathString,
-		String phpFileFullLocation, PHPexeItem defaultEXE, String mode, ILaunchConfigurationType configType) {
+			String phpFileFullLocation, PHPexeItem defaultEXE, String mode, ILaunchConfigurationType configType) {
 		ILaunchConfiguration config = null;
 		try {
 			ILaunchConfiguration[] configs = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(
-				configType);
+					configType);
 
 			int numConfigs = configs == null ? 0 : configs.length;
 			for (int i = 0; i < numConfigs; i++) {
 				String fileName = configs[i].getAttribute(IPHPDebugConstants.ATTR_FILE, (String) null);
 				String exeName = configs[i].getAttribute(IPHPDebugConstants.ATTR_EXECUTABLE_LOCATION, (String) null);
-				boolean ecliphpse = configs[i].getAttribute(PHPToolCorePlugin.PLUGIN_ID, false);
+				boolean isPti = configs[i].getAttribute(PHPToolCorePlugin.PLUGIN_ID, false);
 
-				if (ecliphpse && phpPathString.equals(fileName)
-					&& defaultEXE.getExecutable().toString().equals(exeName)) {
+				if (isPti && phpPathString.equals(fileName) && defaultEXE.getExecutable().toString().equals(exeName)) {
 					config = configs[i].getWorkingCopy();
 					break;
 				}
@@ -193,8 +200,8 @@ public class PHPToolLauncher {
 
 				wc = config.getWorkingCopy();
 				wc
-					.setAttribute(IPHPDebugConstants.ATTR_INI_LOCATION, PHPINIFile != null ? PHPINIFile.toString()
-						: null);
+						.setAttribute(IPHPDebugConstants.ATTR_INI_LOCATION, PHPINIFile != null ? PHPINIFile.toString()
+								: null);
 				config = wc.doSave();
 			} catch (CoreException e) {
 				e.printStackTrace();
@@ -241,20 +248,21 @@ public class PHPToolLauncher {
 	 * Create & return a new configuration
 	 */
 	protected ILaunchConfiguration createConfiguration(IProject phpProject, String phpPathString,
-		String phpFileFullLocation, PHPexeItem defaultEXE, ILaunchConfigurationType configType) throws CoreException {
+			String phpFileFullLocation, PHPexeItem defaultEXE, ILaunchConfigurationType configType)
+			throws CoreException {
 		ILaunchConfiguration config = null;
 		ILaunchConfigurationWorkingCopy wc = configType.newInstance(null, getNewConfigurationName(phpPathString));
 
 		// Set the delegate class according to selected executable.
 		wc.setAttribute(PHPDebugCorePreferenceNames.PHP_DEBUGGER_ID, defaultEXE.getDebuggerID());
 		AbstractDebuggerConfiguration debuggerConfiguration = PHPDebuggersRegistry.getDebuggerConfiguration(defaultEXE
-			.getDebuggerID());
+				.getDebuggerID());
 		wc.setAttribute(PHPDebugCorePreferenceNames.CONFIGURATION_DELEGATE_CLASS, debuggerConfiguration
-			.getScriptLaunchDelegateClass());
+				.getScriptLaunchDelegateClass());
 		wc.setAttribute(IPHPDebugConstants.ATTR_FILE, phpPathString);
 		wc.setAttribute(IPHPDebugConstants.ATTR_FILE_FULL_PATH, phpFileFullLocation);
 		wc.setAttribute(IPHPDebugConstants.ATTR_EXECUTABLE_LOCATION, defaultEXE.getExecutable().getAbsolutePath()
-			.toString());
+				.toString());
 		String iniPath = defaultEXE.getINILocation() != null ? defaultEXE.getINILocation().toString() : null;
 		wc.setAttribute(IPHPDebugConstants.ATTR_INI_LOCATION, iniPath);
 		wc.setAttribute(IPHPDebugConstants.RUN_WITH_DEBUG_INFO, false);
@@ -291,12 +299,16 @@ public class PHPToolLauncher {
 				configurationName = lastSegment;
 			}
 		} catch (Exception e) {
-			Logger.log(Logger.WARNING_DEBUG, "Could not generate configuration name for " + fileName
-				+ ".\nThe default name will be used.", e);
+			Logger.log(Logger.WARNING, "Could not generate configuration name for " + fileName
+					+ ".\nThe default name will be used.", e);
 		}
 
-		configurationName = "ecliphpse_" + configurationName;
+		configurationName = "pti_" + configurationName;
 
 		return DebugPlugin.getDefault().getLaunchManager().generateUniqueLaunchConfigurationNameFrom(configurationName);
+	}
+
+	public void setPrintOuput(boolean printOutput) {
+		this.printOutput = printOutput;
 	}
 }

@@ -53,7 +53,7 @@ import org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences.PHPCodeSnifferPre
 public class PHPCodeSniffer extends AbstractPHPTool {
 
 	public final static QualifiedName QUALIFIED_NAME = new QualifiedName(PHPCodeSnifferPlugin.PLUGIN_ID,
-		"phpCodeSnifferTool");
+			"phpCodeSnifferTool");
 	private static PHPCodeSniffer instance;
 
 	protected PHPCodeSniffer() {
@@ -93,16 +93,17 @@ public class PHPCodeSniffer extends AbstractPHPTool {
 								}
 
 								lastProblem = new DefaultProblem(file.toString(), message, IProblem.Syntax,
-									new String[0], type.equals("WARNING") ? ProblemSeverities.Warning
-										: ProblemSeverities.Error, file.lineStart(lineNumber),
-									file.lineEnd(lineNumber), lineNumber);
+										new String[0], type.equals("WARNING") ? ProblemSeverities.Warning
+												: ProblemSeverities.Error, file.lineStart(lineNumber), file
+												.lineEnd(lineNumber), lineNumber);
 							}
 						} else if (lastProblem != null) {
 							lastProblem = new DefaultProblem(lastProblem.getOriginatingFileName(), lastProblem
-								.getMessage()
-								+ " " + m.group(3).trim(), lastProblem.getID(), lastProblem.getArguments(), lastProblem
-								.isWarning() ? ProblemSeverities.Warning : ProblemSeverities.Error, lastProblem
-								.getSourceStart(), lastProblem.getSourceEnd(), lastProblem.getSourceLineNumber());
+									.getMessage()
+									+ " " + m.group(3).trim(), lastProblem.getID(), lastProblem.getArguments(),
+									lastProblem.isWarning() ? ProblemSeverities.Warning : ProblemSeverities.Error,
+									lastProblem.getSourceStart(), lastProblem.getSourceEnd(), lastProblem
+											.getSourceLineNumber());
 						}
 
 						m.reset();
@@ -156,6 +157,7 @@ public class PHPCodeSniffer extends AbstractPHPTool {
 		}
 
 		int tabWidth = prefs.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH);
+		boolean printOutput = prefs.getBoolean(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
 
 		IScopeContext[] preferenceScopes = createPreferenceScopes(project);
 		if (preferenceScopes[0] instanceof ProjectScope) {
@@ -170,11 +172,16 @@ public class PHPCodeSniffer extends AbstractPHPTool {
 					standard = projectStandard;
 
 				tabWidth = node.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH, tabWidth);
+				printOutput = node.getBoolean(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT, printOutput);
 			}
 		}
 
-		return new PHPToolLauncher(getPHPExecutable(phpExecutableId), getScriptFile(), getCommandLineArgs(standard,
-			tabWidth), getPHPINIEntries());
+		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(phpExecutableId), getScriptFile(),
+				getCommandLineArgs(standard, tabWidth), getPHPINIEntries());
+
+		launcher.setPrintOuput(printOutput);
+
+		return launcher;
 	}
 
 	private INIFileEntry[] getPHPINIEntries() {

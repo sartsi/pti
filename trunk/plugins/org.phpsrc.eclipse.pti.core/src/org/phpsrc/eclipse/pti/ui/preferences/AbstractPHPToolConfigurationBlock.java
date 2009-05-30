@@ -42,6 +42,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -56,11 +57,13 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 
 	private static final String PHP_EXE_PAGE_ID = "org.eclipse.php.debug.ui.preferencesphps.PHPsPreferencePage"; //$NON-NLS-1$
 
+	protected Label phpExecutableNameLabel;
 	protected Combo phpExecutableCombo;
-	protected Label nameLabel;
+
+	protected Button debugPrintOutputCheckbox;
 
 	public AbstractPHPToolConfigurationBlock(IStatusChangeListener context, IProject project, Key[] allKeys,
-		IWorkbenchPreferenceContainer container) {
+			IWorkbenchPreferenceContainer container) {
 		super(context, project, allKeys, container);
 	}
 
@@ -76,6 +79,8 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 
 		createVersionContent(composite);
 		unpackPHPExecutable();
+
+		createDebugComposite(composite);
 
 		Composite toolComposite = createToolContents(composite);
 		toolComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -95,8 +100,8 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 		composite.setLayout(layout);
 		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		nameLabel = new Label(composite, SWT.NONE);
-		nameLabel.setText("PHP Executable:");
+		phpExecutableNameLabel = new Label(composite, SWT.NONE);
+		phpExecutableNameLabel.setText("PHP Executable:");
 
 		phpExecutableCombo = new Combo(composite, SWT.READ_ONLY);
 
@@ -112,6 +117,31 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 		});
 
 		addLink(composite, PHPDebugUIMessages.PhpDebugPreferencePage_installedPHPsLink, PHP_EXE_PAGE_ID);
+
+		return composite;
+	}
+
+	private Composite createDebugComposite(Composite parent) {
+		Group composite = new Group(parent, SWT.RESIZE);
+		composite.setText("Debug");
+
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 1;
+		composite.setLayout(layout);
+		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		debugPrintOutputCheckbox = new Button(composite, SWT.CHECK);
+		debugPrintOutputCheckbox.setText("print PHP output to console");
+		debugPrintOutputCheckbox.setSelection(getBooleanValue(getDebugPrintOutputKey()));
+		debugPrintOutputCheckbox.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e) {
+				boolean selection = debugPrintOutputCheckbox.getSelection();
+				setValue(getDebugPrintOutputKey(), selection);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
 
 		return composite;
 	}
@@ -156,6 +186,8 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 
 	protected abstract Key getPHPExecutableKey();
 
+	protected abstract Key getDebugPrintOutputKey();
+
 	@Override
 	protected String[] getFullBuildDialogStrings(boolean workspaceSettings) {
 		return null;
@@ -170,7 +202,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(getShell(), propertyPageID, null,
-					null);
+						null);
 				dialog.setBlockOnOpen(true);
 				dialog.addPageChangedListener(new IPageChangedListener() {
 					public void pageChanged(PageChangedEvent event) {
