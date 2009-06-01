@@ -137,7 +137,9 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 	}
 
 	protected void validateFile(final IFile file) {
-		Job job = new Job("PHP CodeSniffer: " + file.getName()) {
+		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.forFile(file);
+
+		Job job = new Job("PHP CodeSniffer (" + prefs.getStandardName() + ")") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				monitor.beginTask("Validating " + file.getProjectRelativePath().toString(), IProgressMonitor.UNKNOWN);
