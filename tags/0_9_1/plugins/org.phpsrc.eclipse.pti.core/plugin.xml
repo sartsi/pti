@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension
+		point="org.eclipse.ui.preferencePages">
+		<page
+			category="org.eclipse.php.ui.preferences.PHPBasePreferencePage"
+			class="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
+			id="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
+			name="Tools">
+		</page>
+	</extension>
+	<extension point="org.eclipse.ui.propertyPages">
+		<page
+			class="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
+			id="org.phpsrc.eclipse.pti.ui.propertyPages.PHPToolsPreferencePage"
+			name="PHP Tools">
+			<enabledWhen>
+				<adapt type="org.eclipse.core.resources.IProject">
+				</adapt>
+			</enabledWhen>
+			<filter name="nature" value="org.eclipse.php.core.PHPNature" />
+		</page>
+	</extension>
+	<extension point="org.eclipse.ui.popupMenus">
+		<objectContribution
+			id="org.phpsrc.eclipse.pti.ui.phpToolsObjectContribution"
+			objectClass="org.eclipse.dltk.core.IModelElement">
+			<menu
+				id="phptools"
+				path="additions"
+				label="&amp;PHP Tools">
+				<separator name="tools" />
+			</menu>
+			<enablement>
+				<or>
+					<objectState name="extension" value="php"/>
+					<objectState name="extension" value="php4"/>
+					<objectState name="extension" value="php5"/>
+				</or>
+			</enablement>
+		</objectContribution>
+		<viewerContribution
+			id="org.phpsrc.eclipse.pti.ui.phpToolsEditorContribution"
+			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
+			<menu
+				id="phptools"
+				path="additions"
+				label="&amp;PHP Tools">
+				<separator name="tools" />
+			</menu>
+		</viewerContribution>
+	</extension>
+</plugin>
