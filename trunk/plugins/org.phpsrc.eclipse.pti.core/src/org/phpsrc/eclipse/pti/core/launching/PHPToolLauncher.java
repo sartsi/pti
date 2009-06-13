@@ -35,9 +35,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -48,7 +46,6 @@ import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.php.debug.core.debugger.parameters.IDebugParametersKeys;
-import org.eclipse.php.internal.core.documentModel.provisional.contenttype.ContentTypeIdForPHP;
 import org.eclipse.php.internal.debug.core.IPHPDebugConstants;
 import org.eclipse.php.internal.debug.core.debugger.AbstractDebuggerConfiguration;
 import org.eclipse.php.internal.debug.core.phpIni.INIFileModifier;
@@ -60,6 +57,7 @@ import org.eclipse.php.internal.debug.ui.PHPDebugUIMessages;
 import org.eclipse.php.internal.debug.ui.PHPDebugUIPlugin;
 import org.eclipse.swt.widgets.Display;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
+import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
@@ -97,11 +95,9 @@ public class PHPToolLauncher {
 		try {
 			String phpFileLocation = null;
 			IProject project = file.getProject();
-			IContentType contentType = Platform.getContentTypeManager().getContentType(
-					ContentTypeIdForPHP.ContentTypeID_PHP);
-			if (contentType.isAssociatedWith(file.getName())) {
+
+			if (PHPToolkitUtil.isPhpFile(file)) {
 				IPath location = file.getLocation();
-				// check for non null values - EFS issues
 				if (location != null) {
 					phpFileLocation = location.toOSString();
 				} else {

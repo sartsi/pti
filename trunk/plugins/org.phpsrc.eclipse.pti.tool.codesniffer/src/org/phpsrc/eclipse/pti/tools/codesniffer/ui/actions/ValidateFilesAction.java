@@ -44,7 +44,6 @@ import org.eclipse.dltk.core.ModelException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.php.internal.core.phpModel.PHPModelUtil;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -52,6 +51,7 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.wst.validation.ValidationState;
+import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferencesFactory;
 import org.phpsrc.eclipse.pti.tools.codesniffer.validator.PHPCodeSnifferValidator;
@@ -77,7 +77,7 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 					if (entry instanceof ISourceModule) {
 						IFile file = (IFile) ((ISourceModule) entry).getCorrespondingResource();
 
-						if (PHPModelUtil.isPhpFile(file)) {
+						if (PHPToolkitUtil.isPhpFile(file)) {
 							if (structuredSelection.size() == 1) {
 								PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.forFile(file);
 								actionText += " (" + prefs.getStandardName() + ")";

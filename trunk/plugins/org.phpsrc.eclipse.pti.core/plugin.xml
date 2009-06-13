@@ -7,7 +7,7 @@
 			category="org.eclipse.php.ui.preferences.PHPBasePreferencePage"
 			class="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
 			id="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
-			name="Tools">
+			name="PHP Tools">
 		</page>
 	</extension>
 	<extension point="org.eclipse.ui.propertyPages">

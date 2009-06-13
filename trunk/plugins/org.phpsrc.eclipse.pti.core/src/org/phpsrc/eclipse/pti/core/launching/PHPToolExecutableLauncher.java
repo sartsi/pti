@@ -58,7 +58,6 @@ import org.eclipse.php.internal.debug.core.launching.PHPLaunchUtilities;
 import org.eclipse.php.internal.debug.core.phpIni.PHPINIUtil;
 import org.eclipse.php.internal.debug.core.preferences.PHPexeItem;
 import org.eclipse.php.internal.debug.core.preferences.PHPexes;
-import org.eclipse.php.internal.debug.core.zend.debugger.ProcessCrashDetector;
 import org.eclipse.swt.widgets.Display;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 
@@ -76,7 +75,7 @@ public class PHPToolExecutableLauncher {
 	}
 
 	public IProcess launch(ILaunchConfiguration configuration, ILaunch launch, IProgressMonitor monitor)
-		throws CoreException {
+			throws CoreException {
 		String phpExeString = configuration.getAttribute(IPHPDebugConstants.ATTR_EXECUTABLE_LOCATION, (String) null);
 		String phpIniPath = configuration.getAttribute(IPHPDebugConstants.ATTR_INI_LOCATION, (String) null);
 		String fileName = configuration.getAttribute(IPHPDebugConstants.ATTR_FILE_FULL_PATH, (String) null);
@@ -111,7 +110,7 @@ public class PHPToolExecutableLauncher {
 		// Locate the php.ini by using the attribute. If the attribute was null,
 		// try to locate an php.ini that exists next to the executable.
 		File phpIni = (phpIniPath != null && new File(phpIniPath).exists()) ? new File(phpIniPath) : PHPINIUtil
-			.findPHPIni(phpExeString);
+				.findPHPIni(phpExeString);
 		File tempIni = PHPINIUtil.prepareBeforeDebug(phpIni, phpExeString, project);
 		launch.setAttribute(IDebugParametersKeys.PHP_INI_LOCATION, tempIni.getAbsolutePath());
 
@@ -140,7 +139,7 @@ public class PHPToolExecutableLauncher {
 
 		String[] args = PHPLaunchUtilities.getProgramArguments(launch.getLaunchConfiguration());
 		String[] cmdLine = PHPLaunchUtilities.getCommandLine(launch.getLaunchConfiguration(), phpExeString,
-			phpConfigDir, fileName, sapiType == PHPexeItem.SAPI_CLI ? args : null);
+				phpConfigDir, fileName, sapiType == PHPexeItem.SAPI_CLI ? args : null);
 
 		// Set library search path:
 		if (!OperatingSystem.WINDOWS) {
@@ -166,10 +165,7 @@ public class PHPToolExecutableLauncher {
 
 		File workingDir = new File(fileName).getParentFile();
 		Process p = workingDir.exists() ? DebugPlugin.exec(cmdLine, workingDir, envp) : DebugPlugin.exec(cmdLine, null,
-			envp);
-
-		// Attach a crash detector
-		new Thread(new ProcessCrashDetector(p)).start();
+				envp);
 
 		IProcess process = null;
 
@@ -188,8 +184,8 @@ public class PHPToolExecutableLauncher {
 		if (p != null) {
 			subMonitor = new SubProgressMonitor(monitor, 80); // 10+80 of 100;
 			subMonitor
-				.beginTask(
-					MessageFormat.format("start launch", new Object[] { configuration.getName() }), IProgressMonitor.UNKNOWN); //$NON-NLS-1$
+					.beginTask(
+							MessageFormat.format("start launch", new Object[] { configuration.getName() }), IProgressMonitor.UNKNOWN); //$NON-NLS-1$
 			process = DebugPlugin.newProcess(launch, p, phpExe.toOSString(), processAttributes);
 			if (process == null) {
 				p.destroy();
@@ -222,7 +218,7 @@ public class PHPToolExecutableLauncher {
 
 			if (process.getExitValue() > 1) {
 				throw new CoreException(new Status(IStatus.ERROR, PHPToolCorePlugin.PLUGIN_ID, process
-					.getStreamsProxy().getOutputStreamMonitor().getContents()));
+						.getStreamsProxy().getOutputStreamMonitor().getContents()));
 			}
 
 			// refresh resources
@@ -239,7 +235,7 @@ public class PHPToolExecutableLauncher {
 		display.asyncExec(new Runnable() {
 			public void run() {
 				MessageDialog.openError(display.getActiveShell(), PHPDebugCoreMessages.Debugger_LaunchError_title,
-					message);
+						message);
 			}
 		});
 	}

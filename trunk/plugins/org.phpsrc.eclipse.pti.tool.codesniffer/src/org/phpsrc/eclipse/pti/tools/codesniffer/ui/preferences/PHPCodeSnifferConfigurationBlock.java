@@ -41,7 +41,6 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.window.Window;
-import org.eclipse.php.internal.core.project.PHPNature;
 import org.eclipse.php.internal.ui.preferences.IStatusChangeListener;
 import org.eclipse.php.internal.ui.preferences.util.Key;
 import org.eclipse.php.internal.ui.util.PixelConverter;
@@ -59,6 +58,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
+import org.phpsrc.eclipse.pti.core.PHPCoreID;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.PHPCodeSniffer;
 import org.phpsrc.eclipse.pti.ui.preferences.AbstractPHPToolConfigurationBlock;
@@ -379,7 +379,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 		IProject[] projects = root.getRoot().getProjects();
 		for (IProject project : projects) {
 			try {
-				IProjectNature nature = project.getNature(PHPNature.ID);
+				IProjectNature nature = project.getNature(PHPCoreID.PHPNatureID);
 				if (nature != null) {
 					project.setSessionProperty(PHPCodeSniffer.QUALIFIED_NAME, null);
 				}

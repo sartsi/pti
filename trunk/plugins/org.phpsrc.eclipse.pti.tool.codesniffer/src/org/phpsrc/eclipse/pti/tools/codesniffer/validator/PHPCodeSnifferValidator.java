@@ -34,10 +34,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dltk.compiler.problem.IProblem;
-import org.eclipse.php.internal.core.phpModel.PHPModelUtil;
 import org.eclipse.wst.validation.AbstractValidator;
 import org.eclipse.wst.validation.ValidationResult;
 import org.eclipse.wst.validation.ValidationState;
+import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.tools.codesniffer.ICodeSnifferConstants;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.PHPCodeSniffer;
 
@@ -46,7 +46,7 @@ public class PHPCodeSnifferValidator extends AbstractValidator {
 	@Override
 	public ValidationResult validate(IResource resource, int kind, ValidationState state, IProgressMonitor monitor) {
 		// process only PHP files
-		if (resource.getType() != IResource.FILE || !(PHPModelUtil.isPhpFile((IFile) resource))) {
+		if (resource.getType() != IResource.FILE || !(PHPToolkitUtil.isPhpFile((IFile) resource))) {
 			return null;
 		}
 
