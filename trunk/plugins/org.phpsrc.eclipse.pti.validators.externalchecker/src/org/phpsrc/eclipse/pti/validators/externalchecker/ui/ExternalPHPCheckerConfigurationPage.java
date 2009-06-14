@@ -35,12 +35,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.phpsrc.eclipse.pti.ui.preferences.dialogfields.PHPExecutableDialogField;
 import org.phpsrc.eclipse.pti.validators.externalchecker.core.ExternalPHPChecker;
 import org.phpsrc.eclipse.pti.validators.externalchecker.core.ExternalPHPCheckerPlugin;
 import org.phpsrc.eclipse.pti.validators.externalchecker.core.Rule;
 
 public class ExternalPHPCheckerConfigurationPage extends ValidatorConfigurationPage {
 
+	private PHPExecutableDialogField fPhpExecutable;
 	private StringDialogField fArguments;
 	private EnvironmentPathBlock fPath;
 	private StringDialogField fExtensions;
@@ -131,6 +133,7 @@ public class ExternalPHPCheckerConfigurationPage extends ValidatorConfigurationP
 		externalChecker.setCommand(this.fPath.getPaths());
 		externalChecker.setRules(rulesList.getRules());
 		externalChecker.setExtensions(this.fExtensions.getText());
+		externalChecker.setPhpExecutable(this.fPhpExecutable.getText());
 	}
 
 	private void createPathBrowse(final Composite parent, int columns) {
@@ -147,8 +150,11 @@ public class ExternalPHPCheckerConfigurationPage extends ValidatorConfigurationP
 		createFields();
 
 		this.createPathBrowse(ancestor, columns);
+
+		this.fPhpExecutable.doFillIntoGrid(ancestor, columns);
 		this.fArguments.doFillIntoGrid(ancestor, columns);
 		this.fExtensions.doFillIntoGrid(ancestor, columns);
+
 		Label label = new Label(ancestor, SWT.WRAP);
 		label.setText("Comma separated list of extensions");
 		GridData data = new GridData(SWT.FILL, SWT.FILL, false, false);
@@ -266,9 +272,13 @@ public class ExternalPHPCheckerConfigurationPage extends ValidatorConfigurationP
 			Rule r = externalChecker.getRule(i);
 			rulesList.addRule(r);
 		}
+
+		this.fPhpExecutable.setText(externalChecker.getPhpExecutable());
 	}
 
 	private void createFields() {
+		this.fPhpExecutable = new PHPExecutableDialogField();
+		this.fPhpExecutable.setLabelText("PHP Executable:");
 		this.fArguments = new StringDialogField();
 		this.fArguments.setLabelText("Checker arguments:");
 		this.fExtensions = new StringDialogField();

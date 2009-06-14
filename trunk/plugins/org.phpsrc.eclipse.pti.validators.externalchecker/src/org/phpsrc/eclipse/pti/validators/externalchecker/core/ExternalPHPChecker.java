@@ -28,11 +28,13 @@ public class ExternalPHPChecker extends AbstractValidator {
 	private static final String PATH_TAG = "path"; //$NON-NLS-1$
 	private static final String ENVIRONMENT_ATTR = "environment"; //$NON-NLS-1$
 	private static final String PATH_ATTR = "path"; //$NON-NLS-1$
+	private static final String PHP_EXECUTABLE_ATTR = "php_executable"; //$NON-NLS-1$
 
 	private String arguments;
 	private Map paths;
 	private List<Rule> rules = new ArrayList<Rule>();
 	private String extensions;
+	private String phpExecutable;
 
 	public void setCommand(Map command) {
 		this.paths = command;
@@ -54,6 +56,7 @@ public class ExternalPHPChecker extends AbstractValidator {
 		this.arguments = "%f"; //$NON-NLS-1$
 		this.paths = newEmptyPath();
 		this.extensions = "*"; //$NON-NLS-1$
+		this.phpExecutable = phpExecutable;
 	}
 
 	private Map newEmptyPath() {
@@ -86,6 +89,7 @@ public class ExternalPHPChecker extends AbstractValidator {
 		}
 		this.arguments = element.getAttribute(ARGUMENTS);
 		this.extensions = element.getAttribute(EXTENSIONS);
+		this.phpExecutable = element.getAttribute(PHP_EXECUTABLE_ATTR);
 
 		NodeList nodes = element.getChildNodes();
 		rules.clear();
@@ -104,6 +108,7 @@ public class ExternalPHPChecker extends AbstractValidator {
 		super.storeTo(doc, element);
 		element.setAttribute(ARGUMENTS, this.arguments);
 		element.setAttribute(EXTENSIONS, this.extensions);
+		element.setAttribute(PHP_EXECUTABLE_ATTR, this.phpExecutable);
 
 		for (int i = 0; i < rules.size(); i++) {
 			Element elem = doc.createElement("rule"); //$NON-NLS-1$
@@ -169,6 +174,14 @@ public class ExternalPHPChecker extends AbstractValidator {
 	public void setExtensions(String scriptPattern) {
 		this.extensions = scriptPattern;
 		fireChanged();
+	}
+
+	public String getPhpExecutable() {
+		return phpExecutable;
+	}
+
+	public void setPhpExecutable(String phpExecutable) {
+		this.phpExecutable = phpExecutable;
 	}
 
 	public Object getValidator(IScriptProject project, Class validatorType) {

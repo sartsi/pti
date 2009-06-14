@@ -28,4 +28,5 @@ Export-Package: org.phpsrc.eclipse.pti.core,
  org.phpsrc.eclipse.pti.core.preferences,
  org.phpsrc.eclipse.pti.core.tools,
  org.phpsrc.eclipse.pti.ui,
- org.phpsrc.eclipse.pti.ui.preferences
+ org.phpsrc.eclipse.pti.ui.preferences,
+ org.phpsrc.eclipse.pti.ui.preferences.dialogfields

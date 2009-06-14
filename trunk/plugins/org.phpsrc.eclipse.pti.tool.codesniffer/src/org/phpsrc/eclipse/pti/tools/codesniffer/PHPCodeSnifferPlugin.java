@@ -88,11 +88,11 @@ public class PHPCodeSnifferPlugin extends AbstractPHPToolPlugin {
 
 	public String[] getCodeSnifferStandards() {
 		IPath sp = PHPLibraryPEARPlugin.getDefault().resolvePluginResource(
-			"/php/library/PEAR/PHP/CodeSniffer/Standards");
+				"/php/library/PEAR/PHP/CodeSniffer/Standards");
 
 		File[] dirs = new File(sp.toString()).listFiles(new FileFilter() {
 			public boolean accept(File f) {
-				return f.isDirectory();
+				return f.isDirectory() && !f.getName().startsWith(".");
 			}
 		});
 
@@ -107,7 +107,7 @@ public class PHPCodeSnifferPlugin extends AbstractPHPToolPlugin {
 	@Override
 	public IPath[] getPluginIncludePaths() {
 		return new IPath[] { PHPLibraryPEARPlugin.getDefault().resolvePluginResource("/php/library"),
-			PHPLibraryPEARPlugin.getDefault().resolvePluginResource("/php/library/PEAR"),
-			resolvePluginResource("/php/tools") };
+				PHPLibraryPEARPlugin.getDefault().resolvePluginResource("/php/library/PEAR"),
+				resolvePluginResource("/php/tools") };
 	}
 }
