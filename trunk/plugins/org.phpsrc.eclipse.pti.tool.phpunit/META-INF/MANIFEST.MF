@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PHP Tool PHPUnit
+Bundle-SymbolicName: org.phpsrc.eclipse.pti.tool.phpunit
+Bundle-Version: 0.1.0.I20090627000000
+Bundle-Activator: org.phpsrc.eclipse.pti.tool.phpunit.PHPUnitPlugin
+Bundle-Vendor: Sven Kiera
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.phpsrc.eclipse.pti.core;bundle-version="1.0.0",
+ org.phpsrc.eclipse.pti.library.pear;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
