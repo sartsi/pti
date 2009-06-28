@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PHP Tool Codesniffer
 Bundle-SymbolicName: org.phpsrc.eclipse.pti.tool.codesniffer;singleton:=true
-Bundle-Version: 1.0.0.I20090613120000
+Bundle-Version: 1.0.0.I20090628000000
 Bundle-Activator: org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin
 Bundle-Vendor: Sven Kiera
 Require-Bundle: org.eclipse.ui,
@@ -22,3 +22,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide;bundle-version="3.4.1"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
+Export-Package: org.phpsrc.eclipse.pti.tools.codesniffer,
+ org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences

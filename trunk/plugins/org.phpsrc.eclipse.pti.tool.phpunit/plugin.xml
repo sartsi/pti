@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+	 	<wizard
+			id="org.phpsrc.eclipse.pti.tool.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard"
+			name="PHPUnit Test Case"
+			class="org.phpsrc.eclipse.pti.tool.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard"
+			category="org.eclipse.php.project.ui"
+			icon="icons/full/obj16/new_testcase.gif">
+				<description>Create a PHPUnit Test Case</description>
+		</wizard>
+   </extension>
+	<extension point="org.eclipse.ui.popupMenus">
+		<objectContribution
+			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitObjectContribution"
+			objectClass="org.eclipse.dltk.core.IModelElement">
+			<menu
+				id="phpunit"
+				path="phptools/tools"
+				label="&amp;PHPUnit">
+				<separator name="tests" />
+			</menu>
+			<enablement>
+				<or>
+					<objectState name="extension" value="php"/>
+					<objectState name="extension" value="php4"/>
+					<objectState name="extension" value="php5"/>
+				</or>
+			</enablement>
+		</objectContribution>
+		<objectContribution
+			id="org.phpsrc.eclipse.pti.ui.phpToolsCodeSnifferObjectContribution"
+			objectClass="org.eclipse.dltk.core.IModelElement">
+			<action
+				id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.object.ValidateFilesAction"
+				label="Create Test Case"
+				style="push"
+				menubarPath="phptools/phpunit/tests"
+				class="org.phpsrc.eclipse.pti.tool.phpunit.ui.actions.CreateTestCaseAction"
+				enablesFor="+">
+			</action>
+			<enablement>
+				<or>
+					<objectState name="extension" value="php"/>
+					<objectState name="extension" value="php4"/>
+					<objectState name="extension" value="php5"/>
+				</or>
+			</enablement>
+		</objectContribution>
+		<viewerContribution
+			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitViewerContribution"
+			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
+			<menu
+				id="phpunit"
+				path="phptools/tools"
+				label="&amp;PHPUnit">
+				<separator name="tests" />
+			</menu>
+		</viewerContribution>
+		<viewerContribution
+			id="org.phpsrc.eclipse.pti.ui.phpToolsCodeSnifferEditorContribution"
+			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
+			<action
+				id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.editor.ValidateFilesAction"
+				label="Create Test Case"
+				style="push"
+				menubarPath="phptools/phpunit/tests"
+				class="org.phpsrc.eclipse.pti.tool.phpunit.ui.actions.CreateTestCaseAction"
+				enablesFor="*">
+			</action>
+		</viewerContribution>
+	</extension>
+</plugin>

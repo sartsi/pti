@@ -42,12 +42,12 @@ import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileUtil;
 import org.phpsrc.eclipse.pti.core.php.source.ISourceFile;
-import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
+import org.phpsrc.eclipse.pti.core.tools.AbstractPHPToolParser;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferencesFactory;
 
-public class PHPCodeSniffer extends AbstractPHPTool {
+public class PHPCodeSniffer extends AbstractPHPToolParser {
 
 	public final static QualifiedName QUALIFIED_NAME = new QualifiedName(PHPCodeSnifferPlugin.PLUGIN_ID,
 			"phpCodeSnifferTool");
