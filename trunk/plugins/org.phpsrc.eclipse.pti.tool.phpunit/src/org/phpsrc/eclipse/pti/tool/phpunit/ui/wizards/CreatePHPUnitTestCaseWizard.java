@@ -17,14 +17,12 @@ public class CreatePHPUnitTestCaseWizard extends Wizard implements INewWizard {
 		setNeedsProgressMonitor(true);
 	}
 
-	@Override
 	public boolean performFinish() {
 		IProject project = sourceClassPage.getProject();
 		System.out.println(project);
 		return false;
 	}
 
-	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.workbench = workbench;
 		this.selection = selection;
