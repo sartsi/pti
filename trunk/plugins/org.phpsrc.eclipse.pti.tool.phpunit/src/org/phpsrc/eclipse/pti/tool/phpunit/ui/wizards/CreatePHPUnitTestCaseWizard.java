@@ -1,10 +1,12 @@
 package org.phpsrc.eclipse.pti.tool.phpunit.ui.wizards;
 
-import org.eclipse.core.resources.IProject;
+import java.io.InvalidObjectException;
+
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.phpsrc.eclipse.pti.tool.phpunit.core.PHPUnit;
 
 public class CreatePHPUnitTestCaseWizard extends Wizard implements INewWizard {
 
@@ -18,8 +20,14 @@ public class CreatePHPUnitTestCaseWizard extends Wizard implements INewWizard {
 	}
 
 	public boolean performFinish() {
-		IProject project = sourceClassPage.getProject();
-		System.out.println(project);
+		PHPUnit phpunit = PHPUnit.getInstance();
+		try {
+			phpunit.createTestSkeleton(sourceClassPage.getSourceClassName(), sourceClassPage.getSourceClassFile(),
+					sourceClassPage.getTestClassFilePath());
+		} catch (InvalidObjectException e) {
+			e.printStackTrace();
+		}
+
 		return false;
 	}
 

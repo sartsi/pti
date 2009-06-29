@@ -92,19 +92,25 @@ public class PHPToolLauncher {
 	}
 
 	public String launch(IFile file) {
-		try {
-			String phpFileLocation = null;
-			IProject project = file.getProject();
-
-			if (PHPToolkitUtil.isPhpFile(file)) {
-				IPath location = file.getLocation();
-				if (location != null) {
-					phpFileLocation = location.toOSString();
-				} else {
-					phpFileLocation = file.getFullPath().toString();
-				}
+		String phpFileLocation = null;
+		if (PHPToolkitUtil.isPhpFile(file)) {
+			IPath location = file.getLocation();
+			if (location != null) {
+				phpFileLocation = location.toOSString();
+			} else {
+				phpFileLocation = file.getFullPath().toString();
 			}
+		}
 
+		return launch(file.getProject(), phpFileLocation);
+	}
+
+	public String launch(IProject project) {
+		return launch(project, "");
+	}
+
+	protected String launch(IProject project, String phpFileLocation) {
+		try {
 			if (phpFileLocation == null) {
 				// Could not find target to launch
 				throw new CoreException(new Status(IStatus.ERROR, PHPDebugUIPlugin.ID, IStatus.OK,

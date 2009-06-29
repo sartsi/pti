@@ -26,9 +26,13 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tool.phpunit.core;
 
+import java.io.InvalidObjectException;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
@@ -54,16 +58,26 @@ public class PHPUnit extends AbstractPHPTool {
 		return instance;
 	}
 
-	public void createTestSkeleton(String className, IFile testClassFile) {
+	public void createTestSkeleton(String className, IFile classFile, String testClassFilePath)
+			throws InvalidObjectException {
+		Path path = new Path(testClassFilePath);
+		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+		IProject project = file.getProject();
+		if (project == null)
+			throw new InvalidObjectException("no project found");
 
+		String cmdLineArgs = "--skeleton-test " + className;
+		PHPToolLauncher launcher = getProjectPHPToolLauncher(project, cmdLineArgs, classFile.getParent().getLocation());
+		String output = launcher.launch(project);
+		System.out.println(output);
 	}
 
-	private PHPToolLauncher getProjectPHPToolLauncher(IProject project, String cmdLineArgs) {
+	private PHPToolLauncher getProjectPHPToolLauncher(IProject project, String cmdLineArgs, IPath fileIncludePath) {
 
 		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.forProject(project);
 
 		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
-				cmdLineArgs, getPHPINIEntries());
+				cmdLineArgs, getPHPINIEntries(fileIncludePath));
 
 		launcher.setPrintOuput(prefs.isPrintOutput());
 
@@ -71,8 +85,21 @@ public class PHPUnit extends AbstractPHPTool {
 	}
 
 	private INIFileEntry[] getPHPINIEntries() {
-
 		IPath[] includePaths = PHPCodeSnifferPlugin.getDefault().getPluginIncludePaths();
+		return getPHPINIEntries(includePaths);
+	}
+
+	private INIFileEntry[] getPHPINIEntries(IPath fileIncludePath) {
+		IPath[] pluginIncludePaths = PHPCodeSnifferPlugin.getDefault().getPluginIncludePaths();
+
+		IPath[] includePaths = new IPath[pluginIncludePaths.length + 1];
+		System.arraycopy(pluginIncludePaths, 0, includePaths, 0, pluginIncludePaths.length);
+		includePaths[includePaths.length - 1] = fileIncludePath;
+
+		return getPHPINIEntries(includePaths);
+	}
+
+	private INIFileEntry[] getPHPINIEntries(IPath[] includePaths) {
 
 		INIFileEntry[] entries;
 		if (includePaths.length > 0) {

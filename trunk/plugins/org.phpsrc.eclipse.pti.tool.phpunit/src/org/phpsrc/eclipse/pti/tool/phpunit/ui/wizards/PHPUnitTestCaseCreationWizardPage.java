@@ -1,6 +1,7 @@
 package org.phpsrc.eclipse.pti.tool.phpunit.ui.wizards;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -33,6 +34,7 @@ import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
 public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 
 	protected Text classText;
+	protected IFile classFile;
 	protected Text containerText;
 	protected Text fileText;
 	private IStructuredSelection selection;
@@ -138,6 +140,7 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 		SourceType type = (SourceType) match.getElement();
 
 		classText.setText(type.getElementName());
+		classFile = (IFile) match.getResource();
 
 		String path = type.getPath().toOSString();
 		if (path.indexOf("\\", 1) >= 0) {
@@ -306,12 +309,20 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 		return classText.getText();
 	}
 
+	public IFile getSourceClassFile() {
+		return classFile;
+	}
+
 	public String getContainerName() {
 		return containerText.getText();
 	}
 
 	public String getFileName() {
 		return fileText.getText();
+	}
+
+	public String getTestClassFilePath() {
+		return getContainerName() + "\\" + getFileName();
 	}
 
 	public IProject getProject() {
