@@ -150,8 +150,8 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 		}
 
 		String fileName = match.getResource().getName();
-		int lastDot = fileName.lastIndexOf(".");
-		String testFileName = fileName.substring(0, lastDot) + "Test" + fileName.substring(lastDot);
+		int dotPos = fileName.indexOf(".");
+		String testFileName = fileName.substring(0, dotPos) + "Test" + fileName.substring(dotPos);
 		fileText.setText(testFileName);
 	}
 
