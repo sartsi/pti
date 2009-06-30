@@ -214,7 +214,7 @@ class PHPUnit_TextUI_Command
         catch (RuntimeException $e) {
             PHPUnit_TextUI_TestRunner::showError($e->getMessage());
         }
-
+        
         if (isset($options[1][0])) {
             $arguments['test'] = $options[1][0];
         }
@@ -595,7 +595,7 @@ class PHPUnit_TextUI_Command
                     }
 
                     $skeleton = $reflector->newInstanceArgs($args);
-                    $skeleton->write();
+                    $skeleton->write($args[3]);
                 }
 
                 catch (Exception $e) {

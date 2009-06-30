@@ -28,12 +28,18 @@ package org.phpsrc.eclipse.pti.tool.phpunit.core;
 
 import java.io.InvalidObjectException;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
+import org.phpsrc.eclipse.pti.core.launching.OperatingSystem;
 import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileUtil;
@@ -58,18 +64,38 @@ public class PHPUnit extends AbstractPHPTool {
 		return instance;
 	}
 
-	public void createTestSkeleton(String className, IFile classFile, String testClassFilePath)
-			throws InvalidObjectException {
+	public boolean createTestSkeleton(String className, IFile classFile, String testClassFilePath)
+			throws InvalidObjectException, CoreException {
 		Path path = new Path(testClassFilePath);
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		IProject project = file.getProject();
 		if (project == null)
 			throw new InvalidObjectException("no project found");
 
+		IFolder folder = (IFolder) file.getParent();
+		createFolder(folder);
+
 		String cmdLineArgs = "--skeleton-test " + className;
+		cmdLineArgs += " " + OperatingSystem.escapeShellFileArg(classFile.getLocation().toOSString());
+		cmdLineArgs += " " + className + "Test";
+		cmdLineArgs += " " + OperatingSystem.escapeShellFileArg(file.getLocation().toOSString());
+
 		PHPToolLauncher launcher = getProjectPHPToolLauncher(project, cmdLineArgs, classFile.getParent().getLocation());
 		String output = launcher.launch(project);
-		System.out.println(output);
+
+		folder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+
+		return (output.indexOf("Wrote skeleton for ") >= 0 ? true : false);
+	}
+
+	private void createFolder(IFolder folder) throws CoreException {
+		IContainer parent = folder.getParent();
+		if (parent instanceof IFolder) {
+			createFolder((IFolder) parent);
+		}
+		if (!folder.exists()) {
+			folder.create(true, true, new NullProgressMonitor());
+		}
 	}
 
 	private PHPToolLauncher getProjectPHPToolLauncher(IProject project, String cmdLineArgs, IPath fileIncludePath) {

@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.dltk.core.search.SearchMatch;
 import org.eclipse.dltk.internal.core.SourceType;
 import org.eclipse.jface.dialogs.IDialogPage;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
@@ -29,6 +30,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.phpsrc.eclipse.pti.core.PHPCoreID;
+import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
 
 public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
@@ -43,6 +45,8 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 	protected static final String UTF_8 = "UTF 8"; //$NON-NLS-1$
 	protected static final String NO_TEMPLATE = "-- none -- "; //$NON-NLS-1$
 	protected Label targetResourceLabel;
+
+	protected boolean testFileExists = false;
 
 	public PHPUnitTestCaseCreationWizardPage(final IStructuredSelection selection) {
 		super("wizardPage"); //$NON-NLS-1$
@@ -215,6 +219,8 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 	 * Ensures that both text fields are set.
 	 */
 	protected void dialogChanged() {
+		testFileExists = false;
+
 		final String container = getContainerName();
 		final String fileName = getFileName();
 
@@ -222,6 +228,7 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 			updateStatus("PHPFileCreationWizardPage.10"); //$NON-NLS-1$
 			return;
 		}
+
 		final IContainer containerFolder = getContainer(container);
 		if (containerFolder == null || !containerFolder.exists()) {
 			setMessage("Selected folder does not exist and will be created", WizardPage.INFORMATION);
@@ -232,6 +239,7 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 			}
 			if (fileName != null && !fileName.equals("") && containerFolder.getFile(new Path(fileName)).exists()) { //$NON-NLS-1$
 				setMessage("File exists and will be overwritten", WizardPage.WARNING);
+				testFileExists = true;
 			}
 		}
 
@@ -327,5 +335,13 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 
 	public IProject getProject() {
 		return project;
+	}
+
+	public boolean finish() {
+		if (testFileExists) {
+			return MessageDialog.openConfirm(PHPToolCorePlugin.getActiveWorkbenchShell(), "Test file exists",
+					"Test file exists. Overwrite?");
+		}
+		return true;
 	}
 }
