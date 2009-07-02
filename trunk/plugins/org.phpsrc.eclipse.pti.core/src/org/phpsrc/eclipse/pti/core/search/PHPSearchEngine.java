@@ -2,6 +2,7 @@ package org.phpsrc.eclipse.pti.core.search;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.search.DLTKSearchParticipant;
 import org.eclipse.dltk.core.search.IDLTKSearchConstants;
 import org.eclipse.dltk.core.search.IDLTKSearchScope;
@@ -14,17 +15,28 @@ import org.eclipse.dltk.ui.search.PatternQuerySpecification;
 import org.eclipse.php.internal.core.PHPLanguageToolkit;
 
 public class PHPSearchEngine {
-	public static SearchMatch[] findClass(String className) {
-		DLTKSearchScopeFactory factory = DLTKSearchScopeFactory.getInstance();
-		String scopeDescription = factory.getWorkspaceScopeDescription(false);
-		IDLTKSearchScope scope = factory.createWorkspaceScope(false, PHPLanguageToolkit.getDefault());
 
+	public static IDLTKSearchScope createWorkspaceScope() {
+		DLTKSearchScopeFactory factory = DLTKSearchScopeFactory.getInstance();
+		return factory.createWorkspaceScope(false, PHPLanguageToolkit.getDefault());
+	}
+
+	public static IDLTKSearchScope createProjectScope(IScriptProject project) {
+		DLTKSearchScopeFactory factory = DLTKSearchScopeFactory.getInstance();
+		return factory.createProjectSearchScope(project, false);
+	}
+
+	public static SearchMatch[] findClass(String className, IDLTKSearchScope scope) {
 		PatternQuerySpecification querySpec = new PatternQuerySpecification(className, IDLTKSearchConstants.TYPE,
-				false, IDLTKSearchConstants.DECLARATIONS, scope, scopeDescription);
+				false, IDLTKSearchConstants.DECLARATIONS, scope, "");
 
 		SearchPattern pattern = SearchPattern.createPattern(querySpec.getPattern(), querySpec.getSearchFor(), querySpec
 				.getLimitTo(), SearchPattern.R_EXACT_MATCH, scope.getLanguageToolkit());
 
+		return findMatches(pattern, scope);
+	}
+
+	private static SearchMatch[] findMatches(SearchPattern pattern, IDLTKSearchScope scope) {
 		SearchEngine engine = new SearchEngine();
 		try {
 			PHPClassSearchRequestor requestor = new PHPClassSearchRequestor();

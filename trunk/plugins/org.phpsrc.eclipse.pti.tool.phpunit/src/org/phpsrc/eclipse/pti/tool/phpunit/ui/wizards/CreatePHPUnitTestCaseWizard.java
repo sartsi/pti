@@ -3,6 +3,7 @@ package org.phpsrc.eclipse.pti.tool.phpunit.ui.wizards;
 import java.io.InvalidObjectException;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -48,5 +49,9 @@ public class CreatePHPUnitTestCaseWizard extends Wizard implements INewWizard {
 
 	public boolean setSourceClassName(String className) {
 		return sourceClassPage.setSourceClassName(className);
+	}
+
+	public boolean setSourceClassName(String className, IDLTKSearchScope scope) {
+		return sourceClassPage.setSourceClassName(className, scope);
 	}
 }

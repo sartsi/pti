@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.dltk.core.search.SearchMatch;
 import org.eclipse.dltk.internal.core.SourceType;
 import org.eclipse.jface.dialogs.IDialogPage;
@@ -304,7 +305,11 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 	}
 
 	public boolean setSourceClassName(String className) {
-		SearchMatch[] matches = PHPSearchEngine.findClass(className);
+		return setSourceClassName(className, PHPSearchEngine.createWorkspaceScope());
+	}
+
+	public boolean setSourceClassName(String className, IDLTKSearchScope scope) {
+		SearchMatch[] matches = PHPSearchEngine.findClass(className, scope);
 		if (matches.length > 0) {
 			setSourceClass(matches[0]);
 			return true;

@@ -31,6 +31,7 @@ import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.dltk.core.DLTKCore;
 import org.eclipse.dltk.core.IOpenable;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
@@ -48,6 +49,7 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
+import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
 import org.phpsrc.eclipse.pti.tool.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
@@ -117,7 +119,8 @@ public class CreateTestCaseAction implements IObjectActionDelegate, IEditorActio
 				WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 						wizard);
 				dialog.create();
-				wizard.setSourceClassName(type.getElementName());
+				wizard.setSourceClassName(type.getElementName(), PHPSearchEngine.createProjectScope(DLTKCore
+						.create(file.getProject())));
 				dialog.open();
 			}
 		} catch (ModelException e) {
