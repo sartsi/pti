@@ -26,7 +26,11 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.core;
 
+import java.io.IOException;
 import java.io.InvalidObjectException;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -40,6 +44,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.dltk.compiler.problem.DefaultProblem;
+import org.eclipse.dltk.compiler.problem.IProblem;
+import org.eclipse.dltk.compiler.problem.ProblemSeverities;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
@@ -48,6 +55,7 @@ import org.phpsrc.eclipse.pti.core.launching.OperatingSystem;
 import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileUtil;
+import org.phpsrc.eclipse.pti.core.php.source.PHPSourceFile;
 import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
 import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferences;
@@ -92,11 +100,13 @@ public class PHPUnit extends AbstractPHPTool {
 		return (output.indexOf("Wrote skeleton for ") >= 0 ? true : false);
 	}
 
-	public boolean runTestCase(IFile testFile) {
+	public IProblem[] runTestCase(IFile testFile) {
 
-		boolean failures = false;
+		ArrayList<IProblem> problems = new ArrayList<IProblem>();
 
 		try {
+			PHPSourceFile sourceFile = new PHPSourceFile(testFile);
+
 			ISourceModule module = PHPToolkitUtil.getSourceModule(testFile);
 			IType[] types = module.getAllTypes();
 			for (IType type : types) {
@@ -106,14 +116,40 @@ public class PHPUnit extends AbstractPHPTool {
 				PHPToolLauncher launcher = getProjectPHPToolLauncher(testFile.getProject(), cmdLineArgs, testFile
 						.getParent().getLocation());
 				String output = launcher.launch(testFile.getProject());
-				if (output.indexOf("FAILURES!") >= 0)
-					failures = true;
+				if (output.length() > 0) {
+					Pattern pFailed = Pattern.compile("(Failed .*)");
+
+					String[] lines = output.split("\n");
+					for (int i = 0; i < lines.length; i++) {
+						Matcher m = pFailed.matcher(lines[i].trim());
+						if (m.matches()) {
+							String msg = lines[i].trim();
+
+							if (lines[i + 1].lastIndexOf(":") != -1) {
+								int lineNumber = Integer.parseInt(lines[i + 1]
+										.substring(lines[i + 1].lastIndexOf(":") + 1));
+								System.out.println("nr: " + lineNumber);
+								System.out.println("s: " + sourceFile.lineStart(lineNumber));
+								System.out.println("e: " + sourceFile.lineEnd(lineNumber));
+								problems.add(new DefaultProblem(testFile.getFullPath().toOSString(), msg,
+										IProblem.Task, new String[0], ProblemSeverities.Error, sourceFile
+												.lineStart(lineNumber), sourceFile.lineEnd(lineNumber), lineNumber));
+
+								++i;
+							}
+						}
+					}
+				}
 			}
 		} catch (ModelException e) {
 			e.printStackTrace();
+		} catch (CoreException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
-		return !failures;
+		return problems.toArray(new IProblem[0]);
 	}
 
 	private void createFolder(IFolder folder) throws CoreException {

@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+	<extension
+		id="org.phpsrc.eclipse.pti.tools.phpunit.validator.phpToolPHPUnitMarker"
+		name="PHPUnit"
+		point="org.eclipse.core.resources.markers">
+		<persistent value="true"/>
+		<attribute name="lineNumber"/>
+		<attribute name="charStart"/>
+		<attribute name="charEnd"/>
+		<attribute name="message"/>
+		<attribute name="priority"/>
+		<attribute name="severity"/>
+		<super type="org.eclipse.core.resources.problemmarker"/>
+ 	</extension> 
    <extension
          point="org.eclipse.ui.newWizards">
 	 	<wizard

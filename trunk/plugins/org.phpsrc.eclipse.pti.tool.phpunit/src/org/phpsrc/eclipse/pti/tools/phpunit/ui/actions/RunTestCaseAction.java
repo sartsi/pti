@@ -31,6 +31,7 @@ import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -52,10 +53,11 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.wst.validation.ValidationState;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
-import org.phpsrc.eclipse.pti.tools.phpunit.core.PHPUnit;
 import org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard;
+import org.phpsrc.eclipse.pti.tools.phpunit.validator.PHPUnitValidator;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class RunTestCaseAction implements IObjectActionDelegate, IEditorActionDelegate {
@@ -107,8 +109,8 @@ public class RunTestCaseAction implements IObjectActionDelegate, IEditorActionDe
 			protected IStatus run(IProgressMonitor monitor) {
 				monitor.beginTask("Run " + file.getProjectRelativePath().toString(), IProgressMonitor.UNKNOWN);
 
-				PHPUnit phpunit = PHPUnit.getInstance();
-				phpunit.runTestCase(file);
+				PHPUnitValidator validator = new PHPUnitValidator();
+				validator.validate(file, IResourceDelta.NO_CHANGE, new ValidationState(), monitor);
 
 				return Status.OK_STATUS;
 			}
