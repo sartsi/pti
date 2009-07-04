@@ -40,6 +40,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.dltk.core.ISourceModule;
+import org.eclipse.dltk.core.IType;
+import org.eclipse.dltk.core.ModelException;
+import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.launching.OperatingSystem;
 import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
@@ -86,6 +90,30 @@ public class PHPUnit extends AbstractPHPTool {
 		folder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 
 		return (output.indexOf("Wrote skeleton for ") >= 0 ? true : false);
+	}
+
+	public boolean runTestCase(IFile testFile) {
+
+		boolean failures = false;
+
+		try {
+			ISourceModule module = PHPToolkitUtil.getSourceModule(testFile);
+			IType[] types = module.getAllTypes();
+			for (IType type : types) {
+				String cmdLineArgs = type.getElementName();
+				cmdLineArgs += " " + OperatingSystem.escapeShellFileArg(testFile.getLocation().toOSString());
+
+				PHPToolLauncher launcher = getProjectPHPToolLauncher(testFile.getProject(), cmdLineArgs, testFile
+						.getParent().getLocation());
+				String output = launcher.launch(testFile.getProject());
+				if (output.indexOf("FAILURES!") >= 0)
+					failures = true;
+			}
+		} catch (ModelException e) {
+			e.printStackTrace();
+		}
+
+		return !failures;
 	}
 
 	private void createFolder(IFolder folder) throws CoreException {
