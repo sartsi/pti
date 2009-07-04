@@ -24,7 +24,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package org.phpsrc.eclipse.pti.tool.phpunit.core;
+package org.phpsrc.eclipse.pti.tools.phpunit.core;
 
 import java.io.InvalidObjectException;
 
@@ -33,6 +33,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -44,10 +45,9 @@ import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileUtil;
 import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
-import org.phpsrc.eclipse.pti.tool.phpunit.PHPUnitPlugin;
-import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
-import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
-import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferencesFactory;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
+import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferences;
+import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferencesFactory;
 
 public class PHPUnit extends AbstractPHPTool {
 
@@ -100,7 +100,17 @@ public class PHPUnit extends AbstractPHPTool {
 
 	private PHPToolLauncher getProjectPHPToolLauncher(IProject project, String cmdLineArgs, IPath fileIncludePath) {
 
-		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.forProject(project);
+		PHPUnitPreferences prefs = PHPUnitPreferencesFactory.forProject(project);
+
+		String bootstrap = prefs.getBootstrap();
+		if (bootstrap != null && bootstrap.length() > 0) {
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			IResource resource = root.findMember(bootstrap);
+			if (resource.exists()) {
+				cmdLineArgs = "--bootstrap " + OperatingSystem.escapeShellFileArg(resource.getLocation().toOSString())
+						+ " " + cmdLineArgs;
+			}
+		}
 
 		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
 				cmdLineArgs, getPHPINIEntries(fileIncludePath));
@@ -111,12 +121,12 @@ public class PHPUnit extends AbstractPHPTool {
 	}
 
 	private INIFileEntry[] getPHPINIEntries() {
-		IPath[] includePaths = PHPCodeSnifferPlugin.getDefault().getPluginIncludePaths();
+		IPath[] includePaths = PHPUnitPlugin.getDefault().getPluginIncludePaths();
 		return getPHPINIEntries(includePaths);
 	}
 
 	private INIFileEntry[] getPHPINIEntries(IPath fileIncludePath) {
-		IPath[] pluginIncludePaths = PHPCodeSnifferPlugin.getDefault().getPluginIncludePaths();
+		IPath[] pluginIncludePaths = PHPUnitPlugin.getDefault().getPluginIncludePaths();
 
 		IPath[] includePaths = new IPath[pluginIncludePaths.length + 1];
 		System.arraycopy(pluginIncludePaths, 0, includePaths, 0, pluginIncludePaths.length);
