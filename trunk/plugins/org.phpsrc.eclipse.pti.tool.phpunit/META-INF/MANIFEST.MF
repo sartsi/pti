@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PHP Tool PHPUnit
-Bundle-SymbolicName: org.phpsrc.eclipse.pti.tool.phpunit;singleton:=true
+Bundle-SymbolicName: org.phpsrc.eclipse.pti.tools.phpunit;singleton:=true
 Bundle-Version: 0.1.0.I20090702000000
-Bundle-Activator: org.phpsrc.eclipse.pti.tool.phpunit.PHPUnitPlugin
+Bundle-Activator: org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin
 Bundle-Vendor: Sven Kiera
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

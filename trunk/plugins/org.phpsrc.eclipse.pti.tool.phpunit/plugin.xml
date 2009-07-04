@@ -4,9 +4,9 @@
    <extension
          point="org.eclipse.ui.newWizards">
 	 	<wizard
-			id="org.phpsrc.eclipse.pti.tool.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard"
+			id="org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard"
 			name="PHPUnit Test Case"
-			class="org.phpsrc.eclipse.pti.tool.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard"
+			class="org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard"
 			category="org.eclipse.php.project.ui"
 			icon="icons/full/obj16/new_testcase.gif">
 				<description>Create a PHPUnit Test Case</description>
@@ -31,14 +31,14 @@
 			</enablement>
 		</objectContribution>
 		<objectContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsCodeSnifferObjectContribution"
+			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitObjectContribution"
 			objectClass="org.eclipse.dltk.core.IModelElement">
 			<action
-				id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.object.ValidateFilesAction"
+				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
 				label="Create Test Case"
 				style="push"
 				menubarPath="phptools/phpunit/tests"
-				class="org.phpsrc.eclipse.pti.tool.phpunit.ui.actions.CreateTestCaseAction"
+				class="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
 				enablesFor="+">
 			</action>
 			<enablement>
@@ -60,16 +60,38 @@
 			</menu>
 		</viewerContribution>
 		<viewerContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsCodeSnifferEditorContribution"
+			id="org.phpsrc.eclipse.pti.ui.PHPUnitEditorContribution"
 			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
 			<action
-				id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.editor.ValidateFilesAction"
+				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
 				label="Create Test Case"
 				style="push"
 				menubarPath="phptools/phpunit/tests"
-				class="org.phpsrc.eclipse.pti.tool.phpunit.ui.actions.CreateTestCaseAction"
+				class="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
 				enablesFor="*">
 			</action>
 		</viewerContribution>
+	</extension>
+	<extension
+		point="org.eclipse.ui.preferencePages">
+		<page
+			category="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
+			class="org.phpsrc.eclipse.pti.tools.phpunit.ui.preferences.PHPUnitPreferencePage"
+			id="org.phpsrc.eclipse.pti.tools.phpunit.ui.preferences.PHPUnitPreferencePage"
+			name="PHPUnit">
+		</page>
+	</extension>
+	<extension point="org.eclipse.ui.propertyPages">
+		<page
+			category="org.phpsrc.eclipse.pti.ui.propertyPages.PHPToolsPreferencePage"
+			class="org.phpsrc.eclipse.pti.tools.phpunit.ui.preferences.PHPUnitPreferencePage"
+			id="org.phpsrc.eclipse.pti.tools.phpunit.ui.propertyPages.PHPUnitPreferencePage"
+			name="PHPUnit">
+			<enabledWhen>
+				<adapt type="org.eclipse.core.resources.IProject">
+				</adapt>
+			</enabledWhen>
+			<filter name="nature" value="org.eclipse.php.core.PHPNature" />
+		</page>
 	</extension>
 </plugin>
