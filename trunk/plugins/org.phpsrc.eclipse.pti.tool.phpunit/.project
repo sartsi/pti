@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Plugin_org.phpsrc.eclipse.pti.tool.phpunit</name>
+	<name>Plugin_org.phpsrc.eclipse.pti.tools.phpunit</name>
 	<comment></comment>
 	<projects>
 	</projects>
