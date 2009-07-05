@@ -99,10 +99,12 @@ public class CreateTestCaseAction implements IObjectActionDelegate, IEditorActio
 	}
 
 	public void setActiveEditor(IAction action, IEditorPart targetPart) {
-		IEditorInput iei = targetPart.getEditorInput();
-		if (iei instanceof IFileEditorInput) {
-			IFileEditorInput ifei = (IFileEditorInput) iei;
-			files = new IResource[] { ifei.getFile() };
+		if (targetPart != null) {
+			IEditorInput iei = targetPart.getEditorInput();
+			if (iei instanceof IFileEditorInput) {
+				IFileEditorInput ifei = (IFileEditorInput) iei;
+				files = new IResource[] { ifei.getFile() };
+			}
 		}
 	}
 

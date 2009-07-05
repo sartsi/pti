@@ -56,6 +56,7 @@ import org.eclipse.wst.validation.ValidationState;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.validator.PHPUnitValidator;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
@@ -131,10 +132,12 @@ public class RunTestCaseAction implements IObjectActionDelegate, IEditorActionDe
 			while (iterator.hasNext())
 				runFile(iterator.next());
 		} else {
+			System.out.println("not found!");
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					ErrorDialog.openError(PHPToolCorePlugin.getActiveWorkbenchShell(), "Error",
-							"Can't find test file.", Status.CANCEL_STATUS);
+							"Can't execute test case.", new Status(IStatus.ERROR, PHPUnitPlugin.PLUGIN_ID,
+									"No test case class found."));
 				}
 			});
 		}
@@ -161,10 +164,12 @@ public class RunTestCaseAction implements IObjectActionDelegate, IEditorActionDe
 	}
 
 	public void setActiveEditor(IAction action, IEditorPart targetPart) {
-		IEditorInput iei = targetPart.getEditorInput();
-		if (iei instanceof IFileEditorInput) {
-			IFileEditorInput ifei = (IFileEditorInput) iei;
-			files = new IResource[] { ifei.getFile() };
+		if (targetPart != null) {
+			IEditorInput iei = targetPart.getEditorInput();
+			if (iei instanceof IFileEditorInput) {
+				IFileEditorInput ifei = (IFileEditorInput) iei;
+				files = new IResource[] { ifei.getFile() };
+			}
 		}
 	}
 }

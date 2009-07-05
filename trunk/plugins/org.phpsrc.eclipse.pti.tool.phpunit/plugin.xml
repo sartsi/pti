@@ -94,13 +94,6 @@
 		<viewerContribution
 			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitCreateTestCaseEditorContribution"
 			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
-			<visibility>
-				<or>
-					<objectState name="extension" value="php"/>
-					<objectState name="extension" value="php4"/>
-					<objectState name="extension" value="php5"/>
-				</or>
-			</visibility>
 			<action
 				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
 				label="Create Test Case"
@@ -113,13 +106,6 @@
 		<viewerContribution
 			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitRunTestCaseEditorContribution"
 			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
-			<visibility>
-				<or>
-					<objectState name="extension" value="php"/>
-					<objectState name="extension" value="php4"/>
-					<objectState name="extension" value="php5"/>
-				</or>
-			</visibility>
 			<action
 				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
 				label="Run Test Case"

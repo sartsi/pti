@@ -116,7 +116,7 @@ public class PHPUnit extends AbstractPHPTool {
 				PHPToolLauncher launcher = getProjectPHPToolLauncher(testFile.getProject(), cmdLineArgs, testFile
 						.getParent().getLocation());
 				String output = launcher.launch(testFile.getProject());
-				if (output.length() > 0) {
+				if (output != null && output.length() > 0) {
 					Pattern pFailed = Pattern.compile("(Failed .*)");
 
 					String[] lines = output.split("\n");
