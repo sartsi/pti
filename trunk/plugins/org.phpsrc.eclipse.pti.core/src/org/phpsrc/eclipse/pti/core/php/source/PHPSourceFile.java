@@ -68,7 +68,7 @@ public class PHPSourceFile implements ISourceFile {
 	}
 
 	public int lineStart(int lineNumber) throws IndexOutOfBoundsException {
-		return lineEnds.get(lineNumber - 1);
+		return lineStarts.get(lineNumber - 1);
 	}
 
 	public int lineEnd(int lineNumber) throws IndexOutOfBoundsException {

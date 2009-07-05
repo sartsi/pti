@@ -31,7 +31,6 @@ import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.dltk.core.DLTKCore;
 import org.eclipse.dltk.core.IOpenable;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
@@ -119,8 +118,7 @@ public class CreateTestCaseAction implements IObjectActionDelegate, IEditorActio
 				WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 						wizard);
 				dialog.create();
-				wizard.setSourceClassName(type.getElementName(), PHPSearchEngine.createProjectScope(DLTKCore
-						.create(file.getProject())));
+				wizard.setSourceClassName(type.getElementName(), PHPSearchEngine.createProjectScope(file.getProject()));
 				dialog.open();
 			}
 		} catch (ModelException e) {

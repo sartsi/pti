@@ -128,9 +128,6 @@ public class PHPUnit extends AbstractPHPTool {
 							if (lines[i + 1].lastIndexOf(":") != -1) {
 								int lineNumber = Integer.parseInt(lines[i + 1]
 										.substring(lines[i + 1].lastIndexOf(":") + 1));
-								System.out.println("nr: " + lineNumber);
-								System.out.println("s: " + sourceFile.lineStart(lineNumber));
-								System.out.println("e: " + sourceFile.lineEnd(lineNumber));
 								problems.add(new DefaultProblem(testFile.getFullPath().toOSString(), msg,
 										IProblem.Task, new String[0], ProblemSeverities.Error, sourceFile
 												.lineStart(lineNumber), sourceFile.lineEnd(lineNumber), lineNumber));

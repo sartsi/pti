@@ -44,19 +44,14 @@
 			</enablement>
 		</objectContribution>
 		<objectContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitObjectContribution"
+			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitCreateTestCaseObjectContribution"
 			objectClass="org.eclipse.dltk.core.IModelElement">
 			<visibility>
-				<and>
-					<or>
-						<objectState name="extension" value="php"/>
-						<objectState name="extension" value="php4"/>
-						<objectState name="extension" value="php5"/>
-					</or>
-					<not>
-						<objectState name="name" value="*Test.*"/>
-					</not>
-				</and>
+				<or>
+					<objectState name="extension" value="php"/>
+					<objectState name="extension" value="php4"/>
+					<objectState name="extension" value="php5"/>
+				</or>
 			</visibility>
 			<action
 				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
@@ -68,17 +63,14 @@
 			</action>
 		</objectContribution>
 		<objectContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitObjectContribution"
+			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitRunTestCaseObjectContribution"
 			objectClass="org.eclipse.dltk.core.IModelElement">
 			<visibility>
-				<and>
-					<or>
-						<objectState name="extension" value="php"/>
-						<objectState name="extension" value="php4"/>
-						<objectState name="extension" value="php5"/>
-					</or>
-					<objectState name="name" value="*Test.*"/>
-				</and>
+				<or>
+					<objectState name="extension" value="php"/>
+					<objectState name="extension" value="php4"/>
+					<objectState name="extension" value="php5"/>
+				</or>
 			</visibility>
 			<action
 				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
@@ -100,19 +92,14 @@
 			</menu>
 		</viewerContribution>
 		<viewerContribution
-			id="org.phpsrc.eclipse.pti.ui.PHPUnitEditorContribution"
+			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitCreateTestCaseEditorContribution"
 			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
 			<visibility>
-				<and>
-					<or>
-						<objectState name="extension" value="php"/>
-						<objectState name="extension" value="php4"/>
-						<objectState name="extension" value="php5"/>
-					</or>
-					<not>
-						<objectState name="name" value="*Test.*"/>
-					</not>
-				</and>
+				<or>
+					<objectState name="extension" value="php"/>
+					<objectState name="extension" value="php4"/>
+					<objectState name="extension" value="php5"/>
+				</or>
 			</visibility>
 			<action
 				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
@@ -120,6 +107,25 @@
 				style="push"
 				menubarPath="phptools/phpunit/tests"
 				class="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
+				enablesFor="*">
+			</action>
+		</viewerContribution>
+		<viewerContribution
+			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitRunTestCaseEditorContribution"
+			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
+			<visibility>
+				<or>
+					<objectState name="extension" value="php"/>
+					<objectState name="extension" value="php4"/>
+					<objectState name="extension" value="php5"/>
+				</or>
+			</visibility>
+			<action
+				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
+				label="Run Test Case"
+				style="push"
+				menubarPath="phptools/phpunit/tests"
+				class="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
 				enablesFor="*">
 			</action>
 		</viewerContribution>

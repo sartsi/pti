@@ -36,27 +36,26 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.dltk.core.DLTKCore;
 import org.eclipse.dltk.core.IOpenable;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
+import org.eclipse.dltk.core.search.SearchMatch;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.validation.ValidationState;
+import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
-import org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard;
 import org.phpsrc.eclipse.pti.tools.phpunit.validator.PHPUnitValidator;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
@@ -97,9 +96,47 @@ public class RunTestCaseAction implements IObjectActionDelegate, IEditorActionDe
 		if (files != null) {
 			for (IResource file : files) {
 				if (file instanceof IFile) {
-					runFile((IFile) file);
+					searchTestCase((IFile) file);
 				}
 			}
+		}
+	}
+
+	protected void searchTestCase(IFile file) {
+		ISourceModule module = PHPToolkitUtil.getSourceModule(file);
+
+		ArrayList<IFile> testFiles = new ArrayList<IFile>();
+
+		IType[] types;
+		try {
+			types = module.getAllTypes();
+			if (types.length > 0) {
+				String[] classes = types[0].getSuperClasses();
+				if (classes.length > 0 && classes[0].equals("PHPUnit_Framework_TestCase")) {
+					testFiles.add(file);
+				} else {
+					SearchMatch[] matches = PHPSearchEngine.findClass(types[0].getElementName() + "Test",
+							PHPSearchEngine.createProjectScope(file.getProject()));
+
+					if (matches.length > 0)
+						testFiles.add((IFile) matches[0].getResource());
+				}
+			}
+		} catch (ModelException e) {
+			e.printStackTrace();
+		}
+
+		if (testFiles.size() > 0) {
+			Iterator<IFile> iterator = testFiles.iterator();
+			while (iterator.hasNext())
+				runFile(iterator.next());
+		} else {
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					ErrorDialog.openError(PHPToolCorePlugin.getActiveWorkbenchShell(), "Error",
+							"Can't find test file.", Status.CANCEL_STATUS);
+				}
+			});
 		}
 	}
 
@@ -129,27 +166,5 @@ public class RunTestCaseAction implements IObjectActionDelegate, IEditorActionDe
 			IFileEditorInput ifei = (IFileEditorInput) iei;
 			files = new IResource[] { ifei.getFile() };
 		}
-	}
-
-	protected void createTestCase(IFile file) {
-		CreatePHPUnitTestCaseWizard wizard = new CreatePHPUnitTestCaseWizard();
-		wizard.init(PlatformUI.getWorkbench(), new StructuredSelection());
-
-		ISourceModule module = PHPToolkitUtil.getSourceModule(file);
-
-		try {
-			IType[] types = module.getAllTypes();
-			for (IType type : types) {
-				WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-						wizard);
-				dialog.create();
-				wizard.setSourceClassName(type.getElementName(), PHPSearchEngine.createProjectScope(DLTKCore
-						.create(file.getProject())));
-				dialog.open();
-			}
-		} catch (ModelException e) {
-			e.printStackTrace();
-		}
-
 	}
 }

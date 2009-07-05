@@ -1,7 +1,9 @@
 package org.phpsrc.eclipse.pti.core.search;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.dltk.core.DLTKCore;
 import org.eclipse.dltk.core.IScriptProject;
 import org.eclipse.dltk.core.search.DLTKSearchParticipant;
 import org.eclipse.dltk.core.search.IDLTKSearchConstants;
@@ -19,6 +21,10 @@ public class PHPSearchEngine {
 	public static IDLTKSearchScope createWorkspaceScope() {
 		DLTKSearchScopeFactory factory = DLTKSearchScopeFactory.getInstance();
 		return factory.createWorkspaceScope(false, PHPLanguageToolkit.getDefault());
+	}
+
+	public static IDLTKSearchScope createProjectScope(IProject project) {
+		return createProjectScope(DLTKCore.create(project));
 	}
 
 	public static IDLTKSearchScope createProjectScope(IScriptProject project) {
