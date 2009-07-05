@@ -153,7 +153,7 @@ public class PHPToolLauncher {
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					ErrorDialog.openError(PHPToolCorePlugin.getActiveWorkbenchShell(), "Error",
-							"Unable to validate file.", stat);
+							"Unable to execute file", stat);
 				}
 			});
 		}
