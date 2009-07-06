@@ -36,6 +36,9 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.dltk.core.ISourceModule;
+import org.eclipse.dltk.core.IType;
+import org.eclipse.dltk.core.ModelException;
 import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.dltk.core.search.SearchMatch;
 import org.eclipse.dltk.internal.core.SourceType;
@@ -59,6 +62,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.phpsrc.eclipse.pti.core.PHPCoreID;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
+import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
 import org.phpsrc.eclipse.pti.core.search.PHPSearchMatch;
 import org.phpsrc.eclipse.pti.core.search.ui.dialogs.FilteredPHPClassSelectionDialog;
@@ -88,7 +92,7 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 	 * @see IDialogPage#createControl(Composite)
 	 */
 	public void createControl(final Composite parent) {
-		final Composite container = new Composite(parent, SWT.NULL);
+		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 1;
 		layout.verticalSpacing = 10;
@@ -98,16 +102,17 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 		classGroup.setText("Source");
 
 		final GridLayout classLayout = new GridLayout();
-		classGroup.setLayout(classLayout);
 		classLayout.numColumns = 3;
-		classLayout.verticalSpacing = 9;
+		classLayout.verticalSpacing = 10;
+		classGroup.setLayout(classLayout);
+		classGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
 		Label classLabel = new Label(classGroup, SWT.NULL);
 		classLabel.setText("Class Name"); //$NON-NLS-1$
 
 		classText = new Text(classGroup, SWT.BORDER | SWT.SINGLE);
 		classText.setEditable(false);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.widthHint = 400;
 		classText.setLayoutData(gd);
 		classText.addModifyListener(new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
@@ -127,15 +132,16 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 		fileGroup.setText("Test");
 
 		final GridLayout fileLayout = new GridLayout();
-		fileGroup.setLayout(fileLayout);
 		fileLayout.numColumns = 3;
-		fileLayout.verticalSpacing = 9;
+		fileLayout.verticalSpacing = 10;
+		fileGroup.setLayout(fileLayout);
+		fileGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
 		Label fileLabel = new Label(fileGroup, SWT.NULL);
 		fileLabel.setText("Source Folder"); //$NON-NLS-1$
 
 		containerText = new Text(fileGroup, SWT.BORDER | SWT.SINGLE);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.widthHint = 400;
 		containerText.setLayoutData(gd);
 		containerText.addModifyListener(new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
@@ -157,7 +163,6 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 		fileText = new Text(fileGroup, SWT.BORDER | SWT.SINGLE);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
-		// gd.widthHint = 300;
 		fileText.setLayoutData(gd);
 		fileText.addModifyListener(new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
@@ -168,17 +173,36 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 		initialize();
 		dialogChanged();
 		setControl(container);
+
+		if (this.selection != null) {
+			Object element = this.selection.getFirstElement();
+			ISourceModule module = PHPToolkitUtil.getSourceModule(element);
+			if (module != null) {
+				IType[] types;
+				try {
+					types = module.getAllTypes();
+					if (types != null && types.length > 0) {
+						this.setSourceClassName(types[0].getElementName(), PHPSearchEngine.createProjectScope(types[0]
+								.getResource().getProject()));
+					}
+				} catch (ModelException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
 	}
 
 	private void setSourceClass(SearchMatch match) {
-		setSourceClass(new PHPSearchMatch((SourceType) match.getElement(), match.getResource()));
+		setSourceClass((SourceType) match.getElement(), match.getResource());
 	}
 
 	private void setSourceClass(PHPSearchMatch match) {
-		SourceType type = (SourceType) match.getElement();
+		setSourceClass(match.getElement(), match.getResource());
+	}
 
+	private void setSourceClass(SourceType type, IResource resource) {
 		classText.setText(type.getElementName());
-		classFile = (IFile) match.getResource();
+		classFile = (IFile) resource;
 
 		String path = type.getPath().toOSString();
 		if (path.indexOf("\\", 1) >= 0) {
@@ -190,7 +214,7 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 			containerText.setText(path + "\\tests");
 		}
 
-		String fileName = match.getResource().getName();
+		String fileName = resource.getName();
 		int dotPos = fileName.indexOf(".");
 		String testFileName = fileName.substring(0, dotPos) + "Test" + fileName.substring(dotPos);
 		fileText.setText(testFileName);
@@ -267,7 +291,7 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 		final String fileName = getFileName();
 
 		if (container.length() == 0) {
-			updateStatus("PHPFileCreationWizardPage.10"); //$NON-NLS-1$
+			updateStatus("Folder must be specified");
 			return;
 		}
 
@@ -276,7 +300,7 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 			setMessage("Selected folder does not exist and will be created", WizardPage.INFORMATION);
 		} else {
 			if (!containerFolder.getProject().isOpen()) {
-				updateStatus("PHPFileCreationWizardPage.12"); //$NON-NLS-1$
+				updateStatus("Selected folder is in a closed project");
 				return;
 			}
 			if (fileName != null && !fileName.equals("") && containerFolder.getFile(new Path(fileName)).exists()) { //$NON-NLS-1$
@@ -293,13 +317,13 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 		}
 
 		if (this.project == null) {
-			updateStatus("Project does not exist"); //$NON-NLS-1$
+			updateStatus("Project does not exist");
 			return;
 		}
 
 		int dotIndex = fileName.lastIndexOf('.');
 		if (fileName.length() == 0 || dotIndex == 0) {
-			updateStatus("PHPFileCreationWizardPage.15"); //$NON-NLS-1$
+			updateStatus("File name must be specified");
 			return;
 		}
 
@@ -308,7 +332,7 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 			for (int i = 0; i < fileNameWithoutExtention.length(); i++) {
 				char ch = fileNameWithoutExtention.charAt(i);
 				if (!(Character.isJavaIdentifierPart(ch) || ch == '.' || ch == '-')) {
-					updateStatus("PHPFileCreationWizardPage.16"); //$NON-NLS-1$
+					updateStatus("File name contains illegal characters");
 					return;
 				}
 			}
@@ -319,7 +343,7 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 			// fixed bug 195274
 			// get the extensions from content type
 			final String[] fileExtensions = contentType.getFileSpecs(IContentType.FILE_EXTENSION_SPEC);
-			StringBuffer buffer = new StringBuffer("PHPFileCreationWizardPage.17"); //$NON-NLS-1$
+			StringBuffer buffer = new StringBuffer("The file name must end in one of the following extensions [");
 			buffer.append(fileExtensions[0]);
 			for (String extension : fileExtensions) {
 				buffer.append(", ").append(extension); //$NON-NLS-1$

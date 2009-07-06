@@ -84,22 +84,21 @@ public class PHPUnitConfigurationBlock extends AbstractPHPToolConfigurationBlock
 	private Composite createBootstrapContent(Composite folder) {
 
 		final Group bootstrapGroup = new Group(folder, SWT.RESIZE);
-		bootstrapGroup.setText("Test");
+		bootstrapGroup.setText("PHPUnit Options");
 
 		final GridLayout bootstrapLayout = new GridLayout();
-		bootstrapGroup.setLayout(bootstrapLayout);
 		bootstrapLayout.numColumns = 3;
 		bootstrapLayout.verticalSpacing = 9;
+		bootstrapGroup.setLayout(bootstrapLayout);
+
 		Label fileLabel = new Label(bootstrapGroup, SWT.NULL);
-		fileLabel.setText("Bootstrap file:"); //$NON-NLS-1$
+		fileLabel.setText("Bootstrap file:");
 
 		fBootstrap = new Text(bootstrapGroup, SWT.BORDER | SWT.SINGLE);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.widthHint = 400;
-		fBootstrap.setLayoutData(gd);
+		fBootstrap.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		fFileButton = new Button(bootstrapGroup, SWT.PUSH);
-		fFileButton.setText("Browse..."); //$NON-NLS-1$
+		fFileButton.setText("Browse...");
 		fFileButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(final SelectionEvent e) {
 				handleBrowse();
@@ -112,7 +111,7 @@ public class PHPUnitConfigurationBlock extends AbstractPHPToolConfigurationBlock
 	private void handleBrowse() {
 
 		final ResourceSelectionDialog dialog = new ResourceSelectionDialog(getShell(), ResourcesPlugin.getWorkspace()
-				.getRoot(), "PHPFileCreationWizardPage.9"); //$NON-NLS-1$
+				.getRoot(), "Select Bootstrap File");
 
 		if (dialog.open() == Window.OK) {
 			final Object[] result = dialog.getResult();

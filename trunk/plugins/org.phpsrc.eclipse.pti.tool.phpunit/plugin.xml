@@ -16,13 +16,19 @@
  	</extension> 
    <extension
          point="org.eclipse.ui.newWizards">
-	 	<wizard
+		<category
+			id="org.phpsrc.eclipse.tools.phpunit.wizards"
+			parentCategory="org.eclipse.php.project.ui"
+			name="PHPUnit">
+		</category>
+		<wizard
 			id="org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard"
 			name="PHPUnit Test Case"
 			class="org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard"
-			category="org.eclipse.php.project.ui"
+			category="org.eclipse.php.project.ui/org.phpsrc.eclipse.tools.phpunit.wizards"
 			icon="icons/full/obj16/new_testcase.gif">
 				<description>Create a PHPUnit Test Case</description>
+				<selection class="org.eclipse.core.resources.IResource"/>
 		</wizard>
    </extension>
 	<extension point="org.eclipse.ui.popupMenus">
