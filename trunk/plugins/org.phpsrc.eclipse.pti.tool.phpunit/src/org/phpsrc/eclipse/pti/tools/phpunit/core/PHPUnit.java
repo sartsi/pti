@@ -161,7 +161,7 @@ public class PHPUnit extends AbstractPHPTool {
 
 	private PHPToolLauncher getProjectPHPToolLauncher(IProject project, String cmdLineArgs, IPath fileIncludePath) {
 
-		PHPUnitPreferences prefs = PHPUnitPreferencesFactory.forProject(project);
+		PHPUnitPreferences prefs = PHPUnitPreferencesFactory.factory(project);
 
 		String bootstrap = prefs.getBootstrap();
 		if (bootstrap != null && bootstrap.length() > 0) {

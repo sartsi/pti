@@ -28,7 +28,6 @@
 package org.phpsrc.eclipse.pti.tools.phpunit;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.QualifiedName;
 import org.osgi.framework.BundleContext;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
 import org.phpsrc.eclipse.pti.library.pear.PHPLibraryPEARPlugin;
@@ -37,9 +36,6 @@ import org.phpsrc.eclipse.pti.library.pear.PHPLibraryPEARPlugin;
  * The activator class controls the plug-in life cycle
  */
 public class PHPUnitPlugin extends AbstractPHPToolPlugin {
-
-	public final static QualifiedName QUALIFIED_NAME = new QualifiedName(PHPUnitPlugin.PLUGIN_ID, "PHPUnitTool");
-
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.phpsrc.eclipse.pti.tools.phpunit";
 

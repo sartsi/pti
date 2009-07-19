@@ -79,7 +79,7 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 
 						if (PHPToolkitUtil.isPhpFile(file)) {
 							if (structuredSelection.size() == 1) {
-								PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.forFile(file);
+								PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(file);
 								actionText += " (" + prefs.getStandardName() + ")";
 							}
 							resources.add(((ISourceModule) entry).getCorrespondingResource());
@@ -139,7 +139,7 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 	}
 
 	protected void validateFile(final IFile file) {
-		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.forFile(file);
+		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(file);
 
 		Job job = new Job("PHP CodeSniffer (" + prefs.getStandardName() + ")") {
 			@Override

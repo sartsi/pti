@@ -40,35 +40,29 @@ import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences.PHPCodeSnifferPreferenceNames;
 
 public class PHPCodeSnifferPreferencesFactory {
-	public static PHPCodeSnifferPreferences forFile(IFile file) {
-		return forProject(file.getProject());
+	public static PHPCodeSnifferPreferences factory(IFile file) {
+		return factory(file.getProject());
 	}
 
-	public static PHPCodeSnifferPreferences forResource(IResource resource) {
-		return forProject(resource.getProject());
+	public static PHPCodeSnifferPreferences factory(IResource resource) {
+		return factory(resource.getProject());
 	}
 
-	public static PHPCodeSnifferPreferences forProject(IProject project) {
-		String phpExe;
-		boolean printOutput;
-		String standard;
-		String standardName;
-		int tabWidth;
-
+	public static PHPCodeSnifferPreferences factory(IProject project) {
 		Preferences prefs = PHPCodeSnifferPlugin.getDefault().getPluginPreferences();
 
-		phpExe = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_PHP_EXECUTABLE);
+		String phpExe = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_PHP_EXECUTABLE);
 
 		// Check first the standard path. Is it not empty we have a custom
 		// standard, so we must use the path instead of the name.
-		standard = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH);
-		standardName = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_NAME);
+		String standard = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH);
+		String standardName = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_NAME);
 		if (standard == null || standard.equals("")) {
 			standard = standardName;
 		}
 
-		tabWidth = prefs.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH);
-		printOutput = prefs.getBoolean(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
+		int tabWidth = prefs.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH);
+		boolean printOutput = prefs.getBoolean(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
 
 		IScopeContext[] preferenceScopes = createPreferenceScopes(project);
 		if (preferenceScopes[0] instanceof ProjectScope) {

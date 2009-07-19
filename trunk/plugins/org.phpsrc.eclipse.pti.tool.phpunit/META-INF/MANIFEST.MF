@@ -21,7 +21,23 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.php.core;bundle-version="2.1.0",
  org.eclipse.dltk.core,
  org.eclipse.dltk.ui;bundle-version="1.0.0",
- org.eclipse.search;bundle-version="3.5.0"
+ org.eclipse.search;bundle-version="3.5.0",
+ org.eclipse.rse.connectorservice.ssh;bundle-version="2.1.100",
+ org.eclipse.rse.services.ssh;bundle-version="3.0.0",
+ org.eclipse.rse;bundle-version="3.1.0",
+ org.eclipse.rse.core;bundle-version="3.1.0",
+ org.eclipse.rse.services;bundle-version="3.1.0",
+ org.eclipse.rse.ui;bundle-version="3.1.0",
+ org.eclipse.rse.shells.ui;bundle-version="3.0.100",
+ org.eclipse.rse.subsystems.shells.core;bundle-version="3.1.0",
+ org.eclipse.rse.subsystems.shells.ssh;bundle-version="2.1.100"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.ui.dialogs
+Export-Package: org.phpsrc.eclipse.pti.tools.phpunit,
+ org.phpsrc.eclipse.pti.tools.phpunit.core,
+ org.phpsrc.eclipse.pti.tools.phpunit.core.preferences,
+ org.phpsrc.eclipse.pti.tools.phpunit.ui.actions,
+ org.phpsrc.eclipse.pti.tools.phpunit.ui.preferences,
+ org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards,
+ org.phpsrc.eclipse.pti.tools.phpunit.validator

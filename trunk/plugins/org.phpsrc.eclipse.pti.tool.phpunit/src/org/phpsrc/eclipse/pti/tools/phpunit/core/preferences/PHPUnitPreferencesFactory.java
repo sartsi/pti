@@ -40,24 +40,20 @@ import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.ui.preferences.PHPUnitPreferenceNames;
 
 public class PHPUnitPreferencesFactory {
-	public static PHPUnitPreferences forFile(IFile file) {
-		return forProject(file.getProject());
+	public static PHPUnitPreferences factory(IFile file) {
+		return factory(file.getProject());
 	}
 
-	public static PHPUnitPreferences forResource(IResource resource) {
-		return forProject(resource.getProject());
+	public static PHPUnitPreferences factory(IResource resource) {
+		return factory(resource.getProject());
 	}
 
-	public static PHPUnitPreferences forProject(IProject project) {
-		String phpExe;
-		boolean printOutput;
-		String bootstrap;
-
+	public static PHPUnitPreferences factory(IProject project) {
 		Preferences prefs = PHPUnitPlugin.getDefault().getPluginPreferences();
 
-		phpExe = prefs.getString(PHPUnitPreferenceNames.PREF_PHP_EXECUTABLE);
-		printOutput = prefs.getBoolean(PHPUnitPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
-		bootstrap = prefs.getString(PHPUnitPreferenceNames.PREF_BOOTSTRAP);
+		String phpExe = prefs.getString(PHPUnitPreferenceNames.PREF_PHP_EXECUTABLE);
+		boolean printOutput = prefs.getBoolean(PHPUnitPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
+		String bootstrap = prefs.getString(PHPUnitPreferenceNames.PREF_BOOTSTRAP);
 
 		IScopeContext[] preferenceScopes = createPreferenceScopes(project);
 		if (preferenceScopes[0] instanceof ProjectScope) {

@@ -40,7 +40,7 @@ import org.phpsrc.eclipse.pti.library.pear.PHPLibraryPEARPlugin;
 public class PHPCodeSnifferPlugin extends AbstractPHPToolPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.phpsrc.eclipse.pti.tool.codesniffer";
+	public static final String PLUGIN_ID = "org.phpsrc.eclipse.pti.tools.codesniffer";
 
 	// The shared instance
 	private static PHPCodeSnifferPlugin plugin;

@@ -142,7 +142,7 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 
 	private PHPToolLauncher getProjectPHPToolLauncher(IProject project) {
 
-		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.forProject(project);
+		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(project);
 
 		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
 				getCommandLineArgs(prefs.getStandard(), prefs.getTabWidth()), getPHPINIEntries());

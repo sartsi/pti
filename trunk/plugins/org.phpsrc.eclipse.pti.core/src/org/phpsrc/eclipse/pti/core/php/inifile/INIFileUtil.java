@@ -33,10 +33,13 @@ import org.eclipse.core.runtime.IPath;
 public class INIFileUtil {
 	public static INIFileEntry createIncludePathEntry(IPath[] includePaths) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(includePaths[0]);
-		for (int i = 1; i < includePaths.length; i++) {
-			sb.append(File.pathSeparator);
-			sb.append(includePaths[i].toOSString());
+
+		if (includePaths != null && includePaths.length > 0) {
+			sb.append(includePaths[0]);
+			for (int i = 1; i < includePaths.length; i++) {
+				sb.append(File.pathSeparator);
+				sb.append(includePaths[i].toOSString());
+			}
 		}
 
 		return new INIFileEntry("include_path", sb.toString());
