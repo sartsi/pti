@@ -53,7 +53,6 @@ import org.eclipse.php.internal.debug.core.phpIni.PHPINIUtil;
 import org.eclipse.php.internal.debug.core.preferences.PHPDebugCorePreferenceNames;
 import org.eclipse.php.internal.debug.core.preferences.PHPDebuggersRegistry;
 import org.eclipse.php.internal.debug.core.preferences.PHPexeItem;
-import org.eclipse.php.internal.debug.ui.PHPDebugUIMessages;
 import org.eclipse.php.internal.debug.ui.PHPDebugUIPlugin;
 import org.eclipse.swt.widgets.Display;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
@@ -114,7 +113,7 @@ public class PHPToolLauncher {
 			if (phpFileLocation == null) {
 				// Could not find target to launch
 				throw new CoreException(new Status(IStatus.ERROR, PHPDebugUIPlugin.ID, IStatus.OK,
-						PHPDebugUIMessages.launch_failure_no_target, null));
+						"Launch target not found", null));
 			}
 
 			ILaunchConfiguration config = findLaunchConfiguration(project, phpScript.toOSString(), phpScript
@@ -143,7 +142,7 @@ public class PHPToolLauncher {
 			} else {
 				// Could not find launch configuration
 				throw new CoreException(new Status(IStatus.ERROR, PHPDebugUIPlugin.ID, IStatus.OK,
-						PHPDebugUIMessages.launch_failure_no_config, null));
+						"Launch configuration could not be created for the selected file.", null));
 			}
 		} catch (CoreException ce) {
 			if (printOutput)

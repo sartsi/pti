@@ -32,7 +32,6 @@ import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.php.internal.debug.core.preferences.PHPexeItem;
 import org.eclipse.php.internal.debug.core.preferences.PHPexes;
-import org.eclipse.php.internal.debug.ui.PHPDebugUIMessages;
 import org.eclipse.php.internal.ui.preferences.IStatusChangeListener;
 import org.eclipse.php.internal.ui.preferences.OptionsConfigurationBlock;
 import org.eclipse.php.internal.ui.preferences.util.Key;
@@ -116,7 +115,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 			}
 		});
 
-		addLink(composite, PHPDebugUIMessages.PhpDebugPreferencePage_installedPHPsLink, PHP_EXE_PAGE_ID);
+		addLink(composite, "PHP Executables...", PHP_EXE_PAGE_ID);
 
 		return composite;
 	}
@@ -166,7 +165,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 		PHPexeItem[] items = exes.getAllItems();
 
 		if (items == null || items.length == 0) {
-			return new String[] { PHPDebugUIMessages.PhpDebugPreferencePage_noExeDefined };
+			return new String[] { "None Defined" };
 		}
 
 		String[] entryList = new String[items.length];
