@@ -19,7 +19,7 @@
 		name="PHP CodeSniffer Validator (for PHP Files)"
 		point="org.eclipse.wst.validation.validatorV2">
 		<validator
-			build="false"
+			build="true"
 			class="org.phpsrc.eclipse.pti.tools.codesniffer.validator.PHPCodeSnifferValidator"
 			manual="true"
 			markerId="org.phpsrc.eclipse.pti.tools.codesniffer.validator.phpToolCodeSnifferMarker"
@@ -27,12 +27,7 @@
 			version="1">
 			<include>
 				<rules>
-					<contentType id="org.eclipse.wst.html.core.htmlsource"></contentType>
-					<fileext caseSensitive="false" ext="php" />
-					<fileext caseSensitive="false" ext="php4" />
-					<fileext caseSensitive="false" ext="inc" />
-					<fileext caseSensitive="false" ext="php5" />
-					<fileext caseSensitive="false" ext="tpl" />
+					<contentType exactMatch="true" id="org.eclipse.php.core.phpsource"></contentType>
 				</rules>
 			</include>
 			<group id="org.eclipse.wst.sse.core.structuredModelGroup" />
