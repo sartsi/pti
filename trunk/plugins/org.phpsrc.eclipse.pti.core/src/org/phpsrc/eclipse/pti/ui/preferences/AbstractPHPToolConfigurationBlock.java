@@ -115,7 +115,17 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 			}
 		});
 
-		addLink(composite, "PHP Executables...", PHP_EXE_PAGE_ID);
+		IPageChangedListener listener = new IPageChangedListener() {
+			public void pageChanged(PageChangedEvent event) {
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						phpExecutableCombo.setItems(preparePHPExecutableEntryList());
+					}
+				});
+			}
+		};
+
+		addLink(composite, "PHP Executables...", PHP_EXE_PAGE_ID, listener);
 
 		return composite;
 	}
@@ -193,24 +203,24 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 	}
 
 	protected void addLink(Composite parent, String label, final String propertyPageID) {
+		addLink(parent, label, propertyPageID, null);
+	}
+
+	protected void addLink(Composite parent, String label, final String propertyPageID,
+			final IPageChangedListener listener) {
 		Link link = new Link(parent, SWT.NONE);
 		link.setFont(parent.getFont());
 		link.setLayoutData(new GridData(SWT.END, SWT.BEGINNING, true, false));
-		link.setText(label);
+		link.setText("<a>" + label + "</a>");
 		link.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(getShell(), propertyPageID, null,
 						null);
 				dialog.setBlockOnOpen(true);
-				dialog.addPageChangedListener(new IPageChangedListener() {
-					public void pageChanged(PageChangedEvent event) {
-						Display.getDefault().asyncExec(new Runnable() {
-							public void run() {
-							}
-						});
-					}
-				});
+				if (listener != null) {
+					dialog.addPageChangedListener(listener);
+				}
 				dialog.open();
 			}
 		});
