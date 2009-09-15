@@ -74,7 +74,7 @@ public class PHPExecutableDialogField extends DialogField {
 		Link link = new Link(parent, SWT.NONE);
 		link.setFont(parent.getFont());
 		link.setLayoutData(new GridData(SWT.END, SWT.BEGINNING, true, false));
-		link.setText("PHP Executables...");
+		link.setText("<a>PHP Executables...</a>");
 		link.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {

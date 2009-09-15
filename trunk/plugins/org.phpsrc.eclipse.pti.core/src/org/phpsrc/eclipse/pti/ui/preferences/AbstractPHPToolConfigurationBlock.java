@@ -125,7 +125,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 			}
 		};
 
-		addLink(composite, "PHP Executables...", PHP_EXE_PAGE_ID, listener);
+		addLink(composite, "<a>PHP Executables...</a>", PHP_EXE_PAGE_ID, listener);
 
 		return composite;
 	}
@@ -211,7 +211,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 		Link link = new Link(parent, SWT.NONE);
 		link.setFont(parent.getFont());
 		link.setLayoutData(new GridData(SWT.END, SWT.BEGINNING, true, false));
-		link.setText("<a>" + label + "</a>");
+		link.setText(label);
 		link.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
