@@ -13,10 +13,10 @@
  * @package  PHP_UML
  * @author   Baptiste Autin <ohlesbeauxjours@yahoo.fr>
  * @license  http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version  SVN: $Revision: 105 $
+ * @version  SVN: $Revision: 129 $
  * @link     http://pear.php.net/package/PHP_UML
  * @link     http://www.baptisteautin.com/projects/PHP_UML/
- * @since    $Date: 2009-06-04 19:48:27 +0200 (jeu., 04 juin 2009) $
+ * @since    $Date: 2009-08-27 17:50:59 +0200 (jeu., 27 août 2009) $
  */
 
 require_once 'PEAR/Exception.php';
@@ -53,16 +53,19 @@ spl_autoload_register(array('PHP_UML', 'autoload'));
  */
 class PHP_UML
 {
-
+    /**
+     * Character used to separate the patterns passed to setIgnorePattern() and
+     * setMatchPattern().
+     * @var string
+     */
     const PATTERN_SEPARATOR = ',';
-    
+
     /**
      * If true, a UML logical view is created.
-     *
      * @var boolean
      */
     public $logicalView = true;
-    
+
     /**
      * If true, a UML deployment view is created.
      * Each file produces an artifact.
@@ -78,70 +81,75 @@ class PHP_UML
     public $componentView = false;
 
     /**
-     * If true, docblocks are interpreted
-     * (especially @package and @param, which can have a major influence)
+     * If true, the docblocks content is parsed.
+     * All possible information is retrieved : general comments, @package, @param...
      * @var boolean
      */
     public $docblocks = true;
+
+    /**
+     * If true, the elements (class, function) are included in the API only if their
+     * comments contain explicitly a docblock "@api"
+     * @var boolean
+     */
+    public $onlyApi = false;
+
+    /**
+     * If true, the elements marked with @internal are included in the API.
+     * @var boolean
+     */
+    public $showInternal = false;
 
     /**
      * If true, the PHP variable prefix $ is kept
      * @var boolean
      */
     public $dollar = true;
-    
+
     /**
      * A reference to a PHP_UML_Metamodel_Superstructure object.
-     *
      * @var PHP_UML::Metamodel::PHP_UML_Metamodel_Superstructure
      */
     public $model;
 
-    /**
-     * List of directories to scan
-     *
-     * @var array
-     */
-    private $directories = array();
-    
-    /**
-     * List of files to scan
-     *
-     * @var array
-     */
-    private $files = array();
-    
-    /**
-     * Allowed filenames (possible wildcards are ? and *)
-     * 
-     * @var array
-     */
-    private $matchPatterns = array('*.php');
-    
-    /**
-     * Ignored directories (possible wildcards are ? and *)
-     *
-     * @var array();
-     */
-    private $ignorePatterns = array();
     
     /**
      * The concatened XMI string
      * @var string
      */
     private $xmi = '';
-
-    /**
-     * A reference to a PHP_UML_PHP_Parser object
-     * @var PHP_UML_PHP_Parser
-     */
-    private $parser;
     
     /**
      * A reference to a PHP_UML_XMI_BuilderImplX object
      * @var PHP_UML_XMI_Builder
      */
     private $builder;
+
+    /**
+     * List of directories to scan
+     * @var array
+     */
+    private $directories = array();
+    
+    /**
+     * List of files to scan
+     * @var array
+     */
+    private $files = array();
+
+    /**
+     * Allowed filenames (possible wildcards are ? and *)
+     * 
+     * @var array
+     */
+    private $matchPatterns = array('*.php');
+
+    /**
+     * Ignored directories (possible wildcards are ? and *)
+     *
+     * @var array();
+     */
+    private $ignorePatterns = array();
 
     /**
      * Constructor
@@ -189,7 +197,7 @@ class PHP_UML
             $this->xmi = PHP_UML_Output_Exporter::transform('xmi1to2.xsl', $this->xmi);
         }
     }
-    
+
     /**
      * Set the input elements (files and/or directories) to parse
      *
@@ -212,57 +220,7 @@ class PHP_UML
         }    
     }
 
-    /**
-     * Setter for the directorie(s) to parse.
-     * Usage: $phpuml->setDirectories(array('dir1/dir2', 'dir3/dir4/dir5'));
-     * Or:    $phpuml->setDirectories('dir1/dir2, dir3/dir4/dir5'); 
-     *
-     * @param mixed $directories List of directories (string or array)
-     
-    public function setDirectories($directories)
-    {
-        if (is_array($directories)) {
-            $this->directories = $directories;
-        }
-        else {
-            $this->directories = explode(self::PATTERN_SEPARATOR, $directories);
-            $this->directories = array_map('trim', $this->directories);
-        }
-    }
-     */
-    
-    /**
-     * Setter for the file(s) to parse. Can be absolute or relative pathes.
-     * Usage: $phpuml->setFiles(array('file1.php', 'file2.php'));
-     * Or:    $phpuml->setFiles('file1.php, file2.php'); 
-     * If a file contains a wildcard, it will set an appropriate file pattern.
-     * 
-     * @param mixed $files List of filenames (string or array)
-     
-    public function setFiles($files)
-    {
-        if (is_array($files)) {
-            $tabFiles = $files;
-        }
-        else {
-            $tabFiles = explode(self::PATTERN_SEPARATOR, $files);
-            $tabFiles = array_map('trim', $tabFiles);
-        }
-        $this->files = array();
-        foreach($tabFiles as $file) {
-            if (strpos($file, '*')===false && strpos($file, '?')===false) {
-                $this->files[] = $file;
-            }
-            else {
-                if(isset($this->filePatterns[0]) && $this->filePatterns[0] == '*')
-                    $this->matchPatterns = array($file);
-                else
-                    $this->matchPatterns[] = $file;
-            }
-        }
-    }
-     */
-  
+
     /**
      * Setter for the filename patterns.
      * Usage: $phpuml->setFilePatterns(array('*.php', '*.php5'));
@@ -276,10 +234,10 @@ class PHP_UML
             $this->matchPatterns = $patterns;
         } else {
             $this->matchPatterns = explode(self::PATTERN_SEPARATOR, $patterns);
-            $this->matchPatterns = array_map('trim', $this->filePatterns);
+            $this->matchPatterns = array_map('trim', $this->matchPatterns);
         }
     }
-    
+
     /**
      * Set a list of files / directories to ignore during parsing
      * Usage: $phpuml->setIgnorePatterns(array('examples', '.svn'));
@@ -293,10 +251,26 @@ class PHP_UML
             $this->ignorePatterns = $patterns;
         } else {
             $this->ignorePatterns = explode(self::PATTERN_SEPARATOR, $patterns);
-            $this->ignorePatterns = array_map('trim', $this->ignorePatterns);
         }
+        $this->ignorePatterns = array_map(array('self', 'cleanPattern'), $this->ignorePatterns);
     }
-    
+
+    /**
+     * Converts a path pattern to the format expected by FileScanner
+     * (separator can only be / ; must not start by any separator)
+     * 
+     * @see PHP_UML_FilePatternFilterIterator#accept()
+     *
+     * @param string $p Pattern
+     */
+    public static function cleanPattern($p)
+    {
+        $p = str_replace('/', DIRECTORY_SEPARATOR, trim($p));
+        if ($p[0]==DIRECTORY_SEPARATOR)
+            $p = substr($p, 1);
+        return $p;
+    }
+
     /**
      * Set the packages to include in the XMI code
      * By default, ALL packages found will be included.
@@ -316,7 +290,7 @@ class PHP_UML
     }
     */
 
-    
+
     /**
      * Parses a PHP folder, and builds a PHP_UML_Metamodel_Superstructure object
      * corresponding to what has been parsed.
@@ -333,10 +307,10 @@ class PHP_UML
     }
 
     /**
-     * Parse directories and files, depending on what the "_directories"
-     * and "_files" properties have been set to (with setDirectory() and setFile())
+     * Parse the directories and the files (depending on what the $directories
+     * and $files properties have been set to with setInput())
      *
-     * @param string $modelName Model name (likely, the name of your application)
+     * @param string $modelName A model name (e.g., the name of your application)
      */
     public function parse($modelName = 'default')
     {
@@ -352,45 +326,20 @@ class PHP_UML
         $this->model->deploymentPackages->name = 'Deployment View';
         $this->model->deploymentPackages->id   = PHP_UML_SimpleUID::getUID();
 
-        $this->parser = new PHP_UML_PHP_Parser($this->model, $this->docblocks, $this->dollar);
+        $fileScanner = new PHP_UML_FileScannerImpl();
 
-        // Parsing directories
-        foreach ($this->directories as $pathItem) {
-            $baseDir  = realpath($pathItem);
-            $trailing = substr($baseDir, -1);
-            if ($trailing != '/' && $trailing != '\\')
-                $baseDir .= DIRECTORY_SEPARATOR;
+        $fileScanner->files          = $this->files;
+        $fileScanner->directories    = $this->directories;
+        $fileScanner->matchPatterns  = $this->matchPatterns;
+        $fileScanner->ignorePatterns = $this->ignorePatterns;
 
-            if ($baseDir != '' && is_dir($baseDir) && is_readable($baseDir)) {
-
-                $objects = new RecursiveIteratorIterator(
-                    new PHP_UML_FilePatternFilterIterator(
-                        new RecursiveDirectoryIterator($baseDir), $this->ignorePatterns, $this->matchPatterns
-                    )
-                );
-
-                $baseDirPos = strlen($baseDir);
-                foreach ($objects as $ptr) {
-                    $relativePath = substr($ptr->getPathname(), $baseDirPos);
-                    $this->parser->parse($baseDir, $relativePath);
-                }
-            }
-            else
-                throw new PHP_UML_Exception($pathItem.': unknown folder.');
-        }
-
-        // Parsing files
-        foreach ($this->files as $filenameItem) {
-            $filenameItem = realpath($filenameItem);
-            $baseDir      = dirname($filenameItem).DIRECTORY_SEPARATOR;
-            $baseName     = basename($filenameItem);
-            $this->parser->parse($baseDir, $baseName);
-        }
+        $fileScanner->parser = new PHP_UML_PHP_Parser($this->model, $this->docblocks, $this->dollar, !$this->showInternal, $this->onlyApi);
+        $fileScanner->scan();
 
         $this->model->resolveAll();
     }
  
-    
+ 
     /**
      * Runs the XMI generator on the PHP model stored in $this->model.
      * 

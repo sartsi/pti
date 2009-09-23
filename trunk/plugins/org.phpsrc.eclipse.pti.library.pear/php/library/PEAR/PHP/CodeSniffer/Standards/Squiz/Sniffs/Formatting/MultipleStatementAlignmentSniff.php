@@ -7,10 +7,9 @@
  * @category  PHP
  * @package   PHP_CodeSniffer
  * @author    Greg Sherwood <gsherwood@squiz.net>
- * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: MultipleStatementAlignmentSniff.php,v 1.5 2007/07/27 05:36:25 squiz Exp $
+ * @version   CVS: $Id: MultipleStatementAlignmentSniff.php 270193 2008-12-01 02:29:14Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -28,14 +27,31 @@ if (class_exists('Generic_Sniffs_Formatting_MultipleStatementAlignmentSniff', tr
  * @category  PHP
  * @package   PHP_CodeSniffer
  * @author    Greg Sherwood <gsherwood@squiz.net>
- * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Formatting_MultipleStatementAlignmentSniff extends Generic_Sniffs_Formatting_MultipleStatementAlignmentSniff
 {
+
+    /**
+     * The maximum amount of padding before the alignment is ignored.
+     *
+     * If the amount of padding required to align this assignment with the
+     * surrounding assignments exceeds this number, the assignment will be
+     * ignored and no errors or warnings will be thrown.
+     *
+     * @var int
+     */
+    protected $maxPadding = 8;
+
+    /**
+     * If true, multi-line assignments are not checked.
+     *
+     * @var int
+     */
+    protected $ignoreMultiLine = true;
 
     /**
      * If true, an error will be thrown; otherwise a warning.

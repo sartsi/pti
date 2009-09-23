@@ -11,10 +11,10 @@
  * @package  PHP_UML
  * @author   Baptiste Autin <ohlesbeauxjours@yahoo.fr>
  * @license  http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version  SVN: $Revision: 97 $
+ * @version  SVN: $Revision: 118 $
  * @link     http://pear.php.net/package/PHP_UML
  * @link     http://www.baptisteautin.com/projects/PHP_UML/
- * @since    $Date: 2009-01-04 21:57:08 +0100 (dim., 04 janv. 2009) $
+ * @since    $Date: 2009-07-11 20:48:51 +0200 (sam., 11 juil. 2009) $
  */
 
 /**
@@ -57,13 +57,14 @@ class PHP_UML_FilePatternFilterIterator extends RecursiveFilterIterator
     {
         $ptr      = $this->getInnerIterator()->current();
         $filename = $ptr->getFilename();
+        $pathname = $ptr->getPathname();
 
         // it must not be ignored:
         foreach ($this->ignored as $pattern) {
-            $pregPattern = '/^'.
-                str_replace(array('\*', '\?'), array('.*', '.'), preg_quote($pattern)).
+            $pregPattern = '/'.
+                str_replace(array('\*', '\?'), array('.*', '.'), preg_quote(DIRECTORY_SEPARATOR.$pattern, '/')).
                 '$/i';
-            if (preg_match($pregPattern, $filename)>0) {
+            if (preg_match($pregPattern, $pathname)>0) {
                 return false;
             }
         }
@@ -71,7 +72,7 @@ class PHP_UML_FilePatternFilterIterator extends RecursiveFilterIterator
         if ($ptr->isFile()) {
             foreach ($this->allowed as $pattern) {
                 $pregPattern = '/^'.
-                    str_replace(array('\*', '\?'), array('.*', '.'), preg_quote($pattern)).
+                    str_replace(array('\*', '\?'), array('.*', '.'), preg_quote($pattern, '/')).
                     '$/i';
                 if (preg_match($pregPattern, $filename)>0) {
                     return true;

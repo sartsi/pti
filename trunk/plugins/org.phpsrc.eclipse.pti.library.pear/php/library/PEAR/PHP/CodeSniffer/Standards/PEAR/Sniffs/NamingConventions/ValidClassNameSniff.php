@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ValidClassNameSniff.php,v 1.10 2008/04/28 01:02:28 squiz Exp $
+ * @version   CVS: $Id: ValidClassNameSniff.php 258612 2008-04-28 01:02:28Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -26,7 +26,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PEAR_Sniffs_NamingConventions_ValidClassNameSniff implements PHP_CodeSniffer_Sniff

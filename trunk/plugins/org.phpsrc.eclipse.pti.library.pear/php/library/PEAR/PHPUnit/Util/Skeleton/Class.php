@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: Class.php 4583 2009-01-30 10:45:06Z sb $
+ * @version    SVN: $Id: Class.php 5162 2009-08-29 08:49:43Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 3.3.0
  */
@@ -58,7 +58,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.3.17
+ * @version    Release: 3.4.0
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.3.0
  */
@@ -69,20 +69,20 @@ class PHPUnit_Util_Skeleton_Class extends PHPUnit_Util_Skeleton
     /**
      * Constructor.
      *
-     * @param  string  $inClassName
-     * @param  string  $inSourceFile
+     * @param string $inClassName
+     * @param string $inSourceFile
+     * @param string $outClassName
+     * @param string $outSourceFile
      * @throws RuntimeException
      */
-    public function __construct($inClassName, $inSourceFile = '')
+    public function __construct($inClassName, $inSourceFile = '', $outClassName = '', $outSourceFile = '')
     {
         if (empty($inSourceFile)) {
-            $this->inSourceFile = $inClassName . '.php';
-        } else {
-            $this->inSourceFile = $inSourceFile;
+            $inSourceFile = $inClassName . '.php';
         }
 
         if (!is_file($inSourceFile)) {
-            throw new RuntimeException(
+            throw new PHPUnit_Framework_Exception(
               sprintf(
                 '"%s" could not be opened.',
 
@@ -93,9 +93,18 @@ class PHPUnit_Util_Skeleton_Class extends PHPUnit_Util_Skeleton
 
         $this->tokens = token_get_all(file_get_contents($inSourceFile));
 
-        $this->inClassName   = $inClassName;
-        $this->outClassName  = substr($inClassName, 0, strlen($inClassName) - 4);
-        $this->outSourceFile = dirname($this->inSourceFile) . DIRECTORY_SEPARATOR . $this->outClassName . '.php';
+        if (empty($outClassName)) {
+            $outClassName = substr($inClassName, 0, strlen($inClassName) - 4);
+        }
+
+        if (empty($outSourceFile)) {
+            $outSourceFile = dirname($inSourceFile) . DIRECTORY_SEPARATOR .
+                             $outClassName . '.php';
+        }
+
+        parent::__construct(
+          $inClassName, $inSourceFile, $outClassName, $outSourceFile
+        );
     }
 
     /**
@@ -139,7 +148,7 @@ class PHPUnit_Util_Skeleton_Class extends PHPUnit_Util_Skeleton
 
         $classTemplate->setVar(
           array(
-            'className' => $this->outClassName,
+            'className' => $this->outClassName['fullyQualifiedClassName'],
             'methods'   => $methods,
             'date'      => date('Y-m-d'),
             'time'      => date('H:i:s')
@@ -172,7 +181,8 @@ class PHPUnit_Util_Skeleton_Class extends PHPUnit_Util_Skeleton
                 }
 
                 else if ($this->tokens[$i][0] == T_OBJECT_OPERATOR &&
-                    is_string($this->tokens[$i+2]) && trim($this->tokens[$i+2]) == '(' &&
+                    is_string($this->tokens[$i+2]) &&
+                    trim($this->tokens[$i+2]) == '(' &&
                     in_array($this->findVariableName($i), $variables) &&
                     !in_array($this->tokens[$i+1][1], $methods)) {
                     $methods[] = $this->tokens[$i+1][1];
@@ -216,7 +226,7 @@ class PHPUnit_Util_Skeleton_Class extends PHPUnit_Util_Skeleton
 
                 case T_STRING: {
                     if ($inNew) {
-                        if ($_value == $this->outClassName) {
+                        if ($_value == $this->outClassName['fullyQualifiedClassName']) {
                             $variables[] = $this->findVariableName($i);
                         }
                     }
@@ -240,10 +250,12 @@ class PHPUnit_Util_Skeleton_Class extends PHPUnit_Util_Skeleton
     protected function findVariableName($start)
     {
         for ($i = $start - 1; $i >= 0; $i--) {
-            if (is_array($this->tokens[$i]) && $this->tokens[$i][0] == T_VARIABLE) {
+            if (is_array($this->tokens[$i]) &&
+                $this->tokens[$i][0] == T_VARIABLE) {
                 $variable = $this->tokens[$i][1];
 
-                if (is_array($this->tokens[$i+1]) && $this->tokens[$i+1][0] == T_OBJECT_OPERATOR) {
+                if (is_array($this->tokens[$i+1]) &&
+                    $this->tokens[$i+1][0] == T_OBJECT_OPERATOR) {
                     $variable .= '->' . $this->tokens[$i+2][1];
                 }
 

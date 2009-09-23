@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ForbiddenFunctionsSniff.php,v 1.6 2008/02/01 03:19:54 squiz Exp $
+ * @version   CVS: $Id: ForbiddenFunctionsSniff.php 265109 2008-08-19 06:35:37Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -26,7 +26,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Generic_Sniffs_PHP_ForbiddenFunctionsSniff implements PHP_CodeSniffer_Sniff
@@ -44,6 +44,13 @@ class Generic_Sniffs_PHP_ForbiddenFunctionsSniff implements PHP_CodeSniffer_Snif
                                      'sizeof' => 'count',
                                      'delete' => 'unset',
                                     );
+
+    /**
+     * If true, an error will be thrown; otherwise a warning.
+     *
+     * @var bool
+     */
+    protected $error = true;
 
 
     /**
@@ -83,12 +90,22 @@ class Generic_Sniffs_PHP_ForbiddenFunctionsSniff implements PHP_CodeSniffer_Snif
             return;
         }
 
-        $error = "The use of function $function() is forbidden";
+        $error = "The use of function $function() is ";
+        if ($this->error === true) {
+            $error .= 'forbidden';
+        } else {
+            $error .= 'discouraged';
+        }
+
         if ($this->forbiddenFunctions[$function] !== null) {
             $error .= '; use '.$this->forbiddenFunctions[$function].'() instead';
         }
 
-        $phpcsFile->addError($error, $stackPtr);
+        if ($this->error === true) {
+            $phpcsFile->addError($error, $stackPtr);
+        } else {
+            $phpcsFile->addWarning($error, $stackPtr);
+        }
 
     }//end process()
 

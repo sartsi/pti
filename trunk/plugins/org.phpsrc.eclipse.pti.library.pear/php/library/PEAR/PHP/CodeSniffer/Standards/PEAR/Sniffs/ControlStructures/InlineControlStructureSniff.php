@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: InlineControlStructureSniff.php,v 1.1 2008/05/01 00:49:32 squiz Exp $
+ * @version   CVS: $Id: InlineControlStructureSniff.php 258843 2008-05-01 00:49:32Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -30,7 +30,7 @@ if (class_exists('Generic_Sniffs_ControlStructures_InlineControlStructureSniff',
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PEAR_Sniffs_ControlStructures_InlineControlStructureSniff extends Generic_Sniffs_ControlStructures_InlineControlStructureSniff

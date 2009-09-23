@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ForLoopDeclarationSniff.php,v 1.8 2008/05/08 03:38:48 squiz Exp $
+ * @version   CVS: $Id: ForLoopDeclarationSniff.php 267647 2008-10-23 04:47:44Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -25,7 +25,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_ControlStructures_ForLoopDeclarationSniff implements PHP_CodeSniffer_Sniff
@@ -85,7 +85,7 @@ class Squiz_Sniffs_ControlStructures_ForLoopDeclarationSniff implements PHP_Code
             $errors[] = 'Space found before closing bracket of FOR loop';
         }
 
-        $firstSemicolon  = $phpcsFile->findNext(T_SEMICOLON, $openingBracket);
+        $firstSemicolon  = $phpcsFile->findNext(T_SEMICOLON, $openingBracket, $closingBracket);
 
         // Check whitespace around each of the tokens.
         if ($firstSemicolon !== false) {

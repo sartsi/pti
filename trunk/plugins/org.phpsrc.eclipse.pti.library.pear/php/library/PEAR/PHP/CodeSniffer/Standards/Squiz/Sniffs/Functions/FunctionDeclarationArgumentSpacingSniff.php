@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: FunctionDeclarationArgumentSpacingSniff.php,v 1.10 2007/10/19 07:05:35 squiz Exp $
+ * @version   CVS: $Id: FunctionDeclarationArgumentSpacingSniff.php 274897 2009-01-29 23:39:52Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -25,7 +25,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Functions_FunctionDeclarationArgumentSpacingSniff implements PHP_CodeSniffer_Sniff
@@ -60,6 +60,8 @@ class Squiz_Sniffs_Functions_FunctionDeclarationArgumentSpacingSniff implements 
         $functionName = $phpcsFile->findNext(array(T_STRING), $stackPtr);
         $openBracket  = $tokens[$stackPtr]['parenthesis_opener'];
         $closeBracket = $tokens[$stackPtr]['parenthesis_closer'];
+
+        $multiLine = ($tokens[$openBracket]['line'] !== $tokens[$closeBracket]['line']);
 
         $nextParam = $openBracket;
         $params    = array();
@@ -133,17 +135,19 @@ class Squiz_Sniffs_Functions_FunctionDeclarationArgumentSpacingSniff implements 
                             $phpcsFile->addError($error, $nextToken);
                         }
 
-                        if ($tokens[($comma + 1)]['code'] !== T_WHITESPACE) {
-                            $error = "Expected 1 space between comma and type hint \"$hint\"; 0 found";
-                            $phpcsFile->addError($error, $nextToken);
-                        } else {
-                            $gap = strlen($tokens[($comma + 1)]['content']);
-                            if ($gap !== 1) {
-                                $error = "Expected 1 space between comma and type hint \"$hint\"; $gap found";
+                        if ($multiLine === false) {
+                            if ($tokens[($comma + 1)]['code'] !== T_WHITESPACE) {
+                                $error = "Expected 1 space between comma and type hint \"$hint\"; 0 found";
                                 $phpcsFile->addError($error, $nextToken);
+                            } else {
+                                $gap = strlen($tokens[($comma + 1)]['content']);
+                                if ($gap !== 1) {
+                                    $error = "Expected 1 space between comma and type hint \"$hint\"; $gap found";
+                                    $phpcsFile->addError($error, $nextToken);
+                                }
                             }
                         }
-                    } else if ($gap !== 1) {
+                    } else if ($multiLine === false && $gap !== 1) {
                         $error = "Expected 1 space between comma and argument \"$arg\"; $gap found";
                         $phpcsFile->addError($error, $nextToken);
                     }//end if
@@ -174,12 +178,14 @@ class Squiz_Sniffs_Functions_FunctionDeclarationArgumentSpacingSniff implements 
                             $phpcsFile->addError($error, $nextToken);
                         }
 
-                        if ($tokens[($bracket + 1)]['code'] === T_WHITESPACE) {
+                        if ($multiLine === false
+                            && $tokens[($bracket + 1)]['code'] === T_WHITESPACE
+                        ) {
                             $gap   = strlen($tokens[($bracket + 1)]['content']);
                             $error = "Expected 0 spaces between opening bracket and type hint \"$hint\"; $gap found";
                             $phpcsFile->addError($error, $nextToken);
                         }
-                    } else {
+                    } else if ($multiLine === false) {
                         $error = "Expected 0 spaces between opening bracket and argument \"$arg\"; $gap found";
                         $phpcsFile->addError($error, $nextToken);
                     }
@@ -197,7 +203,9 @@ class Squiz_Sniffs_Functions_FunctionDeclarationArgumentSpacingSniff implements 
                 $error = "Expected 0 spaces between brackets of function declaration; $space found";
                 $phpcsFile->addError($error, $stackPtr);
             }
-        } else if ($tokens[($closeBracket - 1)]['code'] === T_WHITESPACE) {
+        } else if ($multiLine === false
+            && $tokens[($closeBracket - 1)]['code'] === T_WHITESPACE
+        ) {
             $lastParam = array_pop($params);
             $arg       = $tokens[$lastParam]['content'];
             $gap       = strlen($tokens[($closeBracket - 1)]['content']);

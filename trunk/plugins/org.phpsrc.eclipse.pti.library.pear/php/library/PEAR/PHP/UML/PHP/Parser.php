@@ -8,9 +8,9 @@
  * @package  PHP_UML
  * @author   Baptiste Autin <ohlesbeauxjours@yahoo.fr> 
  * @license  http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version  SVN: $Revision: 105 $
+ * @version  SVN: $Revision: 126 $
  * @link     http://pear.php.net/package/PHP_UML
- * @since    $Date: 2009-06-04 19:48:27 +0200 (jeu., 04 juin 2009) $
+ * @since    $Date: 2009-08-27 14:13:50 +0200 (jeu., 27 août 2009) $
  */
 
 /**
@@ -44,14 +44,12 @@ class PHP_UML_PHP_Parser
     /**
      * Reference to a PHP_UML_Metamodel_Superstructure
      * (where the parser stores all the program elements it finds)
-     *
      * @var PHP_UML_Metamodel_Superstructure
      */
     static public $model;
 
     /**
      * Current PHP_UML_Metamodel_File
-     *
      * @var PHP_UML_Metamodel_File
      */
     static private $file;
@@ -59,22 +57,32 @@ class PHP_UML_PHP_Parser
     /**
      * If true, all docblocks are interpreted, especially @package and the types of
      * the properties/function parameters (if given).
-     *
      * @var bool
      */
     static private $docblocks;
+
+    /**
+     * If true, the elements (class, function) are included in the API only if their
+     * comments contain explicitly a docblock "@api"
+     * @var bool
+     */
+    static private $onlyApi;
     
     /**
      * If true, the symbol $ is kept along with the variable names
-     *
      * @var bool
      */
     static private $keepDollar;
 
     /**
+     * If true, elements marked with @internal are skipped
+     * @var bool
+     */
+    static private $skipInternal;
+
+    /**
      * Current package index (which does not necessary match the last one put
      * over $packages stack). This index refers to the array $model->packages
-     *
      * @var PHP_UML_Metamodel_Package
      */
     static private $currentPackage;
@@ -82,59 +90,58 @@ class PHP_UML_PHP_Parser
     /**
      * Current class doc-comment
      * (also used with namespace doc-comment) 
-     * 
      * @var string
      */
     static private $classDocComment;
 
     /**
      * Current class features (abstract, final)
-     *
      * @var array Array of tokens
      */
     static private $classFeatures;
-    
+
     /**
      * Current element (property or function) features (abstract, public, static...)
-     *
      * @var array Array of tokens
      */
     static private $classElementFeatures;
-    
+
     /**
      * Current element doc-comment
-     *
      * @var string
      */
     static private $classElementDocComment;
-    
+
     /**
      * Current namespace, as defined by the PHP "namespace" instruction
-     *
      * @var string
      */
     static private $currentQn = '';
-    
+
     /**
      * PHP namespace aliases ("use <value> as <key>")
-     *
      * @var array Associative array alias => namespace
      */
     static private $aliases = array();
-    
+
     /**
      * Constructor
      *
-     * @param string &$model    The instance of metamodel to fill
-     * @param bool   $docblocks Set to true to interpret docblocks (@package, types)
-     * @param bool   $dollar    Set to true to keep the symbol $ in variable names
+     * @param PHP_UML_Metamodel_Superstructure &$model    The instance of metamodel to fill
+     * @param bool                             $docblocks Set to true to interpret docblocks (@package, types)
+     * @param bool                             $dollar    Set to true to keep the symbol $ in variable names
+     * @param bool                             $internal  Set to true to skip elements tagged with @internal
+     * @param bool                             $onlyApi   Set to true to include only the elements tagged with @api
      */
-    public function __construct(&$model, $docblocks = true, $dollar = true)
+    public function __construct(PHP_UML_Metamodel_Superstructure &$model, $docblocks = true, $dollar = true, $internal = true, $onlyApi = false)
     {
         self::$model = $model;
-        self::$docblocks  = $docblocks;
-        self::$keepDollar = $dollar;
-        
+
+        self::$docblocks    = $docblocks;
+        self::$keepDollar   = $dollar;
+        self::$skipInternal = $internal;
+        self::$onlyApi      = $onlyApi;
+ 
         if (!defined('T_NAMESPACE'))
             define('T_NAMESPACE', -1);
         if (!defined('T_NS_SEPARATOR'))
@@ -147,7 +154,7 @@ class PHP_UML_PHP_Parser
      * @param string $fileBase Base directory
      * @param string $filePath Pathfile (relative to $fileBase)
      */
-    public function parse($fileBase, $filePath)
+    static public function parse($fileBase, $filePath)
     {
         $filename = $fileBase.$filePath;
 
@@ -173,7 +180,7 @@ class PHP_UML_PHP_Parser
 
         $tokens = token_get_all(file_get_contents($filename));
          
-        if (self::$docblocks) {
+        if (self::$docblocks) {    // || self::$structureFromDocblocks
             // First, let's have a look at the file docblock :
             $dc = self::tNextDocComment($tokens);
             reset($tokens);
@@ -212,8 +219,9 @@ class PHP_UML_PHP_Parser
                 self::$classElementDocComment = '';
                 break;
             case '{':
-                self::tClassifierBody($tokens, $c);
-                self::setNestingPackage($c, $classPkg);
+                $c = self::tClassifierBody($tokens, $c);
+                if (!is_null($c))
+                    self::setNestingPackage($c, $classPkg);
                 return;
             }
         }
@@ -241,8 +249,9 @@ class PHP_UML_PHP_Parser
                 self::$classElementDocComment = '';
                 break;
             case '{':
-                self::tClassifierBody($tokens, $i);
-                self::setNestingPackage($i, $classPkg);
+                $i = self::tClassifierBody($tokens, $i);
+                if(!is_null($i))
+                    self::setNestingPackage($i, $classPkg);
                 return;
             }
         }
@@ -253,9 +262,11 @@ class PHP_UML_PHP_Parser
      * Normally preceded by a tClass or tInterface
      * 
      * @param array                       &$tokens Tokens
-     * @param PHP_UML_Metamodel_Interface &$class  A class or interface
+     * @param PHP_UML_Metamodel_Interface $class   A class or interface
+     * 
+     * @return PHP_UML_Metamodel_Interface The updated class or interface
      */
-    static private function tClassifierBody(&$tokens, PHP_UML_Metamodel_Interface &$class)
+    static private function tClassifierBody(&$tokens, $class)
     {
         $operations = array();
         $attributes = array();
@@ -264,12 +275,18 @@ class PHP_UML_PHP_Parser
         $docs = self::getDocblocksInDocComment(self::$classDocComment);
         $desc = self::getDescriptionInDocComment(self::$classDocComment);
         self::addDocumentation($desc, $docs, $class);
-        
+        $skipClassifier = self::toBeSkipped(self::$classDocComment);    // should the class be ignored?
+
         self::$classElementFeatures = array();
         while (list($c, $v) = each($tokens)) {
+            $skipCurrentElement = self::toBeSkipped(self::$classElementDocComment);
             switch ($v[0]) {
             case T_FUNCTION:
-                $operations[] = self::tFunction($tokens, $class);
+                if ($skipCurrentElement) {
+                    self::tFunction($tokens, $class);
+                } else {
+                    $operations[] = self::tFunction($tokens, $class);
+                }
                 self::$classElementFeatures = array();
                 self::$classElementDocComment = '';
                 break;
@@ -298,8 +315,9 @@ class PHP_UML_PHP_Parser
                     }
                 }
                 self::setTypeElement($a, $type, $token, $value, $v[1], $dbParam);
-                $attributes[] = $a;
-
+                if (!$skipCurrentElement) {
+                    $attributes[] = $a;
+                }
                 self::$classElementFeatures = array();
                 self::$classElementDocComment = '';
                 $type = '';
@@ -322,7 +340,7 @@ class PHP_UML_PHP_Parser
             case '}':
                 $class->ownedOperation = $operations;
                 $class->ownedAttribute = $attributes;
-                return;
+                return $skipClassifier ? null : $class;
             }
         }
     }
@@ -647,7 +665,8 @@ class PHP_UML_PHP_Parser
      * 
      * @param array &$tokens Tokens
      */
-    static private function tBody(&$tokens) {
+    static private function tBody(&$tokens)
+    {
         $curly = 1;
         self::$classFeatures = array();
         while (list($c, $v) = each($tokens)) {
@@ -680,6 +699,7 @@ class PHP_UML_PHP_Parser
             case T_FINAL:
                 self::$classFeatures[] = $v[1];
                 break;
+            case T_CURLY_OPEN:
             case '{':
                 $curly++;
                 break;
@@ -755,8 +775,8 @@ class PHP_UML_PHP_Parser
      * Adds a package to the metamodel ($packages)
      *
      * @param string                    $name       Name of the package to create
-     * @param PHP_UML_Metamodel_Package $nestingPkg Enclosing package. If not provided,
-     *                                              the package will be created at root
+     * @param PHP_UML_Metamodel_Package $nestingPkg Enclosing package. If not given,
+     *                                              the package is created at root
      *
      * @return PHP_UML_Metamodel_Package The package created (or the existing one)
      */
@@ -852,7 +872,7 @@ class PHP_UML_PHP_Parser
             return array(self::addPackage($pkg), $name);
         }
  
-        if (self::$docblocks) {
+        if (self::$docblocks) { // || self::$structureFromDocblocks
             // Is there a @package in the class docblock ?
             $r = self::findPackageInDocblock(self::$classDocComment, $set);
             if ($r>0) {
@@ -1034,6 +1054,20 @@ class PHP_UML_PHP_Parser
     static private function getUID()
     {
         return PHP_UML_SimpleUID::getUID();
+    }
+
+    /**
+     * Returns TRUE if the current element must be ignored (because the docblock
+     * contains @internal, or because onlyAPI is set)
+     * 
+     * @param string $text Docblocks to look into
+     * 
+     * @return bool
+     */
+    static private function toBeSkipped($text)
+    {
+        return (self::$skipInternal && !(stristr($text, '@internal')===false))
+            || (self::$onlyApi && stristr($text, '@api')===false);
     }
 
     /**

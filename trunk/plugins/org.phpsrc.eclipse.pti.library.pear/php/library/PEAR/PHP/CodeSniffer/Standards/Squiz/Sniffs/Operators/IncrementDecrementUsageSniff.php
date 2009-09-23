@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: IncrementDecrementUsageSniff.php,v 1.6 2008/02/28 22:40:50 squiz Exp $
+ * @version   CVS: $Id: IncrementDecrementUsageSniff.php 279955 2009-05-05 06:28:10Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -26,7 +26,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Operators_IncrementDecrementUsageSniff implements PHP_CodeSniffer_Sniff
@@ -192,7 +192,15 @@ class Squiz_Sniffs_Operators_IncrementDecrementUsageSniff implements PHP_CodeSni
         $nextNumber = $previousNumber;
         if ($tokens[$nextNumber]['content'] === '1') {
             if ($tokens[$stackPtr]['code'] === T_EQUAL) {
-                $operator = $tokens[$phpcsFile->findNext(array(T_PLUS, T_MINUS), ($stackPtr + 1), $statementEnd)]['content'];
+                $opToken = $phpcsFile->findNext(array(T_PLUS, T_MINUS), ($nextVar + 1), $statementEnd);
+                if ($opToken === false) {
+                    // Operator was before the varaible, like:
+                    // $var = 1 + $var;
+                    // So we ignore it.
+                    return;
+                }
+
+                $operator = $tokens[$opToken]['content'];
             } else {
                 $operator = substr($tokens[$stackPtr]['content'], 0, 1);
             }
@@ -217,7 +225,7 @@ class Squiz_Sniffs_Operators_IncrementDecrementUsageSniff implements PHP_CodeSni
 
             $error .= " operators should be used where possible; found \"$found\" but expected \"$expected\"";
             $phpcsFile->addError($error, $stackPtr);
-        }
+        }//end if
 
     }//end processAssignment()
 

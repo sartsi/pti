@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: Printer.php 4930 2009-06-06 08:18:48Z sb $
+ * @version    SVN: $Id: Printer.php 5118 2009-08-18 06:38:02Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 2.0.0
  */
@@ -56,7 +56,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.3.17
+ * @version    Release: 3.4.0
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 2.0.0
  * @abstract
@@ -116,11 +116,10 @@ abstract class PHPUnit_Util_Printer
 
     /**
      * Flush buffer, optionally tidy up HTML, and close output.
-     *
      */
     public function flush()
     {
-        if ($this->out !== NULL) {
+        if ($this->out !== NULL && $this->outTarget !== 'php://stderr') {
             fclose($this->out);
         }
 
@@ -204,7 +203,7 @@ abstract class PHPUnit_Util_Printer
         if (is_bool($autoFlush)) {
             $this->autoFlush = $autoFlush;
         } else {
-            throw new InvalidArgumentException;
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
         }
     }
 }

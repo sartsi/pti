@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ScopeIndentSniff.php,v 1.12 2008/03/03 02:51:39 squiz Exp $
+ * @version   CVS: $Id: ScopeIndentSniff.php 254092 2008-03-03 02:51:39Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -31,7 +31,7 @@ if (class_exists('Generic_Sniffs_WhiteSpace_ScopeIndentSniff', true) === false) 
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PEAR_Sniffs_WhiteSpace_ScopeIndentSniff extends Generic_Sniffs_WhiteSpace_ScopeIndentSniff

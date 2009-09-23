@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: PairElement.php,v 1.8 2007/11/30 01:18:41 squiz Exp $
+ * @version   CVS: $Id: PairElement.php 270281 2008-12-02 02:38:34Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -31,7 +31,7 @@ if (class_exists('PHP_CodeSniffer_CommentParser_AbstractDocElement', true) === f
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PHP_CodeSniffer_CommentParser_PairElement extends PHP_CodeSniffer_CommentParser_AbstractDocElement
@@ -82,8 +82,12 @@ class PHP_CodeSniffer_CommentParser_PairElement extends PHP_CodeSniffer_CommentP
      *                                                                  this element
      *                                                                  is in.
      */
-    public function __construct($previousElement, $tokens, $tag, PHP_CodeSniffer_File $phpcsFile)
-    {
+    public function __construct(
+        $previousElement,
+        $tokens,
+        $tag,
+        PHP_CodeSniffer_File $phpcsFile
+    ) {
         parent::__construct($previousElement, $tokens, $tag, $phpcsFile);
 
     }//end __construct()

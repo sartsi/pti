@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: SeleniumTestCase.php 4608 2009-02-03 02:51:17Z sb $
+ * @version    SVN: $Id: SeleniumTestCase.php 5041 2009-07-30 10:14:54Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 3.0.0
  */
@@ -62,7 +62,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.3.17
+ * @version    Release: 3.4.0
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.0.0
  */
@@ -115,6 +115,21 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
     protected $verificationErrors = array();
 
     /**
+     * @var    boolean
+     */
+    protected $captureScreenshotOnFailure = FALSE;
+
+    /**
+     * @var    string
+     */
+    protected $screenshotPath = '';
+
+    /**
+     * @var    string
+     */
+    protected $screenshotUrl = '';
+
+    /**
      * @param  string $name
      * @param  array  $data
      * @param  string $dataName
@@ -138,7 +153,7 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
         $suite->setName($className);
 
         $class            = new ReflectionClass($className);
-        $classGroups      = PHPUnit_Util_Test::getGroups($class->getDocComment());
+        $classGroups      = PHPUnit_Util_Test::getGroups($className);
         $staticProperties = $class->getStaticProperties();
 
         // Create tests from Selenese/HTML files.
@@ -182,14 +197,13 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
 
                 foreach ($class->getMethods() as $method) {
                     if (PHPUnit_Framework_TestSuite::isPublicTestMethod($method)) {
-                        $name             = $method->getName();
-                        $methodDocComment = $method->getDocComment();
-                        $data             = PHPUnit_Util_Test::getProvidedData($className, $name, $methodDocComment);
-                        $groups           = PHPUnit_Util_Test::getGroups($methodDocComment, $classGroups);
+                        $name   = $method->getName();
+                        $data   = PHPUnit_Util_Test::getProvidedData($className, $name);
+                        $groups = PHPUnit_Util_Test::getGroups($className, $name);
 
                         // Test method with @dataProvider.
                         if (is_array($data) || $data instanceof Iterator) {
-                            $dataSuite = new PHPUnit_Framework_TestSuite(
+                            $dataSuite = new PHPUnit_Framework_TestSuite_DataProvider(
                               $className . '::' . $name
                             );
 
@@ -220,14 +234,13 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
         else {
             foreach ($class->getMethods() as $method) {
                 if (PHPUnit_Framework_TestSuite::isPublicTestMethod($method)) {
-                    $name             = $method->getName();
-                    $methodDocComment = $method->getDocComment();
-                    $data             = PHPUnit_Util_Test::getProvidedData($className, $name, $methodDocComment);
-                    $groups           = PHPUnit_Util_Test::getGroups($methodDocComment, $classGroups);
+                    $name   = $method->getName();
+                    $data   = PHPUnit_Util_Test::getProvidedData($className, $name);
+                    $groups = PHPUnit_Util_Test::getGroups($className, $name);
 
                     // Test method with @dataProvider.
                     if (is_array($data) || $data instanceof Iterator) {
-                        $dataSuite = new PHPUnit_Framework_TestSuite(
+                        $dataSuite = new PHPUnit_Framework_TestSuite_DataProvider(
                           $className . '::' . $name
                         );
 
@@ -296,7 +309,9 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
     {
         if (isset($browser['name'])) {
             if (!is_string($browser['name'])) {
-                throw new InvalidArgumentException;
+                throw new InvalidArgumentException(
+                  'Array element "name" is no string.'
+                );
             }
         } else {
             $browser['name'] = '';
@@ -304,7 +319,9 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
 
         if (isset($browser['browser'])) {
             if (!is_string($browser['browser'])) {
-                throw new InvalidArgumentException;
+                throw new InvalidArgumentException(
+                  'Array element "browser" is no string.'
+                );
             }
         } else {
             $browser['browser'] = '';
@@ -312,7 +329,9 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
 
         if (isset($browser['host'])) {
             if (!is_string($browser['host'])) {
-                throw new InvalidArgumentException;
+                throw new InvalidArgumentException(
+                  'Array element "host" is no string.'
+                );
             }
         } else {
             $browser['host'] = 'localhost';
@@ -320,7 +339,9 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
 
         if (isset($browser['port'])) {
             if (!is_int($browser['port'])) {
-                throw new InvalidArgumentException;
+                throw new InvalidArgumentException(
+                  'Array element "port" is no integer.'
+                );
             }
         } else {
             $browser['port'] = 4444;
@@ -328,10 +349,22 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
 
         if (isset($browser['timeout'])) {
             if (!is_int($browser['timeout'])) {
-                throw new InvalidArgumentException;
+                throw new InvalidArgumentException(
+                  'Array element "timeout" is no integer.'
+                );
             }
         } else {
-            $browser['timeout'] = 30000;
+            $browser['timeout'] = 30;
+        }
+
+        if (isset($browser['httpTimeout'])) {
+            if (!is_int($browser['httpTimeout'])) {
+                throw new InvalidArgumentException(
+                  'Array element "httpTimeout" is no integer.'
+                );
+            }
+        } else {
+            $browser['httpTimeout'] = 45;
         }
 
         $driver = new PHPUnit_Extensions_SeleniumTestCase_Driver;
@@ -340,6 +373,7 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
         $driver->setHost($browser['host']);
         $driver->setPort($browser['port']);
         $driver->setTimeout($browser['timeout']);
+        $driver->setHttpTimeout($browser['httpTimeout']);
         $driver->setTestCase($this);
         $driver->setTestId($this->testId);
 
@@ -349,6 +383,7 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
     }
 
     /**
+     * @throws RuntimeException
      */
     protected function runTest()
     {
@@ -360,28 +395,10 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
             $this->runSelenese($this->name);
         }
 
-        if ($this->autoStop) {
-            try {
-                $this->stop();
-            }
-
-            catch (RuntimeException $e) {
-            }
-        }
-
         if (!empty($this->verificationErrors)) {
             $this->fail(implode("\n", $this->verificationErrors));
         }
-    }
 
-    /**
-     * If you want to override tearDown() make sure to either call stop() or
-     * parent::tearDown(). Otherwise the Selenium RC session will not be
-     * closed upon test failure.
-     *
-     */
-    protected function tearDown()
-    {
         if ($this->autoStop) {
             try {
                 $this->stop();
@@ -415,7 +432,7 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
     public function setAutoStop($autoStop)
     {
         if (!is_bool($autoStop)) {
-            throw new InvalidArgumentException;
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
         }
 
         $this->autoStop = $autoStop;
@@ -432,18 +449,16 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
         $xpath    = new DOMXPath($document);
         $rows     = $xpath->query('body/table/tbody/tr');
 
-        foreach ($rows as $row)
-        {
+        foreach ($rows as $row) {
             $action    = NULL;
             $arguments = array();
             $columns   = $xpath->query('td', $row);
 
-            foreach ($columns as $column)
-            {
+            foreach ($columns as $column) {
                 if ($action === NULL) {
-                    $action = $column->nodeValue;
+                    $action = PHPUnit_Util_XML::nodeToText($column);
                 } else {
-                    $arguments[] = $column->nodeValue;
+                    $arguments[] = PHPUnit_Util_XML::nodeToText($column);
                 }
             }
 
@@ -471,9 +486,12 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
      * @method unknown  altKeyUpAndWait()
      * @method unknown  answerOnNextPrompt()
      * @method unknown  assignId()
+     * @method unknown  attachFile()
      * @method unknown  break()
      * @method unknown  captureEntirePageScreenshot()
+     * @method unknown  captureEntirePageScreenshotToString()
      * @method unknown  captureScreenshot()
+     * @method unknown  captureScreenshotToString()
      * @method unknown  check()
      * @method unknown  chooseCancelOnNextConfirmation()
      * @method unknown  chooseOkOnNextConfirmation()
@@ -522,6 +540,7 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
      * @method string   getBodyText()
      * @method string   getConfirmation()
      * @method string   getCookie()
+     * @method string   getCookieByName()
      * @method integer  getCursorPosition()
      * @method integer  getElementHeight()
      * @method integer  getElementIndex()
@@ -561,6 +580,7 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
      * @method boolean  isAlertPresent()
      * @method boolean  isChecked()
      * @method boolean  isConfirmationPresent()
+     * @method boolean  isCookiePresent()
      * @method boolean  isEditable()
      * @method boolean  isElementPresent()
      * @method boolean  isOrdered()
@@ -570,10 +590,16 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
      * @method boolean  isVisible()
      * @method unknown  keyDown()
      * @method unknown  keyDownAndWait()
+     * @method unknown  keyDownNative()
+     * @method unknown  keyDownNativeAndWait()
      * @method unknown  keyPress()
      * @method unknown  keyPressAndWait()
+     * @method unknown  keyPressNative()
+     * @method unknown  keyPressNativeAndWait()
      * @method unknown  keyUp()
      * @method unknown  keyUpAndWait()
+     * @method unknown  keyUpNative()
+     * @method unknown  keyUpNativeAndWait()
      * @method unknown  metaKeyDown()
      * @method unknown  metaKeyDownAndWait()
      * @method unknown  metaKeyUp()
@@ -608,7 +634,9 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
      * @method unknown  removeAllSelectionsAndWait()
      * @method unknown  removeSelection()
      * @method unknown  removeSelectionAndWait()
+     * @method unknown  retrieveLastRemoteControlLogs()
      * @method unknown  runScript()
+     * @method unknown  rollup()
      * @method unknown  select()
      * @method unknown  selectAndWait()
      * @method unknown  selectFrame()
@@ -625,6 +653,7 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
      * @method unknown  shiftKeyDownAndWait()
      * @method unknown  shiftKeyUp()
      * @method unknown  shiftKeyUpAndWait()
+     * @method unknown  shutDownSeleniumServer()
      * @method unknown  store()
      * @method unknown  storeAlert()
      * @method unknown  storeAlertPresent()
@@ -695,121 +724,17 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
      */
     public function __call($command, $arguments)
     {
-        return call_user_func_array(
+        $result = call_user_func_array(
           array($this->drivers[0], $command), $arguments
         );
-    }
 
-    /**
-     * Asserts that an alert is present.
-     *
-     * @param  string $message
-     */
-    public function assertAlertPresent($message = 'No alert present.')
-    {
-        $this->assertTrue($this->isAlertPresent(), $message);
-    }
+        $this->verificationErrors = array_merge(
+          $this->verificationErrors, $this->drivers[0]->getVerificationErrors()
+        );
 
-    /**
-     * Asserts that no alert is present.
-     *
-     * @param  string $message
-     */
-    public function assertNoAlertPresent($message = 'Alert present.')
-    {
-        $this->assertFalse($this->isAlertPresent(), $message);
-    }
+        $this->drivers[0]->clearVerificationErrors();
 
-    /**
-     * Asserts that an option is checked.
-     *
-     * @param  string $locator
-     * @param  string $message
-     */
-    public function assertChecked($locator, $message = '')
-    {
-        if ($message == '') {
-            $message = sprintf(
-              '"%s" not checked.',
-              $locator
-            );
-        }
-
-        $this->assertTrue($this->isChecked($locator), $message);
-    }
-
-    /**
-     * Asserts that an option is not checked.
-     *
-     * @param  string $locator
-     * @param  string $message
-     */
-    public function assertNotChecked($locator, $message = '')
-    {
-        if ($message == '') {
-            $message = sprintf(
-              '"%s" checked.',
-              $locator
-            );
-        }
-
-        $this->assertFalse($this->isChecked($locator), $message);
-    }
-
-    /**
-     * Assert that a confirmation is present.
-     *
-     * @param  string $message
-     */
-    public function assertConfirmationPresent($message = 'No confirmation present.')
-    {
-        $this->assertTrue($this->isConfirmationPresent(), $message);
-    }
-
-    /**
-     * Assert that no confirmation is present.
-     *
-     * @param  string $message
-     */
-    public function assertNoConfirmationPresent($message = 'Confirmation present.')
-    {
-        $this->assertFalse($this->isConfirmationPresent(), $message);
-    }
-
-    /**
-     * Asserts that an input field is editable.
-     *
-     * @param  string $locator
-     * @param  string $message
-     */
-    public function assertEditable($locator, $message = '')
-    {
-        if ($message == '') {
-            $message = sprintf(
-              '"%s" not editable.',
-              $locator
-            );
-        }
-
-        $this->assertTrue($this->isEditable($locator), $message);
-    }
-
-    /**
-     * Asserts that an input field is not editable.
-     *
-     * @param  string $locator
-     * @param  string $message
-     */
-    public function assertNotEditable($locator, $message = '')
-    {
-        if ($message == '') {
-            $message = sprintf(
-              '"%s" editable.',
-              $locator
-            );
-        }
-
-        $this->assertFalse($this->isEditable($locator), $message);
+        return $result;
     }
 
     /**
@@ -837,6 +762,30 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
     }
 
     /**
+     * Asserts that an element's value contains a given string.
+     *
+     * @param  string $locator
+     * @param  string $text
+     * @param  string $message
+     */
+    public function assertElementValueContains($locator, $text, $message = '')
+    {
+        $this->assertContains($text, $this->getValue($locator), $message);
+    }
+
+    /**
+     * Asserts that an element's value does not contain a given string.
+     *
+     * @param  string $locator
+     * @param  string $text
+     * @param  string $message
+     */
+    public function assertElementValueNotContains($locator, $text, $message = '')
+    {
+        $this->assertNotContains($text, $this->getValue($locator), $message);
+    }
+
+    /**
      * Asserts that an element contains a given string.
      *
      * @param  string $locator
@@ -845,7 +794,7 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
      */
     public function assertElementContainsText($locator, $text, $message = '')
     {
-        $this->assertContains($text, $this->getValue($locator), $message);
+        $this->assertContains($text, $this->getText($locator), $message);
     }
 
     /**
@@ -857,85 +806,7 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
      */
     public function assertElementNotContainsText($locator, $text, $message = '')
     {
-        $this->assertNotContains($text, $this->getValue($locator), $message);
-    }
-
-    /**
-     * Asserts than an element is present.
-     *
-     * @param  string $locator
-     * @param  string $message
-     */
-    public function assertElementPresent($locator, $message = '')
-    {
-        if ($message == '') {
-            $message = sprintf(
-              'Element "%s" not present.',
-              $locator
-            );
-        }
-
-        $this->assertTrue($this->isElementPresent($locator), $message);
-    }
-
-    /**
-     * Asserts than an element is not present.
-     *
-     * @param  string $locator
-     * @param  string $message
-     */
-    public function assertElementNotPresent($locator, $message = '')
-    {
-        if ($message == '') {
-            $message = sprintf(
-              'Element "%s" present.',
-              $locator
-            );
-        }
-
-        $this->assertFalse($this->isElementPresent($locator), $message);
-    }
-
-    /**
-     * Asserts that the location is equal to a specified one.
-     *
-     * @param  string $location
-     * @param  string $message
-     */
-    public function assertLocationEquals($location, $message = '')
-    {
-        $this->assertEquals($location, $this->getLocation(), $message);
-    }
-
-    /**
-     * Asserts that the location is not equal to a specified one.
-     *
-     * @param  string $location
-     * @param  string $message
-     */
-    public function assertLocationNotEquals($location, $message = '')
-    {
-        $this->assertNotEquals($location, $this->getLocation(), $message);
-    }
-
-    /**
-     * Asserts than a prompt is present.
-     *
-     * @param  string $message
-     */
-    public function assertPromptPresent($message = 'No prompt present.')
-    {
-        $this->assertTrue($this->isPromptPresent(), $message);
-    }
-
-    /**
-     * Asserts than no prompt is present.
-     *
-     * @param  string $message
-     */
-    public function assertNoPromptPresent($message = 'Prompt present.')
-    {
-        $this->assertFalse($this->isPromptPresent(), $message);
+        $this->assertNotContains($text, $this->getText($locator), $message);
     }
 
     /**
@@ -1062,136 +933,6 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
     }
 
     /**
-     * Asserts that something is selected.
-     *
-     * @param  string $selectLocator
-     * @param  string $message
-     */
-    public function assertSomethingSelected($selectLocator, $message = '')
-    {
-        if ($message == '') {
-            $message = sprintf(
-              'Nothing selected from "%s".',
-              $selectLocator
-            );
-        }
-
-        $this->assertTrue($this->isSomethingSelected($selectLocator), $message);
-    }
-
-    /**
-     * Asserts that nothing is selected.
-     *
-     * @param  string $selectLocator
-     * @param  string $message
-     */
-    public function assertNothingSelected($selectLocator, $message = '')
-    {
-        if ($message == '') {
-            $message = sprintf(
-              'Something selected from "%s".',
-              $selectLocator
-            );
-        }
-
-        $this->assertFalse($this->isSomethingSelected($selectLocator), $message);
-    }
-
-    /**
-     * Asserts that a given text is present.
-     *
-     * @param  string $pattern
-     * @param  string $message
-     */
-    public function assertTextPresent($pattern, $message = '')
-    {
-        if ($message == '') {
-            $message = sprintf(
-              '"%s" not present.',
-              $pattern
-            );
-        }
-
-        $this->assertTrue($this->isTextPresent($pattern), $message);
-    }
-
-    /**
-     * Asserts that a given text is not present.
-     *
-     * @param  string $pattern
-     * @param  string $message
-     */
-    public function assertTextNotPresent($pattern, $message = '')
-    {
-        if ($message == '') {
-            $message = sprintf(
-              '"%s" present.',
-              $pattern
-            );
-        }
-
-        $this->assertFalse($this->isTextPresent($pattern), $message);
-    }
-
-    /**
-     * Asserts that the title is equal to a given string.
-     *
-     * @param  string $title
-     * @param  string $message
-     */
-    public function assertTitleEquals($title, $message = '')
-    {
-        $this->assertEquals($title, $this->getTitle(), $message);
-    }
-
-    /**
-     * Asserts that the title is not equal to a given string.
-     *
-     * @param  string $title
-     * @param  string $message
-     */
-    public function assertTitleNotEquals($title, $message = '')
-    {
-        $this->assertNotEquals($title, $this->getTitle(), $message);
-    }
-
-    /**
-     * Asserts that something is visible.
-     *
-     * @param  string $locator
-     * @param  string $message
-     */
-    public function assertVisible($locator, $message = '')
-    {
-        if ($message == '') {
-            $message = sprintf(
-              '"%s" not visible.',
-              $locator
-            );
-        }
-
-        $this->assertTrue($this->isVisible($locator), $message);
-    }
-
-    /**
-     * Asserts that something is not visible.
-     *
-     * @param  string $locator
-     * @param  string $message
-     */
-    public function assertNotVisible($locator, $message = '')
-    {
-        if ($message == '') {
-            $message = sprintf(
-              '"%s" visible.',
-              $locator
-            );
-        }
-
-        $this->assertFalse($this->isVisible($locator), $message);
-    }
-
-    /**
      * Template Method that is called after Selenium actions.
      *
      * @param  string $action
@@ -1312,6 +1053,46 @@ abstract class PHPUnit_Extensions_SeleniumTestCase extends PHPUnit_Framework_Tes
             $this->defaultAssertions($action);
             $this->inDefaultAssertions = FALSE;
         }
+    }
+
+    /**
+     * This method is called when a test method did not execute successfully.
+     *
+     * @param Exception $e
+     * @since Method available since Release 3.4.0
+     */
+    protected function onNotSuccessfulTest(Exception $e)
+    {
+        if ($e instanceof PHPUnit_Framework_ExpectationFailedException) {
+            $buffer  = 'Current URL: ' . $this->drivers[0]->getLocation() . "\n";
+            $message = $e->getCustomMessage();
+
+            if ($this->captureScreenshotOnFailure &&
+                !empty($this->screenshotPath) && !empty($this->screenshotUrl)) {
+                $this->drivers[0]->captureEntirePageScreenshot(
+                  $this->screenshotPath . DIRECTORY_SEPARATOR . $this->testId . '.png'
+                );
+
+                $buffer .= 'Screenshot: ' . $this->screenshotUrl . '/' . $this->testId . ".png\n";
+            }
+
+            if ($this->autoStop) {
+                try {
+                    $this->stop();
+                }
+
+                catch (RuntimeException $e) {
+                }
+            }
+
+            if (!empty($message)) {
+                $buffer .= "\n" . $message;
+            }
+
+            $e->setCustomMessage($buffer);
+        }
+
+        throw $e;
     }
 }
 ?>

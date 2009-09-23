@@ -9,7 +9,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: PHP.php,v 1.2 2008/06/20 03:33:58 squiz Exp $
+ * @version   CVS: $Id: PHP.php 274064 2009-01-20 23:55:15Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -21,7 +21,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PHP_CodeSniffer_Tokenizers_PHP
@@ -137,6 +137,7 @@ class PHP_CodeSniffer_Tokenizers_PHP
                                                 'with'   => array(
                                                              T_DEFAULT,
                                                              T_CASE,
+                                                             T_SWITCH,
                                                             ),
                                                ),
                             T_DEFAULT       => array(
@@ -144,7 +145,10 @@ class PHP_CodeSniffer_Tokenizers_PHP
                                                 'end'    => T_BREAK,
                                                 'strict' => true,
                                                 'shared' => true,
-                                                'with'   => array(T_CASE),
+                                                'with'   => array(
+                                                             T_CASE,
+                                                             T_SWITCH,
+                                                            ),
                                                ),
                             T_START_HEREDOC => array(
                                                 'start'  => T_START_HEREDOC,
@@ -201,7 +205,10 @@ class PHP_CodeSniffer_Tokenizers_PHP
             */
 
             if ($tokenIsArray === true && substr($token[1], -1) === "\r") {
-                if (isset($tokens[($stackPtr + 1)]) === true && is_array($tokens[($stackPtr + 1)]) === true && $tokens[($stackPtr + 1)][1][0] === "\n") {
+                if (isset($tokens[($stackPtr + 1)]) === true
+                    && is_array($tokens[($stackPtr + 1)]) === true
+                    && $tokens[($stackPtr + 1)][1][0] === "\n"
+                ) {
                     $token[1] .= "\n";
 
                     if ($tokens[($stackPtr + 1)][1] === "\n") {
@@ -209,7 +216,8 @@ class PHP_CodeSniffer_Tokenizers_PHP
                         // so we can skip it.
                         $stackPtr++;
                     } else {
-                        $tokens[($stackPtr + 1)][1] = substr($tokens[($stackPtr + 1)][1], 1);
+                        $tokens[($stackPtr + 1)][1]
+                            = substr($tokens[($stackPtr + 1)][1], 1);
                     }
                 }
             }//end if
@@ -229,7 +237,9 @@ class PHP_CodeSniffer_Tokenizers_PHP
 
                     if ($subTokenIsArray === true) {
                         $tokenContent .= $tokens[$i][1];
-                        if ($tokens[$i][1] === '{') {
+                        if ($tokens[$i][1] === '{'
+                            && $tokens[$i][0] !== T_ENCAPSED_AND_WHITESPACE
+                        ) {
                             $nestedVars[] = $i;
                         }
                     } else {
@@ -239,7 +249,10 @@ class PHP_CodeSniffer_Tokenizers_PHP
                         }
                     }
 
-                    if ($subTokenIsArray === false && $tokens[$i] === '"' && empty($nestedVars) === true) {
+                    if ($subTokenIsArray === false
+                        && $tokens[$i] === '"'
+                        && empty($nestedVars) === true
+                    ) {
                         // We found the other end of the double quoted string.
                         break;
                     }
@@ -283,13 +296,16 @@ class PHP_CodeSniffer_Tokenizers_PHP
 
             if ($tokenIsArray === true && $token[0] === T_START_HEREDOC) {
                 // Add the start heredoc token to the final array.
-                $finalTokens[$newStackPtr] = PHP_CodeSniffer::standardiseToken($token);
+                $finalTokens[$newStackPtr]
+                    = PHP_CodeSniffer::standardiseToken($token);
                 $newStackPtr++;
 
                 $tokenContent = '';
                 for ($i = ($stackPtr + 1); $i < $numTokens; $i++) {
                     $subTokenIsArray = is_array($tokens[$i]);
-                    if ($subTokenIsArray === true && $tokens[$i][0] === T_END_HEREDOC) {
+                    if ($subTokenIsArray === true
+                        && $tokens[$i][0] === T_END_HEREDOC
+                    ) {
                         // We found the other end of the heredoc.
                         break;
                     }
@@ -326,7 +342,8 @@ class PHP_CodeSniffer_Tokenizers_PHP
                 }
 
                 // Add the end heredoc token to the final array.
-                $finalTokens[$newStackPtr] = PHP_CodeSniffer::standardiseToken($tokens[$stackPtr]);
+                $finalTokens[$newStackPtr]
+                    = PHP_CodeSniffer::standardiseToken($tokens[$stackPtr]);
                 $newStackPtr++;
 
                 // Continue, as we're done with this token.
@@ -391,6 +408,20 @@ class PHP_CodeSniffer_Tokenizers_PHP
         return $finalTokens;
 
     }//end tokenizeString()
+
+
+    /**
+     * Performs additional processing after main tokenizing.
+     *
+     * @param array  &$tokens The array of tokens to process.
+     * @param string $eolChar The EOL character to use for splitting strings.
+     *
+     * @return array
+     */
+    public function processAdditional(&$tokens, $eolChar)
+    {
+
+    }//end processAdditional()
 
 
 }//end class

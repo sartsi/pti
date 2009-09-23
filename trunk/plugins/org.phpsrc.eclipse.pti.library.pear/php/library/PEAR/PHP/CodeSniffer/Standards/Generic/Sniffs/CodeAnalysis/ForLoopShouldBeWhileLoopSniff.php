@@ -10,7 +10,7 @@
  * @author    Manuel Pichler <mapi@manuel-pichler.de>
  * @copyright 2007-2008 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   CVS: $Id: ForLoopShouldBeWhileLoopSniff.php,v 1.1 2008/02/06 02:38:36 squiz Exp $
+ * @version   CVS: $Id: ForLoopShouldBeWhileLoopSniff.php 252356 2008-02-06 02:38:37Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -35,7 +35,7 @@
  * @author    Manuel Pichler <mapi@manuel-pichler.de>
  * @copyright 2007-2008 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Generic_Sniffs_CodeAnalysis_ForLoopShouldBeWhileLoopSniff implements PHP_CodeSniffer_Sniff

@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ZendCodingStandard.php,v 1.1 2007/08/09 04:51:52 squiz Exp $
+ * @version   CVS: $Id: ZendCodingStandard.php 267648 2008-10-23 04:52:05Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -27,7 +27,7 @@ if (class_exists('PHP_CodeSniffer_Standards_CodingStandard', true) === false) {
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PHP_CodeSniffer_Standards_Zend_ZendCodingStandard extends PHP_CodeSniffer_Standards_CodingStandard
@@ -44,6 +44,7 @@ class PHP_CodeSniffer_Standards_Zend_ZendCodingStandard extends PHP_CodeSniffer_
     public function getIncludedSniffs()
     {
         return array(
+                'Generic/Sniffs/Functions/OpeningFunctionBraceBsdAllmanSniff.php',
                 'Generic/Sniffs/PHP/DisallowShortOpenTagSniff.php',
                 'Generic/Sniffs/WhiteSpace/DisallowTabIndentSniff.php',
                 'PEAR/Sniffs/Classes/ClassDeclarationSniff.php',

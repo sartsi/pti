@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: HTML.php,v 1.3 2007/08/08 05:54:55 squiz Exp $
+ * @version   CVS: $Id: HTML.php 270764 2008-12-07 21:40:02Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -29,7 +29,7 @@ require_once 'PHP/CodeSniffer/DocGenerators/Generator.php';
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.1.0
+ * @version   Release: 1.2.0
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PHP_CodeSniffer_DocGenerators_HTML extends PHP_CodeSniffer_DocGenerators_Generator
@@ -190,7 +190,7 @@ class PHP_CodeSniffer_DocGenerators_HTML extends PHP_CodeSniffer_DocGenerators_G
         error_reporting(E_ALL);
         echo '  <div class="tag-line">';
         echo 'Documentation generated on '.date('r');
-        echo ' by <a href="http://pear.php.net/package/PHP_CodeSniffer">PHP_CodeSniffer 1.1.0</a>';
+        echo ' by <a href="http://pear.php.net/package/PHP_CodeSniffer">PHP_CodeSniffer 1.2.0</a>';
         echo '</div>'.PHP_EOL;
         error_reporting(E_ALL | E_STRICT);
 
@@ -259,18 +259,18 @@ class PHP_CodeSniffer_DocGenerators_HTML extends PHP_CodeSniffer_DocGenerators_G
         $codeBlocks = $node->getElementsByTagName('code');
 
         $firstTitle = $codeBlocks->item(0)->getAttribute('title');
-        $first      = trim($codeBlocks->item(0)->nodeValue);
-        $first      = str_replace("\n", '</br>', $first);
-        $first      = str_replace(' ', '&nbsp;', $first);
-        $first      = str_replace('<em>', '<span class="code-comparison-highlight">', $first);
-        $first      = str_replace('</em>', '</span>', $first);
+        $first = trim($codeBlocks->item(0)->nodeValue);
+        $first = str_replace("\n", '</br>', $first);
+        $first = str_replace(' ', '&nbsp;', $first);
+        $first = str_replace('<em>', '<span class="code-comparison-highlight">', $first);
+        $first = str_replace('</em>', '</span>', $first);
 
         $secondTitle = $codeBlocks->item(1)->getAttribute('title');
-        $second      = trim($codeBlocks->item(1)->nodeValue);
-        $second      = str_replace("\n", '</br>', $second);
-        $second      = str_replace(' ', '&nbsp;', $second);
-        $second      = str_replace('<em>', '<span class="code-comparison-highlight">', $second);
-        $second      = str_replace('</em>', '</span>', $second);
+        $second = trim($codeBlocks->item(1)->nodeValue);
+        $second = str_replace("\n", '</br>', $second);
+        $second = str_replace(' ', '&nbsp;', $second);
+        $second = str_replace('<em>', '<span class="code-comparison-highlight">', $second);
+        $second = str_replace('</em>', '</span>', $second);
 
         echo '  <table class="code-comparison">'.PHP_EOL;
         echo '   <tr>'.PHP_EOL;
