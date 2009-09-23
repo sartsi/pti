@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.dltk.compiler.problem.DefaultProblem;
 import org.eclipse.dltk.compiler.problem.IProblem;
@@ -145,16 +146,25 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(project);
 
 		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
-				getCommandLineArgs(prefs.getStandard(), prefs.getTabWidth()), getPHPINIEntries());
+				getCommandLineArgs(prefs.getStandard(), prefs.getTabWidth()), getPHPINIEntries(prefs));
 
 		launcher.setPrintOuput(prefs.isPrintOutput());
 
 		return launcher;
 	}
 
-	private INIFileEntry[] getPHPINIEntries() {
+	private INIFileEntry[] getPHPINIEntries(PHPCodeSnifferPreferences prefs) {
 
 		IPath[] includePaths = PHPCodeSnifferPlugin.getDefault().getPluginIncludePaths();
+
+		if (prefs.isCustom()) {
+			IPath[] tmpIncludePaths = new IPath[includePaths.length + 2];
+			System.arraycopy(includePaths, 0, tmpIncludePaths, 2, includePaths.length);
+			tmpIncludePaths[0] = new Path(prefs.getStandard());
+			tmpIncludePaths[1] = new Path(prefs.getStandard()).removeLastSegments(1);
+
+			includePaths = tmpIncludePaths;
+		}
 
 		INIFileEntry[] entries;
 		if (includePaths.length > 0) {

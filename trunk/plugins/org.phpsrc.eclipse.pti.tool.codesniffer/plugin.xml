@@ -39,7 +39,7 @@
 			category="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
 			class="org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences.PHPCodeSnifferPreferencePage"
 			id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences.PHPCodeSnifferPreferencePage"
-			name="CodeSniffer">
+			name="PHP CodeSniffer">
 		</page>
 	</extension>
 	<extension point="org.eclipse.ui.propertyPages">
@@ -47,7 +47,7 @@
 			category="org.phpsrc.eclipse.pti.ui.propertyPages.PHPToolsPreferencePage"
 			class="org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences.PHPCodeSnifferPreferencePage"
 			id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.propertyPages.PHPCodeSnifferPreferencePage"
-			name="CodeSniffer">
+			name="PHP CodeSniffer">
 			<enabledWhen>
 				<adapt type="org.eclipse.core.resources.IProject">
 				</adapt>

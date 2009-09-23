@@ -53,4 +53,8 @@ public class PHPCodeSnifferPreferences extends AbstractPHPToolPreferences {
 	public int getTabWidth() {
 		return tabWidth;
 	}
+
+	public boolean isCustom() {
+		return !standard.equals(standardName);
+	}
 }
