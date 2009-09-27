@@ -1,5 +1,4 @@
 /*******************************************************************************
- * Copyright (c) 2009, Sven Kiera
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,12 +49,14 @@ import org.eclipse.dltk.compiler.problem.ProblemSeverities;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
+import org.eclipse.dltk.core.search.SearchMatch;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.launching.OperatingSystem;
 import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileUtil;
 import org.phpsrc.eclipse.pti.core.php.source.PHPSourceFile;
+import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
 import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
 import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferences;
@@ -115,6 +116,7 @@ public class PHPUnit extends AbstractPHPTool {
 
 				PHPToolLauncher launcher = getProjectPHPToolLauncher(testFile.getProject(), cmdLineArgs, testFile
 						.getParent().getLocation());
+
 				String output = launcher.launch(testFile.getProject());
 				if (output != null && output.length() > 0) {
 					Pattern pFailed = Pattern.compile("(Failed .*)");
@@ -125,9 +127,10 @@ public class PHPUnit extends AbstractPHPTool {
 						if (m.matches()) {
 							String msg = lines[i].trim();
 
-							if (lines[i + 1].lastIndexOf(":") != -1) {
-								int lineNumber = Integer.parseInt(lines[i + 1]
-										.substring(lines[i + 1].lastIndexOf(":") + 1));
+							String lineFailureLocation = lines[i + 2];
+							if (lineFailureLocation.lastIndexOf(":") != -1) {
+								int lineNumber = Integer.parseInt(lineFailureLocation.substring(lineFailureLocation
+										.lastIndexOf(":") + 1));
 								problems.add(new DefaultProblem(testFile.getFullPath().toOSString(), msg,
 										IProblem.Task, new String[0], ProblemSeverities.Error, sourceFile
 												.lineStart(lineNumber), sourceFile.lineEnd(lineNumber), lineNumber));
@@ -210,5 +213,30 @@ public class PHPUnit extends AbstractPHPTool {
 
 	private IPath getScriptFile() {
 		return PHPUnitPlugin.getDefault().resolvePluginResource("/php/tools/phpunit.php");
+	}
+
+	static public IFile searchTestCase(IFile file) {
+		ISourceModule module = PHPToolkitUtil.getSourceModule(file);
+
+		IType[] types;
+		try {
+			types = module.getAllTypes();
+			if (types.length > 0) {
+				String[] classes = types[0].getSuperClasses();
+				if (classes.length > 0 && classes[0].equals("PHPUnit_Framework_TestCase")) {
+					return file;
+				} else {
+					SearchMatch[] matches = PHPSearchEngine.findClass(types[0].getElementName() + "Test",
+							PHPSearchEngine.createProjectScope(file.getProject()));
+
+					if (matches.length > 0)
+						return (IFile) matches[0].getResource();
+				}
+			}
+		} catch (ModelException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 }

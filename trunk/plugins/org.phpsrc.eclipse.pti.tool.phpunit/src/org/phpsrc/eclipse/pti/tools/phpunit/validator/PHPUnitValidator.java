@@ -48,8 +48,12 @@ public class PHPUnitValidator extends AbstractValidator {
 			return null;
 		}
 
+		IFile testCaseFile = PHPUnit.searchTestCase((IFile) resource);
+		if (testCaseFile == null)
+			return null;
+
 		ValidationResult result = new ValidationResult();
-		validateFile(result, (IFile) resource, kind);
+		validateFile(result, testCaseFile, kind);
 		return result;
 	}
 

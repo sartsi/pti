@@ -40,7 +40,6 @@ import org.eclipse.dltk.core.IOpenable;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
-import org.eclipse.dltk.core.search.SearchMatch;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -55,8 +54,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.wst.validation.ValidationState;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
-import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
 import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
+import org.phpsrc.eclipse.pti.tools.phpunit.core.PHPUnit;
 import org.phpsrc.eclipse.pti.tools.phpunit.validator.PHPUnitValidator;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
@@ -112,16 +111,9 @@ public class RunTestCaseAction implements IObjectActionDelegate, IEditorActionDe
 		try {
 			types = module.getAllTypes();
 			if (types.length > 0) {
-				String[] classes = types[0].getSuperClasses();
-				if (classes.length > 0 && classes[0].equals("PHPUnit_Framework_TestCase")) {
-					testFiles.add(file);
-				} else {
-					SearchMatch[] matches = PHPSearchEngine.findClass(types[0].getElementName() + "Test",
-							PHPSearchEngine.createProjectScope(file.getProject()));
-
-					if (matches.length > 0)
-						testFiles.add((IFile) matches[0].getResource());
-				}
+				IFile testCaseFile = PHPUnit.searchTestCase(file);
+				if (testCaseFile != null)
+					testFiles.add(testCaseFile);
 			}
 		} catch (ModelException e) {
 			e.printStackTrace();

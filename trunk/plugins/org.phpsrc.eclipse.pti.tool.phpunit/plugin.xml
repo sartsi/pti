@@ -13,7 +13,26 @@
 		<attribute name="priority"/>
 		<attribute name="severity"/>
 		<super type="org.eclipse.core.resources.problemmarker"/>
- 	</extension> 
+ 	</extension>
+ 	<extension
+		id="PHPUnitAutomaticTestExecutionValidatorForPHP"
+		name="PHPUnit Automatic Test Execution (for PHP Files)"
+		point="org.eclipse.wst.validation.validatorV2">
+		<validator
+			class="org.phpsrc.eclipse.pti.tools.phpunit.validator.PHPUnitValidator"
+			build="false"
+			manual="false"
+			markerId="org.phpsrc.eclipse.pti.tools.phpunit.validator.phpToolPHPUnitMarker"
+			sourceid="org.eclipse.php.core.phpsource"
+			version="1">
+			<include>
+				<rules>
+					<contentType exactMatch="true" id="org.eclipse.php.core.phpsource"></contentType>
+				</rules>
+			</include>
+			<group id="org.eclipse.wst.sse.core.structuredModelGroup" />
+		</validator>
+	</extension>
    <extension
          point="org.eclipse.ui.newWizards">
 		<category
@@ -42,23 +61,15 @@
 				<separator name="tests" />
 			</menu>
 			<enablement>
-				<or>
-					<objectState name="extension" value="php"/>
-					<objectState name="extension" value="php4"/>
-					<objectState name="extension" value="php5"/>
-				</or>
+				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
 			</enablement>
 		</objectContribution>
 		<objectContribution
 			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitCreateTestCaseObjectContribution"
 			objectClass="org.eclipse.dltk.core.IModelElement">
-			<visibility>
-				<or>
-					<objectState name="extension" value="php"/>
-					<objectState name="extension" value="php4"/>
-					<objectState name="extension" value="php5"/>
-				</or>
-			</visibility>
+			<enablement>
+				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
+			</enablement>
 			<action
 				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
 				label="Create Test Case"
@@ -71,13 +82,9 @@
 		<objectContribution
 			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitRunTestCaseObjectContribution"
 			objectClass="org.eclipse.dltk.core.IModelElement">
-			<visibility>
-				<or>
-					<objectState name="extension" value="php"/>
-					<objectState name="extension" value="php4"/>
-					<objectState name="extension" value="php5"/>
-				</or>
-			</visibility>
+			<enablement>
+				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
+			</enablement>
 			<action
 				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
 				label="Run Test Case"
