@@ -24,24 +24,37 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package org.phpsrc.eclipse.pti.core.launching;
+package org.phpsrc.eclipse.pti.core.compiler.problem;
 
-public class OperatingSystem {
-	public static final boolean WINDOWS = java.io.File.separatorChar == '\\'; //$NON-NLS-1$
-	public static final boolean MAC = System.getProperty("os.name").startsWith("Mac");
+import org.eclipse.core.resources.IFile;
+import org.eclipse.dltk.compiler.problem.DefaultProblem;
 
-	public static String escapeShellArg(String arg) {
-		if (WINDOWS) {
-			return "\"" + arg + "\"";
-		} else {
-			return arg.replaceAll(" ", "\t");
-		}
+public class FileProblem extends DefaultProblem {
+
+	protected IFile originatingFile;
+
+	public FileProblem(IFile originatingFile, String message, int id, String[] stringArguments, int severity,
+			int startPosition, int endPosition, int line, int column) {
+		super(originatingFile.getFullPath().toOSString(), message, id, stringArguments, severity, startPosition,
+				endPosition, line, column);
+
+		this.originatingFile = originatingFile;
 	}
 
-	public static String escapeShellFileArg(String fileName) {
-		if (WINDOWS)
-			fileName = fileName.replace('\\', '/');
+	public FileProblem(IFile originatingFile, String message, int id, String[] stringArguments, int severity,
+			int startPosition, int endPosition, int line) {
+		super(originatingFile.getFullPath().toOSString(), message, id, stringArguments, severity, startPosition,
+				endPosition, line);
 
-		return escapeShellArg(fileName);
+		this.originatingFile = originatingFile;
+	}
+
+	public void setOriginatingFile(IFile originatingFile) {
+		this.originatingFile = originatingFile;
+		setOriginatingFileName(originatingFile.getFullPath().toOSString());
+	}
+
+	public IFile getOriginatingFile() {
+		return this.originatingFile;
 	}
 }

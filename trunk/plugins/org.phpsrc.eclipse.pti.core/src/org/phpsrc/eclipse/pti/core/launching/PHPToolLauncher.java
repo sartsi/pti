@@ -128,7 +128,8 @@ public class PHPToolLauncher {
 				config = wc.doSave();
 
 				if (printOutput)
-					Logger.logToConsole(phpExe.getExecutable().toString() + " " + arguments);
+					Logger.logToConsole(phpExe.getExecutable().toString() + " " + phpScript.toOSString() + " "
+							+ arguments);
 
 				PHPToolExecutableLauncher php = new PHPToolExecutableLauncher();
 				IProcess process = php.launch(config);
