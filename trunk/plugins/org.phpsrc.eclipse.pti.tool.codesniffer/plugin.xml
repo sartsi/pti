@@ -84,4 +84,12 @@
 			</action>
 		</viewerContribution>
 	</extension>
+	<extension
+		point="org.eclipse.ui.ide.markerResolution">
+		<markerResolutionGenerator
+			markerType="org.phpsrc.eclipse.pti.tools.codesniffer.validator.phpToolCodeSnifferMarker"
+			class="org.phpsrc.eclipse.pti.tools.codesniffer.ui.correction.CorrectionMarkerResolutionGenerator">
+		</markerResolutionGenerator>
+	</extension>
+
 </plugin>

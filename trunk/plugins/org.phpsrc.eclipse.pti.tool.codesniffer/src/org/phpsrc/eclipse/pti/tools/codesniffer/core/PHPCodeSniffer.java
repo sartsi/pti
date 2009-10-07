@@ -26,10 +26,10 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.codesniffer.core;
 
+import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.apache.xerces.parsers.DOMParser;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -47,6 +47,11 @@ import org.phpsrc.eclipse.pti.core.tools.AbstractPHPToolParser;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferencesFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 public class PHPCodeSniffer extends AbstractPHPToolParser {
 
@@ -70,46 +75,24 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 
 		try {
 			if (output.length() > 0) {
-				Pattern p = Pattern.compile("(.*)\\| (.*) \\| (.*)");
+				PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(file.getFile());
 
-				DefaultProblem lastProblem = null;
+				int tabWidth = 0;
+				if (prefs != null)
+					tabWidth = prefs.getTabWidth();
 
-				String[] lines = output.split("\n");
-				for (String line : lines) {
-					line = line.trim();
-					Matcher m = p.matcher(line);
-					if (m.matches()) {
-						if (line.indexOf("|") > 0) {
-							String lineNumberGroup = m.group(1).trim();
-							int lineNumber = Integer.parseInt(lineNumberGroup);
-							String type = m.group(2).trim();
-							String message = m.group(3).trim();
+				int xmlStart = output.indexOf("<?xml");
+				if (xmlStart >= 0) {
+					output = output.substring(xmlStart).trim();
 
-							if (type.equals("ERROR") || type.equals("WARNING")) {
-								if (lastProblem != null) {
-									problems.add(lastProblem);
-								}
+					DOMParser parser = new DOMParser();
+					parser.parse(new InputSource(new StringReader(output)));
 
-								lastProblem = new DefaultProblem(file.toString(), message, IProblem.Syntax,
-										new String[0], type.equals("WARNING") ? ProblemSeverities.Warning
-												: ProblemSeverities.Error, file.lineStart(lineNumber), file
-												.lineEnd(lineNumber), lineNumber);
-							}
-						} else if (lastProblem != null) {
-							lastProblem = new DefaultProblem(lastProblem.getOriginatingFileName(), lastProblem
-									.getMessage()
-									+ " " + m.group(3).trim(), lastProblem.getID(), lastProblem.getArguments(),
-									lastProblem.isWarning() ? ProblemSeverities.Warning : ProblemSeverities.Error,
-									lastProblem.getSourceStart(), lastProblem.getSourceEnd(), lastProblem
-											.getSourceLineNumber());
-						}
-
-						m.reset();
-					}
-				}
-
-				if (lastProblem != null) {
-					problems.add(lastProblem);
+					Document doc = parser.getDocument();
+					problems.addAll(createProblemMarker(file, doc.getElementsByTagName("error"),
+							ProblemSeverities.Error, tabWidth));
+					problems.addAll(createProblemMarker(file, doc.getElementsByTagName("warning"),
+							ProblemSeverities.Warning, tabWidth));
 				}
 			}
 		} catch (Exception e) {
@@ -117,6 +100,24 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 		}
 
 		return problems.toArray(new IProblem[0]);
+	}
+
+	protected ArrayList<IProblem> createProblemMarker(ISourceFile file, NodeList list, int type, int tabWidth) {
+		ArrayList<IProblem> problems = new ArrayList<IProblem>();
+
+		int length = list.getLength();
+		for (int i = 0; i < length; i++) {
+			Node item = list.item(i);
+
+			NamedNodeMap attr = item.getAttributes();
+
+			int lineNr = Integer.parseInt(attr.getNamedItem("line").getTextContent());
+			int column = Integer.parseInt(attr.getNamedItem("column").getTextContent());
+			problems.add(new DefaultProblem(file.toString(), item.getTextContent(), IProblem.Syntax, new String[0],
+					type, file.lineStart(lineNr), file.lineEnd(lineNr), lineNr));
+		}
+
+		return problems;
 	}
 
 	@Override
@@ -182,7 +183,7 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 
 	private String getCommandLineArgs(String standard, int tabWidth) {
 
-		String args = "--standard=" + OperatingSystem.escapeShellFileArg(standard);
+		String args = "--report=xml --standard=" + OperatingSystem.escapeShellFileArg(standard);
 
 		if (tabWidth > 0)
 			args += " --tab-width=" + tabWidth;
