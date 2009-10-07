@@ -221,10 +221,11 @@ public class PHPToolExecutableLauncher {
 				}
 			}
 
-			if (process.getExitValue() > 1) {
-				throw new CoreException(new Status(IStatus.ERROR, PHPToolCorePlugin.PLUGIN_ID, process
-						.getStreamsProxy().getOutputStreamMonitor().getContents()));
-			}
+			// if (process.getExitValue() > 1) {
+			// throw new CoreException(new Status(IStatus.ERROR,
+			// PHPToolCorePlugin.PLUGIN_ID, process
+			// .getStreamsProxy().getOutputStreamMonitor().getContents()));
+			// }
 
 			// refresh resources
 			subMonitor = new SubProgressMonitor(monitor, 10); // 10+80+10 of
