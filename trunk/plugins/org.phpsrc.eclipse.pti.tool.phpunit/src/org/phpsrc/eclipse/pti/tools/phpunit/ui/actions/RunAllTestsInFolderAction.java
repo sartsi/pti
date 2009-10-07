@@ -29,116 +29,63 @@ package org.phpsrc.eclipse.pti.tools.phpunit.ui.actions;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.dltk.core.IOpenable;
-import org.eclipse.dltk.core.ISourceModule;
-import org.eclipse.dltk.core.ModelException;
+import org.eclipse.dltk.core.IScriptFolder;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorActionDelegate;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
-import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
-import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
-import org.phpsrc.eclipse.pti.tools.phpunit.core.PHPUnit;
 import org.phpsrc.eclipse.pti.tools.phpunit.validator.PHPUnitValidator;
-import org.phpsrc.eclipse.pti.ui.Logger;
 
-public class RunTestCaseAction implements IObjectActionDelegate, IEditorActionDelegate {
-	private IResource[] files;
+public class RunAllTestsInFolderAction implements IObjectActionDelegate {
+	private IScriptFolder[] folders;
 
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		ISelection selection = targetPart.getSite().getSelectionProvider().getSelection();
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-			files = new IResource[structuredSelection.size()];
+			folders = new IScriptFolder[structuredSelection.size()];
 
-			ArrayList<IResource> resources = new ArrayList<IResource>(structuredSelection.size());
+			ArrayList<IScriptFolder> resources = new ArrayList<IScriptFolder>(structuredSelection.size());
 
 			Iterator<?> iterator = structuredSelection.iterator();
 			while (iterator.hasNext()) {
 				Object entry = iterator.next();
-				try {
-					if (entry instanceof ISourceModule) {
-						IFile file = (IFile) ((ISourceModule) entry).getCorrespondingResource();
-
-						if (PHPToolkitUtil.isPhpFile(file)) {
-							resources.add(((ISourceModule) entry).getCorrespondingResource());
-						}
-					} else if (entry instanceof IOpenable) {
-						resources.add(((IOpenable) entry).getCorrespondingResource());
-					}
-				} catch (ModelException e) {
-					Logger.logException(e);
+				if (entry instanceof IScriptFolder) {
+					resources.add((IScriptFolder) entry);
 				}
 			}
 
-			files = resources.toArray(new IResource[0]);
+			folders = resources.toArray(new IScriptFolder[0]);
 		}
 	}
 
 	public void run(IAction action) {
-		if (files != null) {
-			for (IResource file : files) {
-				if (file instanceof IFile) {
-					if (PHPUnit.isTestSuite((IFile) file)) {
-						runTestSuite((IFile) file);
-					} else {
-						IFile testCaseFile = PHPUnit.searchTestCase((IFile) file);
-						if (testCaseFile != null) {
-							runTestCase(testCaseFile);
-						} else {
-							Display.getDefault().asyncExec(new Runnable() {
-								public void run() {
-									ErrorDialog.openError(PHPToolCorePlugin.getActiveWorkbenchShell(), "Error",
-											"Can't execute test case / test suite.", new Status(IStatus.ERROR,
-													PHPUnitPlugin.PLUGIN_ID, "No test case / test suite found."));
-								}
-							});
-						}
-					}
+		if (folders != null) {
+			for (IScriptFolder folder : folders) {
+				IResource resource = folder.getResource();
+				if (resource instanceof IFolder) {
+					runAllTests((IFolder) resource);
 				}
 			}
 		}
 	}
 
-	protected void runTestCase(final IFile file) {
+	protected void runAllTests(final IFolder folder) {
 		Job job = new Job("PHPUnit") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				monitor.beginTask("Run " + file.getProjectRelativePath().toString(), IProgressMonitor.UNKNOWN);
+				monitor.beginTask("Run all Tests from " + folder.getProjectRelativePath().toString(),
+						IProgressMonitor.UNKNOWN);
 
 				PHPUnitValidator validator = new PHPUnitValidator();
-				validator.validateTestCase(file);
-
-				return Status.OK_STATUS;
-			}
-		};
-
-		job.setUser(false);
-		job.schedule();
-	}
-
-	protected void runTestSuite(final IFile file) {
-		Job job = new Job("PHPUnit") {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				monitor.beginTask("Run " + file.getProjectRelativePath().toString(), IProgressMonitor.UNKNOWN);
-
-				PHPUnitValidator validator = new PHPUnitValidator();
-				validator.validateTestSuite(file);
+				validator.validateFolder(folder);
 
 				return Status.OK_STATUS;
 			}
@@ -149,15 +96,5 @@ public class RunTestCaseAction implements IObjectActionDelegate, IEditorActionDe
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
-	}
-
-	public void setActiveEditor(IAction action, IEditorPart targetPart) {
-		if (targetPart != null) {
-			IEditorInput iei = targetPart.getEditorInput();
-			if (iei instanceof IFileEditorInput) {
-				IFileEditorInput ifei = (IFileEditorInput) iei;
-				files = new IResource[] { ifei.getFile() };
-			}
-		}
 	}
 }

@@ -43,7 +43,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.dltk.compiler.problem.DefaultProblem;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.ProblemSeverities;
 import org.eclipse.dltk.core.ISourceModule;
@@ -51,6 +50,7 @@ import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.dltk.core.search.SearchMatch;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
+import org.phpsrc.eclipse.pti.core.compiler.problem.FileProblem;
 import org.phpsrc.eclipse.pti.core.launching.OperatingSystem;
 import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
@@ -102,12 +102,7 @@ public class PHPUnit extends AbstractPHPTool {
 	}
 
 	public IProblem[] runTestCase(IFile testFile) {
-
-		ArrayList<IProblem> problems = new ArrayList<IProblem>();
-
 		try {
-			PHPSourceFile sourceFile = new PHPSourceFile(testFile);
-
 			ISourceModule module = PHPToolkitUtil.getSourceModule(testFile);
 			IType[] types = module.getAllTypes();
 			for (IType type : types) {
@@ -118,35 +113,70 @@ public class PHPUnit extends AbstractPHPTool {
 						.getParent().getLocation());
 
 				String output = launcher.launch(testFile.getProject());
-				if (output != null && output.length() > 0) {
-					Pattern pFailed = Pattern.compile("(Failed .*)");
+				return parseOutput(testFile.getProject(), output);
+			}
+		} catch (ModelException e) {
+			e.printStackTrace();
+		}
 
-					String[] lines = output.split("\n");
-					for (int i = 0; i < lines.length; i++) {
-						Matcher m = pFailed.matcher(lines[i].trim());
-						if (m.matches()) {
-							String msg = lines[i].trim();
+		return new IProblem[0];
+	}
 
-							String lineFailureLocation = lines[i + 2];
-							if (lineFailureLocation.lastIndexOf(":") != -1) {
+	public IProblem[] runAllTestsInFolder(IFolder folder) {
+		String cmdLineArgs = OperatingSystem.escapeShellFileArg(folder.getLocation().toOSString());
+		PHPToolLauncher launcher = getProjectPHPToolLauncher(folder.getProject(), cmdLineArgs, folder.getLocation());
+		return parseOutput(folder.getProject(), launcher.launch(folder.getProject()));
+	}
+
+	public IProblem[] runTestSuite(IFile file) {
+		String cmdLineArgs = OperatingSystem.escapeShellFileArg(file.getLocation().toOSString());
+		PHPToolLauncher launcher = getProjectPHPToolLauncher(file.getProject(), cmdLineArgs, file.getLocation());
+		return parseOutput(file.getProject(), launcher.launch(file.getProject()));
+	}
+
+	protected IProblem[] parseOutput(IProject project, String output) {
+		ArrayList<IProblem> problems = new ArrayList<IProblem>();
+
+		String projectLocation = project.getLocation().toOSString();
+
+		if (output != null && output.length() > 0) {
+			Pattern pFailed = Pattern.compile("(Failed .*)");
+
+			String[] lines = output.split("\n");
+			for (int i = 0; i < lines.length; i++) {
+				Matcher m = pFailed.matcher(lines[i].trim());
+				if (m.matches()) {
+					String msg = lines[i].trim();
+
+					String lineFailureLocation = lines[i + 2];
+					if (lineFailureLocation.lastIndexOf(":") != -1) {
+
+						String file = lineFailureLocation.substring(0, lineFailureLocation.lastIndexOf(":"));
+
+						IResource testFile = project.findMember(file.substring(projectLocation.length()));
+						if (testFile != null) {
+							PHPSourceFile sourceFile;
+							try {
+								sourceFile = new PHPSourceFile((IFile) testFile);
+
 								int lineNumber = Integer.parseInt(lineFailureLocation.substring(lineFailureLocation
 										.lastIndexOf(":") + 1));
-								problems.add(new DefaultProblem(testFile.getFullPath().toOSString(), msg,
-										IProblem.Task, new String[0], ProblemSeverities.Error, sourceFile
-												.lineStart(lineNumber), sourceFile.lineEnd(lineNumber), lineNumber));
 
+								problems.add(new FileProblem((IFile) testFile, msg, IProblem.Task, new String[0],
+										ProblemSeverities.Error, sourceFile.lineStart(lineNumber), sourceFile
+												.lineEnd(lineNumber), lineNumber));
 								++i;
+							} catch (CoreException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
 							}
 						}
 					}
 				}
 			}
-		} catch (ModelException e) {
-			e.printStackTrace();
-		} catch (CoreException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
 		return problems.toArray(new IProblem[0]);
@@ -238,5 +268,21 @@ public class PHPUnit extends AbstractPHPTool {
 		}
 
 		return null;
+	}
+
+	static public boolean isTestSuite(IFile file) {
+		ISourceModule module = PHPToolkitUtil.getSourceModule(file);
+
+		IType[] types;
+		try {
+			types = module.getAllTypes();
+			if (types.length > 0) {
+				return types[0].getSource().indexOf("PHPUnit_Framework_TestSuite") != -1 ? true : false;
+			}
+		} catch (ModelException e) {
+			e.printStackTrace();
+		}
+
+		return false;
 	}
 }

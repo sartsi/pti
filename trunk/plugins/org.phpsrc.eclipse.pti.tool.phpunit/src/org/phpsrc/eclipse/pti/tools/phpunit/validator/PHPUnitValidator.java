@@ -27,6 +27,7 @@
 package org.phpsrc.eclipse.pti.tools.phpunit.validator;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -36,6 +37,7 @@ import org.eclipse.wst.validation.AbstractValidator;
 import org.eclipse.wst.validation.ValidationResult;
 import org.eclipse.wst.validation.ValidationState;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
+import org.phpsrc.eclipse.pti.core.compiler.problem.FileProblem;
 import org.phpsrc.eclipse.pti.tools.phpunit.IPHPUnitConstants;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.PHPUnit;
 
@@ -52,12 +54,10 @@ public class PHPUnitValidator extends AbstractValidator {
 		if (testCaseFile == null)
 			return null;
 
-		ValidationResult result = new ValidationResult();
-		validateFile(result, testCaseFile, kind);
-		return result;
+		return validateTestCase(testCaseFile);
 	}
 
-	protected void validateFile(ValidationResult result, IFile file, int kind) {
+	public ValidationResult validateTestCase(IFile file) {
 		// remove the markers currently existing for this resource
 		// in case of project/folder, the markers are deleted recursively
 		try {
@@ -66,10 +66,39 @@ public class PHPUnitValidator extends AbstractValidator {
 		}
 
 		PHPUnit phpunit = PHPUnit.getInstance();
-		IProblem[] problems;
+		return createFileMarker(phpunit.runTestCase(file));
+	}
+
+	public ValidationResult validateTestSuite(IFile file) {
+		// remove the markers currently existing for this resource
+		// in case of project/folder, the markers are deleted recursively
 		try {
-			problems = phpunit.runTestCase(file);
-			for (IProblem problem : problems) {
+			file.getParent().deleteMarkers(IPHPUnitConstants.VALIDATOR_PHPUNIT_MARKER, false, IResource.DEPTH_INFINITE);
+		} catch (CoreException e) {
+		}
+
+		PHPUnit phpunit = PHPUnit.getInstance();
+		return createFileMarker(phpunit.runTestCase(file));
+	}
+
+	public ValidationResult validateFolder(IFolder folder) {
+		// remove the markers currently existing for this resource
+		// in case of project/folder, the markers are deleted recursively
+		try {
+			folder.deleteMarkers(IPHPUnitConstants.VALIDATOR_PHPUNIT_MARKER, false, IResource.DEPTH_INFINITE);
+		} catch (CoreException e) {
+		}
+
+		PHPUnit phpunit = PHPUnit.getInstance();
+		return createFileMarker(phpunit.runAllTestsInFolder(folder));
+	}
+
+	protected ValidationResult createFileMarker(IProblem[] problems) {
+		ValidationResult result = new ValidationResult();
+		for (IProblem problem : problems) {
+			IFile file = ((FileProblem) problem).getOriginatingFile();
+
+			try {
 				IMarker marker = file.createMarker(IPHPUnitConstants.VALIDATOR_PHPUNIT_MARKER);
 				marker.setAttribute(IMarker.PROBLEM, true);
 				marker.setAttribute(IMarker.LINE_NUMBER, problem.getSourceLineNumber());
@@ -84,9 +113,11 @@ public class PHPUnitValidator extends AbstractValidator {
 				marker.setAttribute(IMarker.CHAR_START, problem.getSourceStart());
 				marker.setAttribute(IMarker.CHAR_END, problem.getSourceEnd());
 				marker.setAttribute(IMarker.MESSAGE, problem.getMessage());
+			} catch (CoreException e) {
+				e.printStackTrace();
 			}
-		} catch (CoreException e) {
-			e.printStackTrace();
 		}
+
+		return result;
 	}
 }
