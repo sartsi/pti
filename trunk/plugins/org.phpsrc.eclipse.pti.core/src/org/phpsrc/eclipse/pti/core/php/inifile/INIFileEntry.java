@@ -33,15 +33,25 @@ public class INIFileEntry {
 	private final String section;
 	private final String name;
 	private final String value;
+	private final boolean additional;
 
 	public INIFileEntry(String name, String value) {
 		this(GLOBAL_SECTION, name, value);
 	}
 
+	public INIFileEntry(String name, String value, boolean additional) {
+		this(GLOBAL_SECTION, name, value, additional);
+	}
+
 	public INIFileEntry(String section, String name, String value) {
+		this(section, name, value, false);
+	}
+
+	public INIFileEntry(String section, String name, String value, boolean additional) {
 		this.section = section;
 		this.name = name;
 		this.value = value;
+		this.additional = additional;
 	}
 
 	public String getSection() {
@@ -54,5 +64,9 @@ public class INIFileEntry {
 
 	public String getValue() {
 		return value;
+	}
+
+	public boolean isAdditional() {
+		return additional;
 	}
 }

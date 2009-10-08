@@ -42,6 +42,6 @@ public class INIFileUtil {
 			}
 		}
 
-		return new INIFileEntry("include_path", sb.toString());
+		return new INIFileEntry("PHP", "include_path", sb.toString(), true);
 	}
 }

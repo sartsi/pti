@@ -48,7 +48,6 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.php.debug.core.debugger.parameters.IDebugParametersKeys;
 import org.eclipse.php.internal.debug.core.IPHPDebugConstants;
 import org.eclipse.php.internal.debug.core.debugger.AbstractDebuggerConfiguration;
-import org.eclipse.php.internal.debug.core.phpIni.INIFileModifier;
 import org.eclipse.php.internal.debug.core.phpIni.PHPINIUtil;
 import org.eclipse.php.internal.debug.core.preferences.PHPDebugCorePreferenceNames;
 import org.eclipse.php.internal.debug.core.preferences.PHPDebuggersRegistry;
@@ -58,6 +57,7 @@ import org.eclipse.swt.widgets.Display;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
+import org.phpsrc.eclipse.pti.core.php.inifile.INIFileModifier;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPToolLauncher {
@@ -174,43 +174,41 @@ public class PHPToolLauncher {
 	 */
 	protected ILaunchConfiguration findLaunchConfiguration(IProject phpProject, String phpPathString,
 			String phpFileFullLocation, PHPexeItem defaultEXE, String mode, ILaunchConfigurationType configType) {
+
 		ILaunchConfiguration config = null;
 		try {
 			ILaunchConfiguration[] configs = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(
 					configType);
 
 			int numConfigs = configs == null ? 0 : configs.length;
+
 			for (int i = 0; i < numConfigs; i++) {
 				String fileName = configs[i].getAttribute(IPHPDebugConstants.ATTR_FILE, (String) null);
 				String exeName = configs[i].getAttribute(IPHPDebugConstants.ATTR_EXECUTABLE_LOCATION, (String) null);
 				boolean isPti = configs[i].getAttribute(PHPToolCorePlugin.PLUGIN_ID, false);
 
 				if (isPti && phpPathString.equals(fileName) && defaultEXE.getExecutable().toString().equals(exeName)) {
-					config = configs[i].getWorkingCopy();
+					String iniLocation = configs[i].getAttribute(IPHPDebugConstants.ATTR_INI_LOCATION, (String) null);
+					if (iniLocation == null || !(new File(iniLocation).exists())) {
+						configs[i].delete();
+					} else {
+						config = configs[i];
+					}
 					break;
 				}
 			}
 
 			if (config == null) {
-				config = createConfiguration(phpProject, phpPathString, phpFileFullLocation, defaultEXE, configType);
+				String iniFile = null;
+				File PHPINIFile = createCustomPHPINIFile(config, defaultEXE, iniEntries);
+				if (PHPINIFile != null)
+					iniFile = PHPINIFile.getAbsolutePath().toString();
+
+				config = createConfiguration(phpProject, phpPathString, phpFileFullLocation, defaultEXE, configType,
+						iniFile);
 			}
 		} catch (CoreException ce) {
 			ce.printStackTrace();
-		}
-
-		if (iniEntries != null && iniEntries.length > 0) {
-			try {
-				File PHPINIFile = createCustomPHPINIFile(config, defaultEXE, iniEntries);
-				ILaunchConfigurationWorkingCopy wc;
-
-				wc = config.getWorkingCopy();
-				wc
-						.setAttribute(IPHPDebugConstants.ATTR_INI_LOCATION, PHPINIFile != null ? PHPINIFile.toString()
-								: null);
-				config = wc.doSave();
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
 		}
 
 		return config;
@@ -229,31 +227,38 @@ public class PHPToolLauncher {
 		}
 
 		File tmpPHPINIFile;
-		// if (oldPHPINIFile != null)
-		// tmpPHPINIFile = PHPINIUtil.createTemporaryPHPINIFile(oldPHPINIFile);
-		// else
-		tmpPHPINIFile = PHPINIUtil.createTemporaryPHPINIFile();
+		if (oldPHPINIFile != null)
+			tmpPHPINIFile = PHPINIUtil.createTemporaryPHPINIFile(oldPHPINIFile);
+		else
+			tmpPHPINIFile = PHPINIUtil.createTemporaryPHPINIFile();
 
-		try {
-			INIFileModifier modifier = new INIFileModifier(tmpPHPINIFile);
-			for (INIFileEntry entry : fileEntries) {
-				modifier.addEntry(entry.getSection(), entry.getName(), entry.getValue());
+		if (fileEntries != null && fileEntries.length > 0) {
+			try {
+				INIFileModifier modifier = new INIFileModifier(tmpPHPINIFile);
+				for (INIFileEntry entry : fileEntries) {
+					String newValue = entry.getValue();
+					if (entry.isAdditional()) {
+						String oldValue = modifier.getEntry(entry.getSection(), entry.getName());
+						if (oldValue != null)
+							newValue = oldValue + ";" + newValue;
+					}
+
+					modifier.addEntry(entry.getSection(), entry.getName(), newValue, true, null);
+				}
+				modifier.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			modifier.close();
-
-			return tmpPHPINIFile;
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
-		return oldPHPINIFile;
+		return tmpPHPINIFile;
 	}
 
 	/**
 	 * Create & return a new configuration
 	 */
 	protected ILaunchConfiguration createConfiguration(IProject phpProject, String phpPathString,
-			String phpFileFullLocation, PHPexeItem defaultEXE, ILaunchConfigurationType configType)
+			String phpFileFullLocation, PHPexeItem defaultEXE, ILaunchConfigurationType configType, String iniPath)
 			throws CoreException {
 		ILaunchConfiguration config = null;
 		ILaunchConfigurationWorkingCopy wc = configType.newInstance(null, getNewConfigurationName(phpPathString));
@@ -268,7 +273,8 @@ public class PHPToolLauncher {
 		wc.setAttribute(IPHPDebugConstants.ATTR_FILE_FULL_PATH, phpFileFullLocation);
 		wc.setAttribute(IPHPDebugConstants.ATTR_EXECUTABLE_LOCATION, defaultEXE.getExecutable().getAbsolutePath()
 				.toString());
-		String iniPath = defaultEXE.getINILocation() != null ? defaultEXE.getINILocation().toString() : null;
+		if (iniPath == null)
+			iniPath = defaultEXE.getINILocation() != null ? defaultEXE.getINILocation().toString() : null;
 		wc.setAttribute(IPHPDebugConstants.ATTR_INI_LOCATION, iniPath);
 		wc.setAttribute(IPHPDebugConstants.RUN_WITH_DEBUG_INFO, false);
 		wc.setAttribute(IDebugParametersKeys.FIRST_LINE_BREAKPOINT, false);
