@@ -66,7 +66,7 @@
 		</objectContribution>
 		<objectContribution
 			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitCreateTestCaseObjectContribution"
-			objectClass="org.eclipse.dltk.core.IModelElement">
+			objectClass="org.eclipse.dltk.internal.core.SourceModule">
 			<enablement>
 				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
 			</enablement>
@@ -81,7 +81,7 @@
 		</objectContribution>
 		<objectContribution
 			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitRunTestCaseObjectContribution"
-			objectClass="org.eclipse.dltk.core.IModelElement">
+			objectClass="org.eclipse.dltk.internal.core.SourceModule">
 			<enablement>
 				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
 			</enablement>
