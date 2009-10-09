@@ -253,15 +253,17 @@ public class PHPUnit extends AbstractPHPTool {
 			types = module.getAllTypes();
 			if (types.length > 0) {
 				String[] classes = types[0].getSuperClasses();
-				if (classes.length > 0 && classes[0].equals("PHPUnit_Framework_TestCase")) {
-					return file;
-				} else {
-					SearchMatch[] matches = PHPSearchEngine.findClass(types[0].getElementName() + "Test",
-							PHPSearchEngine.createProjectScope(file.getProject()));
-
-					if (matches.length > 0)
-						return (IFile) matches[0].getResource();
+				for (String c : classes) {
+					if (c.equals("PHPUnit_Framework_TestCase")) {
+						return file;
+					}
 				}
+
+				SearchMatch[] matches = PHPSearchEngine.findClass(types[0].getElementName() + "Test", PHPSearchEngine
+						.createProjectScope(file.getProject()));
+
+				if (matches.length > 0)
+					return (IFile) matches[0].getResource();
 			}
 		} catch (ModelException e) {
 			e.printStackTrace();
