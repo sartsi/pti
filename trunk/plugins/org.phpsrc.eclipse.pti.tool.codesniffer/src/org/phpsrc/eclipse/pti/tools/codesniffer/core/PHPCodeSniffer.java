@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.dltk.compiler.problem.DefaultProblem;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.ProblemSeverities;
 import org.phpsrc.eclipse.pti.core.launching.OperatingSystem;
@@ -47,6 +46,7 @@ import org.phpsrc.eclipse.pti.core.tools.AbstractPHPToolParser;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferencesFactory;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.problem.CodeSnifferProblem;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -113,8 +113,9 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 
 			int lineNr = Integer.parseInt(attr.getNamedItem("line").getTextContent());
 			int column = Integer.parseInt(attr.getNamedItem("column").getTextContent());
-			problems.add(new DefaultProblem(file.toString(), item.getTextContent(), IProblem.Syntax, new String[0],
-					type, file.lineStart(lineNr), file.lineEnd(lineNr), lineNr));
+			String source = attr.getNamedItem("source").getTextContent();
+			problems.add(new CodeSnifferProblem(file.toString(), item.getTextContent(), IProblem.Syntax, new String[0],
+					type, file.lineStart(lineNr), file.lineEnd(lineNr), lineNr, column, source));
 		}
 
 		return problems;

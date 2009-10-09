@@ -29,15 +29,8 @@ package org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.dltk.core.IOpenable;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ModelException;
@@ -50,11 +43,10 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.wst.validation.ValidationState;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.jobs.ValidationJob;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferencesFactory;
-import org.phpsrc.eclipse.pti.tools.codesniffer.validator.PHPCodeSnifferValidator;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class ValidateFilesAction implements IObjectActionDelegate, IEditorActionDelegate {
@@ -99,10 +91,10 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 	}
 
 	public void run(IAction action) {
-		if (files != null) {
-			for (IResource file : files) {
-				validateResouce(file);
-			}
+		if (files != null && files.length > 0) {
+			ValidationJob job = new ValidationJob(files);
+			job.setUser(false);
+			job.schedule();
 		}
 	}
 
@@ -117,43 +109,5 @@ public class ValidateFilesAction implements IObjectActionDelegate, IEditorAction
 				files = new IResource[] { ifei.getFile() };
 			}
 		}
-	}
-
-	protected void validateResouce(IResource resource) {
-		if (resource instanceof IContainer) {
-			validateContainer((IContainer) resource);
-		} else if (resource instanceof IFile) {
-			validateFile((IFile) resource);
-		}
-	}
-
-	protected void validateContainer(final IContainer folder) {
-		try {
-			IResource[] members = folder.members();
-			for (IResource member : members) {
-				validateResouce(member);
-			}
-		} catch (CoreException e) {
-			Logger.logException(e);
-		}
-	}
-
-	protected void validateFile(final IFile file) {
-		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(file);
-
-		Job job = new Job("PHP CodeSniffer (" + prefs.getStandardName() + ")") {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				monitor.beginTask("Validating " + file.getProjectRelativePath().toString(), IProgressMonitor.UNKNOWN);
-
-				PHPCodeSnifferValidator validator = new PHPCodeSnifferValidator();
-				validator.validate(file, IResourceDelta.NO_CHANGE, new ValidationState(), monitor);
-
-				return Status.OK_STATUS;
-			}
-		};
-
-		job.setUser(false);
-		job.schedule();
 	}
 }
