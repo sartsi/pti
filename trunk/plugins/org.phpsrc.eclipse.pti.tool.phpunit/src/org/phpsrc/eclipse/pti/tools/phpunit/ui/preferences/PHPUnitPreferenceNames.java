@@ -29,5 +29,7 @@ package org.phpsrc.eclipse.pti.tools.phpunit.ui.preferences;
 public class PHPUnitPreferenceNames {
 	public static final String PREF_PHP_EXECUTABLE = "php_executable"; //$NON-NLS-1$
 	public static final String PREF_DEBUG_PRINT_OUTPUT = "debug_print_output"; //$NON-NLS-1$
-	public static final String PREF_BOOTSTRAP = "bootstrap";
+	public static final String PREF_BOOTSTRAP = "bootstrap"; //$NON-NLS-1$
+	public static final String PREF_TEST_FILE_PATTERN_FOLDER = "test_file_pattern_folder"; //$NON-NLS-1$
+	public static final String PREF_TEST_FILE_PATTERN_FILE = "test_file_pattern_file"; //$NON-NLS-1$
 }

@@ -61,6 +61,7 @@ import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
 import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferences;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferencesFactory;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPUnit extends AbstractPHPTool {
 
@@ -116,7 +117,7 @@ public class PHPUnit extends AbstractPHPTool {
 				return parseOutput(testFile.getProject(), output);
 			}
 		} catch (ModelException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 
 		return new IProblem[0];
@@ -140,15 +141,21 @@ public class PHPUnit extends AbstractPHPTool {
 		String projectLocation = project.getLocation().toOSString();
 
 		if (output != null && output.length() > 0) {
-			Pattern pFailed = Pattern.compile("(Failed .*)");
+			Pattern pFailed = Pattern.compile("[0-9]+\\) .*");
 
 			String[] lines = output.split("\n");
 			for (int i = 0; i < lines.length; i++) {
 				Matcher m = pFailed.matcher(lines[i].trim());
 				if (m.matches()) {
+					++i;
 					String msg = lines[i].trim();
+					++i;
+					if (!"".equals(lines[i].trim())) {
+						msg += " (" + lines[i].trim() + ")";
+						++i;
+					}
 
-					String lineFailureLocation = lines[i + 2];
+					String lineFailureLocation = lines[i + 1];
 					if (lineFailureLocation.lastIndexOf(":") != -1) {
 
 						String file = lineFailureLocation.substring(0, lineFailureLocation.lastIndexOf(":"));
@@ -167,11 +174,9 @@ public class PHPUnit extends AbstractPHPTool {
 												.lineEnd(lineNumber), lineNumber));
 								++i;
 							} catch (CoreException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+								Logger.logException(e);
 							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+								Logger.logException(e);
 							}
 						}
 					}
@@ -266,7 +271,7 @@ public class PHPUnit extends AbstractPHPTool {
 					return (IFile) matches[0].getResource();
 			}
 		} catch (ModelException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 
 		return null;
@@ -282,7 +287,7 @@ public class PHPUnit extends AbstractPHPTool {
 				return types[0].getSource().indexOf("PHPUnit_Framework_TestSuite") != -1 ? true : false;
 			}
 		} catch (ModelException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 
 		return false;

@@ -36,6 +36,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.PHPUnit;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class CreatePHPUnitTestCaseWizard extends Wizard implements INewWizard {
 
@@ -55,9 +56,9 @@ public class CreatePHPUnitTestCaseWizard extends Wizard implements INewWizard {
 				return phpunit.createTestSkeleton(sourceClassPage.getSourceClassName(), sourceClassPage
 						.getSourceClassFile(), sourceClassPage.getTestClassFilePath());
 			} catch (InvalidObjectException e) {
-				e.printStackTrace();
+				Logger.logException(e);
 			} catch (CoreException e) {
-				e.printStackTrace();
+				Logger.logException(e);
 			}
 		}
 

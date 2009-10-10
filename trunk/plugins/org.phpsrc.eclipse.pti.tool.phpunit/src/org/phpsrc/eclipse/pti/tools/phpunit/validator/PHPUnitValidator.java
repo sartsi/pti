@@ -40,6 +40,7 @@ import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.compiler.problem.FileProblem;
 import org.phpsrc.eclipse.pti.tools.phpunit.IPHPUnitConstants;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.PHPUnit;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPUnitValidator extends AbstractValidator {
 
@@ -114,7 +115,7 @@ public class PHPUnitValidator extends AbstractValidator {
 				marker.setAttribute(IMarker.CHAR_END, problem.getSourceEnd());
 				marker.setAttribute(IMarker.MESSAGE, problem.getMessage());
 			} catch (CoreException e) {
-				e.printStackTrace();
+				Logger.logException(e);
 			}
 		}
 

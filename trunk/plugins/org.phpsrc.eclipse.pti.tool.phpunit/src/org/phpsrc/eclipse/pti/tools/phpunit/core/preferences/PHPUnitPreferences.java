@@ -31,13 +31,26 @@ import org.phpsrc.eclipse.pti.core.preferences.AbstractPHPToolPreferences;
 
 public class PHPUnitPreferences extends AbstractPHPToolPreferences {
 	protected String bootstrap;
+	protected String testFilePatternFolder;
+	protected String testFilePatternFile;
 
-	public PHPUnitPreferences(String phpExecutable, boolean printOutput, String bootstrap) {
+	public PHPUnitPreferences(String phpExecutable, boolean printOutput, String bootstrap,
+			String testFilePatternFolder, String testFilePatternFile) {
 		super(phpExecutable, printOutput);
 		this.bootstrap = bootstrap;
+		this.testFilePatternFolder = testFilePatternFolder;
+		this.testFilePatternFile = testFilePatternFile;
 	}
 
 	public String getBootstrap() {
 		return bootstrap;
+	}
+
+	public String getTestFilePatternFolder() {
+		return testFilePatternFolder;
+	}
+
+	public String getTestFilePatternFile() {
+		return testFilePatternFile;
 	}
 }

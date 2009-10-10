@@ -54,6 +54,8 @@ public class PHPUnitPreferencesFactory {
 		String phpExe = prefs.getString(PHPUnitPreferenceNames.PREF_PHP_EXECUTABLE);
 		boolean printOutput = prefs.getBoolean(PHPUnitPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
 		String bootstrap = prefs.getString(PHPUnitPreferenceNames.PREF_BOOTSTRAP);
+		String testFilePatternFolder = prefs.getString(PHPUnitPreferenceNames.PREF_TEST_FILE_PATTERN_FOLDER);
+		String testFilePatternFile = prefs.getString(PHPUnitPreferenceNames.PREF_TEST_FILE_PATTERN_FILE);
 
 		IScopeContext[] preferenceScopes = createPreferenceScopes(project);
 		if (preferenceScopes[0] instanceof ProjectScope) {
@@ -62,10 +64,13 @@ public class PHPUnitPreferencesFactory {
 				phpExe = node.get(PHPUnitPreferenceNames.PREF_PHP_EXECUTABLE, phpExe);
 				printOutput = node.getBoolean(PHPUnitPreferenceNames.PREF_DEBUG_PRINT_OUTPUT, printOutput);
 				bootstrap = node.get(PHPUnitPreferenceNames.PREF_BOOTSTRAP, bootstrap);
+				testFilePatternFolder = node.get(PHPUnitPreferenceNames.PREF_TEST_FILE_PATTERN_FOLDER,
+						testFilePatternFolder);
+				testFilePatternFile = node.get(PHPUnitPreferenceNames.PREF_TEST_FILE_PATTERN_FILE, testFilePatternFile);
 			}
 		}
 
-		return new PHPUnitPreferences(phpExe, printOutput, bootstrap);
+		return new PHPUnitPreferences(phpExe, printOutput, bootstrap, testFilePatternFolder, testFilePatternFile);
 	}
 
 	protected static IScopeContext[] createPreferenceScopes(IProject project) {

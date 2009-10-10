@@ -124,7 +124,7 @@ public class CreateTestCaseAction implements IObjectActionDelegate, IEditorActio
 				dialog.open();
 			}
 		} catch (ModelException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 
 	}
