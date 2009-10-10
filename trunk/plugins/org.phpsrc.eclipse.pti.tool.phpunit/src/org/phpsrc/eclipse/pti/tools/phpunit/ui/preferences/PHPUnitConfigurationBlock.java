@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ResourceSelectionDialog;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
-import org.phpsrc.eclipse.pti.core.PHPCoreID;
+import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
 import org.phpsrc.eclipse.pti.tools.phpunit.IPHPUnitConstants;
 import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.PHPUnit;
@@ -234,7 +234,7 @@ public class PHPUnitConfigurationBlock extends AbstractPHPToolConfigurationBlock
 		IProject[] projects = root.getRoot().getProjects();
 		for (IProject project : projects) {
 			try {
-				IProjectNature nature = project.getNature(PHPCoreID.PHPNatureID);
+				IProjectNature nature = project.getNature(IPHPCoreConstants.PHPNatureID);
 				if (nature != null) {
 					project.setSessionProperty(PHPUnit.QUALIFIED_NAME, null);
 				}

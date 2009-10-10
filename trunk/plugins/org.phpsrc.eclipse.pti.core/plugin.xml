@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+	<extension point="org.eclipse.debug.core.launchConfigurationTypes">
+		<launchConfigurationType
+			id="org.phprc.eclipse.pti.core.launching.PHPToolLaunchType"
+			delegate="org.eclipse.php.internal.debug.core.launching.PHPLaunchDelegateProxy"
+			modes="run"
+			name="PHP Tool Application"
+			public="false"
+			delegateName="PHP Tool Launch Tooling"
+			delegateDescription="This Application Launcher supports running and debugging PHP applications.">
+		</launchConfigurationType>
+	</extension>
 	<extension
 		point="org.eclipse.ui.preferencePages">
 		<page

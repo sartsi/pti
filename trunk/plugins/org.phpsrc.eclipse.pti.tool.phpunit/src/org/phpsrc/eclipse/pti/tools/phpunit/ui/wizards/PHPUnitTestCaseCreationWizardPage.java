@@ -62,7 +62,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
-import org.phpsrc.eclipse.pti.core.PHPCoreID;
+import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
@@ -369,7 +369,7 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 			}
 		}
 
-		final IContentType contentType = Platform.getContentTypeManager().getContentType(PHPCoreID.ContentTypeID_PHP);
+		final IContentType contentType = Platform.getContentTypeManager().getContentType(IPHPCoreConstants.ContentTypeID_PHP);
 		if (!contentType.isAssociatedWith(fileName)) {
 			// fixed bug 195274
 			// get the extensions from content type

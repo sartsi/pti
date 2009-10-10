@@ -43,7 +43,7 @@ public class PHPToolkitUtil {
 			IResource resource = sourceModule.getCorrespondingResource();
 			if (resource instanceof IFile) {
 				IContentDescription contentDescription = ((IFile) resource).getContentDescription();
-				return PHPCoreID.ContentTypeID_PHP.equals(contentDescription.getContentType().getId());
+				return IPHPCoreConstants.ContentTypeID_PHP.equals(contentDescription.getContentType().getId());
 			}
 		} catch (CoreException e) {
 		}
@@ -65,7 +65,7 @@ public class PHPToolkitUtil {
 			return hasPhpExtention(file);
 		}
 
-		return PHPCoreID.ContentTypeID_PHP.equals(contentDescription.getContentType().getId());
+		return IPHPCoreConstants.ContentTypeID_PHP.equals(contentDescription.getContentType().getId());
 	}
 
 	public static boolean hasPhpExtention(final IFile file) {
@@ -75,7 +75,7 @@ public class PHPToolkitUtil {
 			return false;
 		}
 		String extension = fileName.substring(index + 1);
-		final IContentType type = Platform.getContentTypeManager().getContentType(PHPCoreID.ContentTypeID_PHP);
+		final IContentType type = Platform.getContentTypeManager().getContentType(IPHPCoreConstants.ContentTypeID_PHP);
 		final String[] validExtensions = type.getFileSpecs(IContentType.FILE_EXTENSION_SPEC);
 		for (String validExtension : validExtensions) {
 			if (extension.equalsIgnoreCase(validExtension)) {
@@ -97,7 +97,7 @@ public class PHPToolkitUtil {
 		}
 		String extension = fileName.substring(index + 1);
 
-		final IContentType type = Platform.getContentTypeManager().getContentType(PHPCoreID.ContentTypeID_PHP);
+		final IContentType type = Platform.getContentTypeManager().getContentType(IPHPCoreConstants.ContentTypeID_PHP);
 		final String[] validExtensions = type.getFileSpecs(IContentType.FILE_EXTENSION_SPEC);
 		for (String validExtension : validExtensions) {
 			if (extension.equalsIgnoreCase(validExtension)) {
@@ -119,7 +119,7 @@ public class PHPToolkitUtil {
 			return false;
 		}
 
-		final IProjectNature nature = project.getNature(PHPCoreID.PHPNatureID);
+		final IProjectNature nature = project.getNature(IPHPCoreConstants.PHPNatureID);
 		return nature != null;
 	}
 

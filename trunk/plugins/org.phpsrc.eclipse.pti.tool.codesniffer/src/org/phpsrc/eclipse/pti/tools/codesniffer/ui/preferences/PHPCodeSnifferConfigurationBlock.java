@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
-import org.phpsrc.eclipse.pti.core.PHPCoreID;
+import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.PHPCodeSniffer;
 import org.phpsrc.eclipse.pti.ui.Logger;
@@ -381,7 +381,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 		IProject[] projects = root.getRoot().getProjects();
 		for (IProject project : projects) {
 			try {
-				IProjectNature nature = project.getNature(PHPCoreID.PHPNatureID);
+				IProjectNature nature = project.getNature(IPHPCoreConstants.PHPNatureID);
 				if (nature != null) {
 					project.setSessionProperty(PHPCodeSniffer.QUALIFIED_NAME, null);
 				}

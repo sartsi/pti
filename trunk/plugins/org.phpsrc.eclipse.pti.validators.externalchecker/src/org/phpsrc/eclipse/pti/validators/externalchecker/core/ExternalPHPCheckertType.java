@@ -3,7 +3,7 @@ package org.phpsrc.eclipse.pti.validators.externalchecker.core;
 import org.eclipse.dltk.validators.core.AbstractValidatorType;
 import org.eclipse.dltk.validators.core.ISourceModuleValidator;
 import org.eclipse.dltk.validators.core.IValidator;
-import org.phpsrc.eclipse.pti.core.PHPCoreID;
+import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
 
 public class ExternalPHPCheckertType extends AbstractValidatorType {
 
@@ -22,7 +22,7 @@ public class ExternalPHPCheckertType extends AbstractValidatorType {
 	}
 
 	public String getNature() {
-		return PHPCoreID.PHPNatureID;
+		return IPHPCoreConstants.PHPNatureID;
 	}
 
 	public boolean isBuiltin() {

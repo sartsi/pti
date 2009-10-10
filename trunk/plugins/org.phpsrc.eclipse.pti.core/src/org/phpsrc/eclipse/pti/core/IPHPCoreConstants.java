@@ -26,9 +26,8 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.core;
 
-public class PHPCoreID {
-
+public class IPHPCoreConstants {
 	public final static String ContentTypeID_PHP = "org.eclipse.php.core.phpsource";
 	public final static String PHPNatureID = "org.eclipse.php.core.PHPNature";
-
+	public final static String LaunchType = "org.phprc.eclipse.pti.core.launching.PHPToolLaunchType";
 }
