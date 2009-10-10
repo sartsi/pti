@@ -61,6 +61,7 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.phpsrc.eclipse.pti.core.PHPCoreID;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.PHPCodeSniffer;
+import org.phpsrc.eclipse.pti.ui.Logger;
 import org.phpsrc.eclipse.pti.ui.preferences.AbstractPHPToolConfigurationBlock;
 
 public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurationBlock {
@@ -385,7 +386,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 					project.setSessionProperty(PHPCodeSniffer.QUALIFIED_NAME, null);
 				}
 			} catch (CoreException e) {
-				e.printStackTrace();
+				Logger.logException(e);
 			}
 		}
 	}

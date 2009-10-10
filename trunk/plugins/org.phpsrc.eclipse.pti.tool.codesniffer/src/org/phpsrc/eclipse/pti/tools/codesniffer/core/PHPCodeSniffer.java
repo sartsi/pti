@@ -47,6 +47,7 @@ import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferencesFactory;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.problem.CodeSnifferProblem;
+import org.phpsrc.eclipse.pti.ui.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -96,7 +97,7 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 
 		return problems.toArray(new IProblem[0]);
@@ -129,7 +130,7 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 			if (launcher != null)
 				return launcher;
 		} catch (CoreException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 
 		launcher = getProjectPHPToolLauncher(project);
@@ -137,7 +138,7 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 		try {
 			project.setSessionProperty(QUALIFIED_NAME, launcher);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 
 		return launcher;

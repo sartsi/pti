@@ -42,6 +42,7 @@ import org.eclipse.dltk.core.search.SearchPattern;
 import org.eclipse.dltk.internal.ui.search.DLTKSearchScopeFactory;
 import org.eclipse.dltk.ui.search.PatternQuerySpecification;
 import org.eclipse.php.internal.core.PHPLanguageToolkit;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPSearchEngine {
 
@@ -91,7 +92,7 @@ public class PHPSearchEngine {
 			return requestor.getMatches();
 
 		} catch (CoreException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 
 		return new SearchMatch[0];

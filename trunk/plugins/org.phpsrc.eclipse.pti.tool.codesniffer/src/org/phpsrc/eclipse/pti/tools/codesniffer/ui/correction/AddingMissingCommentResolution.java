@@ -36,6 +36,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.swt.graphics.Image;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class AddingMissingCommentResolution extends AbstractResolution {
 
@@ -85,9 +86,9 @@ public class AddingMissingCommentResolution extends AbstractResolution {
 			}
 
 		} catch (CoreException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		} catch (BadLocationException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 	}
 }

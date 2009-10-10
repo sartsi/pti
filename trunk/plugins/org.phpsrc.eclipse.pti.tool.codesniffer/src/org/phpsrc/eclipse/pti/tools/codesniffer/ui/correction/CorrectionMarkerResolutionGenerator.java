@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolution2;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class CorrectionMarkerResolutionGenerator implements IMarkerResolutionGenerator2 {
 
@@ -45,7 +46,7 @@ public class CorrectionMarkerResolutionGenerator implements IMarkerResolutionGen
 				return new IMarkerResolution[] { resolution };
 
 		} catch (CoreException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 
 		return null;
@@ -58,7 +59,7 @@ public class CorrectionMarkerResolutionGenerator implements IMarkerResolutionGen
 			msg = (String) marker.getAttribute(IMarker.MESSAGE);
 			return findResolution(msg) != null;
 		} catch (CoreException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 
 		return false;

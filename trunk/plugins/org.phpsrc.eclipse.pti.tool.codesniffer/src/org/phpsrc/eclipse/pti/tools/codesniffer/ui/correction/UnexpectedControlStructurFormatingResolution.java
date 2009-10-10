@@ -36,6 +36,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.swt.graphics.Image;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class UnexpectedControlStructurFormatingResolution extends AbstractResolution {
 
@@ -106,9 +107,9 @@ public class UnexpectedControlStructurFormatingResolution extends AbstractResolu
 			}
 
 		} catch (CoreException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		} catch (BadLocationException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 	}
 }

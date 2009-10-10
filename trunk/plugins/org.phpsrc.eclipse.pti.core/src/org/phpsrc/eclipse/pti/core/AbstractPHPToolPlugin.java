@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public abstract class AbstractPHPToolPlugin extends AbstractUIPlugin {
 	public IPath resolvePluginResource(String resource) {
@@ -43,7 +44,7 @@ public abstract class AbstractPHPToolPlugin extends AbstractUIPlugin {
 
 				return new Path(new java.io.File(u.getFile()).getAbsolutePath());
 			} catch (IOException e) {
-				e.printStackTrace();
+				Logger.logException(e);
 			}
 		}
 

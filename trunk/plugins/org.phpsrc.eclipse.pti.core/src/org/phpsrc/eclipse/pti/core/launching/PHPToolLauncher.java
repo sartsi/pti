@@ -208,7 +208,7 @@ public class PHPToolLauncher {
 						iniFile);
 			}
 		} catch (CoreException ce) {
-			ce.printStackTrace();
+			Logger.logException(ce);
 		}
 
 		return config;
@@ -222,7 +222,7 @@ public class PHPToolLauncher {
 				String iniLocation = config.getAttribute(IPHPDebugConstants.ATTR_INI_LOCATION, (String) null);
 				oldPHPINIFile = iniLocation != null ? new File(iniLocation) : null;
 			} catch (CoreException e) {
-				e.printStackTrace();
+				Logger.logException(e);
 			}
 		}
 
@@ -247,7 +247,7 @@ public class PHPToolLauncher {
 				}
 				modifier.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				Logger.logException(e);
 			}
 		}
 

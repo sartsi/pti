@@ -40,6 +40,7 @@ import org.eclipse.wst.validation.ValidationState;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.tools.codesniffer.ICodeSnifferConstants;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.PHPCodeSniffer;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPCodeSnifferValidator extends AbstractValidator {
 
@@ -84,9 +85,9 @@ public class PHPCodeSnifferValidator extends AbstractValidator {
 				marker.setAttribute(IMarker.MESSAGE, problem.getMessage());
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 	}
 }

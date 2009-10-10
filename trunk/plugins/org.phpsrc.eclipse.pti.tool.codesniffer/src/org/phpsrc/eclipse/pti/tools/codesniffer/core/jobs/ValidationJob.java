@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.wst.validation.ValidationState;
 import org.phpsrc.eclipse.pti.tools.codesniffer.validator.PHPCodeSnifferValidator;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class ValidationJob extends Job {
 
@@ -92,7 +93,7 @@ public class ValidationJob extends Job {
 				getFilesFromResouce(member, files);
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 	}
 
