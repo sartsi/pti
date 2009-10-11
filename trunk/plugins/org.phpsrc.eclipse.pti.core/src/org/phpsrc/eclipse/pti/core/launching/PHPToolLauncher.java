@@ -220,7 +220,8 @@ public class PHPToolLauncher {
 
 		if (oldPHPINIFile == null) {
 			try {
-				String iniLocation = config.getAttribute(IPHPDebugConstants.ATTR_INI_LOCATION, (String) null);
+				String iniLocation = config != null ? config.getAttribute(IPHPDebugConstants.ATTR_INI_LOCATION,
+						(String) null) : null;
 				oldPHPINIFile = iniLocation != null ? new File(iniLocation) : null;
 			} catch (CoreException e) {
 				Logger.logException(e);
