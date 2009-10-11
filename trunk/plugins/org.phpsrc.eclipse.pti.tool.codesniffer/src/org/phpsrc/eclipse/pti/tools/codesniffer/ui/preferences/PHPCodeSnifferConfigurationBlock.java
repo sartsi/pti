@@ -57,6 +57,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
@@ -73,6 +74,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 	private static final Key PREF_DEFAULT_STANDARD_NAME = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_NAME);
 	private static final Key PREF_DEFAULT_STANDARD_PATH = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH);
 	private static final Key PREF_DEFAULT_TAB_WITH = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH);
+	private static final Key PREF_IGNORE_PATTERN = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_IGNORE_PATTERN);
 
 	private static final int IDX_ADD = 0;
 	private static final int IDX_EDIT = 1;
@@ -81,6 +83,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 
 	private final ListDialogField<Standard> fStandardsList;
 	private final StringDialogField fTabWidth;
+	private final StringDialogField fIgnorePattern;
 
 	public static class Standard {
 		public String name;
@@ -246,12 +249,17 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 		fTabWidth.setLabelText("Tab width:");
 
 		unpackTabWidth();
+
+		fIgnorePattern = new StringDialogField();
+		fIgnorePattern.setLabelText("Patterns:");
+
+		unpackIgnorePattern();
 	}
 
 	private static Key[] getKeys() {
 		return new Key[] { PREF_PHP_EXECUTABLE, PREF_DEBUG_PRINT_OUTPUT, PREF_CUSTOM_STANDARD_NAMES,
 				PREF_CUSTOM_STANDARD_PATHS, PREF_DEFAULT_STANDARD_NAME, PREF_DEFAULT_STANDARD_PATH,
-				PREF_DEFAULT_TAB_WITH };
+				PREF_DEFAULT_TAB_WITH, PREF_IGNORE_PATTERN };
 	}
 
 	@Override
@@ -299,6 +307,27 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 		tabWidthGroup.setLayoutData(tabWidthData);
 
 		fTabWidth.doFillIntoGrid(tabWidthGroup, 3);
+
+		GridLayout ignorePatternLayout = new GridLayout();
+		ignorePatternLayout.marginHeight = 5;
+		ignorePatternLayout.marginWidth = 0;
+		ignorePatternLayout.numColumns = 3;
+		ignorePatternLayout.marginLeft = 4;
+		ignorePatternLayout.marginRight = 4;
+
+		Group ignorePatternGroup = new Group(folder, SWT.NULL);
+		ignorePatternGroup.setText("Ignore Directory and Files");
+		ignorePatternGroup.setLayout(ignorePatternLayout);
+		ignorePatternGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		fIgnorePattern.doFillIntoGrid(ignorePatternGroup, 3);
+
+		Label ignorePatternInfoLabel = new Label(ignorePatternGroup, SWT.NULL);
+		ignorePatternInfoLabel.setText("Patterns are separated by a comma (* = any string, ?= any character)");
+		GridData infoData = new GridData(GridData.FILL_HORIZONTAL);
+		infoData.horizontalSpan = 3;
+		ignorePatternInfoLabel.setLayoutData(infoData);
+		makeFontItalic(ignorePatternInfoLabel);
 
 		return markersGroup;
 	}
@@ -372,6 +401,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 		} catch (Exception e) {
 		}
 		setValue(PREF_DEFAULT_TAB_WITH, "" + tabWidth);
+		setValue(PREF_IGNORE_PATTERN, fIgnorePattern.getText());
 
 		return super.processChanges(container);
 	}
@@ -441,12 +471,19 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 	protected void updateControls() {
 		unpackStandards();
 		unpackTabWidth();
+		unpackIgnorePattern();
 	}
 
 	private void unpackTabWidth() {
 		String tabWidth = getValue(PREF_DEFAULT_TAB_WITH);
 		if (tabWidth != null)
 			fTabWidth.setText(tabWidth);
+	}
+
+	private void unpackIgnorePattern() {
+		String ignorePattern = getValue(PREF_IGNORE_PATTERN);
+		if (ignorePattern != null)
+			fIgnorePattern.setText(ignorePattern);
 	}
 
 	private void unpackStandards() {

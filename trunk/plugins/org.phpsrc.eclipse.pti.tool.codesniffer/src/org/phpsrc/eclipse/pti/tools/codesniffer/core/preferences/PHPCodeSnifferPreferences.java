@@ -33,13 +33,18 @@ public class PHPCodeSnifferPreferences extends AbstractPHPToolPreferences {
 	protected String standard;
 	protected String standardName;
 	protected int tabWidth;
+	protected String ignorePattern;
 
 	public PHPCodeSnifferPreferences(String phpExecutable, boolean printOutput, String standard, String standardName,
-			int tabWidth) {
+			int tabWidth, String ignorePattern) {
 		super(phpExecutable, printOutput);
 		this.standard = standard;
 		this.standardName = standardName;
 		this.tabWidth = tabWidth;
+		if (ignorePattern != null && ignorePattern.length() > 0)
+			this.ignorePattern = ignorePattern;
+		else
+			this.ignorePattern = null;
 	}
 
 	public String getStandard() {
@@ -56,5 +61,9 @@ public class PHPCodeSnifferPreferences extends AbstractPHPToolPreferences {
 
 	public boolean isCustom() {
 		return !standard.equals(standardName);
+	}
+
+	public String getIgnorePattern() {
+		return ignorePattern;
 	}
 }

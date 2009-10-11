@@ -26,10 +26,13 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.codesniffer.core;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import org.apache.xerces.parsers.DOMParser;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -42,6 +45,7 @@ import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileUtil;
 import org.phpsrc.eclipse.pti.core.php.source.ISourceFile;
+import org.phpsrc.eclipse.pti.core.php.source.PHPSourceFile;
 import org.phpsrc.eclipse.pti.core.tools.AbstractPHPToolParser;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
@@ -70,13 +74,43 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 		return instance;
 	}
 
+	public IProblem[] parse(IFile file) throws CoreException, IOException {
+		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(file);
+		if (canParse(prefs.getIgnorePattern(), file))
+			return parseOutput(new PHPSourceFile(file), launchFile(file), prefs);
+		else
+			return new IProblem[0];
+	}
+
+	protected boolean canParse(String ignorePattern, IFile file) {
+		if (ignorePattern == null || ignorePattern.length() == 0)
+			return true;
+
+		String filePath = file.getFullPath().toPortableString();
+
+		String[] patterns = ignorePattern.split(",");
+		for (String pattern : patterns) {
+			pattern = pattern.replace("\\", "/").replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*").replaceAll("\\?",
+					".?");
+			Pattern p = Pattern.compile(pattern);
+			if (p.matcher(filePath).matches()) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	@Override
 	protected IProblem[] parseOutput(ISourceFile file, String output) {
+		return parseOutput(file, output, PHPCodeSnifferPreferencesFactory.factory(file.getFile()));
+	}
+
+	protected IProblem[] parseOutput(ISourceFile file, String output, PHPCodeSnifferPreferences prefs) {
 		ArrayList<IProblem> problems = new ArrayList<IProblem>();
 
 		try {
 			if (output.length() > 0) {
-				PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(file.getFile());
 
 				int tabWidth = 0;
 				if (prefs != null)

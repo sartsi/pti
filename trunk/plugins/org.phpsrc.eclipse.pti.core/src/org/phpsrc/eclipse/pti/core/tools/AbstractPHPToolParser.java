@@ -15,7 +15,7 @@ public abstract class AbstractPHPToolParser extends AbstractPHPTool {
 		return parseOutput(new PHPSourceFile(file), launchFile(file));
 	}
 
-	private String launchFile(IFile file) {
+	protected String launchFile(IFile file) {
 		PHPToolLauncher launcher = getPHPToolLauncher(file.getProject());
 		String output = launcher.launch(file);
 		if (output == null)

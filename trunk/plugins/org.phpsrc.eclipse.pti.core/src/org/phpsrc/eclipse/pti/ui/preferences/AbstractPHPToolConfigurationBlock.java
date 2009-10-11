@@ -39,6 +39,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -224,5 +226,14 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 				dialog.open();
 			}
 		});
+	}
+
+	protected void makeFontItalic(Label label) {
+		Font font = label.getFont();
+		FontData[] data = font.getFontData();
+		if (data.length > 0) {
+			data[0].setStyle(data[0].getStyle() | SWT.ITALIC);
+		}
+		label.setFont(new Font(font.getDevice(), data));
 	}
 }
