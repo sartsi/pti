@@ -160,13 +160,19 @@ public class INIFileModifier {
 
 					if (!replaced) {
 						section.lines.add(name + '=' + quoteString(value));
+						return;
 					}
 				} else {
 					section.lines.add(name + '=' + quoteString(value));
+					return;
 				}
 				break;
 			}
 		}
+
+		INIFileSection section = new INIFileSection(sectionName);
+		section.lines.add(name + '=' + quoteString(value));
+		sections.add(section);
 	}
 
 	/**
