@@ -64,6 +64,7 @@ public class PHPCodeSnifferPreferencesFactory {
 		int tabWidth = prefs.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH);
 		boolean printOutput = prefs.getBoolean(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
 		String ignorePattern = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_IGNORE_PATTERN);
+		String ignoreSniffs = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_IGNORE_SNIFFS);
 
 		IScopeContext[] preferenceScopes = createPreferenceScopes(project);
 		if (preferenceScopes[0] instanceof ProjectScope) {
@@ -83,10 +84,12 @@ public class PHPCodeSnifferPreferencesFactory {
 				tabWidth = node.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH, tabWidth);
 				printOutput = node.getBoolean(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT, printOutput);
 				ignorePattern = node.get(PHPCodeSnifferPreferenceNames.PREF_IGNORE_PATTERN, ignorePattern);
+				ignoreSniffs = node.get(PHPCodeSnifferPreferenceNames.PREF_IGNORE_SNIFFS, ignoreSniffs);
 			}
 		}
 
-		return new PHPCodeSnifferPreferences(phpExe, printOutput, standard, standardName, tabWidth, ignorePattern);
+		return new PHPCodeSnifferPreferences(phpExe, printOutput, standard, standardName, tabWidth, ignorePattern,
+				ignoreSniffs == null || ignoreSniffs.length() == 0 ? null : ignoreSniffs.split(","));
 	}
 
 	protected static IScopeContext[] createPreferenceScopes(IProject project) {

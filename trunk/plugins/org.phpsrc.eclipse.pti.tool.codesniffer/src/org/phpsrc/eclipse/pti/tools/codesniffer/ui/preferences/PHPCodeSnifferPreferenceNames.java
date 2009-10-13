@@ -35,4 +35,5 @@ public class PHPCodeSnifferPreferenceNames {
 	public static final String PREF_DEFAULT_STANDARD_PATH = "default_standard_path"; //$NON-NLS-1$
 	public static final String PREF_DEFAULT_TAB_WITH = "default_tab_width"; //$NON-NLS-1$
 	public static final String PREF_IGNORE_PATTERN = "ignore_pattern"; //$NON-NLS-1$
+	public static final String PREF_IGNORE_SNIFFS = "pref_ignore_sniffs"; //$NON-NLS-1$
 }

@@ -75,6 +75,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 	private static final Key PREF_DEFAULT_STANDARD_PATH = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH);
 	private static final Key PREF_DEFAULT_TAB_WITH = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH);
 	private static final Key PREF_IGNORE_PATTERN = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_IGNORE_PATTERN);
+	private static final Key PREF_IGNORE_SNIFFS = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_IGNORE_SNIFFS);
 
 	private static final int IDX_ADD = 0;
 	private static final int IDX_EDIT = 1;
@@ -84,6 +85,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 	private final ListDialogField<Standard> fStandardsList;
 	private final StringDialogField fTabWidth;
 	private final StringDialogField fIgnorePattern;
+	private final StringDialogField fIgnoreSniffs;
 
 	public static class Standard {
 		public String name;
@@ -254,12 +256,17 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 		fIgnorePattern.setLabelText("Patterns:");
 
 		unpackIgnorePattern();
+
+		fIgnoreSniffs = new StringDialogField();
+		fIgnoreSniffs.setLabelText("Sniffs:");
+
+		unpackIgnoreSniffs();
 	}
 
 	private static Key[] getKeys() {
 		return new Key[] { PREF_PHP_EXECUTABLE, PREF_DEBUG_PRINT_OUTPUT, PREF_CUSTOM_STANDARD_NAMES,
 				PREF_CUSTOM_STANDARD_PATHS, PREF_DEFAULT_STANDARD_NAME, PREF_DEFAULT_STANDARD_PATH,
-				PREF_DEFAULT_TAB_WITH, PREF_IGNORE_PATTERN };
+				PREF_DEFAULT_TAB_WITH, PREF_IGNORE_PATTERN, PREF_IGNORE_SNIFFS };
 	}
 
 	@Override
@@ -308,6 +315,16 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 
 		fTabWidth.doFillIntoGrid(tabWidthGroup, 3);
 
+		createDialogFieldWithInfoText(folder, fIgnorePattern, "Ignore Directories and Files",
+				"Patterns are separated by a comma (* = any string, ?= any character)");
+
+		createDialogFieldWithInfoText(folder, fIgnoreSniffs, "Ignore Sniffs", "Sniffs are separated by a comma");
+
+		return markersGroup;
+	}
+
+	private void createDialogFieldWithInfoText(Composite folder, StringDialogField field, String groupText,
+			String infoText) {
 		GridLayout ignorePatternLayout = new GridLayout();
 		ignorePatternLayout.marginHeight = 5;
 		ignorePatternLayout.marginWidth = 0;
@@ -316,20 +333,18 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 		ignorePatternLayout.marginRight = 4;
 
 		Group ignorePatternGroup = new Group(folder, SWT.NULL);
-		ignorePatternGroup.setText("Ignore Directory and Files");
+		ignorePatternGroup.setText(groupText);
 		ignorePatternGroup.setLayout(ignorePatternLayout);
 		ignorePatternGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		fIgnorePattern.doFillIntoGrid(ignorePatternGroup, 3);
+		field.doFillIntoGrid(ignorePatternGroup, 3);
 
 		Label ignorePatternInfoLabel = new Label(ignorePatternGroup, SWT.NULL);
-		ignorePatternInfoLabel.setText("Patterns are separated by a comma (* = any string, ?= any character)");
+		ignorePatternInfoLabel.setText(infoText);
 		GridData infoData = new GridData(GridData.FILL_HORIZONTAL);
 		infoData.horizontalSpan = 3;
 		ignorePatternInfoLabel.setLayoutData(infoData);
 		makeFontItalic(ignorePatternInfoLabel);
-
-		return markersGroup;
 	}
 
 	final boolean isDefaultStandard(Standard standard) {
@@ -402,6 +417,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 		}
 		setValue(PREF_DEFAULT_TAB_WITH, "" + tabWidth);
 		setValue(PREF_IGNORE_PATTERN, fIgnorePattern.getText());
+		setValue(PREF_IGNORE_SNIFFS, fIgnoreSniffs.getText());
 
 		return super.processChanges(container);
 	}
@@ -472,6 +488,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 		unpackStandards();
 		unpackTabWidth();
 		unpackIgnorePattern();
+		unpackIgnoreSniffs();
 	}
 
 	private void unpackTabWidth() {
@@ -484,6 +501,12 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 		String ignorePattern = getValue(PREF_IGNORE_PATTERN);
 		if (ignorePattern != null)
 			fIgnorePattern.setText(ignorePattern);
+	}
+
+	private void unpackIgnoreSniffs() {
+		String ignoreSniffs = getValue(PREF_IGNORE_SNIFFS);
+		if (ignoreSniffs != null)
+			fIgnoreSniffs.setText(ignoreSniffs);
 	}
 
 	private void unpackStandards() {

@@ -33,5 +33,7 @@ public interface ISourceFile {
 
 	public int lineEnd(int lineNumber) throws IndexOutOfBoundsException;
 
+	public int lineStartTabCount(int lineNumber) throws IndexOutOfBoundsException;
+
 	public IFile getFile();
 }

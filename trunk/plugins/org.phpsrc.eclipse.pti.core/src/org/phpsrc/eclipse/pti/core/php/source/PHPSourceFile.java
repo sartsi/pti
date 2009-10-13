@@ -38,6 +38,7 @@ public class PHPSourceFile implements ISourceFile {
 	private final IFile file;
 	private ArrayList<Integer> lineStarts;
 	private ArrayList<Integer> lineEnds;
+	private ArrayList<Integer> lineStartTabCount;
 
 	public PHPSourceFile(IFile file) throws CoreException, IOException {
 		this.file = file;
@@ -47,6 +48,7 @@ public class PHPSourceFile implements ISourceFile {
 	private void determineLinePositions(IFile file) throws CoreException, IOException {
 		lineStarts = new ArrayList<Integer>();
 		lineEnds = new ArrayList<Integer>();
+		lineStartTabCount = new ArrayList<Integer>();
 
 		InputStreamReader isr;
 		isr = new InputStreamReader(file.getContents());
@@ -54,17 +56,27 @@ public class PHPSourceFile implements ISourceFile {
 		int last = -1;
 		int i = 0;
 		int c;
+		boolean countTabs = true;
+		int tabCount = 0;
 		while ((c = isr.read()) != -1) {
 			if ((char) c == '\n') {
 				lineStarts.add(new Integer(last + 1));
 				lineEnds.add(new Integer(i));
+				lineStartTabCount.add(new Integer(tabCount));
 				last = i;
+				countTabs = true;
+				tabCount = 0;
+			} else if (countTabs && (char) c == '\t') {
+				++tabCount;
+			} else if ((char) c != ' ') {
+				countTabs = false;
 			}
 			i++;
 		}
 
 		lineStarts.add(new Integer(last + 1));
 		lineEnds.add(new Integer(i));
+		lineStartTabCount.add(new Integer(tabCount));
 	}
 
 	public int lineStart(int lineNumber) throws IndexOutOfBoundsException {
@@ -75,8 +87,11 @@ public class PHPSourceFile implements ISourceFile {
 		return lineEnds.get(lineNumber - 1);
 	}
 
+	public int lineStartTabCount(int lineNumber) throws IndexOutOfBoundsException {
+		return lineStartTabCount.get(lineNumber - 1);
+	}
+
 	public IFile getFile() {
 		return file;
 	}
-
 }

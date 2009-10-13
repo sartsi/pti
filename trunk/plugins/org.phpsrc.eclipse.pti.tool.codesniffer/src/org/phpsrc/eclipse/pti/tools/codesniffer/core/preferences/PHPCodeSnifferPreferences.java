@@ -34,9 +34,10 @@ public class PHPCodeSnifferPreferences extends AbstractPHPToolPreferences {
 	protected String standardName;
 	protected int tabWidth;
 	protected String ignorePattern;
+	protected String[] ignoreSniffs;
 
 	public PHPCodeSnifferPreferences(String phpExecutable, boolean printOutput, String standard, String standardName,
-			int tabWidth, String ignorePattern) {
+			int tabWidth, String ignorePattern, String[] ignoreSniffs) {
 		super(phpExecutable, printOutput);
 		this.standard = standard;
 		this.standardName = standardName;
@@ -45,6 +46,7 @@ public class PHPCodeSnifferPreferences extends AbstractPHPToolPreferences {
 			this.ignorePattern = ignorePattern;
 		else
 			this.ignorePattern = null;
+		this.ignoreSniffs = ignoreSniffs;
 	}
 
 	public String getStandard() {
@@ -65,5 +67,9 @@ public class PHPCodeSnifferPreferences extends AbstractPHPToolPreferences {
 
 	public String getIgnorePattern() {
 		return ignorePattern;
+	}
+
+	public String[] getIgnoreSniffs() {
+		return ignoreSniffs;
 	}
 }

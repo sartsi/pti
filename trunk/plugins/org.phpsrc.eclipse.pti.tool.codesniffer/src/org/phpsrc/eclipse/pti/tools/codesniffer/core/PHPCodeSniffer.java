@@ -125,9 +125,9 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 
 					Document doc = parser.getDocument();
 					problems.addAll(createProblemMarker(file, doc.getElementsByTagName("error"),
-							ProblemSeverities.Error, tabWidth));
+							ProblemSeverities.Error, tabWidth, prefs.getIgnoreSniffs()));
 					problems.addAll(createProblemMarker(file, doc.getElementsByTagName("warning"),
-							ProblemSeverities.Warning, tabWidth));
+							ProblemSeverities.Warning, tabWidth, prefs.getIgnoreSniffs()));
 				}
 			}
 		} catch (Exception e) {
@@ -137,7 +137,11 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 		return problems.toArray(new IProblem[0]);
 	}
 
-	protected ArrayList<IProblem> createProblemMarker(ISourceFile file, NodeList list, int type, int tabWidth) {
+	protected ArrayList<IProblem> createProblemMarker(ISourceFile file, NodeList list, int type, int tabWidth,
+			String[] ignoreSniffs) {
+		if (tabWidth <= 0)
+			tabWidth = 2;
+
 		ArrayList<IProblem> problems = new ArrayList<IProblem>();
 
 		int length = list.getLength();
@@ -146,11 +150,29 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 
 			NamedNodeMap attr = item.getAttributes();
 
+			String source = attr.getNamedItem("source").getTextContent();
+			if (ignoreSniffs != null && ignoreSniffs.length > 0) {
+				boolean ignoreSniff = false;
+				for (int s = 0; s < ignoreSniffs.length; s++) {
+					if (ignoreSniffs[s].equals(source)) {
+						ignoreSniff = true;
+						break;
+					}
+				}
+				if (ignoreSniff)
+					continue;
+			}
+
 			int lineNr = Integer.parseInt(attr.getNamedItem("line").getTextContent());
 			int column = Integer.parseInt(attr.getNamedItem("column").getTextContent());
-			String source = attr.getNamedItem("source").getTextContent();
+			int lineStart = file.lineStart(lineNr);
+
+			// calculate real column with tabs
+			if (column > 1)
+				lineStart += (column - 1 - (file.lineStartTabCount(lineNr) * (tabWidth - 1)));
+
 			problems.add(new CodeSnifferProblem(file.toString(), item.getTextContent(), IProblem.Syntax, new String[0],
-					type, file.lineStart(lineNr), file.lineEnd(lineNr), lineNr, column, source));
+					type, lineStart, file.lineEnd(lineNr), lineNr, column, source));
 		}
 
 		return problems;
