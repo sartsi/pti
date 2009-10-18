@@ -29,12 +29,21 @@ package org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards;
 
 import java.io.InvalidObjectException;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.PHPUnit;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
@@ -53,11 +62,24 @@ public class CreatePHPUnitTestCaseWizard extends Wizard implements INewWizard {
 		if (sourceClassPage.finish()) {
 			PHPUnit phpunit = PHPUnit.getInstance();
 			try {
-				return phpunit.createTestSkeleton(sourceClassPage.getSourceClassName(), sourceClassPage
+				boolean ok = phpunit.createTestSkeleton(sourceClassPage.getSourceClassName(), sourceClassPage
 						.getSourceClassFile(), sourceClassPage.getTestClassFilePath());
+
+				if (ok) {
+					Path path = new Path(sourceClassPage.getTestClassFilePath());
+					IFile testFile = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+					IEditorInput editorInput = new FileEditorInput(testFile);
+					IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+					IWorkbenchPage page = window.getActivePage();
+					page.openEditor(editorInput, page.getActiveEditor().getSite().getId());
+				}
+
+				return ok;
 			} catch (InvalidObjectException e) {
+				e.printStackTrace();
 				Logger.logException(e);
 			} catch (CoreException e) {
+				e.printStackTrace();
 				Logger.logException(e);
 			}
 		}
@@ -81,5 +103,9 @@ public class CreatePHPUnitTestCaseWizard extends Wizard implements INewWizard {
 
 	public boolean setSourceClassName(String className, IDLTKSearchScope scope) {
 		return sourceClassPage.setSourceClassName(className, scope);
+	}
+
+	public boolean setSourceClassName(String className, IResource classFile) {
+		return sourceClassPage.setSourceClassName(className, classFile);
 	}
 }

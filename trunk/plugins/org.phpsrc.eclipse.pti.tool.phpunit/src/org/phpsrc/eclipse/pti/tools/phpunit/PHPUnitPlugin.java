@@ -27,6 +27,7 @@
 
 package org.phpsrc.eclipse.pti.tools.phpunit;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.osgi.framework.BundleContext;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
@@ -82,9 +83,13 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 	}
 
 	@Override
-	public IPath[] getPluginIncludePaths() {
-		return new IPath[] { PHPLibraryPEARPlugin.getDefault().resolvePluginResource("/php/library"),
-				PHPLibraryPEARPlugin.getDefault().resolvePluginResource("/php/library/PEAR"),
-				resolvePluginResource("/php/tools") };
+	public IPath[] getPluginIncludePaths(IProject project) {
+		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(project);
+
+		IPath[] includePaths = new IPath[pearPaths.length + 1];
+		includePaths[0] = resolvePluginResource("/php/tools");
+		System.arraycopy(pearPaths, 0, includePaths, 1, pearPaths.length);
+
+		return includePaths;
 	}
 }

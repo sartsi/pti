@@ -26,9 +26,15 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.library.pear;
 
+import java.util.ArrayList;
+
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.osgi.framework.BundleContext;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
+import org.phpsrc.eclipse.pti.library.pear.core.preferences.PEARPreferences;
+import org.phpsrc.eclipse.pti.library.pear.core.preferences.PEARPreferencesFactory;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -36,7 +42,7 @@ import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
 public class PHPLibraryPEARPlugin extends AbstractPHPToolPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "Plugin_org.phpsrc.eclipse.pti.library.pear";
+	public static final String PLUGIN_ID = "org.phpsrc.eclipse.pti.library.pear";
 
 	// The shared instance
 	private static PHPLibraryPEARPlugin plugin;
@@ -83,7 +89,24 @@ public class PHPLibraryPEARPlugin extends AbstractPHPToolPlugin {
 	}
 
 	@Override
-	public IPath[] getPluginIncludePaths() {
-		return new IPath[0];
+	public IPath[] getPluginIncludePaths(IProject project) {
+		ArrayList<IPath> paths = new ArrayList<IPath>(2);
+
+		PEARPreferences pref = PEARPreferencesFactory.factory(project);
+		if (pref != null && !" ".equals(pref.getLibraryPath())) {
+			IPath path = Path.fromOSString(pref.getLibraryPath());
+			if (path != null) {
+				paths.add(path);
+			}
+			path = Path.fromOSString(pref.getLibraryPath() + Path.SEPARATOR + "PEAR");
+			if (path != null) {
+				paths.add(path);
+			}
+		}
+
+		paths.add(resolvePluginResource("/php/library"));
+		paths.add(resolvePluginResource("/php/library/PEAR"));
+
+		return paths.toArray(new IPath[0]);
 	}
 }

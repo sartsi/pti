@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.core;
 
+import java.io.File;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;
@@ -26,6 +28,7 @@ import org.eclipse.dltk.core.DLTKCore;
 import org.eclipse.dltk.core.IMember;
 import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.ISourceModule;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPToolkitUtil {
 
@@ -180,4 +183,27 @@ public class PHPToolkitUtil {
 		return null;
 	}
 
+	public static File createTempFile(String fileName) {
+		File tmpFile = null;
+		try {
+			// Create temporary directory:
+			File tempDir = new File(System.getProperty("java.io.tmpdir"), "eclipse_pti"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (!tempDir.exists()) {
+				tempDir.mkdir();
+				tempDir.deleteOnExit();
+			}
+			tempDir = File.createTempFile("session", null, tempDir); //$NON-NLS-1$
+			tempDir.delete(); // delete temp file
+			tempDir.mkdir();
+			tempDir.deleteOnExit();
+
+			// Create empty configuration file:
+			tmpFile = new File(tempDir, fileName);
+			tmpFile.createNewFile();
+			tmpFile.deleteOnExit();
+		} catch (Exception e) {
+			Logger.logException(e);
+		}
+		return tmpFile;
+	}
 }

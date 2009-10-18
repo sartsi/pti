@@ -45,7 +45,6 @@ import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.dltk.core.search.SearchMatch;
 import org.eclipse.dltk.internal.core.SourceType;
 import org.eclipse.jface.dialogs.IDialogPage;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
@@ -63,7 +62,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
-import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
 import org.phpsrc.eclipse.pti.core.search.PHPSearchMatch;
@@ -188,8 +186,7 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 				try {
 					types = module.getAllTypes();
 					if (types != null && types.length > 0) {
-						this.setSourceClassName(types[0].getElementName(), PHPSearchEngine.createProjectScope(types[0]
-								.getResource().getProject()));
+						this.setSourceClassName(types[0].getElementName(), types[0].getResource());
 					}
 				} catch (ModelException e1) {
 					e1.printStackTrace();
@@ -243,11 +240,12 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 			patternFile = PHPUnitConfigurationBlock.TEST_FILE_PATTERN_FILE_DEFAULT;
 
 		String fileName = resource.getName();
-		int dotPos = fileName.lastIndexOf(".");
+		int firstDotPos = fileName.indexOf(".");
+		int lastDotPos = fileName.lastIndexOf(".");
 		patternFile = patternFile.replaceAll(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_FILENAME, fileName
-				.substring(0, dotPos));
+				.substring(0, firstDotPos));
 		patternFile = patternFile.replaceAll(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_FILE_EXTENSION, fileName
-				.substring(dotPos + 1));
+				.substring(lastDotPos + 1));
 		fileText.setText(patternFile);
 	}
 
@@ -335,7 +333,7 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 				return;
 			}
 			if (fileName != null && !fileName.equals("") && containerFolder.getFile(new Path(fileName)).exists()) { //$NON-NLS-1$
-				setMessage("File exists and will be overwritten", WizardPage.WARNING);
+				setMessage("File exists and will be combined", WizardPage.INFORMATION);
 				testFileExists = true;
 			}
 		}
@@ -369,7 +367,8 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 			}
 		}
 
-		final IContentType contentType = Platform.getContentTypeManager().getContentType(IPHPCoreConstants.ContentTypeID_PHP);
+		final IContentType contentType = Platform.getContentTypeManager().getContentType(
+				IPHPCoreConstants.ContentTypeID_PHP);
 		if (!contentType.isAssociatedWith(fileName)) {
 			// fixed bug 195274
 			// get the extensions from content type
@@ -401,12 +400,29 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 	}
 
 	public boolean setSourceClassName(String className) {
-		return setSourceClassName(className, PHPSearchEngine.createWorkspaceScope());
+		return setSourceClassName(className, PHPSearchEngine.createWorkspaceScope(), null);
+	}
+
+	public boolean setSourceClassName(String className, IResource classFile) {
+		return setSourceClassName(className, PHPSearchEngine.createProjectScope(classFile.getProject()), classFile);
 	}
 
 	public boolean setSourceClassName(String className, IDLTKSearchScope scope) {
+		return setSourceClassName(className, scope, null);
+	}
+
+	protected boolean setSourceClassName(String className, IDLTKSearchScope scope, IResource classFile) {
 		SearchMatch[] matches = PHPSearchEngine.findClass(className, scope);
+
 		if (matches.length > 0) {
+			for (SearchMatch match : matches) {
+				if (classFile != null || match.getResource().equals(classFile)) {
+					setSourceClass(match);
+					return true;
+				}
+			}
+
+			// no file found, so use first match
 			setSourceClass(matches[0]);
 			return true;
 		}
@@ -439,10 +455,6 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 	}
 
 	public boolean finish() {
-		if (testFileExists) {
-			return MessageDialog.openConfirm(PHPToolCorePlugin.getActiveWorkbenchShell(), "Test file exists",
-					"Test file exists. Overwrite?");
-		}
 		return true;
 	}
 }

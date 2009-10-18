@@ -24,23 +24,11 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package org.phpsrc.eclipse.pti.core.php.inifile;
+package org.phpsrc.eclipse.pti.library.pear.ui.preferences;
 
-import java.io.File;
-
-import org.eclipse.core.runtime.IPath;
-
-public class INIFileUtil {
-	public static INIFileEntry createIncludePathEntry(IPath[] includePaths) {
-		StringBuffer sb = new StringBuffer();
-		if (includePaths != null && includePaths.length > 0) {
-			sb.append(includePaths[0]);
-			for (int i = 1; i < includePaths.length; i++) {
-				sb.append(File.pathSeparator);
-				sb.append(includePaths[i].toOSString());
-			}
-		}
-
-		return new INIFileEntry("PHP", "include_path", sb.toString(), true);
-	}
+public class PEARPreferenceNames {
+	public static final String PREF_DEFAULT_LIBRARY_NAME = "default_library_name"; //$NON-NLS-1$
+	public static final String PREF_DEFAULT_LIBRARY_PATH = "default_library_path"; //$NON-NLS-1$
+	public static final String PREF_CUSTOM_LIBRARY_NAMES = "custom_library_names"; //$NON-NLS-1$
+	public static final String PREF_CUSTOM_LIBRARY_PATHS = "custom_library_paths"; //$NON-NLS-1$
 }

@@ -48,7 +48,6 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
-import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
 import org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
@@ -120,7 +119,7 @@ public class CreateTestCaseAction implements IObjectActionDelegate, IEditorActio
 				WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 						wizard);
 				dialog.create();
-				wizard.setSourceClassName(type.getElementName(), PHPSearchEngine.createProjectScope(file.getProject()));
+				wizard.setSourceClassName(type.getElementName(), file);
 				dialog.open();
 			}
 		} catch (ModelException e) {

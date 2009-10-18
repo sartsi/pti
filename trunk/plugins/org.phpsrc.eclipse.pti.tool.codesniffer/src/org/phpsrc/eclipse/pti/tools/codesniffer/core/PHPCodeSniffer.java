@@ -205,16 +205,16 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(project);
 
 		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
-				getCommandLineArgs(prefs.getStandard(), prefs.getTabWidth()), getPHPINIEntries(prefs));
+				getCommandLineArgs(prefs.getStandard(), prefs.getTabWidth()), getPHPINIEntries(prefs, project));
 
 		launcher.setPrintOuput(prefs.isPrintOutput());
 
 		return launcher;
 	}
 
-	private INIFileEntry[] getPHPINIEntries(PHPCodeSnifferPreferences prefs) {
+	private INIFileEntry[] getPHPINIEntries(PHPCodeSnifferPreferences prefs, IProject project) {
 
-		IPath[] includePaths = PHPCodeSnifferPlugin.getDefault().getPluginIncludePaths();
+		IPath[] includePaths = PHPCodeSnifferPlugin.getDefault().getPluginIncludePaths(project);
 
 		if (prefs.isCustom()) {
 			IPath[] tmpIncludePaths = new IPath[includePaths.length + 2];

@@ -103,16 +103,13 @@ public class PHPToolExecutableLauncher {
 			return null;
 		}
 
-		SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10); // 10
-		// of
-		// 100
+		SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 10);
 
 		// Locate the php.ini by using the attribute. If the attribute was null,
 		// try to locate an php.ini that exists next to the executable.
 		File phpIni = (phpIniPath != null && new File(phpIniPath).exists()) ? new File(phpIniPath) : PHPINIUtil
 				.findPHPIni(phpExeString);
-		File tempIni = PHPINIUtil.prepareBeforeDebug(phpIni, phpExeString, project);
-		launch.setAttribute(IDebugParametersKeys.PHP_INI_LOCATION, tempIni.getAbsolutePath());
+		launch.setAttribute(IDebugParametersKeys.PHP_INI_LOCATION, phpIni.getAbsolutePath());
 
 		// resolve location
 		IPath phpExe = new Path(phpExeString);

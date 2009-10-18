@@ -29,6 +29,7 @@ package org.phpsrc.eclipse.pti.core;
 import java.io.IOException;
 import java.net.URL;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -51,5 +52,5 @@ public abstract class AbstractPHPToolPlugin extends AbstractUIPlugin {
 		return null;
 	}
 
-	public abstract IPath[] getPluginIncludePaths();
+	public abstract IPath[] getPluginIncludePaths(IProject project);
 }

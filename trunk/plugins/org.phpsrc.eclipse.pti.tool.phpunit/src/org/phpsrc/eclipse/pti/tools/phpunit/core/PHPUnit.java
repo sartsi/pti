@@ -25,6 +25,7 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.core;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.ProblemSeverities;
+import org.eclipse.dltk.core.IMethod;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
@@ -89,17 +91,65 @@ public class PHPUnit extends AbstractPHPTool {
 		IFolder folder = (IFolder) file.getParent();
 		createFolder(folder);
 
+		String testClassLocation = file.getLocation().toOSString();
+
+		String oldSource = null;
+		ArrayList<String> oldMethods = new ArrayList<String>();
+		if (file.exists()) {
+			ISourceModule oldModule = PHPToolkitUtil.getSourceModule(file);
+			IType oldClass = oldModule.getAllTypes()[0];
+			for (IMethod method : oldClass.getMethods()) {
+				if (method.getElementName().startsWith("test")) {
+					oldMethods.add(method.getElementName());
+				}
+			}
+
+			oldSource = oldModule.getSource();
+		}
+
 		String cmdLineArgs = "--skeleton-test " + className;
 		cmdLineArgs += " " + OperatingSystem.escapeShellFileArg(classFile.getLocation().toOSString());
 		cmdLineArgs += " " + className + "Test";
-		cmdLineArgs += " " + OperatingSystem.escapeShellFileArg(file.getLocation().toOSString());
+		cmdLineArgs += " " + OperatingSystem.escapeShellFileArg(testClassLocation);
 
 		PHPToolLauncher launcher = getProjectPHPToolLauncher(project, cmdLineArgs, classFile.getParent().getLocation());
 		String output = launcher.launch(project);
 
-		folder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+		boolean ok = (output.indexOf("Wrote skeleton for ") >= 0 ? true : false);
 
-		return (output.indexOf("Wrote skeleton for ") >= 0 ? true : false);
+		if (ok) {
+			folder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+
+			if (oldSource != null) {
+				StringBuffer newSource = new StringBuffer(oldSource.substring(0, oldSource.lastIndexOf("}")));
+
+				ISourceModule newModule = PHPToolkitUtil.getSourceModule(file);
+				newModule.reconcile(false, null, new NullProgressMonitor());
+
+				IType newClass = newModule.getAllTypes()[0];
+				for (IMethod method : newClass.getMethods()) {
+					if (method.getElementName().startsWith("test")) {
+						if (!oldMethods.contains(method.getElementName())) {
+							newSource.append("\n    " + method.getSource() + "\n");
+						}
+					}
+				}
+
+				newSource.append(oldSource.substring(oldSource.lastIndexOf("}")));
+
+				try {
+					FileWriter writer = new FileWriter(file.getLocation().toOSString());
+					writer.write(newSource.toString());
+					writer.close();
+
+					file.refreshLocal(IResource.DEPTH_ZERO, new NullProgressMonitor());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return ok;
 	}
 
 	public IProblem[] runTestCase(IFile testFile) {
@@ -212,20 +262,20 @@ public class PHPUnit extends AbstractPHPTool {
 		}
 
 		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
-				cmdLineArgs, getPHPINIEntries(fileIncludePath));
+				cmdLineArgs, getPHPINIEntries(project, fileIncludePath));
 
 		launcher.setPrintOuput(prefs.isPrintOutput());
 
 		return launcher;
 	}
 
-	private INIFileEntry[] getPHPINIEntries() {
-		IPath[] includePaths = PHPUnitPlugin.getDefault().getPluginIncludePaths();
+	private INIFileEntry[] getPHPINIEntries(IProject project) {
+		IPath[] includePaths = PHPUnitPlugin.getDefault().getPluginIncludePaths(project);
 		return getPHPINIEntries(includePaths);
 	}
 
-	private INIFileEntry[] getPHPINIEntries(IPath fileIncludePath) {
-		IPath[] pluginIncludePaths = PHPUnitPlugin.getDefault().getPluginIncludePaths();
+	private INIFileEntry[] getPHPINIEntries(IProject project, IPath fileIncludePath) {
+		IPath[] pluginIncludePaths = PHPUnitPlugin.getDefault().getPluginIncludePaths(project);
 
 		IPath[] includePaths = new IPath[pluginIncludePaths.length + 1];
 		System.arraycopy(pluginIncludePaths, 0, includePaths, 0, pluginIncludePaths.length);

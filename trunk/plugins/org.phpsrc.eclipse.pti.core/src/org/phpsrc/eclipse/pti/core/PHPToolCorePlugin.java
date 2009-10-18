@@ -26,6 +26,7 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.core;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -84,7 +85,7 @@ public class PHPToolCorePlugin extends AbstractPHPToolPlugin {
 	}
 
 	@Override
-	public IPath[] getPluginIncludePaths() {
+	public IPath[] getPluginIncludePaths(IProject project) {
 		return new IPath[0];
 	}
 
