@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PHP_Beautifier
+Bundle-SymbolicName: Plugin_org.phpsrc.eclipse.pti.phpbeautifier
+Bundle-Version: 0.1.0.qualifier
+Bundle-Activator: plugin_org.phpsrc.eclipse.pti.phpbeautifier.Activator
+Bundle-Vendor: Dejan Spasic
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.phpsrc.eclipse.pti.core;bundle-version="1.1.0",
+ org.phpsrc.eclipse.pti.library.pear;bundle-version="1.1.0",
+ org.phpsrc.eclipse.pti.validators.externalchecker;bundle-version="1.0.1",
+ org.eclipse.dltk.core;bundle-version="1.0.1",
+ org.eclipse.php.debug.core;bundle-version="2.1.1",
+ org.eclipse.core.resources;bundle-version="3.5.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
