@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: PHP_Beautifier
 Bundle-SymbolicName: Plugin_org.phpsrc.eclipse.pti.phpbeautifier
 Bundle-Version: 0.1.0.qualifier
-Bundle-Activator: plugin_org.phpsrc.eclipse.pti.phpbeautifier.Activator
+Bundle-Activator: org.phpsrc.eclipse.pti.phpbeautifier.Activator
 Bundle-Vendor: Dejan Spasic
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
