@@ -24,7 +24,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package plugin_org.phpsrc.eclipse.pti.phpbeautifier;
+package org.phpsrc.eclipse.pti.phpbeautifier;
 
 import org.eclipse.core.runtime.IPath;
 import org.osgi.framework.BundleContext;
