@@ -30,10 +30,7 @@ import java.io.File;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectNature;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.window.Window;
 import org.eclipse.php.internal.ui.preferences.IStatusChangeListener;
 import org.eclipse.php.internal.ui.preferences.util.Key;
@@ -49,12 +46,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ResourceSelectionDialog;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
-import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
 import org.phpsrc.eclipse.pti.library.pear.ui.preferences.AbstractPEARPHPToolConfigurationBlock;
 import org.phpsrc.eclipse.pti.tools.phpunit.IPHPUnitConstants;
 import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.PHPUnit;
-import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPUnitConfigurationBlock extends AbstractPEARPHPToolConfigurationBlock {
 
@@ -210,28 +205,13 @@ public class PHPUnitConfigurationBlock extends AbstractPEARPHPToolConfigurationB
 
 	@Override
 	protected boolean processChanges(IWorkbenchPreferenceContainer container) {
-		clearProjectLauncherCache();
+		clearProjectLauncherCache(PHPUnit.QUALIFIED_NAME);
 
 		setValue(PREF_BOOSTRAP, fBootstrap.getText());
 		setValue(PREF_TEST_FILE_PATTERN_FOLDER, fTestFilePatternFolder.getText());
 		setValue(PREF_TEST_FILE_PATTERN_FILE, fTestFilePatternFile.getText());
 
 		return super.processChanges(container);
-	}
-
-	private void clearProjectLauncherCache() {
-		IWorkspace root = ResourcesPlugin.getWorkspace();
-		IProject[] projects = root.getRoot().getProjects();
-		for (IProject project : projects) {
-			try {
-				IProjectNature nature = project.getNature(IPHPCoreConstants.PHPNatureID);
-				if (nature != null) {
-					project.setSessionProperty(PHPUnit.QUALIFIED_NAME, null);
-				}
-			} catch (CoreException e) {
-				Logger.logException(e);
-			}
-		}
 	}
 
 	@Override

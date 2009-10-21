@@ -98,18 +98,16 @@ public class PEARPreferencesFactory {
 		String libPath = prefs.getString(PEARPreferenceNames.PREF_CUSTOM_LIBRARY_PATHS);
 		String libName = prefs.getString(PEARPreferenceNames.PREF_CUSTOM_LIBRARY_NAMES);
 
-		if (libPath == null || libName == null)
-			return new PEARPreferences[0];
-
-		String[] libPaths = libPath.split(";");
-		String[] libNames = libName.split(";");
-
-		ArrayList<PEARPreferences> items = new ArrayList<PEARPreferences>(libPaths.length);
-
+		ArrayList<PEARPreferences> items = new ArrayList<PEARPreferences>(1);
 		items.add(new PEARPreferences("<Internal>", ""));
 
-		for (int i = 0; i < libPaths.length; i++) {
-			items.add(new PEARPreferences(libNames[i], libPaths[i]));
+		if (libPath != null && libName != null && libPath.length() > 0 && libName.length() > 0) {
+			String[] libPaths = libPath.split(";");
+			String[] libNames = libName.split(";");
+
+			for (int i = 0; i < libPaths.length; i++) {
+				items.add(new PEARPreferences(libNames[i], libPaths[i]));
+			}
 		}
 
 		return items.toArray(new PEARPreferences[0]);

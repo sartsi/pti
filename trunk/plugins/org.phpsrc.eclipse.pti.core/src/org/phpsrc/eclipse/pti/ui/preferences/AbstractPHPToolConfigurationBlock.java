@@ -27,6 +27,11 @@
 package org.phpsrc.eclipse.pti.ui.preferences;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectNature;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.preference.PreferenceDialog;
@@ -53,6 +58,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
+import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigurationBlock {
 
@@ -235,5 +242,22 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 			data[0].setStyle(data[0].getStyle() | SWT.ITALIC);
 		}
 		label.setFont(new Font(font.getDevice(), data));
+	}
+
+	protected void clearProjectLauncherCache(QualifiedName propertyName) {
+		IWorkspace root = ResourcesPlugin.getWorkspace();
+		IProject[] projects = root.getRoot().getProjects();
+		for (IProject project : projects) {
+			if (project.isOpen()) {
+				try {
+					IProjectNature nature = project.getNature(IPHPCoreConstants.PHPNatureID);
+					if (nature != null) {
+						project.setSessionProperty(propertyName, null);
+					}
+				} catch (CoreException e) {
+					Logger.logException(e);
+				}
+			}
+		}
 	}
 }

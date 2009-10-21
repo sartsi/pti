@@ -31,10 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectNature;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -59,11 +55,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
-import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
 import org.phpsrc.eclipse.pti.library.pear.ui.preferences.AbstractPEARPHPToolConfigurationBlock;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.PHPCodeSniffer;
-import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigurationBlock {
 
@@ -409,7 +403,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 
 	@Override
 	protected boolean processChanges(IWorkbenchPreferenceContainer container) {
-		clearProjectLauncherCache();
+		clearProjectLauncherCache(PHPCodeSniffer.QUALIFIED_NAME);
 
 		int tabWidth = 0;
 		try {
@@ -421,21 +415,6 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		setValue(PREF_IGNORE_SNIFFS, fIgnoreSniffs.getText());
 
 		return super.processChanges(container);
-	}
-
-	private void clearProjectLauncherCache() {
-		IWorkspace root = ResourcesPlugin.getWorkspace();
-		IProject[] projects = root.getRoot().getProjects();
-		for (IProject project : projects) {
-			try {
-				IProjectNature nature = project.getNature(IPHPCoreConstants.PHPNatureID);
-				if (nature != null) {
-					project.setSessionProperty(PHPCodeSniffer.QUALIFIED_NAME, null);
-				}
-			} catch (CoreException e) {
-				Logger.logException(e);
-			}
-		}
 	}
 
 	private void setToDefaultStandard(Standard standard) {
