@@ -296,7 +296,7 @@ public class PHPUnit extends AbstractPHPTool {
 		return entries;
 	}
 
-	private IPath getScriptFile() {
+	public static IPath getScriptFile() {
 		return PHPUnitPlugin.getDefault().resolvePluginResource("/php/tools/phpunit.php");
 	}
 

@@ -162,7 +162,7 @@ public class PHPToolLauncher {
 		return null;
 	}
 
-	protected ILaunchConfigurationType getPHPExeLaunchConfigType() {
+	protected static ILaunchConfigurationType getPHPExeLaunchConfigType() {
 		ILaunchManager lm = DebugPlugin.getDefault().getLaunchManager();
 		return lm.getLaunchConfigurationType(IPHPCoreConstants.LaunchType);
 	}
@@ -213,6 +213,31 @@ public class PHPToolLauncher {
 		}
 
 		return config;
+	}
+
+	public static void deleteAllConfigs(String phpPathString) {
+		if (phpPathString == null)
+			return;
+
+		ILaunchConfigurationType configType = getPHPExeLaunchConfigType();
+
+		try {
+			ILaunchConfiguration[] configs = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(
+					configType);
+
+			int numConfigs = configs == null ? 0 : configs.length;
+
+			for (int i = 0; i < numConfigs; i++) {
+				String fileName = configs[i].getAttribute(IPHPDebugConstants.ATTR_FILE, (String) null);
+				boolean isPti = configs[i].getAttribute(PHPToolCorePlugin.PLUGIN_ID, false);
+
+				if (isPti && phpPathString.equals(fileName)) {
+					configs[i].delete();
+				}
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected File createCustomPHPINIFile(ILaunchConfiguration config, PHPexeItem defaultEXE, INIFileEntry[] fileEntries) {

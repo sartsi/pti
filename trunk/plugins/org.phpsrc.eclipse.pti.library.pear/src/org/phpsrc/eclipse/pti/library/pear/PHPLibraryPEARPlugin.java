@@ -90,9 +90,16 @@ public class PHPLibraryPEARPlugin extends AbstractPHPToolPlugin {
 
 	@Override
 	public IPath[] getPluginIncludePaths(IProject project) {
+		return getPluginIncludePaths(PEARPreferencesFactory.factory(project));
+	}
+
+	public IPath[] getPluginIncludePaths(String libraryName) {
+		return getPluginIncludePaths(PEARPreferencesFactory.factoryByName(libraryName));
+	}
+
+	public IPath[] getPluginIncludePaths(PEARPreferences pref) {
 		ArrayList<IPath> paths = new ArrayList<IPath>(2);
 
-		PEARPreferences pref = PEARPreferencesFactory.factory(project);
 		if (pref != null && !" ".equals(pref.getLibraryPath())) {
 			IPath path = Path.fromOSString(pref.getLibraryPath());
 			if (path != null) {

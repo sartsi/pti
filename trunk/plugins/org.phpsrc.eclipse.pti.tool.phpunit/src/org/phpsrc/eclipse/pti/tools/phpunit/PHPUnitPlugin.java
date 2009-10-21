@@ -32,6 +32,8 @@ import org.eclipse.core.runtime.IPath;
 import org.osgi.framework.BundleContext;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
 import org.phpsrc.eclipse.pti.library.pear.PHPLibraryPEARPlugin;
+import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferences;
+import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferencesFactory;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -84,7 +86,10 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 
 	@Override
 	public IPath[] getPluginIncludePaths(IProject project) {
-		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(project);
+
+		PHPUnitPreferences prefs = PHPUnitPreferencesFactory.factory(project);
+
+		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(prefs.getPearLibraryName());
 
 		IPath[] includePaths = new IPath[pearPaths.length + 1];
 		includePaths[0] = resolvePluginResource("/php/tools");

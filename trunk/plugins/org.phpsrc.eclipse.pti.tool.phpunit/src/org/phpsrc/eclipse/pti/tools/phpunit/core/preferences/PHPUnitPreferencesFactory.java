@@ -56,6 +56,7 @@ public class PHPUnitPreferencesFactory {
 		String bootstrap = prefs.getString(PHPUnitPreferenceNames.PREF_BOOTSTRAP);
 		String testFilePatternFolder = prefs.getString(PHPUnitPreferenceNames.PREF_TEST_FILE_PATTERN_FOLDER);
 		String testFilePatternFile = prefs.getString(PHPUnitPreferenceNames.PREF_TEST_FILE_PATTERN_FILE);
+		String pearLibraryName = prefs.getString(PHPUnitPreferenceNames.PREF_PEAR_LIBRARY);
 
 		IScopeContext[] preferenceScopes = createPreferenceScopes(project);
 		if (preferenceScopes[0] instanceof ProjectScope) {
@@ -67,10 +68,12 @@ public class PHPUnitPreferencesFactory {
 				testFilePatternFolder = node.get(PHPUnitPreferenceNames.PREF_TEST_FILE_PATTERN_FOLDER,
 						testFilePatternFolder);
 				testFilePatternFile = node.get(PHPUnitPreferenceNames.PREF_TEST_FILE_PATTERN_FILE, testFilePatternFile);
+				pearLibraryName = node.get(PHPUnitPreferenceNames.PREF_PEAR_LIBRARY, pearLibraryName);
 			}
 		}
 
-		return new PHPUnitPreferences(phpExe, printOutput, bootstrap, testFilePatternFolder, testFilePatternFile);
+		return new PHPUnitPreferences(phpExe, printOutput, pearLibraryName, bootstrap, testFilePatternFolder,
+				testFilePatternFile);
 	}
 
 	protected static IScopeContext[] createPreferenceScopes(IProject project) {

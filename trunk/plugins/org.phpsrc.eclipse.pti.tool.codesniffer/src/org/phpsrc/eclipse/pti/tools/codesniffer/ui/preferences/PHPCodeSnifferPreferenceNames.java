@@ -28,6 +28,7 @@ package org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences;
 
 public class PHPCodeSnifferPreferenceNames {
 	public static final String PREF_PHP_EXECUTABLE = "php_executable"; //$NON-NLS-1$
+	public static final String PREF_PEAR_LIBRARY = "pear_library"; //$NON-NLS-1$
 	public static final String PREF_DEBUG_PRINT_OUTPUT = "debug_print_output"; //$NON-NLS-1$
 	public static final String PREF_CUSTOM_STANDARD_NAMES = "custom_standard_names"; //$NON-NLS-1$
 	public static final String PREF_CUSTOM_STANDARD_PATHS = "custom_standard_paths"; //$NON-NLS-1$

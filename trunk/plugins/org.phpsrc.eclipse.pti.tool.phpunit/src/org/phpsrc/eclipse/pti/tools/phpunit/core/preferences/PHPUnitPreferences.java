@@ -27,16 +27,16 @@
 
 package org.phpsrc.eclipse.pti.tools.phpunit.core.preferences;
 
-import org.phpsrc.eclipse.pti.core.preferences.AbstractPHPToolPreferences;
+import org.phpsrc.eclipse.pti.library.pear.core.preferences.AbstractPEARPHPToolPreferences;
 
-public class PHPUnitPreferences extends AbstractPHPToolPreferences {
+public class PHPUnitPreferences extends AbstractPEARPHPToolPreferences {
 	protected String bootstrap;
 	protected String testFilePatternFolder;
 	protected String testFilePatternFile;
 
-	public PHPUnitPreferences(String phpExecutable, boolean printOutput, String bootstrap,
+	public PHPUnitPreferences(String phpExecutable, boolean printOutput, String pearLibraryName, String bootstrap,
 			String testFilePatternFolder, String testFilePatternFile) {
-		super(phpExecutable, printOutput);
+		super(phpExecutable, printOutput, pearLibraryName);
 		this.bootstrap = bootstrap;
 		this.testFilePatternFolder = testFilePatternFolder;
 		this.testFilePatternFile = testFilePatternFile;

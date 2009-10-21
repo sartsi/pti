@@ -60,14 +60,15 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
+import org.phpsrc.eclipse.pti.library.pear.ui.preferences.AbstractPEARPHPToolConfigurationBlock;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.PHPCodeSniffer;
 import org.phpsrc.eclipse.pti.ui.Logger;
-import org.phpsrc.eclipse.pti.ui.preferences.AbstractPHPToolConfigurationBlock;
 
-public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurationBlock {
+public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigurationBlock {
 
 	private static final Key PREF_PHP_EXECUTABLE = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_PHP_EXECUTABLE);
+	private static final Key PREF_PEAR_LIBRARY = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_PEAR_LIBRARY);
 	private static final Key PREF_DEBUG_PRINT_OUTPUT = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
 	private static final Key PREF_CUSTOM_STANDARD_NAMES = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_CUSTOM_STANDARD_NAMES);
 	private static final Key PREF_CUSTOM_STANDARD_PATHS = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_CUSTOM_STANDARD_PATHS);
@@ -264,7 +265,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 	}
 
 	private static Key[] getKeys() {
-		return new Key[] { PREF_PHP_EXECUTABLE, PREF_DEBUG_PRINT_OUTPUT, PREF_CUSTOM_STANDARD_NAMES,
+		return new Key[] { PREF_PHP_EXECUTABLE, PREF_PEAR_LIBRARY, PREF_DEBUG_PRINT_OUTPUT, PREF_CUSTOM_STANDARD_NAMES,
 				PREF_CUSTOM_STANDARD_PATHS, PREF_DEFAULT_STANDARD_NAME, PREF_DEFAULT_STANDARD_PATH,
 				PREF_DEFAULT_TAB_WITH, PREF_IGNORE_PATTERN, PREF_IGNORE_SNIFFS };
 	}
@@ -477,6 +478,11 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 		return PREF_DEBUG_PRINT_OUTPUT;
 	}
 
+	@Override
+	protected Key getPEARLibraryKey() {
+		return PREF_PEAR_LIBRARY;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -559,4 +565,5 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPHPToolConfigurati
 		if (defaultStandard != null)
 			setToDefaultStandard(defaultStandard);
 	}
+
 }

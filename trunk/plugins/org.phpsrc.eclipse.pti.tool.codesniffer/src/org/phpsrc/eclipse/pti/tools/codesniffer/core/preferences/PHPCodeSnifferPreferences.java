@@ -27,18 +27,18 @@
 
 package org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences;
 
-import org.phpsrc.eclipse.pti.core.preferences.AbstractPHPToolPreferences;
+import org.phpsrc.eclipse.pti.library.pear.core.preferences.AbstractPEARPHPToolPreferences;
 
-public class PHPCodeSnifferPreferences extends AbstractPHPToolPreferences {
+public class PHPCodeSnifferPreferences extends AbstractPEARPHPToolPreferences {
 	protected String standard;
 	protected String standardName;
 	protected int tabWidth;
 	protected String ignorePattern;
 	protected String[] ignoreSniffs;
 
-	public PHPCodeSnifferPreferences(String phpExecutable, boolean printOutput, String standard, String standardName,
-			int tabWidth, String ignorePattern, String[] ignoreSniffs) {
-		super(phpExecutable, printOutput);
+	public PHPCodeSnifferPreferences(String phpExecutable, boolean printOutput, String pearLibraryName,
+			String standard, String standardName, int tabWidth, String ignorePattern, String[] ignoreSniffs) {
+		super(phpExecutable, printOutput, pearLibraryName);
 		this.standard = standard;
 		this.standardName = standardName;
 		this.tabWidth = tabWidth;

@@ -27,6 +27,8 @@
 
 package org.phpsrc.eclipse.pti.library.pear.core.preferences;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -73,10 +75,43 @@ public class PEARPreferencesFactory {
 		return new PEARPreferences(libName, libPath);
 	}
 
+	public static PEARPreferences factoryByName(String name) {
+		if (name != null && !"".equals(name) && !name.startsWith("<")) {
+			for (PEARPreferences prefs : getAll()) {
+				if (prefs.getLibraryName().equals(name))
+					return prefs;
+			}
+		}
+
+		return null;
+	}
+
 	protected static IScopeContext[] createPreferenceScopes(IProject project) {
 		if (project != null) {
 			return new IScopeContext[] { new ProjectScope(project), new InstanceScope(), new DefaultScope() };
 		}
 		return new IScopeContext[] { new InstanceScope(), new DefaultScope() };
+	}
+
+	public static PEARPreferences[] getAll() {
+		Preferences prefs = PHPLibraryPEARPlugin.getDefault().getPluginPreferences();
+		String libPath = prefs.getString(PEARPreferenceNames.PREF_CUSTOM_LIBRARY_PATHS);
+		String libName = prefs.getString(PEARPreferenceNames.PREF_CUSTOM_LIBRARY_NAMES);
+
+		if (libPath == null || libName == null)
+			return new PEARPreferences[0];
+
+		String[] libPaths = libPath.split(";");
+		String[] libNames = libName.split(";");
+
+		ArrayList<PEARPreferences> items = new ArrayList<PEARPreferences>(libPaths.length);
+
+		items.add(new PEARPreferences("<Internal>", ""));
+
+		for (int i = 0; i < libPaths.length; i++) {
+			items.add(new PEARPreferences(libNames[i], libPaths[i]));
+		}
+
+		return items.toArray(new PEARPreferences[0]);
 	}
 }

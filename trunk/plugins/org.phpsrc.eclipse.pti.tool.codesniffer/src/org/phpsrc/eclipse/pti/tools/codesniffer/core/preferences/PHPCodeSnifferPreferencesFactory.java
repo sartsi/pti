@@ -60,6 +60,7 @@ public class PHPCodeSnifferPreferencesFactory {
 		if (standard == null || standard.equals("")) {
 			standard = standardName;
 		}
+		String pearLibraryName = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_PEAR_LIBRARY);
 
 		int tabWidth = prefs.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH);
 		boolean printOutput = prefs.getBoolean(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
@@ -81,6 +82,7 @@ public class PHPCodeSnifferPreferencesFactory {
 					standardName = projectStandardName;
 				}
 
+				pearLibraryName = node.get(PHPCodeSnifferPreferenceNames.PREF_PEAR_LIBRARY, pearLibraryName);
 				tabWidth = node.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH, tabWidth);
 				printOutput = node.getBoolean(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT, printOutput);
 				ignorePattern = node.get(PHPCodeSnifferPreferenceNames.PREF_IGNORE_PATTERN, ignorePattern);
@@ -88,8 +90,8 @@ public class PHPCodeSnifferPreferencesFactory {
 			}
 		}
 
-		return new PHPCodeSnifferPreferences(phpExe, printOutput, standard, standardName, tabWidth, ignorePattern,
-				ignoreSniffs == null || ignoreSniffs.length() == 0 ? null : ignoreSniffs.split(","));
+		return new PHPCodeSnifferPreferences(phpExe, printOutput, pearLibraryName, standard, standardName, tabWidth,
+				ignorePattern, ignoreSniffs == null || ignoreSniffs.length() == 0 ? null : ignoreSniffs.split(","));
 	}
 
 	protected static IScopeContext[] createPreferenceScopes(IProject project) {

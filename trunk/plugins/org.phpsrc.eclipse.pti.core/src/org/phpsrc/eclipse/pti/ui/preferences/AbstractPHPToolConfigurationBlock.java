@@ -69,7 +69,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 	}
 
 	@Override
-	public final Control createContents(Composite parent) {
+	public Control createContents(Composite parent) {
 		setShell(parent.getShell());
 
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -81,7 +81,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 		createVersionContent(composite);
 		unpackPHPExecutable();
 
-		createDebugComposite(composite);
+		createDebugContent(composite);
 
 		Composite toolComposite = createToolContents(composite);
 		toolComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -91,7 +91,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 
 	protected abstract Composite createToolContents(Composite parent);
 
-	private Composite createVersionContent(Composite parent) {
+	protected Composite createVersionContent(Composite parent) {
 		Group composite = new Group(parent, SWT.RESIZE);
 		composite.setText("PHP Executable");
 
@@ -132,7 +132,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 		return composite;
 	}
 
-	private Composite createDebugComposite(Composite parent) {
+	protected Composite createDebugContent(Composite parent) {
 		Group composite = new Group(parent, SWT.RESIZE);
 		composite.setText("Debug");
 
@@ -157,7 +157,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 		return composite;
 	}
 
-	private void setPhpExecutable(String value) {
+	protected void setPhpExecutable(String value) {
 		PHPexes exes = PHPexes.getInstance();
 		PHPexeItem[] items = exes.getAllItems();
 
@@ -172,7 +172,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 		}
 	}
 
-	private String[] preparePHPExecutableEntryList() {
+	protected String[] preparePHPExecutableEntryList() {
 		PHPexes exes = PHPexes.getInstance();
 		PHPexeItem[] items = exes.getAllItems();
 
@@ -189,7 +189,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 		return entryList;
 	}
 
-	private void unpackPHPExecutable() {
+	protected void unpackPHPExecutable() {
 		String value = getValue(getPHPExecutableKey());
 		if (value != null)
 			phpExecutableCombo.setText(value);

@@ -50,15 +50,16 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ResourceSelectionDialog;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
+import org.phpsrc.eclipse.pti.library.pear.ui.preferences.AbstractPEARPHPToolConfigurationBlock;
 import org.phpsrc.eclipse.pti.tools.phpunit.IPHPUnitConstants;
 import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.PHPUnit;
 import org.phpsrc.eclipse.pti.ui.Logger;
-import org.phpsrc.eclipse.pti.ui.preferences.AbstractPHPToolConfigurationBlock;
 
-public class PHPUnitConfigurationBlock extends AbstractPHPToolConfigurationBlock {
+public class PHPUnitConfigurationBlock extends AbstractPEARPHPToolConfigurationBlock {
 
 	private static final Key PREF_PHP_EXECUTABLE = getPHPUnitKey(PHPUnitPreferenceNames.PREF_PHP_EXECUTABLE);
+	private static final Key PREF_PEAR_LIBRARY = getPHPUnitKey(PHPUnitPreferenceNames.PREF_PEAR_LIBRARY);
 	private static final Key PREF_DEBUG_PRINT_OUTPUT = getPHPUnitKey(PHPUnitPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
 	private static final Key PREF_BOOSTRAP = getPHPUnitKey(PHPUnitPreferenceNames.PREF_BOOTSTRAP);
 	private static final Key PREF_TEST_FILE_PATTERN_FOLDER = getPHPUnitKey(PHPUnitPreferenceNames.PREF_TEST_FILE_PATTERN_FOLDER);
@@ -81,8 +82,8 @@ public class PHPUnitConfigurationBlock extends AbstractPHPToolConfigurationBlock
 	}
 
 	private static Key[] getKeys() {
-		return new Key[] { PREF_PHP_EXECUTABLE, PREF_DEBUG_PRINT_OUTPUT, PREF_BOOSTRAP, PREF_TEST_FILE_PATTERN_FOLDER,
-				PREF_TEST_FILE_PATTERN_FILE };
+		return new Key[] { PREF_PHP_EXECUTABLE, PREF_PEAR_LIBRARY, PREF_DEBUG_PRINT_OUTPUT, PREF_BOOSTRAP,
+				PREF_TEST_FILE_PATTERN_FOLDER, PREF_TEST_FILE_PATTERN_FILE };
 	}
 
 	@Override
@@ -257,6 +258,11 @@ public class PHPUnitConfigurationBlock extends AbstractPHPToolConfigurationBlock
 	@Override
 	protected Key getDebugPrintOutputKey() {
 		return PREF_DEBUG_PRINT_OUTPUT;
+	}
+
+	@Override
+	protected Key getPEARLibraryKey() {
+		return PREF_PEAR_LIBRARY;
 	}
 
 	/*

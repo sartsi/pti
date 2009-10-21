@@ -32,7 +32,9 @@ import org.eclipse.php.internal.ui.preferences.PropertyAndPreferencePage;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
+import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.PHPCodeSniffer;
 
 public class PHPCodeSnifferPreferencePage extends PropertyAndPreferencePage {
 
@@ -138,6 +140,9 @@ public class PHPCodeSnifferPreferencePage extends PropertyAndPreferencePage {
 		if (fConfigurationBlock != null && !fConfigurationBlock.performOk()) {
 			return false;
 		}
+
+		PHPToolLauncher.deleteAllConfigs(PHPCodeSniffer.getScriptFile().toOSString());
+
 		return super.performOk();
 	}
 

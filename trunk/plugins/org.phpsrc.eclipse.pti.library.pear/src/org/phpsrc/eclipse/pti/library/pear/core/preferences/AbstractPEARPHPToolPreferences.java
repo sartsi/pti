@@ -24,13 +24,21 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package org.phpsrc.eclipse.pti.tools.phpunit.ui.preferences;
 
-public class PHPUnitPreferenceNames {
-	public static final String PREF_PHP_EXECUTABLE = "php_executable"; //$NON-NLS-1$
-	public static final String PREF_PEAR_LIBRARY = "pear_library"; //$NON-NLS-1$
-	public static final String PREF_DEBUG_PRINT_OUTPUT = "debug_print_output"; //$NON-NLS-1$
-	public static final String PREF_BOOTSTRAP = "bootstrap"; //$NON-NLS-1$
-	public static final String PREF_TEST_FILE_PATTERN_FOLDER = "test_file_pattern_folder"; //$NON-NLS-1$
-	public static final String PREF_TEST_FILE_PATTERN_FILE = "test_file_pattern_file"; //$NON-NLS-1$
+package org.phpsrc.eclipse.pti.library.pear.core.preferences;
+
+import org.phpsrc.eclipse.pti.core.preferences.AbstractPHPToolPreferences;
+
+public abstract class AbstractPEARPHPToolPreferences extends AbstractPHPToolPreferences {
+
+	protected String pearLibraryName;
+
+	protected AbstractPEARPHPToolPreferences(String phpExecutable, boolean printOutput, String pearLibraryName) {
+		super(phpExecutable, printOutput);
+		this.pearLibraryName = pearLibraryName;
+	}
+
+	public String getPearLibraryName() {
+		return pearLibraryName;
+	}
 }

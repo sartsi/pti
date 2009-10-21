@@ -235,7 +235,7 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 		return entries;
 	}
 
-	private IPath getScriptFile() {
+	public static IPath getScriptFile() {
 		return PHPCodeSnifferPlugin.getDefault().resolvePluginResource("/php/tools/phpcs.php");
 	}
 

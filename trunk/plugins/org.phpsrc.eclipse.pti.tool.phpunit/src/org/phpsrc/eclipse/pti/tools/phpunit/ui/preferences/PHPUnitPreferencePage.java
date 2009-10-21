@@ -32,7 +32,9 @@ import org.eclipse.php.internal.ui.preferences.PropertyAndPreferencePage;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
+import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
+import org.phpsrc.eclipse.pti.tools.phpunit.core.PHPUnit;
 
 public class PHPUnitPreferencePage extends PropertyAndPreferencePage {
 
@@ -136,6 +138,9 @@ public class PHPUnitPreferencePage extends PropertyAndPreferencePage {
 		if (fConfigurationBlock != null && !fConfigurationBlock.performOk()) {
 			return false;
 		}
+
+		PHPToolLauncher.deleteAllConfigs(PHPUnit.getScriptFile().toOSString());
+
 		return super.performOk();
 	}
 
