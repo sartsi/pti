@@ -90,11 +90,13 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 
 		String[] patterns = ignorePattern.split(",");
 		for (String pattern : patterns) {
-			pattern = pattern.replace("\\", "/").replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*").replaceAll("\\?",
-					".?");
-			Pattern p = Pattern.compile(pattern);
-			if (p.matcher(filePath).matches()) {
-				return false;
+			if (pattern.length() > 0) {
+				pattern = pattern.replace("\\", "/").replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*").replaceAll(
+						"\\?", ".?");
+				Pattern p = Pattern.compile(pattern);
+				if (p.matcher(filePath).matches()) {
+					return false;
+				}
 			}
 		}
 

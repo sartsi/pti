@@ -9,6 +9,7 @@ import org.eclipse.dltk.compiler.problem.IProblem;
 import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.core.php.source.ISourceFile;
 import org.phpsrc.eclipse.pti.core.php.source.PHPSourceFile;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public abstract class AbstractPHPToolParser extends AbstractPHPTool {
 	public IProblem[] parse(IFile file) throws CoreException, IOException {
@@ -16,8 +17,15 @@ public abstract class AbstractPHPToolParser extends AbstractPHPTool {
 	}
 
 	protected String launchFile(IFile file) {
-		PHPToolLauncher launcher = getPHPToolLauncher(file.getProject());
-		String output = launcher.launch(file);
+
+		String output = null;
+		try {
+			PHPToolLauncher launcher = getPHPToolLauncher(file.getProject());
+			output = launcher.launch(file);
+		} catch (Exception e) {
+			Logger.logException(e);
+		}
+
 		if (output == null)
 			return "";
 		else

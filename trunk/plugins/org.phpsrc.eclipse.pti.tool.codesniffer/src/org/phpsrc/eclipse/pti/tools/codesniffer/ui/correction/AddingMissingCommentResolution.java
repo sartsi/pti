@@ -42,7 +42,7 @@ public class AddingMissingCommentResolution extends AbstractResolution {
 
 	@Override
 	public String getDescription() {
-		return "Add expected comment";
+		return "A expected comment. An existing coment will be replaced.";
 	}
 
 	@Override

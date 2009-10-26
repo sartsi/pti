@@ -24,63 +24,69 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
+package org.phpsrc.eclipse.pti.ui.preferences;
 
-package org.phpsrc.eclipse.pti.tools.codesniffer.ui.correction;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.php.internal.ui.preferences.PropertyAndPreferencePage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ui.IMarkerResolution;
-import org.eclipse.ui.IMarkerResolution2;
-import org.eclipse.ui.IMarkerResolutionGenerator2;
-import org.phpsrc.eclipse.pti.ui.Logger;
+public class PHPToolsLibraryPreferencePage extends PropertyAndPreferencePage implements IWorkbenchPreferencePage {
 
-public class CorrectionMarkerResolutionGenerator implements IMarkerResolutionGenerator2 {
+	public PHPToolsLibraryPreferencePage() {
+		super();
+		noDefaultAndApplyButton();
+	}
+
+	public PHPToolsLibraryPreferencePage(String title) {
+		super();
+	}
+
+	public PHPToolsLibraryPreferencePage(String title, ImageDescriptor image) {
+		super();
+	}
 
 	@Override
-	public IMarkerResolution[] getResolutions(IMarker marker) {
-		try {
-			String msg = (String) marker.getAttribute(IMarker.MESSAGE);
+	protected Control createContents(Composite parent) {
+		Composite comp = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		comp.setLayout(layout);
 
-			IMarkerResolution2 resolution = findResolution(msg);
-			if (resolution != null)
-				return new IMarkerResolution[] { resolution };
+		Label descLabel = new Label(comp, SWT.NONE);
+		descLabel.setText("Expand the tree to edit PHP libraries preferences");
 
-		} catch (CoreException e) {
-			Logger.logException(e);
-		}
+		return comp;
+	}
 
+	@Override
+	public void init(IWorkbench workbench) {
+	}
+
+	@Override
+	protected Control createPreferenceContent(Composite composite) {
 		return null;
 	}
 
 	@Override
-	public boolean hasResolutions(IMarker marker) {
-		String msg;
-		try {
-			msg = (String) marker.getAttribute(IMarker.MESSAGE);
-			return findResolution(msg) != null;
-		} catch (CoreException e) {
-			Logger.logException(e);
-		}
+	protected String getPreferencePageID() {
+		return null;
+	}
 
+	@Override
+	protected String getPropertyPageID() {
+		return null;
+	}
+
+	@Override
+	protected boolean hasProjectSpecificOptions(IProject project) {
 		return false;
-	}
-
-	protected IMarkerResolution2 findResolution(String msg) {
-		if (msg.startsWith("End of line character is invalid;")) {
-			return new InvalidEndOfLineCharacterResolution();
-			// } else if (msg.startsWith("Expected \"") && msg.endsWith("\"")) {
-			// return new UnexpectedControlStructurFormatingResolution();
-		} else if (msg.startsWith("String \"")
-				&& msg.endsWith("does not require double quotes; use single quotes instead")) {
-			return new ReplaceDoubleQuotesWithSingleQuotesResolution();
-		} else if (msg.equals("Whitespace found at end of line")) {
-			return new RemoveWhitespaceAtEndOfLineResolution();
-		} else if (msg.startsWith("Expected //")) {
-			return new AddingMissingCommentResolution();
-		}
-
-		// Expected //end doSomething()
-
-		return null;
 	}
 }

@@ -49,7 +49,7 @@ import org.phpsrc.eclipse.pti.ui.preferences.AbstractPHPToolConfigurationBlock;
 
 public abstract class AbstractPEARPHPToolConfigurationBlock extends AbstractPHPToolConfigurationBlock {
 
-	private static final String PEAR_PAGE_ID = "rg.phpsrc.eclipse.pti.library.pear.ui.preferences.PEARPreferencePage"; //$NON-NLS-1$
+	private static final String PEAR_PAGE_ID = "org.phpsrc.eclipse.pti.library.pear.ui.preferences.PEARPreferencePage"; //$NON-NLS-1$
 
 	protected Combo pearLibraryCombo;
 
@@ -111,7 +111,7 @@ public abstract class AbstractPEARPHPToolConfigurationBlock extends AbstractPHPT
 			public void pageChanged(PageChangedEvent event) {
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
-						// pearLibraryCombo.setItems(preparePHPExecutableEntryList());
+						pearLibraryCombo.setItems(preparePEARLibraryEntryList());
 					}
 				});
 			}

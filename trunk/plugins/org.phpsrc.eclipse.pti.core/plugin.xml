@@ -21,7 +21,7 @@
 		</page>
 		<page
 			category="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
-			class="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
+			class="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsLibraryPreferencePage"
 			id="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsLibraryPreferencePage"
 			name="Library">
 		</page>
@@ -31,17 +31,6 @@
 			class="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
 			id="org.phpsrc.eclipse.pti.ui.propertyPages.PHPToolsPreferencePage"
 			name="PHP Tools">
-			<enabledWhen>
-				<adapt type="org.eclipse.core.resources.IProject">
-				</adapt>
-			</enabledWhen>
-			<filter name="nature" value="org.eclipse.php.core.PHPNature" />
-		</page>
-		<page
-			category="org.phpsrc.eclipse.pti.ui.propertyPages.PHPToolsPreferencePage"
-			class="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
-			id="org.phpsrc.eclipse.pti.ui.propertyPages.PHPToolsLibraryPreferencePage"
-			name="Library">
 			<enabledWhen>
 				<adapt type="org.eclipse.core.resources.IProject">
 				</adapt>

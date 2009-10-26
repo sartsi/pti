@@ -39,7 +39,7 @@ public class RemoveWhitespaceAtEndOfLineResolution extends AbstractResolution {
 
 	@Override
 	public String getDescription() {
-		return "Remove whitespaces at end of line.";
+		return "Remove all whitespaces or tabs at end of line.";
 	}
 
 	@Override

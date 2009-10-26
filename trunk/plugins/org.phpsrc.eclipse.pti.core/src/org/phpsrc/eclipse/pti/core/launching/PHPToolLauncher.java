@@ -85,6 +85,9 @@ public class PHPToolLauncher {
 	}
 
 	public PHPToolLauncher(PHPexeItem phpExe, IPath phpScript, String commandLineArgs, INIFileEntry[] iniEntries) {
+		if (phpExe == null)
+			throw new NullPointerException("No php executable");
+
 		this.phpExe = phpExe;
 		this.phpScript = phpScript;
 		this.commandLineArgs = commandLineArgs;

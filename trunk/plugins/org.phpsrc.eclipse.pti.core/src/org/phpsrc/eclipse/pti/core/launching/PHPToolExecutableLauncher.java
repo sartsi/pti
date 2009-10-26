@@ -98,7 +98,7 @@ public class PHPToolExecutableLauncher {
 			return null;
 		}
 
-		if (phpExeString == null) {
+		if (phpExeString == null || phpExeString.equals("")) {
 			displayErrorMessage("Please set a valid PHP executable for this launch.");
 			return null;
 		}

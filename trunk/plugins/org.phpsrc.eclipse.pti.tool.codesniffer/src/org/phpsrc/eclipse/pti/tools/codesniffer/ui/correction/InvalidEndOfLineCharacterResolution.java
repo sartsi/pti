@@ -42,7 +42,7 @@ public class InvalidEndOfLineCharacterResolution extends AbstractResolution {
 
 	@Override
 	public String getDescription() {
-		return "Change end of line character";
+		return "Change end of line character.";
 	}
 
 	@Override
