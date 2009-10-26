@@ -90,6 +90,7 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 
 		String[] patterns = ignorePattern.split(",");
 		for (String pattern : patterns) {
+			pattern = pattern.trim();
 			if (pattern.length() > 0) {
 				pattern = pattern.replace("\\", "/").replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*").replaceAll(
 						"\\?", ".?");
