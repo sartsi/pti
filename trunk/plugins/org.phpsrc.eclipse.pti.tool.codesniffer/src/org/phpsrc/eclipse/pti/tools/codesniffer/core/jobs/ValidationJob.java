@@ -47,7 +47,7 @@ public class ValidationJob extends Job {
 	protected IResource[] resources;
 
 	public ValidationJob(IResource[] resources) {
-		super("CodeSniffer");
+		super("PHP CodeSniffer");
 		this.resources = resources;
 	}
 
