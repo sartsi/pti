@@ -36,8 +36,8 @@ import org.phpsrc.eclipse.pti.library.pear.PHPLibraryPEARPlugin;
 
 public class PEARPreferencePage extends PropertyAndPreferencePage {
 
-	public static final String PREF_ID = "org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences.StandardPreferencePage"; //$NON-NLS-1$
-	public static final String PROP_ID = "org.phpsrc.eclipse.pti.tools.codesniffer.ui.propertyPages.StandardPreferencePage"; //$NON-NLS-1$
+	public static final String PREF_ID = "org.phpsrc.eclipse.pti.library.pear.ui.preferences.PEARPreferencePage"; //$NON-NLS-1$
+	public static final String PROP_ID = "org.phpsrc.eclipse.pti.library.pear.ui.propertyPages.PEARPreferencePage"; //$NON-NLS-1$
 
 	private PEARConfigurationBlock fConfigurationBlock;
 

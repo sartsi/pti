@@ -153,7 +153,7 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 		}
 	}
 
-	private class LibraryAdapter implements IListAdapter<Object>, IDialogFieldListener {
+	private class LibraryListAdapter implements IListAdapter<Object>, IDialogFieldListener {
 
 		private boolean canEdit(List<Object> selectedElements) {
 			return true;
@@ -198,7 +198,7 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 			IWorkbenchPreferenceContainer container) {
 		super(context, project, getKeys(), container);
 
-		LibraryAdapter adapter = new LibraryAdapter();
+		LibraryListAdapter adapter = new LibraryListAdapter();
 
 		String[] buttons = new String[] { "New...", "Edit...", "Remove", null, "Default", };
 
