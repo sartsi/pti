@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: Configuration.php 5176 2009-09-02 07:44:36Z sb $
+ * @version    SVN: $Id: Configuration.php 5288 2009-10-22 17:54:06Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 3.2.0
  */
@@ -58,7 +58,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * <?xml version="1.0" encoding="utf-8" ?>
  *
  * <phpunit backupGlobals="true"
- *          backupStaticAttributes="true"
+ *          backupStaticAttributes="false"
  *          bootstrap="/path/to/bootstrap.php"
  *          colors="false"
  *          convertErrorsToExceptions="true"
@@ -187,7 +187,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.0
+ * @version    Release: 3.4.2
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.2.0
  */
@@ -551,7 +551,7 @@ class PHPUnit_Util_Configuration
         if ($this->document->documentElement->hasAttribute('backupStaticAttributes')) {
             $result['backupStaticAttributes'] = $this->getBoolean(
               (string)$this->document->documentElement->getAttribute('backupStaticAttributes'),
-              TRUE
+              FALSE
             );
         }
 

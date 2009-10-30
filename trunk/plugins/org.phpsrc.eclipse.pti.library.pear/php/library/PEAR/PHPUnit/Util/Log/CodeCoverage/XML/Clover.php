@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: Clover.php 5162 2009-08-29 08:49:43Z sb $
+ * @version    SVN: $Id: Clover.php 5284 2009-10-20 00:56:45Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 3.3.0
  */
@@ -63,7 +63,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.0
+ * @version    Release: 3.4.2
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.1.4
  */
@@ -242,6 +242,28 @@ class PHPUnit_Util_Log_CodeCoverage_XML_Clover extends PHPUnit_Util_Printer
                     $fileStatistics['statements']          += $classStatistics['statements'];
                     $fileStatistics['coveredStatements']   += $classStatistics['coveredStatements'];
                     $fileStatistics['classes']++;
+                }
+
+                foreach ($data as $_line => $_data) {
+                    if (isset($lines[$_line])) {
+                        continue;
+                    }
+
+                    if ($_data != -2) {
+                        $fileStatistics['statements']++;
+
+                        if (is_array($_data)) {
+                            $count = count($_data);
+                            $fileStatistics['coveredStatements']++;
+                        } else {
+                            $count = 0;
+                        }
+
+                        $lines[$_line] = array(
+                          'count' => $count,
+                          'type' => 'stmt'
+                        );
+                    }
                 }
 
                 ksort($lines);

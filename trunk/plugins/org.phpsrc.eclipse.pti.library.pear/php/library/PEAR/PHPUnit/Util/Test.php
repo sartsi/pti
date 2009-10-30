@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: Test.php 5195 2009-09-04 15:21:24Z sb $
+ * @version    SVN: $Id: Test.php 5262 2009-09-30 21:30:10Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 3.0.0
  */
@@ -56,7 +56,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.0
+ * @version    Release: 3.4.2
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.0.0
  */
@@ -430,7 +430,7 @@ class PHPUnit_Util_Test
     {
         $annotations = array();
 
-        if (preg_match_all('/@(?P<name>[A-Za-z_-]+)(?:[ \t]+(?P<value>.*?))?[ \t]*$/m', $docblock, $matches)) {
+        if (preg_match_all('/@(?P<name>[A-Za-z_-]+)(?:[ \t]+(?P<value>.*?))?[ \t]*\r?$/m', $docblock, $matches)) {
             $numMatches = count($matches[0]);
 
             for ($i = 0; $i < $numMatches; ++$i) {
@@ -572,6 +572,28 @@ class PHPUnit_Util_Test
         return self::getBooleanAnnotationSetting(
           $className, $methodName, 'outputBuffering'
         );
+    }
+
+    /**
+     * Returns the process isolation settings for a test.
+     *
+     * @param  string $className
+     * @param  string $methodName
+     * @return boolean
+     * @since  Method available since Release 3.4.1
+     */
+    public static function getProcessIsolationSettings($className, $methodName)
+    {
+        $annotations = self::parseTestMethodAnnotations(
+          $className, $methodName
+        );
+
+        if (isset($annotations['class']['runTestsInSeparateProcesses']) ||
+            isset($annotations['method']['runInSeparateProcess'])) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
     }
 
     /**

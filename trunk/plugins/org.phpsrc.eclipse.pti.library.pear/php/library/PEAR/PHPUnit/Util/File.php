@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: File.php 5234 2009-09-16 06:35:44Z sb $
+ * @version    SVN: $Id: File.php 5288 2009-10-22 17:54:06Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 3.4.0
  */
@@ -60,7 +60,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.0
+ * @version    Release: 3.4.2
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.4.0
  */
@@ -156,17 +156,21 @@ class PHPUnit_Util_File
         $numTokens                  = count($tokens);
         $blocks                     = array();
         $line                       = 1;
-        $name                       = array();
         $currentBlock               = FALSE;
         $currentNamespace           = FALSE;
         $currentClass               = FALSE;
         $currentFunction            = FALSE;
         $currentFunctionStartLine   = FALSE;
+        $currentFunctionTokens      = array();
         $currentDocComment          = FALSE;
         $currentSignature           = FALSE;
         $currentSignatureStartToken = FALSE;
 
         for ($i = 0; $i < $numTokens; $i++) {
+            if ($currentFunction !== FALSE) {
+                $currentFunctionTokens[] = $tokens[$i];
+            }
+
             if (is_string($tokens[$i])) {
                 if ($tokens[$i] == '{') {
                     if ($currentBlock == T_CLASS) {
@@ -203,14 +207,7 @@ class PHPUnit_Util_File
                     $block = array_pop($blocks);
 
                     if ($block !== FALSE && $block !== NULL) {
-                        if ($block == $currentClass) {
-                            self::$classesFunctionsCache[$filename]['classes'][$currentClass]['endLine'] = $line;
-
-                            $currentClass          = FALSE;
-                            $currentClassStartLine = FALSE;
-                        }
-
-                        else if ($block == $currentFunction) {
+                        if ($block == $currentFunction) {
                             if ($currentDocComment !== FALSE) {
                                 $docComment        = $currentDocComment;
                                 $currentDocComment = FALSE;
@@ -222,7 +219,8 @@ class PHPUnit_Util_File
                               'docComment' => $docComment,
                               'signature'  => $currentSignature,
                               'startLine'  => $currentFunctionStartLine,
-                              'endLine'    => $line
+                              'endLine'    => $line,
+                              'tokens'     => $currentFunctionTokens
                             );
 
                             if ($currentClass === FALSE) {
@@ -233,7 +231,15 @@ class PHPUnit_Util_File
 
                             $currentFunction          = FALSE;
                             $currentFunctionStartLine = FALSE;
+                            $currentFunctionTokens    = array();
                             $currentSignature         = FALSE;
+                        }
+
+                        else if ($block == $currentClass) {
+                            self::$classesFunctionsCache[$filename]['classes'][$currentClass]['endLine'] = $line;
+
+                            $currentClass          = FALSE;
+                            $currentClassStartLine = FALSE;
                         }
                     }
                 }
@@ -244,6 +250,26 @@ class PHPUnit_Util_File
             switch ($tokens[$i][0]) {
                 case T_NAMESPACE: {
                     $currentNamespace = $tokens[$i+2][1];
+                    
+                    for ($j = $i+3; $j < $numTokens; $j += 2) {
+                        if ($tokens[$j][0] == T_NS_SEPARATOR) {
+                            $currentNamespace .= '\\' . $tokens[$j+1][1];
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                break;
+
+                case T_CURLY_OPEN: {
+                    $currentBlock = T_CURLY_OPEN;
+                    array_push($blocks, $currentBlock);
+                }
+                break;
+
+                case T_DOLLAR_OPEN_CURLY_BRACES: {
+                    $currentBlock = T_DOLLAR_OPEN_CURLY_BRACES;
+                    array_push($blocks, $currentBlock);
                 }
                 break;
 

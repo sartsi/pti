@@ -40,7 +40,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: TicketListener.php 5234 2009-09-16 06:35:44Z sb $
+ * @version    SVN: $Id: TicketListener.php 5288 2009-10-22 17:54:06Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 3.4.0
  */
@@ -59,7 +59,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.0
+ * @version    Release: 3.4.2
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.4.0
  */

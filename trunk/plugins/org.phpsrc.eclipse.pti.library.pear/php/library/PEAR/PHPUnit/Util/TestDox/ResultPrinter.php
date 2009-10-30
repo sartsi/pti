@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: ResultPrinter.php 5022 2009-07-25 15:23:18Z sb $
+ * @version    SVN: $Id: ResultPrinter.php 5251 2009-09-24 14:22:53Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 2.3.0
  */
@@ -59,7 +59,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.0
+ * @version    Release: 3.4.2
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 2.1.0
  * @abstract
@@ -230,11 +230,19 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
                 $this->tests     = array();
             }
 
-            $annotations = $test->getAnnotations();
+            $prettified = FALSE;
 
-            if (isset($annotations['method']['testdox'][0])) {
-                $this->currentTestMethodPrettified = $annotations['method']['testdox'][0];
-            } else {
+            if ($test instanceof PHPUnit_Framework_TestCase &&
+               !$test instanceof PHPUnit_Framework_Warning) {
+                $annotations = $test->getAnnotations();
+
+                if (isset($annotations['method']['testdox'][0])) {
+                    $this->currentTestMethodPrettified = $annotations['method']['testdox'][0];
+                    $prettified = TRUE;
+                }
+            }
+
+            if (!$prettified) {
                 $this->currentTestMethodPrettified = $this->prettifier->prettifyTestMethod($test->getName(FALSE));
             }
 
