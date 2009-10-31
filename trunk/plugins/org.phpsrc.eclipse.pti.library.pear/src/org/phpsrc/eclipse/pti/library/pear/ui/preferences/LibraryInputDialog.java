@@ -51,7 +51,7 @@ import org.phpsrc.eclipse.pti.library.pear.ui.preferences.PEARConfigurationBlock
  */
 public class LibraryInputDialog extends StatusDialog {
 
-	private class CompilerStandardInputAdapter implements IDialogFieldListener {
+	private class LibraryStandardInputAdapter implements IDialogFieldListener {
 		public void dialogFieldChanged(DialogField field) {
 			doValidation();
 		}
@@ -100,7 +100,7 @@ public class LibraryInputDialog extends StatusDialog {
 
 		fNameDialogField = new StringDialogField();
 		fNameDialogField.setLabelText("Name:");
-		CompilerStandardInputAdapter adapter = new CompilerStandardInputAdapter();
+		LibraryStandardInputAdapter adapter = new LibraryStandardInputAdapter();
 		fNameDialogField.setDialogFieldListener(adapter);
 		fNameDialogField.setText((lib != null) ? lib.name : ""); //$NON-NLS-1$
 	}
