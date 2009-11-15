@@ -61,6 +61,10 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 	private static final Key PREF_METRICS_WARNINGS = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_WARNINGS);
 	private static final Key PREF_METRICS_ERRORS = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_ERRORS);
 
+	public static final String[] DEFAULT_METRIC_IDS = new String[] { "cr", "rcr", "ccn", "ccn2" };
+	public static final String[] DEFAULT_METRIC_NAMES = new String[] { "Code Rank", "Reverse Code Rank",
+			"Cyclomatic Complexity 1", "Cyclomatic Complexity 2" };
+
 	private static final int IDX_ADD = 0;
 	private static final int IDX_EDIT = 1;
 	private static final int IDX_REMOVE = 2;
@@ -119,9 +123,12 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 			} else if (columnIndex == 1) {
 				return m.id;
 			} else if (columnIndex == 2) {
-				return (m.warningCompare + " " + m.warningLevel).trim();
+				return m.warningCompare != null && !"".equals(m.warningCompare) ? (m.warningCompare + " " + m.warningLevel)
+						.trim()
+						: "";
 			} else if (columnIndex == 3) {
-				return (m.errorCompare + " " + m.errorLevel).trim();
+				return m.errorCompare != null && !"".equals(m.errorCompare) ? (m.errorCompare + " " + m.errorLevel)
+						.trim() : "";
 			} else {
 				return "";
 			}
@@ -201,7 +208,8 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 	}
 
 	private static Key[] getKeys() {
-		return new Key[] {};
+		return new Key[] { PREF_METRICS_ENABLED, PREF_METRICS_NAMES, PREF_METRICS_IDS, PREF_METRICS_WARNINGS,
+				PREF_METRICS_ERRORS };
 	}
 
 	@Override
@@ -374,5 +382,23 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 
 			fMetricList.setElements(elements);
 		}
+	}
+
+	public void performDefaults() {
+
+		ArrayList<Metric> elements = new ArrayList<Metric>(DEFAULT_METRIC_IDS.length);
+		for (int i = 0; i < DEFAULT_METRIC_IDS.length; i++) {
+			Metric m = new Metric();
+			m.enabled = false;
+			m.id = DEFAULT_METRIC_IDS[i];
+			m.name = DEFAULT_METRIC_NAMES[i];
+			elements.add(m);
+		}
+
+		fMetricList.setElements(elements);
+
+		settingsUpdated();
+		updateControls();
+		validateSettings(null, null, null);
 	}
 }

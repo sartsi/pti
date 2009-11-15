@@ -10,10 +10,10 @@ public class Metric {
 	public boolean enabled;
 	public String name;
 	public String id;
-	public String warningCompare;
-	public int warningLevel;
-	public String errorCompare;
-	public int errorLevel;
+	public String warningCompare = "";
+	public int warningLevel = 0;
+	public String errorCompare = "";
+	public int errorLevel = 0;
 
 	@Override
 	public String toString() {
