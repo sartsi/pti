@@ -20,7 +20,7 @@
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   CVS: $Id: CommandLine.php,v 1.5 2009/06/19 10:22:48 izi Exp $
+ * @version   CVS: $Id: CommandLine.php 287636 2009-08-24 13:14:06Z izi $
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     Class available since release 0.1.0
  * @filesource
@@ -55,7 +55,7 @@ require_once 'Console/CommandLine/MessageProvider/Default.php';
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   Release: 1.1.0
+ * @version   Release: 1.1.1
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     File available since release 0.1.0
  * @example   docs/examples/ex1.php
@@ -277,8 +277,8 @@ class Console_CommandLine
      *     'name'               => 'yourprogram', // defaults to argv[0]
      *     'description'        => 'Description of your program',
      *     'version'            => '0.0.1', // your program version
-     *     'add_help_option'    => true, // or false to disable --version option
-     *     'add_version_option' => true, // or false to disable --help option
+     *     'add_help_option'    => true, // or false to disable --help option
+     *     'add_version_option' => true, // or false to disable --version option
      *     'force_posix'        => false // or true to force posix compliance
      * ));
      * </code>
@@ -532,8 +532,30 @@ class Console_CommandLine
             include_once 'Console/CommandLine/Command.php';
             $params['name'] = $name;
             $command        = new Console_CommandLine_Command($params);
+            // some properties must cascade to the child command if not 
+            // passed explicitely. This is done only in this case, because if 
+            // we have a Command object we have no way to determine if theses 
+            // properties have already been set
+            $cascade = array(
+                'add_help_option',
+                'add_version_option',
+                'outputter',
+                'message_provider',
+                'force_posix',
+                'force_options_defaults'
+            );
+            foreach ($cascade as $property) {
+                if (!isset($params[$property])) {
+                    $command->$property = $this->$property;
+                }
+            }
+            if (!isset($params['renderer'])) {
+                $renderer          = clone $this->renderer;
+                $renderer->parser  = $command;
+                $command->renderer = $renderer;
+            }
         }
-        $command->parent                = $this;
+        $command->parent = $this;
         $this->commands[$command->name] = $command;
         return $command;
     }

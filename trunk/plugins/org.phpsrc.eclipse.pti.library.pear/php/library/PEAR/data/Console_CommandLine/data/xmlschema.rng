@@ -5,7 +5,7 @@
 
   Author  : David JEAN LOUIS
   Licence : MIT License
-  Version : CVS: $Id: xmlschema.rng,v 1.7 2009/06/19 10:22:48 izi Exp $
+  Version : CVS: $Id: xmlschema.rng 282427 2009-06-19 10:22:48Z izi $
 -->
 
 <grammar xmlns="http://relaxng.org/ns/structure/1.0" 
