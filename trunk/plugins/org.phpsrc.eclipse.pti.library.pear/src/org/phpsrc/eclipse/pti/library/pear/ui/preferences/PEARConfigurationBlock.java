@@ -65,6 +65,7 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 	private static final int IDX_EDIT = 1;
 	private static final int IDX_REMOVE = 2;
 	private static final int IDX_DEFAULT = 4;
+	private static final int IDX_VERSIONS = 6;
 
 	private final ListDialogField<Library> fLibraryList;
 
@@ -172,6 +173,10 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 			return selectedElements.size() == 1 && !isDefaultLibrary((Library) selectedElements.get(0));
 		}
 
+		private boolean canShowVersions(List<Object> selectedElements) {
+			return selectedElements.size() == 1 && isInternalLibrary((Library) selectedElements.get(0));
+		}
+
 		public void customButtonPressed(ListDialogField<Object> field, int index) {
 			doStandardButtonPressed(index);
 		}
@@ -181,6 +186,7 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 			field.enableButton(IDX_EDIT, canEdit(selectedElements));
 			field.enableButton(IDX_DEFAULT, canSetToDefault(selectedElements));
 			field.enableButton(IDX_REMOVE, canRemove(selectedElements));
+			field.enableButton(IDX_VERSIONS, canShowVersions(selectedElements));
 		}
 
 		public void doubleClicked(ListDialogField<Object> field) {
@@ -200,7 +206,7 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 
 		LibraryListAdapter adapter = new LibraryListAdapter();
 
-		String[] buttons = new String[] { "New...", "Edit...", "Remove", null, "Default", };
+		String[] buttons = new String[] { "New...", "Edit...", "Remove", null, "Default", null, "Versions" };
 
 		fLibraryList = new ListDialogField<Library>(adapter, buttons, new PEARLabelProvider());
 		fLibraryList.setDialogFieldListener(adapter);
@@ -257,6 +263,10 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 		return fLibraryList.getIndexOfElement(lib) == 0;
 	}
 
+	final boolean isInternalLibrary(Library lib) {
+		return lib.path == "";
+	}
+
 	@Override
 	protected void validateSettings(Key changedKey, String oldValue, String newValue) {
 		// TODO Auto-generated method stub
@@ -278,6 +288,9 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 			}
 		} else if (index == IDX_DEFAULT) {
 			setToDefaultLibrary(edited);
+		} else if (index == IDX_VERSIONS) {
+			InternalLibraryVersionsDialog dialog = new InternalLibraryVersionsDialog(getShell());
+			dialog.open();
 		}
 	}
 
