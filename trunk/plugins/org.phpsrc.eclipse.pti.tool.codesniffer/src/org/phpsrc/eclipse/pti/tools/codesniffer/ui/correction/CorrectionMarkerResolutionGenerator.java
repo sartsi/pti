@@ -36,7 +36,6 @@ import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class CorrectionMarkerResolutionGenerator implements IMarkerResolutionGenerator2 {
 
-	@Override
 	public IMarkerResolution[] getResolutions(IMarker marker) {
 		try {
 			String msg = (String) marker.getAttribute(IMarker.MESSAGE);
@@ -52,7 +51,6 @@ public class CorrectionMarkerResolutionGenerator implements IMarkerResolutionGen
 		return null;
 	}
 
-	@Override
 	public boolean hasResolutions(IMarker marker) {
 		String msg;
 		try {
