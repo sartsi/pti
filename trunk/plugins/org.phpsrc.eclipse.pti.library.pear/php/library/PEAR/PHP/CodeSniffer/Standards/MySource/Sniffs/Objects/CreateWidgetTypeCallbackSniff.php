@@ -9,7 +9,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: CreateWidgetTypeCallbackSniff.php 268057 2008-10-31 00:00:50Z squiz $
+ * @version   CVS: $Id: CreateWidgetTypeCallbackSniff.php 288253 2009-09-11 03:32:51Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -21,7 +21,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.0
+ * @version   Release: 1.2.1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class MySource_Sniffs_Objects_CreateWidgetTypeCallbackSniff implements PHP_CodeSniffer_Sniff
@@ -97,7 +97,8 @@ class MySource_Sniffs_Objects_CreateWidgetTypeCallbackSniff implements PHP_CodeS
             followed by a return statement or the end of the method.
         */
 
-        $foundCallback = false;
+        $foundCallback  = false;
+        $passedCallback = false;
         for ($i = $start; $i <= $end; $i++) {
             if ($tokens[$i]['code'] === T_RETURN) {
                 // Make sure return statements are not returning anything.
@@ -113,29 +114,61 @@ class MySource_Sniffs_Objects_CreateWidgetTypeCallbackSniff implements PHP_CodeS
 
             // If this is the form "callback.call(" then it is a call
             // to the callback function.
-            if ($tokens[($i + 1)]['code'] !== T_OBJECT_OPERATOR) {
-                continue;
-            }
+            if ($tokens[($i + 1)]['code'] !== T_OBJECT_OPERATOR
+                || $tokens[($i + 2)]['content'] !== 'call'
+                || $tokens[($i + 3)]['code'] !== T_OPEN_PARENTHESIS
+            ) {
+                // One last chance; this might be the callback function
+                // being passed to another function, like this
+                // "this.init(something, callback, something)".
+                if (isset($tokens[$i]['nested_parenthesis']) === false) {
+                    continue;
+                }
 
-            if ($tokens[($i + 2)]['content'] !== 'call') {
-                continue;
-            }
+                // Just make sure those brackets dont belong to anyone,
+                // like an IF or FOR statement.
+                foreach ($tokens[$i]['nested_parenthesis'] as $bracket) {
+                    if (isset($tokens[$bracket]['parenthesis_owner']) === true) {
+                        continue(2);
+                    }
+                }
 
-            if ($tokens[($i + 3)]['code'] !== T_OPEN_PARENTHESIS) {
-                continue;
-            }
+                // Note that we use this endBracket down further when checking
+                // for a RETURN statement.
+                $endBracket = end($tokens[$i]['nested_parenthesis']);
+                $bracket    = key($tokens[$i]['nested_parenthesis']);
+
+                $prev = $phpcsFile->findPrevious(
+                    PHP_CodeSniffer_Tokens::$emptyTokens,
+                    ($bracket - 1),
+                    null,
+                    true
+                );
+
+                if ($tokens[$prev]['code'] !== T_STRING) {
+                    // This is not a function passing the callback.
+                    continue;
+                }
+
+                $passedCallback = true;
+            }//end if
 
             $foundCallback = true;
 
-            // The first argument must be "this" or "self".
-            $arg = $phpcsFile->findNext(T_WHITESPACE, ($i + 4), null, true);
-            if ($tokens[$arg]['content'] !== 'this' && $tokens[$arg]['content'] !== 'self') {
-                $error = 'The first argument passed to the callback function must be "this" or "self"';
-                $phpcsFile->addError($error, $arg);
+            if ($passedCallback === false) {
+                // The first argument must be "this" or "self".
+                $arg = $phpcsFile->findNext(T_WHITESPACE, ($i + 4), null, true);
+                if ($tokens[$arg]['content'] !== 'this' && $tokens[$arg]['content'] !== 'self') {
+                    $error = 'The first argument passed to the callback function must be "this" or "self"';
+                    $phpcsFile->addError($error, $arg);
+                }
             }
 
             // Now it must be followed by a return statement or the end of the function.
-            $endBracket = $tokens[($i + 3)]['parenthesis_closer'];
+            if ($passedCallback === false) {
+                $endBracket = $tokens[($i + 3)]['parenthesis_closer'];
+            }
+
             for ($next = $endBracket; $next <= $end; $next++) {
                 // Skip whitespace so we find the next content after the call.
                 if (in_array($tokens[$next]['code'], PHP_CodeSniffer_Tokens::$emptyTokens) === true) {

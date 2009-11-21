@@ -11,7 +11,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: File.php 286773 2009-08-03 23:27:47Z squiz $
+ * @version   CVS: $Id: File.php 289550 2009-10-11 22:05:45Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -112,7 +112,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.0
+ * @version   Release: 1.2.1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PHP_CodeSniffer_File
@@ -379,11 +379,19 @@ class PHP_CodeSniffer_File
                     $ignoring = false;
                     // Ignore this comment too.
                     $this->_ignoredLines[$token['line']] = true;
+                } else if (strpos($token['content'], '@codingStandardsIgnoreFile') !== false) {
+                    // Ignoring the whole file, just a little late.
+                    $this->_errors       = array();
+                    $this->_warnings     = array();
+                    $this->_errorCount   = 0;
+                    $this->_warningCount = 0;
+                    return;
                 }
             }
 
             if ($ignoring === true) {
                 $this->_ignoredLines[$token['line']] = true;
+                continue;
             }
 
             if (PHP_CODESNIFFER_VERBOSITY > 2) {
@@ -435,9 +443,10 @@ class PHP_CodeSniffer_File
         foreach ($this->_ignoredLines as $line => $ignore) {
             unset($this->_errors[$line]);
             unset($this->_warnings[$line]);
-            $this->_errorCount = count($this->_errors);
-            $this->_warningCount = count($this->_warnings);
         }
+
+        $this->_errorCount   = count($this->_errors);
+        $this->_warningCount = count($this->_warnings);
 
         // If short open tags are off but the file being checked uses
         // short open tags, the whole content will be inline HTML
@@ -624,7 +633,11 @@ class PHP_CodeSniffer_File
     {
         // Work out which sniff generated the warning.
         $parts = explode('_', $this->_activeListener);
-        $sniff = $parts[0].'.'.$parts[2].'.'.$parts[3];
+        if (isset($parts[3]) === true) {
+            $sniff = $parts[0].'.'.$parts[2].'.'.$parts[3];
+        } else {
+            $sniff = 'unknownSniff';
+        }
 
         if ($stackPtr === null) {
             $lineNum = 1;

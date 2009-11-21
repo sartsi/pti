@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: JS.php 270519 2008-12-04 06:07:15Z squiz $
+ * @version   CVS: $Id: JS.php 289840 2009-10-22 00:52:57Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -22,7 +22,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.0
+ * @version   Release: 1.2.1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PHP_CodeSniffer_Tokenizers_JS
@@ -354,7 +354,7 @@ class PHP_CodeSniffer_Tokenizers_JS
                         if (PHP_CODESNIFFER_VERBOSITY > 1) {
                             echo "\t* found end of string *".PHP_EOL;
                             $content = str_replace("\n", '\n', $buffer.$char);
-                            echo "=> Added token T_CONSTANT_ENCAPSED_STRING $content)".PHP_EOL;
+                            echo "=> Added token T_CONSTANT_ENCAPSED_STRING ($content)".PHP_EOL;
                         }
 
                         $buffer          = '';
@@ -447,20 +447,122 @@ class PHP_CodeSniffer_Tokenizers_JS
                 }//end if
 
                 if ($matchedToken === false) {
-                    $value    = $this->tokenValues[strtolower($buffer)];
-                    $tokens[] = array(
-                                 'code'    => constant($value),
-                                 'type'    => $value,
-                                 'content' => $buffer,
-                                );
+                    if (PHP_CODESNIFFER_VERBOSITY > 1 && $lookAheadLength > 0) {
+                        echo "\t* look ahead found nothing *".PHP_EOL;
+                    }
 
-                    if (PHP_CODESNIFFER_VERBOSITY > 1) {
-                        if ($lookAheadLength > 0) {
-                            echo "\t* look ahead found nothing *".PHP_EOL;
+                    // Special case for T_DIVIDE which can actually be
+                    // the start of a regular expression.
+                    $foundRegex = false;
+                    if ($char === '/') {
+                        $beforeTokens = array(
+                                         T_EQUAL,
+                                         T_OPEN_PARENTHESIS,
+                                         T_RETURN,
+                                        );
+
+                        $afterTokens = array(
+                                         ',',
+                                         ')',
+                                         ';',
+                                         ' ',
+                                         '.',
+                                        );
+
+                        // Find the last non-whitespace token that was added
+                        // to the tokens array.
+                        $numTokens = count($tokens);
+                        for ($prev = ($numTokens - 1); $prev >= 0; $prev--) {
+                            if (in_array($tokens[$prev]['code'], PHP_CodeSniffer_Tokens::$emptyTokens) === false) {
+                                break;
+                            }
                         }
 
-                        $content = str_replace("\n", '\n', $buffer);
-                        echo "=> Added token $value ($content)".PHP_EOL;
+                        if (in_array($tokens[$prev]['code'], $beforeTokens) === true) {
+                            // This is probably a regular expression,
+                            // so look for the end of it.
+                            if (PHP_CODESNIFFER_VERBOSITY > 1) {
+                                $content = str_replace("\n", '\n', $char);
+                                echo "\t* token possibly starts a regular expression *".PHP_EOL;
+                            }
+
+                            for ($next = ($i + 1); $next < $numChars; $next++) {
+                                if ($chars[$next] === '/') {
+                                    // Just make sure this is not escaped first.
+                                    if ($chars[($next - 1)] !== '\\') {
+                                        break;
+                                    }
+                                } else {
+                                    $possiblEolChar = substr($string, $next, strlen($eolChar));
+                                    if ($possiblEolChar === $eolChar) {
+                                        // This is the last token on the line and regular
+                                        // expressions need to be defined on a single line,
+                                        // so this is not a regular expression.
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if ($chars[$next] === '/') {
+                                while (preg_match('|[a-zA-Z]|', $chars[($next + 1)]) !== 0) {
+                                    // The token directly after the end of the regex can
+                                    // be modifiers like global and case insensitive
+                                    // (.e.g, /pattern/gi).
+                                    $next++;
+                                }
+
+                                $regexEnd = $next;
+
+                                for ($next = ($next + 1); $next < $numChars; $next++) {
+                                    if ($chars[$next] !== ' ') {
+                                        break;
+                                    } else {
+                                        $possiblEolChar = substr($string, $next, strlen($eolChar));
+                                        if ($possiblEolChar === $eolChar) {
+                                            // This is the last token on the line.
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (in_array($chars[$next], $afterTokens) === true) {
+                                    // This is a regular expression, so join all the
+                                    // tokens together.
+                                    $content = '';
+                                    for ($x = $i; $x <= $regexEnd; $x++) {
+                                        $content .= $chars[$x];
+                                    }
+
+                                    $tokens[] = array(
+                                                 'code'    => T_REGULAR_EXPRESSION,
+                                                 'type'    => 'T_REGULAR_EXPRESSION',
+                                                 'content' => $content,
+                                                );
+
+                                    if (PHP_CODESNIFFER_VERBOSITY > 1) {
+                                        $content = str_replace("\n", '\n', $content);
+                                        echo "=> Added token T_REGULAR_EXPRESSION ($content)".PHP_EOL;
+                                    }
+
+                                    $i          = $regexEnd;
+                                    $foundRegex = true;
+                                }
+                            }//end if
+                        }//end if
+                    }//end if
+
+                    if ($foundRegex === false) {
+                        $value    = $this->tokenValues[strtolower($buffer)];
+                        $tokens[] = array(
+                                     'code'    => constant($value),
+                                     'type'    => $value,
+                                     'content' => $buffer,
+                                    );
+
+                        if (PHP_CODESNIFFER_VERBOSITY > 1) {
+                            $content = str_replace("\n", '\n', $buffer);
+                            echo "=> Added token $value ($content)".PHP_EOL;
+                        }
                     }
 
                     $cleanBuffer = true;
@@ -541,11 +643,40 @@ class PHP_CodeSniffer_Tokenizers_JS
             if ($inComment === ''
                 && array_key_exists($buffer, $this->commentTokens) === true
             ) {
-                // We have started a comment.
-                $inComment = $buffer;
+                // This is not really a comment if the content
+                // looks like \// (i.e., it is escaped).
+                if (isset($chars[($i - 2)]) === true && $chars[($i - 2)] === '\\') {
+                    $lastToken   = array_pop($tokens);
+                    $lastContent = $lastToken['content'];
+                    if (PHP_CODESNIFFER_VERBOSITY > 1) {
+                        $value   = $this->tokenValues[strtolower($lastContent)];
+                        $content = str_replace("\n", '\n', $lastContent);
+                        echo "=> Removed token $value ($content)".PHP_EOL;
+                    }
 
-                if (PHP_CODESNIFFER_VERBOSITY > 1) {
-                    echo "\t* looking for end of comment *".PHP_EOL;
+                    $lastChars    = str_split($lastContent);
+                    $lastNumChars = count($lastChars);
+                    for ($x = 0; $x < $lastNumChars; $x++) {
+                        $lastChar = $lastChars[$x];
+                        $value    = $this->tokenValues[strtolower($lastChar)];
+                        $tokens[] = array(
+                                     'code'    => constant($value),
+                                     'type'    => $value,
+                                     'content' => $lastChar,
+                                    );
+
+                        if (PHP_CODESNIFFER_VERBOSITY > 1) {
+                            $content = str_replace("\n", '\n', $lastChar);
+                            echo "=> Added token $value ($content)".PHP_EOL;
+                        }
+                    }
+                } else {
+                    // We have started a comment.
+                    $inComment = $buffer;
+
+                    if (PHP_CODESNIFFER_VERBOSITY > 1) {
+                        echo "\t* looking for end of comment *".PHP_EOL;
+                    }
                 }
             } else if ($inComment !== '') {
                 if ($this->commentTokens[$inComment] === null) {
@@ -624,81 +755,6 @@ class PHP_CodeSniffer_Tokenizers_JS
         $numTokens   = count($tokens);
         for ($stackPtr = 0; $stackPtr < $numTokens; $stackPtr++) {
             $token = $tokens[$stackPtr];
-
-            /*
-                Look for regular expressions and join the tokens together.
-            */
-
-            if ($token['code'] === T_DIVIDE) {
-                $beforeTokens = array(
-                                 T_EQUAL,
-                                 T_OPEN_PARENTHESIS,
-                                 T_RETURN,
-                                );
-
-                $afterTokens = array(
-                                 T_COMMA,
-                                 T_CLOSE_PARENTHESIS,
-                                 T_SEMICOLON,
-                                 T_WHITESPACE,
-                                 T_OBJECT_OPERATOR,
-                                );
-
-                for ($prev = ($stackPtr - 1); $prev >= 0; $prev--) {
-                    if (in_array($tokens[$prev]['code'], PHP_CodeSniffer_Tokens::$emptyTokens) === false) {
-                        break;
-                    }
-                }
-
-                if (in_array($tokens[$prev]['code'], $beforeTokens) === true) {
-                    // This is probably a regular expression,
-                    // so look for the end of it.
-                    for ($next = ($stackPtr + 1); $next < $numTokens; $next++) {
-                        if ($tokens[$next]['code'] === T_DIVIDE) {
-                            // Just make sure this is not escaped first.
-                            if (substr($tokens[($next - 1)]['content'], -1) !== '\\') {
-                                break;
-                            }
-                        } else if (strpos($tokens[$next]['content'], $eolChar) !== false) {
-                            // If this is the last token on the line and regular
-                            // expressions need to be defined on a single line.
-                            break;
-                        }
-                    }
-
-                    if ($tokens[$next]['code'] === T_DIVIDE) {
-                        if ($tokens[($next + 1)]['code'] === T_STRING) {
-                            // The token directly after the end of the regex can
-                            // be modifiers like global and case insensitive
-                            // (.e.g, /pattern/gi).
-                            $next++;
-                        }
-
-                        $regexEnd = $next;
-
-                        for ($next = ($next + 1); $next < $numTokens; $next++) {
-                            if (in_array($tokens[$next]['code'], PHP_CodeSniffer_Tokens::$emptyTokens) === false) {
-                                break;
-                            } else if (strpos($tokens[$next]['content'], $eolChar) !== false) {
-                                // If this is the last token on the line.
-                                break;
-                            }
-                        }
-
-                        if (in_array($tokens[$next]['code'], $afterTokens) === true) {
-                            // This is a regular expression, so join all the
-                            // tokens together.
-                            for ($i = ($stackPtr + 1); $i <= $regexEnd; $i++) {
-                                $token['content'] .= $tokens[$i]['content'];
-                            }
-
-                            $token['code'] = T_REGULAR_EXPRESSION;
-                            $token['type'] = 'T_REGULAR_EXPRESSION';
-                            $stackPtr      = $regexEnd;
-                        }
-                    }//end if
-                }//end if
-            }//end if
 
             /*
                 Look for comments and join the tokens together.

@@ -9,7 +9,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: FunctionDeclarationSniff.php 270199 2008-12-01 05:45:50Z squiz $
+ * @version   CVS: $Id: FunctionDeclarationSniff.php 290494 2009-11-11 01:00:54Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -23,7 +23,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.0
+ * @version   Release: 1.2.1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PEAR_Sniffs_Functions_FunctionDeclarationSniff implements PHP_CodeSniffer_Sniff
@@ -148,7 +148,7 @@ class PEAR_Sniffs_Functions_FunctionDeclarationSniff implements PHP_CodeSniffer_
 
                 $lastLine = $tokens[$i]['line'];
             }
-        }
+        }//end for
 
         if (isset($tokens[$stackPtr]['scope_opener']) === true) {
             // The openning brace needs to be one space away
@@ -186,6 +186,20 @@ class PEAR_Sniffs_Functions_FunctionDeclarationSniff implements PHP_CodeSniffer_
                 $error = 'There must be a single space between the closing parenthesis and the opening brace of a multi-line function declaration';
                 $phpcsFile->addError($error, $next);
             }
+        }//end if
+
+        // The closing parenthesis must be on a new line, even
+        // when checking abstract function definitions.
+        $prev = $phpcsFile->findPrevious(
+                T_WHITESPACE,
+                ($closeBracket - 1),
+                null,
+                true
+            );
+
+        if ($tokens[$prev]['line'] === $tokens[$closeBracket]['line']) {
+            $error = 'The closing parenthesis of a multi-line function declaration must be on a new line';
+            $phpcsFile->addError($error, $closeBracket);
         }
 
     }//end processMultiLineDeclaration()

@@ -11,7 +11,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: CodeSniffer.php 286772 2009-08-03 23:26:32Z squiz $
+ * @version   CVS: $Id: CodeSniffer.php 290802 2009-11-16 06:06:29Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -59,7 +59,7 @@ if (interface_exists('PHP_CodeSniffer_MultiFileSniff', true) === false) {
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.0
+ * @version   Release: 1.2.1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PHP_CodeSniffer
@@ -346,7 +346,7 @@ class PHP_CodeSniffer
 
         // Now process the multi-file sniffs, assuming there are
         // multiple files being sniffed.
-        if (count($files) > 1) {
+        if (count($files) > 1 || is_dir($files[0]) === true) {
             foreach ($this->_tokenListeners['multifile'] as $listener) {
                 // Set the name of the listener for error messages.
                 $activeListener = get_class($listener);
@@ -745,6 +745,28 @@ class PHP_CodeSniffer
             }
         }
 
+        // Before we go and spend time tokenizing this file, just check
+        // to see if there is a tag up top to indicate that the whole
+        // file should be ignored. It must be on one of the first two lines.
+        $firstContent = $contents;
+        if ($contents === null) {
+            $handle = fopen($file, 'r');
+            if ($handle !== false) {
+                $firstContent  = fgets($handle);
+                $firstContent .= fgets($handle);
+                fclose($handle);
+            }
+        }
+
+        if (strpos($firstContent, '@codingStandardsIgnoreFile') !== false) {
+            // We are ignoring the whole file.
+            if (PHP_CODESNIFFER_VERBOSITY > 0) {
+                echo 'Ignoring '.basename($file).PHP_EOL;
+            }
+
+            return;
+        }
+
         if (PHP_CODESNIFFER_VERBOSITY > 0) {
             $startTime = time();
             echo 'Processing '.basename($file).' ';
@@ -889,6 +911,8 @@ class PHP_CodeSniffer
             $report['files'][$filename]['messages'] = $errors;
         }//end foreach
 
+        ksort($report['files']);
+
         return $report;
 
     }//end prepareErrorReport()
@@ -906,7 +930,7 @@ class PHP_CodeSniffer
     public function printXMLErrorReport($showWarnings=true)
     {
         echo '<?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL;
-        echo '<phpcs version="1.2.0">'.PHP_EOL;
+        echo '<phpcs version="1.2.1">'.PHP_EOL;
 
         $errorsShown = 0;
 
@@ -951,7 +975,7 @@ class PHP_CodeSniffer
     public function printCheckstyleErrorReport($showWarnings=true)
     {
         echo '<?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL;
-        echo '<checkstyle version="1.2.0">'.PHP_EOL;
+        echo '<checkstyle version="1.2.1">'.PHP_EOL;
 
         $errorsShown = 0;
 
@@ -1056,12 +1080,14 @@ class PHP_CodeSniffer
      *
      * @param boolean $showWarnings Show warnings as well as errors.
      * @param boolean $showSources  Show error sources in report.
+     * @param int     $width        How wide the report should be.
      *
      * @return int The number of error and warning messages shown.
      */
-    public function printErrorReport($showWarnings=true, $showSources=false)
+    public function printErrorReport($showWarnings=true, $showSources=false, $width=80)
     {
         $errorsShown = 0;
+        $width       = max($width, 70);
 
         $report = $this->prepareErrorReport($showWarnings);
         foreach ($report['files'] as $filename => $file) {
@@ -1070,14 +1096,14 @@ class PHP_CodeSniffer
             }
 
             echo PHP_EOL.'FILE: ';
-            if (strlen($filename) <= 71) {
+            if (strlen($filename) <= ($width - 9)) {
                 echo $filename;
             } else {
-                echo '...'.substr($filename, (strlen($filename) - 71));
+                echo '...'.substr($filename, (strlen($filename) - $width - 9));
             }
 
             echo PHP_EOL;
-            echo str_repeat('-', 80).PHP_EOL;
+            echo str_repeat('-', $width).PHP_EOL;
 
             echo 'FOUND '.$file['errors'].' ERROR(S) ';
 
@@ -1086,7 +1112,7 @@ class PHP_CodeSniffer
             }
 
             echo 'AFFECTING '.count($file['messages']).' LINE(S)'.PHP_EOL;
-            echo str_repeat('-', 80).PHP_EOL;
+            echo str_repeat('-', $width).PHP_EOL;
 
             // Work out the max line number for formatting.
             $maxLine = 0;
@@ -1113,7 +1139,7 @@ class PHP_CodeSniffer
             $paddingLine2 .= ' | ';
 
             // The maxium amount of space an error message can use.
-            $maxErrorSpace = (79 - strlen($paddingLine2));
+            $maxErrorSpace = ($width - strlen($paddingLine2) - 1);
 
             foreach ($file['messages'] as $line => $lineErrors) {
                 foreach ($lineErrors as $column => $colErrors) {
@@ -1144,7 +1170,7 @@ class PHP_CodeSniffer
                 }//end foreach
             }//end foreach
 
-            echo str_repeat('-', 80).PHP_EOL.PHP_EOL;
+            echo str_repeat('-', $width).PHP_EOL.PHP_EOL;
         }//end foreach
 
         return $errorsShown;
@@ -1161,17 +1187,19 @@ class PHP_CodeSniffer
      *
      * @param boolean $showWarnings Show warnings as well as errors.
      * @param boolean $showSources  Show error sources in report.
+     * @param int     $width        How wide the report should be.
      *
      * @return int The number of error and warning messages shown.
      */
-    public function printErrorReportSummary($showWarnings=true, $showSources=false)
+    public function printErrorReportSummary($showWarnings=true, $showSources=false, $width=80)
     {
         $errorFiles = array();
+        $width      = max($width, 70);
 
-        foreach ($this->files as $file) {
-            $numWarnings = $file->getWarningCount();
-            $numErrors   = $file->getErrorCount();
-            $filename    = $file->getFilename();
+        $report = $this->prepareErrorReport($showWarnings);
+        foreach ($report['files'] as $filename => $file) {
+            $numWarnings = $file['warnings'];
+            $numErrors   = $file['errors'];
 
             // If verbose output is enabled, we show the results for all files,
             // but if not, we only show files that had errors or warnings.
@@ -1193,14 +1221,14 @@ class PHP_CodeSniffer
         }
 
         echo PHP_EOL.'PHP CODE SNIFFER REPORT SUMMARY'.PHP_EOL;
-        echo str_repeat('-', 80).PHP_EOL;
+        echo str_repeat('-', $width).PHP_EOL;
         if ($showWarnings === true) {
-            echo 'FILE'.str_repeat(' ', 60).'ERRORS  WARNINGS'.PHP_EOL;
+            echo 'FILE'.str_repeat(' ', ($width - 20)).'ERRORS  WARNINGS'.PHP_EOL;
         } else {
-            echo 'FILE'.str_repeat(' ', 70).'ERRORS'.PHP_EOL;
+            echo 'FILE'.str_repeat(' ', ($width - 10)).'ERRORS'.PHP_EOL;
         }
 
-        echo str_repeat('-', 80).PHP_EOL;
+        echo str_repeat('-', $width).PHP_EOL;
 
         $totalErrors   = 0;
         $totalWarnings = 0;
@@ -1208,9 +1236,9 @@ class PHP_CodeSniffer
 
         foreach ($errorFiles as $file => $errors) {
             if ($showWarnings === true) {
-                $padding = (62 - strlen($file));
+                $padding = ($width - 18 - strlen($file));
             } else {
-                $padding = (72 - strlen($file));
+                $padding = ($width - 8 - strlen($file));
             }
 
             if ($padding < 0) {
@@ -1232,14 +1260,14 @@ class PHP_CodeSniffer
             $totalFiles++;
         }//end foreach
 
-        echo str_repeat('-', 80).PHP_EOL;
+        echo str_repeat('-', $width).PHP_EOL;
         echo "A TOTAL OF $totalErrors ERROR(S) ";
         if ($showWarnings === true) {
             echo "AND $totalWarnings WARNING(S) ";
         }
 
         echo "WERE FOUND IN $totalFiles FILE(S)".PHP_EOL;
-        echo str_repeat('-', 80).PHP_EOL.PHP_EOL;
+        echo str_repeat('-', $width).PHP_EOL.PHP_EOL;
 
         if ($showSources === true) {
             $this->printSourceReport($showWarnings, true);
@@ -1255,12 +1283,14 @@ class PHP_CodeSniffer
      *
      * @param boolean $showWarnings Show warnings as well as errors.
      * @param boolean $showSources  Show error sources in report.
+     * @param int     $width        How wide the report should be.
      *
      * @return int The number of error and warning messages shown.
      */
-    public function printSourceReport($showWarnings=true, $showSources=false)
+    public function printSourceReport($showWarnings=true, $showSources=false, $width=80)
     {
         $sources = array();
+        $width   = max($width, 70);
 
         $errorsShown = 0;
 
@@ -1291,19 +1321,19 @@ class PHP_CodeSniffer
         $sources = array_reverse($sources);
 
         echo PHP_EOL.'PHP CODE SNIFFER VIOLATION SOURCE SUMMARY'.PHP_EOL;
-        echo str_repeat('-', 80).PHP_EOL;
+        echo str_repeat('-', $width).PHP_EOL;
         if ($showSources === true) {
-            echo 'SOURCE'.str_repeat(' ', 69).'COUNT'.PHP_EOL;
-            echo str_repeat('-', 80).PHP_EOL;
+            echo 'SOURCE'.str_repeat(' ', ($width - 11)).'COUNT'.PHP_EOL;
+            echo str_repeat('-', $width).PHP_EOL;
         } else {
-            echo 'STANDARD    CATEGORY            SNIFF'.str_repeat(' ', 38).'COUNT'.PHP_EOL;
-            echo str_repeat('-', 80).PHP_EOL;
+            echo 'STANDARD    CATEGORY            SNIFF'.str_repeat(' ', ($width - 42)).'COUNT'.PHP_EOL;
+            echo str_repeat('-', $width).PHP_EOL;
         }
 
         foreach ($sources as $source => $count) {
             if ($showSources === true) {
                 $source = substr($source, 0, -5);
-                echo $source.str_repeat(' ', (75 - strlen($source)));
+                echo $source.str_repeat(' ', ($width - 5 - strlen($source)));
             } else {
                 $parts = explode('.', $source);
 
@@ -1320,23 +1350,184 @@ class PHP_CodeSniffer
 
                 $sniff = substr($parts[2], 0, -5);
                 $sniff = $this->makeFriendlyName($sniff);
-                if (strlen($sniff) > 41) {
-                    $sniff = substr($sniff, 0, ((strlen($sniff) - 41) * -1));
+                if (strlen($sniff) > ($width - 39)) {
+                    $sniff = substr($sniff, 0, ((strlen($sniff) - $width - 39) * -1));
                 }
-                echo $sniff.str_repeat(' ', (43 - strlen($sniff)));
+                echo $sniff.str_repeat(' ', ($width - 37 - strlen($sniff)));
             }
 
             echo $count.PHP_EOL;
         }//end foreach
 
-        echo str_repeat('-', 80).PHP_EOL;
+        echo str_repeat('-', $width).PHP_EOL;
         echo "A TOTAL OF $errorsShown SNIFF VIOLATION(S) ";
         echo 'WERE FOUND IN '.count($sources).' SOURCE(S)'.PHP_EOL;
-        echo str_repeat('-', 80).PHP_EOL.PHP_EOL;
+        echo str_repeat('-', $width).PHP_EOL.PHP_EOL;
 
         return $errorsShown;
 
     }//end printSourceReport()
+
+
+    /**
+     * Prints the author of all errors and warnings, as given by "svn blame".
+     *
+     * Requires you to have the svn command in your path.
+     *
+     * @param boolean $showWarnings Show warnings as well as errors.
+     * @param boolean $showSources  Show error sources in report.
+     * @param int     $width        How wide the report should be.
+     *
+     * @return int The number of error and warning messages shown.
+     */
+    public function printSvnBlameReport($showWarnings=true, $showSources=false, $width=80)
+    {
+        $authors = array();
+        $praise  = array();
+        $sources = array();
+        $width   = max($width, 70);
+
+        $errorsShown = 0;
+
+        $report = $this->prepareErrorReport($showWarnings);
+        foreach ($report['files'] as $filename => $file) {
+            if (PHP_CODESNIFFER_VERBOSITY > 0) {
+                echo 'Getting SVN blame info for '.basename($filename).'... ';
+            }
+
+            $command = 'svn blame '.$filename;
+            $handle  = popen($command, 'r');
+            if ($handle === false) {
+                echo 'ERROR: Could not execute "'.$command.'"'.PHP_EOL.PHP_EOL;
+                exit(2);
+            }
+
+            $rawContent = stream_get_contents($handle);
+            fclose($handle);
+
+            if (PHP_CODESNIFFER_VERBOSITY > 0) {
+                echo 'DONE'.PHP_EOL;
+            }
+
+            $blames = explode("\n", $rawContent);
+
+            foreach ($file['messages'] as $line => $lineErrors) {
+                $blameParts = array();
+                preg_match('|\s+([^\s]+)\s+([^\s]+)|', $blames[$line], $blameParts);
+
+                if (isset($blameParts[2]) === false) {
+                    continue;
+                }
+
+                $author = $blameParts[2];
+                if (isset($authors[$author]) === false) {
+                    $authors[$author] = 0;
+                    $praise[$author]  = array(
+                                         'good' => 0,
+                                         'bad'  => 0,
+                                        );
+                }
+
+                $praise[$author]['bad']++;
+
+                foreach ($lineErrors as $column => $colErrors) {
+                    foreach ($colErrors as $error) {
+                        $errorsShown++;
+                        $authors[$author]++;
+
+                        if ($showSources === true) {
+                            $source = $error['source'];
+                            if (isset($sources[$author][$source]) === false) {
+                                $sources[$author][$source] = 1;
+                            } else {
+                                $sources[$author][$source]++;
+                            }
+                        }
+                    }
+                }
+
+                unset($blames[$line]);
+            }//end foreach
+
+            // No go through and give the authors some credit for
+            // all the lines that do not have errors.
+            foreach ($blames as $line) {
+                $blameParts = array();
+                preg_match('|\s+([^\s]+)\s+([^\s]+)|', $line, $blameParts);
+
+                if (isset($blameParts[2]) === false) {
+                    continue;
+                }
+
+                $author = $blameParts[2];
+                if (isset($authors[$author]) === false) {
+                    // This author doesn't have any errors.
+                    if (PHP_CODESNIFFER_VERBOSITY === 0) {
+                        continue;
+                    }
+
+                    $authors[$author] = 0;
+                    $praise[$author]  = array(
+                                         'good' => 0,
+                                         'bad'  => 0,
+                                        );
+                }
+
+                $praise[$author]['good']++;
+            }//end foreach
+        }//end foreach
+
+        if ($errorsShown === 0) {
+            // Nothing to show.
+            return 0;
+        }
+
+        asort($authors);
+        $authors = array_reverse($authors);
+
+        echo PHP_EOL.'PHP CODE SNIFFER SVN BLAME SUMMARY'.PHP_EOL;
+        echo str_repeat('-', $width).PHP_EOL;
+        if ($showSources === true) {
+            echo 'AUTHOR   SOURCE'.str_repeat(' ', ($width - 27)).'COUNT (%)'.PHP_EOL;
+            echo str_repeat('-', $width).PHP_EOL;
+        } else {
+            echo 'AUTHOR'.str_repeat(' ', ($width - 18)).'COUNT (%)'.PHP_EOL;
+            echo str_repeat('-', $width).PHP_EOL;
+        }
+
+        foreach ($authors as $author => $count) {
+            if ($praise[$author]['good'] === 0) {
+                $percent = 0;
+            } else {
+                $percent = round(($praise[$author]['bad'] / $praise[$author]['good'] * 100), 2);
+            }
+
+            echo $author.str_repeat(' ', ($width - 12 - strlen($author)))."$count ($percent)".PHP_EOL;
+
+            if ($showSources === true && isset($sources[$author]) === true) {
+                $errors = $sources[$author];
+                asort($errors);
+                $errors = array_reverse($errors);
+
+                foreach ($errors as $source => $count) {
+                    if ($source === 'count') {
+                        continue;
+                    }
+
+                    $source = substr($source, 0, -5);
+                    echo '         '.$source.str_repeat(' ', ($width - 21 - strlen($source))).$count.PHP_EOL;
+                }
+            }
+        }
+
+        echo str_repeat('-', $width).PHP_EOL;
+        echo "A TOTAL OF $errorsShown SNIFF VIOLATION(S) ";
+        echo 'WERE COMMITTED BY '.count($authors).' AUTHOR(S)'.PHP_EOL;
+        echo str_repeat('-', $width).PHP_EOL.PHP_EOL;
+
+        return $errorsShown;
+
+    }//end printSvnBlameReport()
 
 
     /**

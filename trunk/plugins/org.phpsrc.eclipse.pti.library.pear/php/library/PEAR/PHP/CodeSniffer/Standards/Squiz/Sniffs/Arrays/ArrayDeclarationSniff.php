@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ArrayDeclarationSniff.php 261787 2008-06-30 05:26:24Z squiz $
+ * @version   CVS: $Id: ArrayDeclarationSniff.php 287724 2009-08-26 02:56:44Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -23,7 +23,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.0
+ * @version   Release: 1.2.1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Arrays_ArrayDeclarationSniff implements PHP_CodeSniffer_Sniff
@@ -389,16 +389,6 @@ class Squiz_Sniffs_Arrays_ArrayDeclarationSniff implements PHP_CodeSniffer_Sniff
                 }
 
                 continue;
-            }
-
-            if (isset($index['index_content']) === true) {
-                $indexContent = trim($index['index_content'], "'");
-                if (preg_match('|^[a-zA-Z0-9_]+$|', $indexContent) === 1) {
-                    if (strtolower($indexContent) !== $indexContent) {
-                        $error = 'Array index "'.$indexContent.'" should not contain uppercase characters';
-                        $phpcsFile->addError($error, $index['index']);
-                    }
-                }
             }
 
             if (($tokens[$index['index']]['line'] === $tokens[$stackPtr]['line'])) {

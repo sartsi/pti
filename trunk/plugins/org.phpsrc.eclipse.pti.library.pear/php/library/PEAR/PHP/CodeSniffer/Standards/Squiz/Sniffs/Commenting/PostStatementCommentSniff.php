@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: PostStatementCommentSniff.php 265199 2008-08-21 04:47:42Z squiz $
+ * @version   CVS: $Id: PostStatementCommentSniff.php 287976 2009-09-03 04:52:57Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -25,7 +25,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.0
+ * @version   Release: 1.2.1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Commenting_PostStatementCommentSniff implements PHP_CodeSniffer_Sniff
@@ -72,7 +72,7 @@ class Squiz_Sniffs_Commenting_PostStatementCommentSniff implements PHP_CodeSniff
         }
 
         $commentLine = $tokens[$stackPtr]['line'];
-        $lastContent = $phpcsFile->findPrevious(array(T_WHITESPACE), ($stackPtr - 1), null, true);
+        $lastContent = $phpcsFile->findPrevious(T_WHITESPACE, ($stackPtr - 1), null, true);
 
         if ($tokens[$lastContent]['line'] !== $commentLine) {
             return;
@@ -80,6 +80,14 @@ class Squiz_Sniffs_Commenting_PostStatementCommentSniff implements PHP_CodeSniff
 
         if ($tokens[$lastContent]['code'] === T_CLOSE_CURLY_BRACKET) {
             return;
+        }
+
+        // Special case for JS files.
+        if ($tokens[$lastContent]['code'] === T_COMMA) {
+            $lastContent = $phpcsFile->findPrevious(T_WHITESPACE, ($lastContent - 1), null, true);
+            if ($tokens[$lastContent]['code'] === T_CLOSE_CURLY_BRACKET) {
+                return;
+            }
         }
 
         $error = 'Comments may not appear after statements.';

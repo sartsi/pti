@@ -27,7 +27,7 @@ Log                 1.11.5  stable
 Mail                1.1.14  stable
 PEAR                1.9.0   stable
 PHP_Beautifier      0.1.14  beta
-PHP_CodeSniffer     1.2.0   stable
+PHP_CodeSniffer     1.2.1   stable
 PHP_Compat          1.5.0   stable
 PHP_CompatInfo      1.9.0   stable
 PHP_UML             1.0.1   stable
@@ -40,8 +40,10 @@ XML_Util            1.2.1   stable
 
 INSTALLED PACKAGES, CHANNEL PEAR.PHPUNIT.DE:
 ============================================
-PACKAGE VERSION STATE
-PHPUnit 3.4.2   stable
+PACKAGE       VERSION STATE
+File_Iterator 1.1.0   stable
+PHPUnit       3.4.2   stable
+phpcpd        1.2.2   stable
 
 INSTALLED PACKAGES, CHANNEL PECL.PHP.NET:
 =========================================

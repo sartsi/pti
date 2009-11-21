@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: InlineCommentSniff.php 253794 2008-02-26 03:47:35Z squiz $
+ * @version   CVS: $Id: InlineCommentSniff.php 288252 2009-09-11 01:50:05Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -25,12 +25,21 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.0
+ * @version   Release: 1.2.1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Commenting_InlineCommentSniff implements PHP_CodeSniffer_Sniff
 {
 
+    /**
+     * A list of tokenizers this sniff supports.
+     *
+     * @var array
+     */
+    public $supportedTokenizers = array(
+                                   'PHP',
+                                   'JS',
+                                  );
 
     /**
      * Returns an array of tokens this test wants to listen for.
@@ -64,22 +73,50 @@ class Squiz_Sniffs_Commenting_InlineCommentSniff implements PHP_CodeSniffer_Snif
         // We are only interested in inline doc block comments, which are
         // not allowed.
         if ($tokens[$stackPtr]['code'] === T_DOC_COMMENT) {
-            $nextToken = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, ($stackPtr + 1), null, true);
-            $ignore    = array(
-                          T_CLASS,
-                          T_INTERFACE,
-                          T_FUNCTION,
-                          T_PUBLIC,
-                          T_PRIVATE,
-                          T_PROTECTED,
-                          T_STATIC,
-                          T_ABSTRACT,
-                          T_CONST,
-                         );
+            $nextToken = $phpcsFile->findNext(
+                PHP_CodeSniffer_Tokens::$emptyTokens,
+                ($stackPtr + 1),
+                null,
+                true
+            );
+
+            $ignore = array(
+                       T_CLASS,
+                       T_INTERFACE,
+                       T_FUNCTION,
+                       T_PUBLIC,
+                       T_PRIVATE,
+                       T_PROTECTED,
+                       T_STATIC,
+                       T_ABSTRACT,
+                       T_CONST,
+                       T_OBJECT,
+                       T_PROPERTY,
+                      );
+
             if (in_array($tokens[$nextToken]['code'], $ignore) === true) {
                 return;
             } else {
-                $prevToken = $phpcsFile->findPrevious(PHP_CodeSniffer_Tokens::$emptyTokens, ($stackPtr - 1), null, true);
+                if ($phpcsFile->tokenizerType === 'JS') {
+                    // We allow block comments if a function is being assigned
+                    // to a variable.
+                    $ignore    = PHP_CodeSniffer_Tokens::$emptyTokens;
+                    $ignore[]  = T_EQUAL;
+                    $ignore[]  = T_STRING;
+                    $ignore[]  = T_OBJECT_OPERATOR;
+                    $nextToken = $phpcsFile->findNext($ignore, ($nextToken + 1), null, true);
+                    if ($tokens[$nextToken]['code'] === T_FUNCTION) {
+                        return;
+                    }
+                }
+
+                $prevToken = $phpcsFile->findPrevious(
+                    PHP_CodeSniffer_Tokens::$emptyTokens,
+                    ($stackPtr - 1),
+                    null,
+                    true
+                );
+
                 if ($tokens[$prevToken]['code'] === T_OPEN_TAG) {
                     return;
                 }
@@ -89,8 +126,8 @@ class Squiz_Sniffs_Commenting_InlineCommentSniff implements PHP_CodeSniffer_Snif
                     $error  = 'Inline doc block comments are not allowed; use "/* Comment */" or "// Comment" instead';
                     $phpcsFile->addError($error, $stackPtr);
                 }
-            }
-        }
+            }//end if
+        }//end if
 
         if ($tokens[$stackPtr]['content']{0} === '#') {
             $error  = 'Perl-style comments are not allowed; use "// Comment" instead';

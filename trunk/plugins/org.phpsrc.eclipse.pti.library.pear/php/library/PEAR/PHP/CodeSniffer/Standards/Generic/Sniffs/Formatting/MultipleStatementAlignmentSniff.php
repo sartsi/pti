@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: MultipleStatementAlignmentSniff.php 270281 2008-12-02 02:38:34Z squiz $
+ * @version   CVS: $Id: MultipleStatementAlignmentSniff.php 288187 2009-09-09 06:12:33Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -27,7 +27,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.0
+ * @version   Release: 1.2.1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Generic_Sniffs_Formatting_MultipleStatementAlignmentSniff implements PHP_CodeSniffer_Sniff
@@ -248,9 +248,14 @@ class Generic_Sniffs_Formatting_MultipleStatementAlignmentSniff implements PHP_C
                 }
 
                 // If the expected number of spaces for alignment exceeds the
-                // maxPadding rule, we can ignore this assignment.
+                // maxPadding rule, we just check for a single space as no
+                // alignment is required.
                 if ($expected > $this->maxPadding) {
-                    continue;
+                    if ($found === 1) {
+                        continue;
+                    } else {
+                        $expected = 1;
+                    }
                 }
 
                 // Skip multi-line assignments if required.

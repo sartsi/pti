@@ -10,14 +10,14 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ForLoopDeclarationSniff.php 267647 2008-10-23 04:47:44Z squiz $
+ * @version   CVS: $Id: ForLoopDeclarationSniff.php 289611 2009-10-13 07:52:23Z sebastian $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
 /**
  * Squiz_Sniffs_ControlStructures_ForLoopDeclarationSniff.
  *
- * Verifies that there is a spce between each condition of for loops.
+ * Verifies that there is a space between each condition of for loops.
  *
  * @category  PHP
  * @package   PHP_CodeSniffer
@@ -25,7 +25,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.0
+ * @version   Release: 1.2.1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_ControlStructures_ForLoopDeclarationSniff implements PHP_CodeSniffer_Sniff

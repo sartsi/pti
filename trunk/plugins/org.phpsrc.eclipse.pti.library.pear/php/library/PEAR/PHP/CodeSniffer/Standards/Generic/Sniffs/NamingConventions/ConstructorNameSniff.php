@@ -10,7 +10,7 @@
  * @author    Leif Wickland <lwickland@rightnow.com>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ConstructorNameSniff.php 276306 2009-02-24 04:43:44Z squiz $
+ * @version   CVS: $Id: ConstructorNameSniff.php 287726 2009-08-26 05:13:12Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -25,12 +25,12 @@ if (class_exists('PHP_CodeSniffer_Standards_AbstractScopeSniff', true) === false
  * Favor PHP 5 constructor syntax, which uses "function __construct()".
  * Avoid PHP 4 constructor syntax, which uses "function ClassName()".
  *
- * @category  PHP
- * @package   PHP_CodeSniffer
- * @author    Leif Wickland <lwickland@rightnow.com>
- * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.0
- * @link      http://pear.php.net/package/PHP_CodeSniffer
+ * @category PHP
+ * @package  PHP_CodeSniffer
+ * @author   Leif Wickland <lwickland@rightnow.com>
+ * @license  http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
+ * @version  Release: 1.2.1
+ * @link     http://pear.php.net/package/PHP_CodeSniffer
  */
 class Generic_Sniffs_NamingConventions_ConstructorNameSniff extends PHP_CodeSniffer_Standards_AbstractScopeSniff
 {

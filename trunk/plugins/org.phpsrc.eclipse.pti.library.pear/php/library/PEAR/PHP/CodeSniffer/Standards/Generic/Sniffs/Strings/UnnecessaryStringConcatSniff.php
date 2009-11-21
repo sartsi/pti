@@ -9,7 +9,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: UnnecessaryStringConcatSniff.php 270567 2008-12-05 04:39:00Z squiz $
+ * @version   CVS: $Id: UnnecessaryStringConcatSniff.php 287523 2009-08-21 04:20:07Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -24,7 +24,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.0
+ * @version   Release: 1.2.1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Generic_Sniffs_Strings_UnnecessaryStringConcatSniff implements PHP_CodeSniffer_Sniff
@@ -96,11 +96,13 @@ class Generic_Sniffs_Strings_UnnecessaryStringConcatSniff implements PHP_CodeSni
         if (in_array($tokens[$prev]['code'], $stringTokens) === true
             && in_array($tokens[$next]['code'], $stringTokens) === true
         ) {
-            $error = 'String concat is not required here; use a single string instead';
-            if ($this->error === true) {
-                $phpcsFile->addError($error, $stackPtr);
-            } else {
-                $phpcsFile->addWarning($error, $stackPtr);
+            if ($tokens[$prev]['content'][0] === $tokens[$next]['content'][0]) {
+                $error = 'String concat is not required here; use a single string instead';
+                if ($this->error === true) {
+                    $phpcsFile->addError($error, $stackPtr);
+                } else {
+                    $phpcsFile->addWarning($error, $stackPtr);
+                }
             }
         }
 
