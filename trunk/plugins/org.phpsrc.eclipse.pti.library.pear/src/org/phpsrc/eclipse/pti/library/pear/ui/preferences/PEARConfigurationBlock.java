@@ -157,7 +157,7 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 	private class LibraryListAdapter implements IListAdapter<Object>, IDialogFieldListener {
 
 		private boolean canEdit(List<Object> selectedElements) {
-			return true;
+			return selectedElements.size() == 1 && !isInternalLibrary((Library) selectedElements.get(0));
 		}
 
 		private boolean canRemove(List<Object> selectedElements) {
@@ -165,6 +165,11 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 
 			if (count == 0)
 				return false;
+
+			for (int i = 0; i < count; i++) {
+				if (isInternalLibrary((Library) selectedElements.get(i)))
+					return false;
+			}
 
 			return true;
 		}
