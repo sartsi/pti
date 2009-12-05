@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: GlobalState.php 5162 2009-08-29 08:49:43Z sb $
+ * @version    SVN: $Id: GlobalState.php 5323 2009-11-13 08:57:15Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 3.4.0
  */
@@ -56,7 +56,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.2
+ * @version    Release: 3.4.3
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.4.0
  */
@@ -180,11 +180,15 @@ class PHPUnit_Util_GlobalState
 
     public static function getIncludedFilesAsString()
     {
-        $files  = get_included_files();
-        $result = '';
+        $blacklist = PHPUnit_Util_Filter::getBlacklistedFiles();
+        $blacklist = array_flip($blacklist['PHPUNIT']);
+        $files     = get_included_files();
+        $result    = '';
 
-        for ($i = count($files) - 1; strpos($files[$i], 'PHPUnit') === FALSE; $i--) {
-            $result = 'require_once \'' . $files[$i] . "';\n" . $result;
+        for ($i = count($files) - 1; $i > 0; $i--) {
+            if (!isset($blacklist[$files[$i]]) && is_file($files[$i])) {
+                $result = 'require_once \'' . $files[$i] . "';\n" . $result;
+            }
         }
 
         return $result;
@@ -201,7 +205,7 @@ class PHPUnit_Util_GlobalState
                   'if (!defined(\'%s\')) define(\'%s\', %s);' . "\n",
                   $name,
                   $name,
-                  var_export($value, TRUE)
+                  self::exportVariable($value)
                 );
             }
         }
@@ -221,7 +225,7 @@ class PHPUnit_Util_GlobalState
                       '$GLOBALS[\'%s\'][\'%s\'] = %s;' . "\n",
                       $superGlobalArray,
                       $key,
-                      var_export($GLOBALS[$superGlobalArray][$key], TRUE)
+                      self::exportVariable($GLOBALS[$superGlobalArray][$key])
                     );
                 }
             }
@@ -236,7 +240,7 @@ class PHPUnit_Util_GlobalState
                 $result .= sprintf(
                   '$GLOBALS[\'%s\'] = %s;' . "\n",
                   $key,
-                  var_export($GLOBALS[$key], TRUE)
+                  self::exportVariable($GLOBALS[$key])
                 );
             }
         }
@@ -302,6 +306,37 @@ class PHPUnit_Util_GlobalState
         }
 
         self::$staticAttributes = array();
+    }
+
+    protected static function exportVariable($variable)
+    {
+        if (is_scalar($variable) || is_null($variable) ||
+           (is_array($variable) && self::arrayOnlyContainsScalars($variable))) {
+            return var_export($variable, TRUE);
+        }
+
+        return 'unserialize(\'' . serialize($variable) . '\')';
+    }
+
+    protected static function arrayOnlyContainsScalars(array $array)
+    {
+        $result = TRUE;
+
+        foreach ($array as $element) {
+            if (is_array($element)) {
+                $result = self::arrayOnlyContainsScalars($element);
+            }
+
+            else if (!is_scalar($element) && !is_null($element)) {
+                $result = FALSE;
+            }
+
+            if ($result === FALSE) {
+                break;
+            }
+        }
+
+        return $result;
     }
 }
 ?>

@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: Filter.php 5162 2009-08-29 08:49:43Z sb $
+ * @version    SVN: $Id: Filter.php 5320 2009-11-13 07:02:49Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 2.0.0
  */
@@ -54,7 +54,7 @@ require_once 'PHPUnit/Util/FilterIterator.php';
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.2
+ * @version    Release: 3.4.3
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 2.0.0
  */
@@ -348,19 +348,22 @@ class PHPUnit_Util_Filter
 
             foreach ($codeCoverageInformation as $k => $test) {
                 foreach (array_keys($test['files']) as $file) {
-                    if ($isFilteredCache[$file]) {
+                    if (isset($isFilteredCache[$file]) &&
+                        $isFilteredCache[$file]) {
                         unset($codeCoverageInformation[$k]['files'][$file]);
                     }
                 }
 
                 foreach (array_keys($test['dead']) as $file) {
-                    if ($isFilteredCache[$file]) {
+                    if (isset($isFilteredCache[$file]) &&
+                        $isFilteredCache[$file]) {
                         unset($codeCoverageInformation[$k]['dead'][$file]);
                     }
                 }
 
                 foreach (array_keys($test['executable']) as $file) {
-                    if ($isFilteredCache[$file]) {
+                    if (isset($isFilteredCache[$file]) &&
+                        $isFilteredCache[$file]) {
                         unset(
                           $codeCoverageInformation[$k]['executable'][$file]
                         );
@@ -548,6 +551,17 @@ class PHPUnit_Util_Filter
     public static function getCoveredFiles()
     {
         return self::$coveredFiles;
+    }
+
+    /**
+     * Returns the list of blacklisted files.
+     *
+     * @return array
+     * @since  Method available since Release 3.4.3
+     */
+    public static function getBlacklistedFiles()
+    {
+        return self::$blacklistedFiles;
     }
 
     /**

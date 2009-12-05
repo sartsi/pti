@@ -42,7 +42,7 @@ INSTALLED PACKAGES, CHANNEL PEAR.PHPUNIT.DE:
 ============================================
 PACKAGE       VERSION STATE
 File_Iterator 1.1.0   stable
-PHPUnit       3.4.2   stable
+PHPUnit       3.4.3   stable
 phpcpd        1.2.2   stable
 
 INSTALLED PACKAGES, CHANNEL PECL.PHP.NET:

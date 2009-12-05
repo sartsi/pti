@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: TestSuite.php 5260 2009-09-29 12:41:31Z sb $
+ * @version    SVN: $Id: TestSuite.php 5315 2009-11-12 18:40:09Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 2.0.0
  */
@@ -88,7 +88,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.2
+ * @version    Release: 3.4.3
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 2.0.0
  */
@@ -737,6 +737,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         if ($currentClass != '' &&
             !isset(self::$tearDownAfterClassCalled[$currentClass])) {
             call_user_func(array($currentClass, 'tearDownAfterClass'));
+            self::$tearDownAfterClassCalled[$currentClass] = TRUE;
         }
 
         $result->endTestSuite($this);

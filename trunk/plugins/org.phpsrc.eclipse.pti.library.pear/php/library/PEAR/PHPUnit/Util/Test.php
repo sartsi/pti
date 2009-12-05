@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: Test.php 5262 2009-09-30 21:30:10Z sb $
+ * @version    SVN: $Id: Test.php 5303 2009-11-05 11:41:55Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 3.0.0
  */
@@ -56,7 +56,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.2
+ * @version    Release: 3.4.3
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.0.0
  */
@@ -154,7 +154,12 @@ class PHPUnit_Util_Test
             $methodName = substr($methodName, 0, $pos);
         }
 
-        $class      = new ReflectionClass($className);
+        $class = new ReflectionClass($className);
+
+        if (!$class->hasMethod($methodName)) {
+            return $result;
+        }
+
         $method     = new ReflectionMethod($className, $methodName);
         $docComment = $class->getDocComment() . $method->getDocComment();
 
