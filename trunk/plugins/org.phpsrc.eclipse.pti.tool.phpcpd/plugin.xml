@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension
+		id="org.phpsrc.eclipse.pti.tools.phpcpd.validator.phpToolPhpcpdMarker"
+		name="PHP Copy/Paste Detection"
+		point="org.eclipse.core.resources.markers">
+		<persistent value="true"/>
+		<attribute name="lineNumber"/>
+		<attribute name="charStart"/>
+		<attribute name="charEnd"/>
+		<attribute name="message"/>
+		<attribute name="priority"/>
+		<attribute name="severity"/>
+		<super type="org.eclipse.core.resources.problemmarker"/>
+ 	</extension>
+	<extension
+		point="org.eclipse.ui.preferencePages">
+		<page
+			category="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
+			class="org.phpsrc.eclipse.pti.tools.phpcpd.ui.preferences.PhpcpdPreferencePage"
+			id="org.phpsrc.eclipse.pti.tools.phpcpd.ui.preferences.PhpcpdPreferencePage"
+			name="PHP Copy/Paste Detection">
+		</page>
+	</extension>
+	<extension point="org.eclipse.ui.propertyPages">
+		<page
+			category="org.phpsrc.eclipse.pti.ui.propertyPages.PHPToolsPreferencePage"
+			class="org.phpsrc.eclipse.pti.tools.phpcpd.ui.preferences.PhpcpdPreferencePage"
+			id="org.phpsrc.eclipse.pti.tools.phpcpd.ui.propertyPages.PhpcpdPreferencePage"
+			name="PHP Copy/Paste Detection">
+			<enabledWhen>
+				<adapt type="org.eclipse.core.resources.IProject">
+				</adapt>
+			</enabledWhen>
+			<filter name="nature" value="org.eclipse.php.core.PHPNature" />
+		</page>
+	</extension>
+	<extension point="org.eclipse.ui.popupMenus">
+		<objectContribution
+			id="org.phpsrc.eclipse.pti.ui.phpToolsPhpcpdObjectContribution"
+			objectClass="org.eclipse.dltk.core.IModelElement">
+			<action
+				id="org.phpsrc.eclipse.pti.tools.phpcpd.ui.actions.object.ValidateResourcesAction"
+				label="PHP Copy/Paste Detection"
+				style="push"
+				menubarPath="phptools/tools"
+				class="org.phpsrc.eclipse.pti.tools.phpcpd.ui.actions.ValidateResourcesAction"
+				enablesFor="+">
+			</action>
+		</objectContribution>
+	</extension>
+</plugin>
