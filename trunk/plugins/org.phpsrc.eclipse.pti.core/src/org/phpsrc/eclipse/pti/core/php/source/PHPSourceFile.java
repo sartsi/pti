@@ -39,6 +39,7 @@ public class PHPSourceFile implements ISourceFile {
 	private ArrayList<Integer> lineStarts;
 	private ArrayList<Integer> lineEnds;
 	private ArrayList<Integer> lineStartTabCount;
+	private int linesCount;
 
 	public PHPSourceFile(IFile file) throws CoreException, IOException {
 		this.file = file;
@@ -63,6 +64,7 @@ public class PHPSourceFile implements ISourceFile {
 				lineStarts.add(new Integer(last + 1));
 				lineEnds.add(new Integer(i));
 				lineStartTabCount.add(new Integer(tabCount));
+				++linesCount;
 				last = i;
 				countTabs = true;
 				tabCount = 0;
@@ -77,6 +79,7 @@ public class PHPSourceFile implements ISourceFile {
 		lineStarts.add(new Integer(last + 1));
 		lineEnds.add(new Integer(i));
 		lineStartTabCount.add(new Integer(tabCount));
+		++linesCount;
 	}
 
 	public int lineStart(int lineNumber) throws IndexOutOfBoundsException {
@@ -93,5 +96,9 @@ public class PHPSourceFile implements ISourceFile {
 
 	public IFile getFile() {
 		return file;
+	}
+
+	public int getNumberOfLines() {
+		return linesCount;
 	}
 }

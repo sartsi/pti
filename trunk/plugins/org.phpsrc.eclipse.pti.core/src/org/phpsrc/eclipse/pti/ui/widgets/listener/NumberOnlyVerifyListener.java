@@ -24,18 +24,22 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package org.phpsrc.eclipse.pti.core.php.source;
 
-import org.eclipse.core.resources.IFile;
+package org.phpsrc.eclipse.pti.ui.widgets.listener;
 
-public interface ISourceFile {
-	public int lineStart(int lineNumber) throws IndexOutOfBoundsException;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
-	public int lineEnd(int lineNumber) throws IndexOutOfBoundsException;
-
-	public int lineStartTabCount(int lineNumber) throws IndexOutOfBoundsException;
-
-	public IFile getFile();
-
-	public int getNumberOfLines();
+public class NumberOnlyVerifyListener implements Listener {
+	public void handleEvent(Event e) {
+		String string = e.text;
+		char[] chars = new char[string.length()];
+		string.getChars(0, chars.length, chars, 0);
+		for (int i = 0; i < chars.length; i++) {
+			if (!('0' <= chars[i] && chars[i] <= '9')) {
+				e.doit = false;
+				return;
+			}
+		}
+	}
 }
