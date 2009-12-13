@@ -30,4 +30,7 @@ public class PhpcpdPreferenceNames {
 	public static final String PREF_PHP_EXECUTABLE = "php_executable"; //$NON-NLS-1$
 	public static final String PREF_PEAR_LIBRARY = "pear_library"; //$NON-NLS-1$
 	public static final String PREF_DEBUG_PRINT_OUTPUT = "debug_print_output"; //$NON-NLS-1$
+	public static final String PREF_MIN_LINES = "min_lines"; //$NON-NLS-1$
+	public static final String PREF_MIN_TOKENS = "min_tokens"; //$NON-NLS-1$
+	public static final String PREF_FILE_SUFFIXES = "file_suffixes"; //$NON-NLS-1$
 }

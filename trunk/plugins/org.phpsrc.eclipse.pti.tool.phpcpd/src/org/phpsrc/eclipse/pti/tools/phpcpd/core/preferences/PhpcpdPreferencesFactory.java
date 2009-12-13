@@ -54,6 +54,9 @@ public class PhpcpdPreferencesFactory {
 		String phpExe = prefs.getString(PhpcpdPreferenceNames.PREF_PHP_EXECUTABLE);
 		boolean printOutput = prefs.getBoolean(PhpcpdPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
 		String pearLibraryName = prefs.getString(PhpcpdPreferenceNames.PREF_PEAR_LIBRARY);
+		Integer minLines = prefs.getInt(PhpcpdPreferenceNames.PREF_MIN_LINES);
+		Integer minTokens = prefs.getInt(PhpcpdPreferenceNames.PREF_MIN_TOKENS);
+		String fileSuffixes = prefs.getString(PhpcpdPreferenceNames.PREF_FILE_SUFFIXES);
 
 		IScopeContext[] preferenceScopes = createPreferenceScopes(project);
 		if (preferenceScopes[0] instanceof ProjectScope) {
@@ -62,10 +65,13 @@ public class PhpcpdPreferencesFactory {
 				phpExe = node.get(PhpcpdPreferenceNames.PREF_PHP_EXECUTABLE, phpExe);
 				printOutput = node.getBoolean(PhpcpdPreferenceNames.PREF_DEBUG_PRINT_OUTPUT, printOutput);
 				pearLibraryName = node.get(PhpcpdPreferenceNames.PREF_PEAR_LIBRARY, pearLibraryName);
+				minLines = node.getInt(PhpcpdPreferenceNames.PREF_MIN_LINES, minLines);
+				minTokens = node.getInt(PhpcpdPreferenceNames.PREF_MIN_TOKENS, minTokens);
+				fileSuffixes = node.get(PhpcpdPreferenceNames.PREF_FILE_SUFFIXES, fileSuffixes);
 			}
 		}
 
-		return new PhpcpdPreferences(phpExe, printOutput, pearLibraryName);
+		return new PhpcpdPreferences(phpExe, printOutput, pearLibraryName, minLines, minTokens, fileSuffixes);
 	}
 
 	protected static IScopeContext[] createPreferenceScopes(IProject project) {

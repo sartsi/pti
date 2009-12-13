@@ -151,6 +151,13 @@ public class Phpcpd extends AbstractPHPTool {
 
 		PhpcpdPreferences prefs = PhpcpdPreferencesFactory.factory(project);
 
+		if (prefs.minLines > 0)
+			cmdLineArgs = " --min-lines " + prefs.minLines + " " + cmdLineArgs;
+		if (prefs.minTokens > 0)
+			cmdLineArgs = " --min-tokens " + prefs.minTokens + " " + cmdLineArgs;
+		if (prefs.fileSuffixes != null && !"".equals(prefs.fileSuffixes))
+			cmdLineArgs = " --suffixes " + OperatingSystem.escapeShellArg(prefs.fileSuffixes) + " " + cmdLineArgs;
+
 		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
 				cmdLineArgs, getPHPINIEntries(project, fileIncludePath));
 

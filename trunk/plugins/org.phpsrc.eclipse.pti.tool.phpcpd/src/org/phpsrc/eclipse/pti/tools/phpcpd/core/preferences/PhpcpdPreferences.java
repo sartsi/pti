@@ -31,7 +31,16 @@ import org.phpsrc.eclipse.pti.library.pear.core.preferences.AbstractPEARPHPToolP
 
 public class PhpcpdPreferences extends AbstractPEARPHPToolPreferences {
 
-	protected PhpcpdPreferences(String phpExecutable, boolean printOutput, String pearLibraryName) {
+	public Integer minLines;
+	public Integer minTokens;
+	public String fileSuffixes;
+
+	protected PhpcpdPreferences(String phpExecutable, boolean printOutput, String pearLibraryName, Integer minLines,
+			Integer minTokens, String fileSuffixes) {
 		super(phpExecutable, printOutput, pearLibraryName);
+
+		this.minLines = minLines;
+		this.minTokens = minTokens;
+		this.fileSuffixes = fileSuffixes;
 	}
 }
