@@ -35,6 +35,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.phpsrc.eclipse.pti.library.pear.ui.preferences.AbstractPEARPHPToolConfigurationBlock;
 import org.phpsrc.eclipse.pti.tools.phpcpd.PhpcpdPlugin;
@@ -127,6 +128,13 @@ public class PhpcpdConfigurationBlock extends AbstractPEARPHPToolConfigurationBl
 		fileSuffixesGroup.setLayoutData(fileSuffixesData);
 
 		fFileSuffixes.doFillIntoGrid(fileSuffixesGroup, 3);
+
+		Label fileSuffixInfoLabel = new Label(fileSuffixesGroup, SWT.NONE);
+		fileSuffixInfoLabel.setText("File suffixes are separated by a comma");
+		GridData folderInfoData = new GridData(GridData.FILL_HORIZONTAL);
+		folderInfoData.horizontalSpan = 3;
+		fileSuffixInfoLabel.setLayoutData(folderInfoData);
+		makeFontItalic(fileSuffixInfoLabel);
 
 		return conditionsGroup;
 	}
