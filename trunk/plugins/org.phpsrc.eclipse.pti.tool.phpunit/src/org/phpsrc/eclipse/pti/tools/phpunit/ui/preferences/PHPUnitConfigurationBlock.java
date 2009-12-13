@@ -97,7 +97,7 @@ public class PHPUnitConfigurationBlock extends AbstractPEARPHPToolConfigurationB
 		optionGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		unpackTestFilePattern();
-		unpackBoostrap();
+		unpackBootstrap();
 
 		validateSettings(null, null, null);
 
@@ -253,10 +253,12 @@ public class PHPUnitConfigurationBlock extends AbstractPEARPHPToolConfigurationB
 	 */
 	@Override
 	protected void updateControls() {
-		unpackBoostrap();
+		super.updateControls();
+		unpackBootstrap();
+		unpackTestFilePattern();
 	}
 
-	private void unpackBoostrap() {
+	private void unpackBootstrap() {
 		String bootstrap = getValue(PREF_BOOSTRAP);
 		if (bootstrap != null)
 			fBootstrap.setText(bootstrap);
