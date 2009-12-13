@@ -58,6 +58,7 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.phpsrc.eclipse.pti.library.pear.ui.preferences.AbstractPEARPHPToolConfigurationBlock;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.PHPCodeSniffer;
+import org.phpsrc.eclipse.pti.ui.widgets.listener.NumberOnlyVerifyListener;
 
 public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigurationBlock {
 
@@ -309,6 +310,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		tabWidthGroup.setLayoutData(tabWidthData);
 
 		fTabWidth.doFillIntoGrid(tabWidthGroup, 3);
+		fTabWidth.getTextControl(null).addListener(SWT.Verify, new NumberOnlyVerifyListener());
 
 		createDialogFieldWithInfoText(folder, fIgnorePattern, "Ignore Directories and Files",
 				"Patterns are separated by a comma (* = any string, ?= any character)");
