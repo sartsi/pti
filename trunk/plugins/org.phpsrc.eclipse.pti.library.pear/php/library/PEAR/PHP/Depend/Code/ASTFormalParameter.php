@@ -62,7 +62,7 @@ require_once 'PHP/Depend/Code/ASTNode.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2009 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.7
+ * @version    Release: 0.9.8
  * @link       http://www.pdepend.org/
  * @since      0.9.6
  */
@@ -72,12 +72,7 @@ class PHP_Depend_Code_ASTFormalParameter extends PHP_Depend_Code_ASTNode
      * The image type of this node.
      */
     const CLAZZ = __CLASS__;
-
-    /**
-     * The image type of this node.
-     */
-    const IMAGE = __CLASS__;
-
+    
     /**
      * This property is set to <b>true</b> when the parameter is passed by
      * reference.
@@ -91,7 +86,7 @@ class PHP_Depend_Code_ASTFormalParameter extends PHP_Depend_Code_ASTNode
      */
     public function __construct()
     {
-        parent::__construct(self::IMAGE);
+        parent::__construct(self::CLAZZ);
     }
 
     /**

@@ -47,6 +47,8 @@
  * @since      0.9.6
  */
 
+require_once 'PHP/Depend/Code/ASTVisitorI.php';
+
 /**
  * Root interface for an ast node.
  *
@@ -56,7 +58,7 @@
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2009 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.7
+ * @version    Release: 0.9.8
  * @link       http://www.pdepend.org/
  * @since      0.9.6
  */
@@ -171,4 +173,16 @@ interface PHP_Depend_Code_ASTNodeI
      * @return void
      */
     function setParent(PHP_Depend_Code_ASTNodeI $node);
+
+    /**
+     * Accept method of the visitor design pattern. This method will be called
+     * by a visitor during tree traversal.
+     *
+     * @param PHP_Depend_Code_ASTVisitorI $visitor The calling visitor instance.
+     * @param array(string=>integer)      $data    Optional previous calculated data.
+     *
+     * @return void
+     * @since 0.9.8
+     */
+    function accept(PHP_Depend_Code_ASTVisitorI $visitor, $data = null);
 }

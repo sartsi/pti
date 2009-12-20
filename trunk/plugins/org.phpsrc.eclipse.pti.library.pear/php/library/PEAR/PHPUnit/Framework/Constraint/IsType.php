@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: IsType.php 5164 2009-08-29 10:38:39Z sb $
+ * @version    SVN: $Id: IsType.php 5436 2009-12-12 12:19:40Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 3.0.0
  */
@@ -60,7 +60,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.3
+ * @version    Release: 3.4.5
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.0.0
  */
@@ -75,6 +75,7 @@ class PHPUnit_Framework_Constraint_IsType extends PHPUnit_Framework_Constraint
     const TYPE_OBJECT   = 'object';
     const TYPE_RESOURCE = 'resource';
     const TYPE_STRING   = 'string';
+    const TYPE_SCALAR   = 'scalar';
 
     /**
      * @var array
@@ -90,7 +91,8 @@ class PHPUnit_Framework_Constraint_IsType extends PHPUnit_Framework_Constraint
       'numeric' => TRUE,
       'object' => TRUE,
       'resource' => TRUE,
-      'string' => TRUE
+      'string' => TRUE,
+      'scalar' => TRUE
     );
 
     /**
@@ -163,6 +165,10 @@ class PHPUnit_Framework_Constraint_IsType extends PHPUnit_Framework_Constraint
 
             case 'resource': {
                 return is_resource($other);
+            }
+
+            case 'scalar': {
+                return is_scalar($other);
             }
         }
     }

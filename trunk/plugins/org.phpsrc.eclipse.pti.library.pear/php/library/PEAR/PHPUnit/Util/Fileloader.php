@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: Fileloader.php 5315 2009-11-12 18:40:09Z sb $
+ * @version    SVN: $Id: Fileloader.php 5439 2009-12-14 22:12:15Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 2.3.0
  */
@@ -59,7 +59,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.3
+ * @version    Release: 3.4.5
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 2.3.0
  */
@@ -100,15 +100,19 @@ class PHPUnit_Util_Fileloader
      */
     public static function load($filename)
     {
-        $filename = PHPUnit_Util_Filesystem::fileExistsInIncludePath($filename);
+        $_filename = PHPUnit_Util_Filesystem::fileExistsInIncludePath(
+          $filename
+        );
 
-        if (!$filename) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
-              1, 'existing file', $filename
+        if (!$_filename) {
+            throw new RuntimeException(
+              sprintf('Cannot open file "%s".' . "\n", $filename)
             );
         }
 
+        $filename         = $_filename;
         $oldVariableNames = array_keys(get_defined_vars());
+        unset($_filename);
 
         include_once $filename;
 

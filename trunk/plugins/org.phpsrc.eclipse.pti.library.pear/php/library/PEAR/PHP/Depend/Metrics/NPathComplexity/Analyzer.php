@@ -63,7 +63,7 @@ require_once 'PHP/Depend/Util/MathUtil.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2009 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.7
+ * @version    Release: 0.9.8
  * @link       http://www.pdepend.org/
  */
 class PHP_Depend_Metrics_NPathComplexity_Analyzer
@@ -290,7 +290,6 @@ class PHP_Depend_Metrics_NPathComplexity_Analyzer
         $this->_length = count($this->_tokens);
 
         $this->_metrics[$uuid] = $this->_calculateScope();
-//var_dump($this->_metrics);
     }
 
     /**

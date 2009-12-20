@@ -70,7 +70,7 @@ require_once 'PHP/Depend/Input/Iterator.php';
  * @author    Manuel Pichler <mapi@pdepend.org>
  * @copyright 2008-2009 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.9.7
+ * @version   Release: 0.9.8
  * @link      http://pdepend.org/
  */
 class PHP_Depend
@@ -383,8 +383,6 @@ class PHP_Depend
         $collection->removeFilter($this->_codeFilter);
 
         $this->_performAnalyzeProcess();
-
-
 
         // Set global filter for logging
         $collection->addFilter($this->_codeFilter);

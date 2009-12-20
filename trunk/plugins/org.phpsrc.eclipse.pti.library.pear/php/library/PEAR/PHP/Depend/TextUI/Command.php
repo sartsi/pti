@@ -62,7 +62,7 @@ require_once 'PHP/Depend/Util/Log.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2009 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.7
+ * @version    Release: 0.9.8
  * @link       http://pdepend.org/
  */
 class PHP_Depend_TextUI_Command
@@ -195,6 +195,17 @@ class PHP_Depend_TextUI_Command
             unset($options['--optimization']);
         }
 
+        if (isset($options['--notify-me'])) {
+            // Import the class source
+            include_once 'PHP/Depend/DbusUI/ResultPrinter.php';
+            // Load the dbus result printer.
+            $this->_runner->addProcessListener(
+                new PHP_Depend_DbusUI_ResultPrinter()
+            );
+            // Remove that option
+            unset($options['--notify-me']);
+        }
+
         if (count($options) > 0) {
             $this->printHelp();
             echo "Unknown option '", key($options), "' given.", PHP_EOL;
@@ -223,7 +234,6 @@ class PHP_Depend_TextUI_Command
                 printf('; Memory: %4.2fMb', $memory);
             }
             echo PHP_EOL;
-
 
             return $result;
         } catch (RuntimeException $e) {
@@ -367,7 +377,7 @@ class PHP_Depend_TextUI_Command
      */
     protected function printVersion()
     {
-        echo 'PHP_Depend 0.9.7 by Manuel Pichler', PHP_EOL, PHP_EOL;
+        echo 'PHP_Depend 0.9.8 by Manuel Pichler', PHP_EOL, PHP_EOL;
     }
 
     /**
@@ -442,6 +452,9 @@ class PHP_Depend_TextUI_Command
         $this->_printOption('--debug', 'Prints debugging information.', $l);
         $this->_printOption('--help', 'Print this help text.', $l);
         $this->_printOption('--version', 'Print the current version.', $l);
+
+        $this->_printDbusOption($l);
+
         $this->_printOption('-d key[=value]', 'Sets a php.ini value.', $l);
         echo PHP_EOL;
     }
@@ -657,6 +670,26 @@ class PHP_Depend_TextUI_Command
             echo PHP_EOL, str_repeat(' ', $length + 3), $line;
         }
         echo PHP_EOL;
+    }
+
+    /**
+     * Optionally outputs the dbus option when the required extension 
+     * is loaded.
+     *
+     * @param integer $length Padding length for the option.
+     *
+     * @return void
+     */
+    private function _printDbusOption($length)
+    {
+        if (extension_loaded("dbus") === false) {
+            return;
+        }
+ 
+        $option  = '--notify-me';
+        $message = 'Show a notification after analysis.';
+  
+        $this->_printOption($option, $message, $length);
     }
 
     /**

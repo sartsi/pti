@@ -31,9 +31,9 @@ class PHP_UML_FileScannerImpl extends PHP_UML_FileScanner
 {
 
     /**
-     * Reference to a PHP_UML_PHP_Parser object
+     * Reference to a PHP_UML_Input_PHP_Parser object
      *
-     * @var PHP_UML_PHP_Parser
+     * @var PHP_UML_Input_PHP_Parser
      */
     public $parser;
 

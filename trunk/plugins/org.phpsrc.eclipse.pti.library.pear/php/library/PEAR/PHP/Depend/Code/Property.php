@@ -60,7 +60,7 @@ require_once 'PHP/Depend/Code/AbstractItem.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2009 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.7
+ * @version    Release: 0.9.8
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_Property 
@@ -310,6 +310,17 @@ class PHP_Depend_Code_Property
     }
 
     /**
+     * Returns the column number where the property declaration starts.
+     *
+     * @return integer
+     * @since 0.9.8
+     */
+    public function getStartColumn()
+    {
+        return $this->_variableDeclarator->getStartColumn();
+    }
+
+    /**
      * Returns the line number where the property declaration ends.
      *
      * @return integer
@@ -318,6 +329,17 @@ class PHP_Depend_Code_Property
     public function getEndLine()
     {
         return $this->_variableDeclarator->getEndLine();
+    }
+
+    /**
+     * Returns the column number where the property declaration ends.
+     *
+     * @return integer
+     * @since 0.9.8
+     */
+    public function getEndColumn()
+    {
+        return $this->_variableDeclarator->getEndColumn();
     }
 
     /**
@@ -401,7 +423,7 @@ class PHP_Depend_Code_Property
      * @return void
      * @since 0.9.6
      */
-    public function setValue($object, $value)
+    public function setValue($object, $value = null)
     {
         throw new ReflectionException(__METHOD__ . '() is not supported.');
     }

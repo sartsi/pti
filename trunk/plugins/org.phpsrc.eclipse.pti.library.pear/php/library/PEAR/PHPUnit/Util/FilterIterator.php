@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: FilterIterator.php 5162 2009-08-29 08:49:43Z sb $
+ * @version    SVN: $Id: FilterIterator.php 5440 2009-12-16 12:52:20Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 3.0.0
  */
@@ -56,7 +56,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.3
+ * @version    Release: 3.4.5
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.0.0
  */
@@ -120,12 +120,11 @@ class PHPUnit_Util_FilterIterator extends FilterIterator
      */
     public function accept()
     {
-        $filename = $this->getInnerIterator()->current()->getFilename();
+        $current  = $this->getInnerIterator()->current();
+        $filename = $current->getFilename();
 
         if (strpos($filename, '.') === 0 ||
-            preg_match(
-              '=/\.[^/]*/=',
-              $this->getInnerIterator()->current()->getPathname())) {
+            preg_match('=/\.[^/]*/=', $current->getRealPath())) {
             return FALSE;
         }
 

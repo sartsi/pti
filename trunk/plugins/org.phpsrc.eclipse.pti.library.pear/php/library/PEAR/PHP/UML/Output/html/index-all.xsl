@@ -54,7 +54,7 @@
 
 	<xsl:template name="indexAllInnerContainer">
 		<xsl:for-each select="packagedElement[@xmi:type='uml:Package' or @xmi:type='uml:Model']">
-			
+
 			<xsl:variable name="setEntities" select="(packagedElement|nestedClassifier)[@xmi:type='uml:Interface' or @xmi:type='uml:Class' or @xmi:type='uml:DataType']"/>
 			<xsl:for-each select="$setEntities">
 				<xsl:variable name="entityName" select="@name"/>
@@ -86,7 +86,7 @@
 				<xsl:for-each select="ownedAttribute">
 					<li>
 						<xsl:attribute name="href">
-							<xsl:value-of select="$fileName"/>
+							<xsl:value-of select="concat($fileName, '#', @name)"/>
 						</xsl:attribute>
 						<comment>
 							Variable in
@@ -115,8 +115,59 @@
 					</li>
 				</xsl:for-each>
 			</xsl:for-each>
+
+			
 			<xsl:call-template name="indexAllInnerContainer"/>
 		</xsl:for-each>
+		<!-- procedural elements -->
+			<xsl:variable name="entityName" select="@name"/>
+			<xsl:variable name="path">
+				<xsl:call-template name="getPackageFilePath">
+					<xsl:with-param name="context" select="."/>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:variable name="fileName">
+				<xsl:value-of select="$path"/>
+				<xsl:choose>
+					<xsl:when test="@xmi:type='uml:Model'">
+						<xsl:value-of select="$fileOverviewSummary"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="concat(@name, '/', $filePackageSummary)"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			<xsl:for-each select="ownedOperation">
+				<li>
+					<xsl:variable name="parameters">
+						<xsl:call-template name="htmlParametersBracket"/>
+					</xsl:variable>
+					<xsl:attribute name="href">
+						<xsl:value-of select="concat($fileName, '#', @name, $parameters)"/>
+					</xsl:attribute>
+					<comment>
+						Method in
+						<a href="{$fileName}"><xsl:value-of select="$entityName"/></a>
+						<xsl:text>&#32;</xsl:text>
+						<xsl:call-template name="titleComment"/>
+					</comment>
+					<xsl:value-of select="@name"/>
+				</li>
+				</xsl:for-each>
+				<xsl:for-each select="ownedAttribute">
+					<li>
+						<xsl:attribute name="href">
+							<xsl:value-of select="concat($fileName, '#', @name)"/>
+						</xsl:attribute>
+						<comment>
+							Constant in
+							<a href="{$fileName}"><xsl:value-of select="$entityName"/></a>
+							<xsl:text>&#32;</xsl:text>
+							<xsl:call-template name="titleComment"/>
+						</comment>
+						<xsl:value-of select="@name"/>
+					</li>
+				</xsl:for-each>
 	</xsl:template>
 
 </xsl:stylesheet>

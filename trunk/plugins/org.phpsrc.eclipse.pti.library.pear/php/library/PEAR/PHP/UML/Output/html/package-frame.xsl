@@ -8,6 +8,8 @@
 		<xsl:param name="relPathTop"/>
 		<xsl:param name="classSet"/>
 		<xsl:param name="interfaceSet"/>
+		<xsl:param name="ownedOperationSet"/>
+		<xsl:param name="ownedAttributeSet"/>
 		<xsl:param name="packageNamePart"/>
 
 		<html>
@@ -42,6 +44,33 @@
 								<xsl:sort select="@name" data-type="text"/>
 								<li class="interfaceElement">
 									<a href="{concat($fileprefixInterface, @name, '.html')}" target="classFrame"><xsl:value-of select="@name"/></a>
+								</li>
+							</xsl:for-each>
+						</ul>
+					</xsl:if>
+					<xsl:if test="count($ownedOperationSet) &gt; 0">
+						<h3>Functions</h3>
+						<ul>
+							<xsl:for-each select="$ownedOperationSet">
+								<xsl:sort select="@name" data-type="text"/>
+								<xsl:variable name="parameters">
+									<xsl:call-template name="htmlParametersBracket">
+									<xsl:with-param name="relPathTop" select="$relPathTop"/>
+									</xsl:call-template>
+								</xsl:variable>
+								<li>
+									<a href="{concat('package-summary.html#', @name, $parameters)}" target="classFrame"><xsl:value-of select="@name"/></a>
+								</li>
+							</xsl:for-each>
+						</ul>
+					</xsl:if>
+					<xsl:if test="count($ownedAttributeSet) &gt; 0">
+						<h3>Constants</h3>
+						<ul>
+							<xsl:for-each select="$ownedAttributeSet">
+								<xsl:sort select="@name" data-type="text"/>
+								<li>
+									<a href="{concat('package-summary.html#', @name)}" target="classFrame"><xsl:value-of select="@name"/></a>
 								</li>
 							</xsl:for-each>
 						</ul>

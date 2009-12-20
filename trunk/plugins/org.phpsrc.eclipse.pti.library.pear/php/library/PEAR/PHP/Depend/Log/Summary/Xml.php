@@ -64,7 +64,7 @@ require_once 'PHP/Depend/Metrics/ProjectAwareI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2009 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.7
+ * @version    Release: 0.9.8
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Log_Summary_Xml
@@ -203,7 +203,7 @@ class PHP_Depend_Log_Summary_Xml
 
         $metrics = $dom->createElement('metrics');
         $metrics->setAttribute('generated', date('Y-m-d\TH:i:s'));
-        $metrics->setAttribute('pdepend', '0.9.7');
+        $metrics->setAttribute('pdepend', '0.9.8');
 
         foreach ($this->projectMetrics as $name => $value) {
             $metrics->setAttribute($name, $value);

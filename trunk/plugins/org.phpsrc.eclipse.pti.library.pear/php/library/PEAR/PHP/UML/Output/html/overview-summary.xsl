@@ -64,6 +64,77 @@
 							</xsl:for-each>
 						</table>
 					</xsl:if>
+					
+					<!-- added for the non-OO ("global") functions -->
+					<xsl:variable name="interfaceSet" select="packagedElement[@xmi:type='uml:Interface']" />
+					<xsl:variable name="classSet" select="packagedElement[@xmi:type='uml:Class']"/>
+					<xsl:variable name="ownedOperationSet" select="ownedOperation"/>
+					<xsl:variable name="ownedAttributeSet" select="ownedAttribute"/>
+					<xsl:variable name="relPathTop"/>
+					
+					<xsl:if test="count($interfaceSet) &gt; 0">
+						<h2>Interface summary</h2>
+						<xsl:call-template name="htmlTableSummary">
+							<xsl:with-param name="relPathTop" select="$relPathTop"/>
+							<xsl:with-param name="set" select="$interfaceSet"/>
+							<xsl:with-param name="filePrefix" select="$fileprefixInterface"/>
+						</xsl:call-template>
+					</xsl:if>
+					
+					<xsl:if test="count($classSet) &gt; 0">
+						<h2>Class summary</h2>
+						<xsl:call-template name="htmlTableSummary">
+							<xsl:with-param name="relPathTop" select="$relPathTop"/>
+							<xsl:with-param name="set" select="$classSet"/>
+							<xsl:with-param name="filePrefix" select="$fileprefixClass"/>
+						</xsl:call-template>
+					</xsl:if>
+					
+					<xsl:if test="count($ownedAttributeSet) &gt; 0">
+						<div id="fieldSummary">
+							<h2>Field Summary</h2>
+							<table border="1" class="tableSummary">
+								<xsl:for-each select="$ownedAttributeSet">
+									<xsl:call-template name="class-field-summary">
+										<xsl:with-param name="relPathTop" select="$relPathTop"/>
+									</xsl:call-template>
+								</xsl:for-each>
+							</table>
+						</div>
+					</xsl:if>
+					<xsl:if test="count($ownedOperationSet) &gt; 0">
+						<div id="methodSummary">
+							<h2>Method Summary</h2>
+							<table border="1" class="tableSummary">
+								<xsl:for-each select="$ownedOperationSet">
+									<xsl:call-template name="class-method-summary">
+										<xsl:with-param name="relPathTop" select="$relPathTop"/>
+									</xsl:call-template>
+								</xsl:for-each>
+							</table>
+						</div>
+					</xsl:if>
+					<xsl:if test="count($ownedAttributeSet) &gt; 0">
+						<div id="fieldDetail">
+							<h2>Field Detail</h2>
+							<xsl:for-each select="$ownedAttributeSet">
+								<xsl:call-template name="class-field-detail">
+									<xsl:with-param name="relPathTop" select="$relPathTop"/>
+								</xsl:call-template>
+							</xsl:for-each>
+						</div>
+					</xsl:if>
+					<xsl:if test="count($ownedOperationSet) &gt; 0">
+						<div id="methodDetail">
+							<h2>Method Detail</h2>
+							<xsl:for-each select="$ownedOperationSet">
+								<xsl:call-template name="class-method-detail">
+									<xsl:with-param name="relPathTop" select="$relPathTop"/>
+									<xsl:with-param name="specifiedBy" select="no"/>
+								</xsl:call-template>
+							</xsl:for-each>
+						</div>
+					</xsl:if>
 
 				</div>
 			</body>

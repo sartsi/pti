@@ -58,7 +58,7 @@ require_once 'PHP/Depend/Code/ASTNodeI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2009 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.7
+ * @version    Release: 0.9.8
  * @link       http://www.pdepend.org/
  * @since      0.9.6
  */
@@ -94,6 +94,34 @@ abstract class PHP_Depend_Code_ASTNode implements PHP_Depend_Code_ASTNodeI
     protected $comment = null;
 
     /**
+     * The start line for this node.
+     *
+     * @var integer
+     */
+    private $_startLine = -1;
+
+    /**
+     * The end line for this node.
+     *
+     * @var integer
+     */
+    private $_endLine = -1;
+
+    /**
+     * The start column for this node.
+     *
+     * @var integer
+     */
+    private $_startColumn = -1;
+
+    /**
+     * The end column for this node.
+     *
+     * @var integer
+     */
+    private $_endColumn = -1;
+
+    /**
      * Constructs a new ast node instance.
      *
      * @param string $image The source image for this node.
@@ -120,6 +148,10 @@ abstract class PHP_Depend_Code_ASTNode implements PHP_Depend_Code_ASTNodeI
      */
     public function getStartLine()
     {
+        if ($this->_startLine > 0) {
+            return $this->_startLine;
+        }
+        
         $tokens = $this->getTokens();
         $token  = reset($tokens);
 
@@ -128,17 +160,50 @@ abstract class PHP_Depend_Code_ASTNode implements PHP_Depend_Code_ASTNodeI
     }
 
     /**
+     * Sets the start line for this node.
+     *
+     * @param integer $startLine The start line for this node.
+     *
+     * @return void
+     */
+    public function setStartLine($startLine)
+    {
+        if (is_int($startLine) === false || $startLine < 1) {
+            throw new InvalidArgumentException('$startLine must be an int>=1.');
+        }
+        $this->_startLine = $startLine;
+    }
+    /**
      * Returns the start column for this ast node.
      *
      * @return integer
      */
     public function getStartColumn()
     {
+        if ($this->_startColumn > 0) {
+            return $this->_startColumn;
+        }
+
         $tokens = $this->getTokens();
         $token  = reset($tokens);
 
         assert($token instanceof PHP_Depend_Token);
         return $token->startColumn;
+    }
+
+    /**
+     * Sets the start column for this node.
+     *
+     * @param integer $startColumn The start column for this node.
+     *
+     * @return void
+     */
+    public function setStartColumn($startColumn)
+    {
+        if (is_int($startColumn) === false || $startColumn < 1) {
+            throw new InvalidArgumentException('$startColumn must be an int>=1.');
+        }
+        $this->_startColumn = $startColumn;
     }
 
     /**
@@ -148,11 +213,31 @@ abstract class PHP_Depend_Code_ASTNode implements PHP_Depend_Code_ASTNodeI
      */
     public function getEndLine()
     {
+        if ($this->_endLine > 0) {
+            return $this->_endLine;
+        }
+
         $tokens = $this->getTokens();
         $token  = end($tokens);
 
         assert($token instanceof PHP_Depend_Token);
         return $token->endLine;
+    }
+
+
+    /**
+     * Sets the end line for this node.
+     *
+     * @param integer $endLine The end line for this node.
+     *
+     * @return void
+     */
+    public function setEndLine($endLine)
+    {
+        if (is_int($endLine) === false || $endLine < 1) {
+            throw new InvalidArgumentException('$endLine must be an int>=1.');
+        }
+        $this->_endLine = $endLine;
     }
 
     /**
@@ -162,11 +247,30 @@ abstract class PHP_Depend_Code_ASTNode implements PHP_Depend_Code_ASTNodeI
      */
     public function getEndColumn()
     {
+        if ($this->_endColumn > 0) {
+            return $this->_endColumn;
+        }
+
         $tokens = $this->getTokens();
         $token  = end($tokens);
 
         assert($token instanceof PHP_Depend_Token);
         return $token->endColumn;
+    }
+
+    /**
+     * Sets the end column for this node.
+     *
+     * @param integer $endColumn The end column for this node.
+     *
+     * @return void
+     */
+    public function setEndColumn($endColumn)
+    {
+        if (is_int($endColumn) === false || $endColumn < 1) {
+            throw new InvalidArgumentException('$endColumn must be an int>=1.');
+        }
+        $this->_endColumn = $endColumn;
     }
 
     /**
@@ -350,5 +454,25 @@ abstract class PHP_Depend_Code_ASTNode implements PHP_Depend_Code_ASTNodeI
         $storage = PHP_Depend_StorageRegistry::get(PHP_Depend::TOKEN_STORAGE);
         $storage->store($tokens, spl_object_hash($this), get_class($this));
     }
+
+    /**
+     * Accept method of the visitor design pattern. This method will be called
+     * by a visitor during tree traversal.
+     *
+     * @param PHP_Depend_Code_ASTVisitorI $visitor The calling visitor instance.
+     * @param array(string=>integer)      $data    Optional previous calculated data.
+     *
+     * @return mixed
+     * @since 0.9.8
+     */
+    public function accept(PHP_Depend_Code_ASTVisitorI $visitor, $data = null)
+    {
+        $data = $visitor->visitBefore($this, $data);
+
+        foreach ($this->nodes as $node) {
+            $data = $node->accept($visitor, $data);
+        }
+
+        return $visitor->visitAfter($this, $data);
+    }
 }
-?>

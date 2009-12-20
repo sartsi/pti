@@ -46,6 +46,7 @@
  * @link       http://pdepend.org/
  */
 
+require_once 'PHP/Depend/Code/ASTVisitorI.php';
 require_once 'PHP/Depend/Metrics/AbstractAnalyzer.php';
 require_once 'PHP/Depend/Metrics/AnalyzerI.php';
 require_once 'PHP/Depend/Metrics/FilterAwareI.php';
@@ -62,7 +63,7 @@ require_once 'PHP/Depend/Metrics/ProjectAwareI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2009 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.7
+ * @version    Release: 0.9.8
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Metrics_CyclomaticComplexity_Analyzer
@@ -70,7 +71,8 @@ class PHP_Depend_Metrics_CyclomaticComplexity_Analyzer
     implements PHP_Depend_Metrics_AnalyzerI,
                PHP_Depend_Metrics_FilterAwareI,
                PHP_Depend_Metrics_NodeAwareI,
-               PHP_Depend_Metrics_ProjectAwareI
+               PHP_Depend_Metrics_ProjectAwareI,
+               PHP_Depend_Code_ASTVisitorI
 {
     /**
      * Type of this analyzer class.
@@ -219,23 +221,7 @@ class PHP_Depend_Metrics_CyclomaticComplexity_Analyzer
     public function visitFunction(PHP_Depend_Code_Function $function)
     {
         $this->fireStartFunction($function);
-
-        // Get all method tokens
-        $tokens = $function->getTokens();
-
-        $ccn  = $this->_calculateCCN($tokens);
-        $ccn2 = $this->_calculateCCN2($tokens);
-
-        // The method metrics
-        $this->_nodeMetrics[$function->getUUID()] = array(
-            self::M_CYCLOMATIC_COMPLEXITY_1  =>  $ccn,
-            self::M_CYCLOMATIC_COMPLEXITY_2  =>  $ccn2
-        );
-
-        // Update project metrics
-        $this->_ccn  += $ccn;
-        $this->_ccn2 += $ccn2;
-
+        $this->calculateComplexity($function);
         $this->fireEndFunction($function);
     }
 
@@ -263,89 +249,279 @@ class PHP_Depend_Metrics_CyclomaticComplexity_Analyzer
     public function visitMethod(PHP_Depend_Code_Method $method)
     {
         $this->fireStartMethod($method);
-
-        // Get all method tokens
-        $tokens = $method->getTokens();
-
-        $ccn  = $this->_calculateCCN($tokens);
-        $ccn2 = $this->_calculateCCN2($tokens);
-
-        // The method metrics
-        $this->_nodeMetrics[$method->getUUID()] = array(
-            self::M_CYCLOMATIC_COMPLEXITY_1  =>  $ccn,
-            self::M_CYCLOMATIC_COMPLEXITY_2  =>  $ccn2
-        );
-
-        // Update project metrics
-        $this->_ccn  += $ccn;
-        $this->_ccn2 += $ccn2;
-
+        $this->calculateComplexity($method);
         $this->fireEndMethod($method);
     }
 
     /**
-     * Calculates the Cyclomatic Complexity Number (CCN).
+     * Visits methods, functions or closures and calculated their complexity.
      *
-     * @param array $tokens The input tokens.
+     * @param PHP_Depend_Code_AbstractCallable $callable The visited callable.
      *
-     * @return integer
+     * @return void
+     * @since 0.9.8
      */
-    private function _calculateCCN(array $tokens)
+    public function calculateComplexity(PHP_Depend_Code_AbstractCallable $callable)
     {
-        // List of tokens
-        $countingTokens = array(
-            PHP_Depend_TokenizerI::T_CASE           =>  true,
-            PHP_Depend_TokenizerI::T_CATCH          =>  true,
-            PHP_Depend_TokenizerI::T_ELSEIF         =>  true,
-            PHP_Depend_TokenizerI::T_FOR            =>  true,
-            PHP_Depend_TokenizerI::T_FOREACH        =>  true,
-            PHP_Depend_TokenizerI::T_IF             =>  true,
-            PHP_Depend_TokenizerI::T_QUESTION_MARK  =>  true,
-            PHP_Depend_TokenizerI::T_WHILE          =>  true
+        $data = array(
+            self::M_CYCLOMATIC_COMPLEXITY_1 => 1,
+            self::M_CYCLOMATIC_COMPLEXITY_2 => 1
         );
-
-        $ccn = 1;
-        foreach ($tokens as $token) {
-            if (isset($countingTokens[$token->type])) {
-                ++$ccn;
-            }
+        
+        foreach ($callable->getChildren() as $child) {
+            $data = $child->accept($this, $data);
         }
-        return $ccn;
+
+        $this->_storeNodeComplexityAndUpdateProject($callable->getUUID(), $data);
     }
 
     /**
-     * Calculates the second version of the Cyclomatic Complexity Number (CCN2).
-     * This version includes boolean operators like <b>&&</b>, <b>and</b>,
-     * <b>or</b> and <b>||</b>.
+     * Stores the complexity of a node and updates the corresponding project
+     * values.
      *
-     * @param array $tokens The input tokens.
+     * @param string                 $id         Identifier of the analyzed item.
+     * @param array(string=>integer) $complexity The node complexity values.
      *
-     * @return integer
+     * @return void
+     * @since 0.9.8
      */
-    private function _calculateCCN2(array $tokens)
+    private function _storeNodeComplexityAndUpdateProject($id, array $complexity)
     {
-        // List of tokens
-        $countingTokens = array(
-            PHP_Depend_TokenizerI::T_BOOLEAN_AND    =>  true,
-            PHP_Depend_TokenizerI::T_BOOLEAN_OR     =>  true,
-            PHP_Depend_TokenizerI::T_CASE           =>  true,
-            PHP_Depend_TokenizerI::T_CATCH          =>  true,
-            PHP_Depend_TokenizerI::T_ELSEIF         =>  true,
-            PHP_Depend_TokenizerI::T_FOR            =>  true,
-            PHP_Depend_TokenizerI::T_FOREACH        =>  true,
-            PHP_Depend_TokenizerI::T_IF             =>  true,
-            PHP_Depend_TokenizerI::T_LOGICAL_AND    =>  true,
-            PHP_Depend_TokenizerI::T_LOGICAL_OR     =>  true,
-            PHP_Depend_TokenizerI::T_QUESTION_MARK  =>  true,
-            PHP_Depend_TokenizerI::T_WHILE          =>  true
-        );
+        $this->_nodeMetrics[$id] = $complexity;
 
-        $ccn2 = 1;
-        foreach ($tokens as $token) {
-            if (isset($countingTokens[$token->type])) {
-                ++$ccn2;
-            }
+        $this->_ccn  += $complexity[self::M_CYCLOMATIC_COMPLEXITY_1];
+        $this->_ccn2 += $complexity[self::M_CYCLOMATIC_COMPLEXITY_2];
+    }
+
+    /**
+     * Generic visit method that is used as a dispatcher to concrete visit
+     * methods. This method will be called before the regular tree traversal
+     * begins.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The current node to visit.
+     * @param array(string=>integer)   $data Optional data, previously calculated.
+     *
+     * @return mixed
+     * @since 0.9.8
+     * @todo Move this method into an abstract PHP_Depend_Code_ASTVisitorAdapter
+     */
+    public function visitBefore(PHP_Depend_Code_ASTNodeI $node, $data = null)
+    {
+        $methodName = 'visitBefore' . substr(get_class($node), 16);
+        if (method_exists($this, $methodName)) {
+            return call_user_func(array($this, $methodName), $node, $data);
         }
-        return $ccn2;
+        return $data;
+    }
+
+    /**
+     * Generic visit method that is used as a dispatcher to concrete visit
+     * methods. This method will be called when the regular tree traversal was
+     * finished.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The current node to visit.
+     * @param array(string=>integer)   $data Optional data, previously calculated.
+     *
+     * @return mixed
+     * @since 0.9.8
+     * @todo Move this method into an abstract PHP_Depend_Code_ASTVisitorAdapter
+     */
+    public function visitAfter(PHP_Depend_Code_ASTNodeI $node, $data = null)
+    {
+        $methodName = 'visitAfter' . substr(get_class($node), 16);
+        if (method_exists($this, $methodName)) {
+            return call_user_func(array($this, $methodName), $node, $data);
+        }
+        return $data;
+    }
+
+    /**
+     * Visits a boolean AND expression.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The currently visited node.
+     * @param array(string=>integer)   $data The previously calculated ccn values.
+     *
+     * @return array(string=>integer)
+     * @since 0.9.8
+     */
+    public function visitBeforeASTBooleanAndExpression($node, $data)
+    {
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_2];
+        return $data;
+    }
+
+    /**
+     * Visits a boolean OR expression.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The currently visited node.
+     * @param array(string=>integer)   $data The previously calculated ccn values.
+     *
+     * @return array(string=>integer)
+     * @since 0.9.8
+     */
+    public function visitBeforeASTBooleanOrExpression($node, $data)
+    {
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_2];
+        return $data;
+    }
+
+    /**
+     * Visits a switch label.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The currently visited node.
+     * @param array(string=>integer)   $data The previously calculated ccn values.
+     *
+     * @return array(string=>integer)
+     * @since 0.9.8
+     */
+    public function visitBeforeASTSwitchLabel($node, $data)
+    {
+        if ($node->isDefault() === false) {
+            ++$data[self::M_CYCLOMATIC_COMPLEXITY_1];
+            ++$data[self::M_CYCLOMATIC_COMPLEXITY_2];
+        }
+        return $data;
+    }
+
+    /**
+     * Visits a catch statement.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The currently visited node.
+     * @param array(string=>integer)   $data The previously calculated ccn values.
+     *
+     * @return array(string=>integer)
+     * @since 0.9.8
+     */
+    public function visitBeforeASTCatchStatement($node, $data)
+    {
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_1];
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_2];
+        return $data;
+    }
+
+    /**
+     * Visits an elseif statement.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The currently visited node.
+     * @param array(string=>integer)   $data The previously calculated ccn values.
+     *
+     * @return array(string=>integer)
+     * @since 0.9.8
+     */
+    public function visitBeforeASTElseIfStatement($node, $data)
+    {
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_1];
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_2];
+        return $data;
+    }
+
+    /**
+     * Visits a for statement.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The currently visited node.
+     * @param array(string=>integer)   $data The previously calculated ccn values.
+     *
+     * @return array(string=>integer)
+     * @since 0.9.8
+     */
+    public function visitBeforeASTForStatement($node, $data)
+    {
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_1];
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_2];
+        return $data;
+    }
+
+    /**
+     * Visits a foreach statement.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The currently visited node.
+     * @param array(string=>integer)   $data The previously calculated ccn values.
+     *
+     * @return array(string=>integer)
+     * @since 0.9.8
+     */
+    public function visitBeforeASTForeachStatement($node, $data)
+    {
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_1];
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_2];
+        return $data;
+    }
+
+    /**
+     * Visits an if statement.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The currently visited node.
+     * @param array(string=>integer)   $data The previously calculated ccn values.
+     *
+     * @return array(string=>integer)
+     * @since 0.9.8
+     */
+    public function visitBeforeASTIfStatement($node, $data)
+    {
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_1];
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_2];
+        return $data;
+    }
+
+    /**
+     * Visits a logical AND expression.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The currently visited node.
+     * @param array(string=>integer)   $data The previously calculated ccn values.
+     *
+     * @return array(string=>integer)
+     * @since 0.9.8
+     */
+    public function visitBeforeASTLogicalAndExpression($node, $data)
+    {
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_2];
+        return $data;
+    }
+
+    /**
+     * Visits a logical OR expression.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The currently visited node.
+     * @param array(string=>integer)   $data The previously calculated ccn values.
+     *
+     * @return array(string=>integer)
+     * @since 0.9.8
+     */
+    public function visitBeforeASTLogicalOrExpression($node, $data)
+    {
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_2];
+        return $data;
+    }
+
+    /**
+     * Visits a ternary operator.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The currently visited node.
+     * @param array(string=>integer)   $data The previously calculated ccn values.
+     *
+     * @return array(string=>integer)
+     * @since 0.9.8
+     */
+    public function visitBeforeASTConditionalExpression($node, $data)
+    {
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_1];
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_2];
+        return $data;
+    }
+
+    /**
+     * Visits a while statement.
+     *
+     * @param PHP_Depend_Code_ASTNodeI $node The currently visited node.
+     * @param array(string=>integer)   $data The previously calculated ccn values.
+     *
+     * @return array(string=>integer)
+     * @since 0.9.8
+     */
+    public function visitBeforeASTWhileStatement($node, $data)
+    {
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_1];
+        ++$data[self::M_CYCLOMATIC_COMPLEXITY_2];
+        return $data;
     }
 }

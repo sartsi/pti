@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: ErrorHandler.php 5122 2009-08-18 15:25:30Z sb $
+ * @version    SVN: $Id: ErrorHandler.php 5404 2009-11-30 13:21:29Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 2.3.0
  */
@@ -57,7 +57,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.3
+ * @version    Release: 3.4.5
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.3.0
  */
@@ -84,11 +84,11 @@ class PHPUnit_Util_ErrorHandler
      */
     public static function handleError($errno, $errstr, $errfile, $errline)
     {
-        self::$errorStack[] = array($errno, $errstr, $errfile, $errline);
-
         if (!($errno & error_reporting())) {
             return FALSE;
         }
+
+        self::$errorStack[] = array($errno, $errstr, $errfile, $errline);
 
         if (version_compare(PHP_VERSION, '5.2.5', '>=')) {
             $trace = debug_backtrace(FALSE);

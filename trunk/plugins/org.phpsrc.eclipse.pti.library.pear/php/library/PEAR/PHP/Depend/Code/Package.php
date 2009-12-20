@@ -59,7 +59,7 @@ require_once 'PHP/Depend/Util/UUID.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2009 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.7
+ * @version    Release: 0.9.8
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_Package implements PHP_Depend_Code_NodeI
@@ -182,7 +182,7 @@ class PHP_Depend_Code_Package implements PHP_Depend_Code_NodeI
     {
         // Skip if this package already contains this type
         if (in_array($type, $this->types, true)) {
-            return;
+            return $type;
         }
 
         if ($type->getPackage() !== null) {

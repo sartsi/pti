@@ -9,18 +9,14 @@
  * @subpackage Metamodel
  * @author     Baptiste Autin <ohlesbeauxjours@yahoo.fr> 
  * @license    http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version    SVN: $Revision: 73 $
+ * @version    SVN: $Revision: 135 $
  * @link       http://pear.php.net/package/PHP_UML
  * @link       http://www.omg.org/mof/
- * @since      $Date: 2008-12-17 01:30:18 +0100 (mer., 17 déc. 2008) $
+ * @since      $Date: 2009-11-30 01:21:11 +0100 (lun., 30 nov. 2009) $
  *
  */
 
-class PHP_UML_Metamodel_Interface extends PHP_UML_Metamodel_Type
+class PHP_UML_Metamodel_Interface extends PHP_UML_Metamodel_Classifier
 {
-    public $superClass = array();
-    public $ownedOperation = array();
-    public $file;
-    public $package;
 }
 ?>

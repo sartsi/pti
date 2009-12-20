@@ -11,10 +11,10 @@
  * @package  PHP_UML
  * @author   Baptiste Autin <ohlesbeauxjours@yahoo.fr>
  * @license  http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version  SVN: $Revision: 97 $
+ * @version  SVN: $Revision: 137 $
  * @link     http://pear.php.net/package/PHP_UML
  * @link     http://www.baptisteautin.com/projects/PHP_UML/
- * @since    $Date: 2009-01-04 21:57:08 +0100 (dim., 04 janv. 2009) $
+ * @since    $Date: 2009-12-12 01:06:40 +0100 (sam., 12 déc. 2009) $
  */
 
 /**
@@ -35,7 +35,7 @@ class PHP_UML_Warning
      * The $stack to read.
      * @var array
      */
-    static public $stack;
+    static public $stack = array();
     
     /**
      * Adds a warning message to the pile

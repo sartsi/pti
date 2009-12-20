@@ -7,7 +7,7 @@ and delivers an UML/XMI representation of the code.
     ]]>
     </description>
     <!-- will be automagically replaced by pear package command -->
-    <version>1.0.1</version>
+    <version>1.5.0</version>
 
     <argument name="input">
         <description>The PHP file(s) or directorie(s) to parse (eg: D:/htdocs/)
@@ -33,8 +33,8 @@ PHP_UML will recursively parse /var/www/test, keeping only the php6 files, and e
     <option name="format">
         <short_name>-f</short_name>
         <long_name>--format</long_name>
-        <description>Output format: "xmi" (default), "html", "php"
-For "html"/"php", if you need to provide your own XMI file, pass it as argument to phpuml</description>
+        <description>Output format: "xmi" (default), "html", "htmlnew", "php"
+For html/htmlnew/php, if you want to provide your own XMI file, pass it as argument to phpuml</description>
         <action>StoreString</action>
         <help_name>format</help_name>
         <default>xmi</default>
@@ -108,5 +108,17 @@ For "html"/"php", if you need to provide your own XMI file, pass it as argument 
         <description>Patterns to match (default is: *.php)</description>
         <action>StoreArray</action>
         <help_name>pattern</help_name>
+    </option>
+    <option name="errorLevel">
+        <long_name>--error-level</long_name>
+        <short_name>-l</short_name>
+        <description>Set the error reporting level (0 for silent mode, 1 for PHP errors and exceptions, 2 for all errors and warnings)</description>
+        <action>StoreFloat</action>
+        <default>1</default>
+    </option>
+    <option name="pureObject">
+        <long_name>--pure-object</long_name>
+        <description>Use this switch if you want PHP_UML to ignore all non object-oriented code</description>
+        <action>StoreTrue</action>
     </option>
 </command>

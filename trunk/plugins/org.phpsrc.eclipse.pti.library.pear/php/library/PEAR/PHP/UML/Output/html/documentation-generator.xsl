@@ -72,6 +72,8 @@
 		<!-- Misc initializations -->
 		<xsl:variable name="interfaceSet" select="packagedElement[@xmi:type='uml:Interface']" />
 		<xsl:variable name="classSet" select="packagedElement[@xmi:type='uml:Class']"/>
+		<xsl:variable name="ownedOperationSet" select="ownedOperation"/>
+		<xsl:variable name="ownedAttributeSet" select="ownedAttribute"/>
 		<xsl:variable name="packageNamePart">
 			<xsl:call-template name="getPackageNamePart"/>
 		</xsl:variable>
@@ -82,6 +84,8 @@
 				<xsl:with-param name="relPathTop" select="$relPathTop"/>
 				<xsl:with-param name="interfaceSet" select="$interfaceSet"/>
 				<xsl:with-param name="classSet" select="$classSet"/>
+				<xsl:with-param name="ownedAttributeSet" select="$ownedAttributeSet"/>
+				<xsl:with-param name="ownedOperationSet" select="$ownedOperationSet"/>
 				<xsl:with-param name="packageNamePart" select="$packageNamePart"/>
 			</xsl:call-template>
 		</xsl:variable>
@@ -93,6 +97,8 @@
 				<xsl:with-param name="relPathTop" select="$relPathTop"/>
 				<xsl:with-param name="interfaceSet" select="$interfaceSet"/>
 				<xsl:with-param name="classSet" select="$classSet"/>
+				<xsl:with-param name="ownedOperationSet" select="$ownedOperationSet"/>
+				<xsl:with-param name="ownedAttributeSet" select="$ownedAttributeSet"/>
 				<xsl:with-param name="packageNamePart" select="$packageNamePart"/>
 			</xsl:call-template>
 		</xsl:variable>

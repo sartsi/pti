@@ -9,10 +9,10 @@
  * @subpackage Metamodel
  * @author     Baptiste Autin <ohlesbeauxjours@yahoo.fr> 
  * @license    http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version    SVN: $Revision: 105 $
+ * @version    SVN: $Revision: 138 $
  * @link       http://pear.php.net/package/PHP_UML
  * @link       http://www.omg.org/mof/
- * @since      $Date: 2009-06-04 19:48:27 +0200 (jeu., 04 juin 2009) $
+ * @since      $Date: 2009-12-13 04:23:11 +0100 (dim., 13 déc. 2009) $
  *
  */
 
@@ -25,7 +25,7 @@
  * This is the job of PHP_UML->generateXMI()
  * 
  * Normally, such a PHP_UML_Metamodel_Superstructure object is built and passed
- * to the PHP_UML_PHP_Parser by an instance of PHP_UML.
+ * to the PHP_UML_Input_PHP_Parser by an instance of PHP_UML.
  * 
  * @category   PHP
  * @package    PHP_UML
@@ -35,20 +35,29 @@
  */
 class PHP_UML_Metamodel_Superstructure
 {
+    const META_INTERFACE = 'PHP_UML_Metamodel_Interface';
+    const META_CLASS     = 'PHP_UML_Metamodel_Class';
+    const META_DATATYPE  = 'PHP_UML_Metamodel_Datatype';
+    const META_OPERATION = 'PHP_UML_Metamodel_Operation';
+    const META_PROPERTY  = 'PHP_UML_Metamodel_Property';
+
+    const PHP_PROFILE_NAME        = 'php';
+    const PHP_STEREOTYPE_DOCBLOCK = 'docblock';
+    
     /**
-     * The root package (a UML Model)
+     * The root package for a logical UML model
      *
      * @var PHP_UML_Metamodel_Package
      */
     public $packages;
-    
+
     /**
-     * The root package (= the physical folder)
+     * The root package for a deployment (physical) model
      *
      * @var PHP_UML_Metamodel_Package
      */    
     public $deploymentPackages;
-    
+
     /**
      * Stack of all stereotypes
      * TODO: when real stereotypes will be implemented, deleting that array, and
@@ -67,34 +76,66 @@ class PHP_UML_Metamodel_Superstructure
     }
 
     /**
-     * Adds the internal PHP datatypes, classes, interfaces...
-     * To be completed...
+     * Adds the internal PHP metatypes, metaclasses, metainterfaces...
      *
-     * @param PHP_UML_Metamodel_Package &$package Base package
      */
-    public function addInternalPhpTypes(PHP_UML_Metamodel_Package &$package)
+    public function addInternalPhpTypes()
     {
         foreach (PHP_UML_Metamodel_Enumeration::$datatypes as $d) {
-            $type       = new PHP_UML_Metamodel_Type;
+            $type       = new PHP_UML_Metamodel_Datatype;
             $type->id   = PHP_UML_SimpleUID::getUID();
             $type->name = $d;
 
-            $package->ownedType[] = $type;
+            $this->packages->ownedType[] = $type;
+            $this->addDocTags($type, 'Internal PHP type.');
+            
         }
         foreach (PHP_UML_Metamodel_Enumeration::$interfaces as $i) {
             $type       = new PHP_UML_Metamodel_Interface;
             $type->id   = PHP_UML_SimpleUID::getUID();
             $type->name = $i;
 
-            $package->ownedType[] = $type;
+            $this->packages->ownedType[] = $type;
+            $this->addDocTags($type, 'Internal PHP interface.');
         }
         foreach (PHP_UML_Metamodel_Enumeration::$classes as $c) {
             $type       = new PHP_UML_Metamodel_Class;
             $type->id   = PHP_UML_SimpleUID::getUID();
             $type->name = $c;
 
-            $package->ownedType[] = $type;
+            $this->packages->ownedType[] = $type;
+            $this->addDocTags($type, 'Internal PHP class.');
         }
+    }
+    
+    /**
+     * Creates a stereotype and the necessary Tag objects for a given element
+     * 
+     * @param PHP_UML_Metamodel_NamedElement &$element The element to document
+     * @param string                         $desc     A textual description
+     * @param array                          $docs     An array containing docblocks
+     */
+    public function addDocTags(PHP_UML_Metamodel_NamedElement &$element, $desc, array $docs = array())
+    {
+        $stereotype = $this->createStereotype($element, self::PHP_PROFILE_NAME, self::PHP_STEREOTYPE_DOCBLOCK);
+
+        if ($desc != '') {
+            $tag        = new PHP_UML_Metamodel_Tag;
+            $tag->id    = PHP_UML_SimpleUID::getUID();;
+            $tag->name  = 'description';
+            $tag->value = $desc;
+
+            $stereotype->ownedAttribute[] = $tag;
+        }
+        foreach ($docs as $doc) {
+            $tag        = new PHP_UML_Metamodel_Tag;
+            $tag->id    = PHP_UML_SimpleUID::getUID();;
+            $tag->name  = $doc[1];
+            $tag->value = trim($doc[2].' '.$doc[3].' '.$doc[4]);
+
+            $stereotype->ownedAttribute[] = $tag;
+        }
+        $element->description = $stereotype;
     }
     
     /**
@@ -112,7 +153,7 @@ class PHP_UML_Metamodel_Superstructure
     private function resolveReferences(PHP_UML_Metamodel_Package &$ns, array &$_oDef)
     {
         if (!is_null($ns->nestedPackage)) {
-            foreach ($ns->nestedPackage as &$pkg) {
+            foreach ($ns->nestedPackage as $key => &$pkg) {
                 $this->resolveReferences($pkg, $_oDef);
             }
         }
@@ -136,26 +177,106 @@ class PHP_UML_Metamodel_Superstructure
                 }
             }
             if (isset($elt->ownedAttribute)) {
-                if (isset($elt->ownedAttribute)) {
-                    foreach ($elt->ownedAttribute as &$attribute) { 
-                        $this->resolveType($ns, $attribute->type, $_oDef, $elt);
+                foreach ($elt->ownedAttribute as &$attribute) { 
+                    $this->resolveType($ns, $attribute->type, $_oDef, $elt);
+                }
+            }
+        }
+        if (isset($ns->ownedOperation)) {
+            foreach ($ns->ownedOperation as &$function) {
+                foreach ($function->ownedParameter as &$parameter) {
+                    $this->resolveType($ns, $parameter->type, $_oDef, $function); 
+                }
+            }
+        }
+        if (isset($ns->ownedAttribute)) {
+            foreach ($ns->ownedAttribute as &$attribute) { 
+                $this->resolveType($ns, $attribute->type, $_oDef, $attribute);
+            }
+        }
+    }
+
+    /**
+     * Deletes all empty packages
+     * 
+     * @param PHP_UML_Metamodel_Package &$ns Top package
+     */
+    private function deleteEmptyPackages(PHP_UML_Metamodel_Package &$ns)
+    {
+        if (!is_null($ns->nestedPackage)) {
+            foreach ($ns->nestedPackage as $key => &$pkg) {
+                if (self::isEmpty($pkg)) {
+                    unset($ns->nestedPackage[$key]);
+                } else {
+                    if ($this->deleteEmptyPackages($pkg)) {
+                        unset($ns->nestedPackage[$key]);
                     }
                 }
             }
-        } 
+            if (self::isEmpty($ns)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a package is empty
+     * 
+     * @param PHP_UML_Metamodel_Package $p Top package
+     */
+    private function isEmpty(PHP_UML_Metamodel_Package $p)
+    {
+        return empty($p->nestedPackage) && empty($p->ownedType) && empty($p->ownedOperation) && empty($p->ownedAttribute);
     }
     
     /**
      * Searches in a given package for a typed element (likely, a class)
      *
-     * @param PHP_UML_Metamodel_Package &$ns   A package element
+     * @param PHP_UML_Metamodel_Package $ns    A package element
      * @param string                    $value A name
      *
      * @return mixed Either FALSE if not found, or the element
      */
-    public function searchTypeIntoPackage(PHP_UML_Metamodel_Package &$ns, $value)
+    public function searchTypeIntoPackage(PHP_UML_Metamodel_Package $ns, $value)
     {
         foreach ($ns->ownedType as $key => &$o) {
+            if (strcasecmp($o->name, $value)==0) {
+                return $o;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Searches if an operation already exists in a given pkg
+     *
+     * @param PHP_UML_Metamodel_Package $ns    A package element
+     * @param string                    $value A name
+     *
+     * @return mixed Either FALSE if not found, or the element
+     */
+    public function searchOperationIntoPackage(PHP_UML_Metamodel_Package $ns, $value)
+    {
+        foreach ($ns->ownedOperation as $key => &$o) {
+            if (strcasecmp($o->name, $value)==0) {
+                return $o;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Searches if an attribute already exists in a given pkg
+     *
+     * @param PHP_UML_Metamodel_Package $ns    A package element
+     * @param string                    $value A name
+     *
+     * @return mixed Either FALSE if not found, or the element
+     */
+    public function searchAttributeIntoPackage(PHP_UML_Metamodel_Package $ns, $value)
+    {
+        foreach ($ns->ownedAttribute as $key => &$o) {
             if (strcasecmp($o->name, $value)==0) {
                 return $o;
             }
@@ -167,13 +288,13 @@ class PHP_UML_Metamodel_Superstructure
      * Retrieves the stereotype (named $name) associated to the element $element
      * If not found, returns null.
      *
-     * @param PHP_UML_Metamodel_NamedElement &$element       Related object
+     * @param PHP_UML_Metamodel_NamedElement $element        Related object
      * @param string                         $profileName    Profile name
      * @param string                         $stereotypeName Stereotype name
      * 
      * @return PHP_UML_Metamodel_Stereotype
      */
-    public function getStereotype(PHP_UML_Metamodel_NamedElement &$element, $profileName, $stereotypeName)
+    public function getStereotype(PHP_UML_Metamodel_NamedElement $element, $profileName, $stereotypeName)
     {
         foreach ($this->stereotypes->getIterator() as $s) {
             if ($s->element == $element && $s->name == $stereotypeName && $s->profile == $profileName) {
@@ -227,12 +348,12 @@ class PHP_UML_Metamodel_Superstructure
      * Searches recursively in a given package for a package, knowing its name
      * Works with position numbers, not variable references.
      * 
-     * @param PHP_UML_Metamodel_Package &$np   A package element (context)
+     * @param PHP_UML_Metamodel_Package $np    A package element (context)
      * @param string                    $value A package name (to find)
      *
      * @return mixed Either FALSE if not found, or the position in the stack
      */
-    public function searchIntoSubpackage(PHP_UML_Metamodel_Package &$np, $value)
+    public function searchIntoSubpackage(PHP_UML_Metamodel_Package $np, $value)
     {
         foreach ($np->nestedPackage as $pkg) {
             if (strcasecmp($pkg->name, $value)==0) {
@@ -245,13 +366,13 @@ class PHP_UML_Metamodel_Superstructure
     /**
      * Does the type resolution for a given element in a given package
      *
-     * @param PHP_UML_Metamodel_Package &$pkg     The nesting package
+     * @param PHP_UML_Metamodel_Package $pkg      The nesting package
      * @param string                    &$element The element to resolve, provided as a name
-     * @param array                     &$pkgDef  The default packages
-     * @param PHP_UML_Metamodel_Type    &$context The context (the nesting class/interface, which 
+     * @param array                     $pkgDef   The default packages
+     * @param PHP_UML_Metamodel_Type    $context  The context (the nesting class/interface, which 
      *                                            is the only element to know the nesting file)
      */
-    private function resolveType(PHP_UML_Metamodel_Package &$pkg, &$element, array &$pkgDef, PHP_UML_Metamodel_Type &$context)
+    private function resolveType(PHP_UML_Metamodel_Package $pkg, &$element, array $pkgDef, PHP_UML_Metamodel_NamedElement $context)
     {
         // Is there a ns separator (\) in it ?
         list($pos, $first, $last) = $this->getPackagePathParts($element, false);
@@ -267,7 +388,7 @@ class PHP_UML_Metamodel_Superstructure
                     $element = $_o;
                 } else {
                     $this->resolutionWarning($element, $context->file->name);
-                    $element = null;
+                    //$element = null;
                 }
             }
         } else {
@@ -287,9 +408,9 @@ class PHP_UML_Metamodel_Superstructure
                         break;
                     }
                 }
-                if (!$found) {                       
+                if (!$found) {
                     $this->resolutionWarning($element, $context->file->name);
-                    $element = null;
+                    //$element = null;
                 }
             }
         }
@@ -318,26 +439,26 @@ class PHP_UML_Metamodel_Superstructure
      *
      * @return array Results array
      */
-    public function getPackagePathParts($path, $modeFirst = true, $alt=PHP_UML_PHP_Parser::T_NS_SEPARATOR2)
+    public function getPackagePathParts($path, $modeFirst = true, $alt=PHP_UML_Input_PHP_Parser::T_NS_SEPARATOR2)
     {
         $first = '';
         $last  = '';
         if ($modeFirst) {
-            $pos1 = strpos($path, PHP_UML_PHP_Parser::T_NS_SEPARATOR);
+            $pos1 = strpos($path, PHP_UML_Input_PHP_Parser::T_NS_SEPARATOR);
             $pos2 = strpos($path, $alt);
             if ($pos1!==false && ($pos1<$pos2 || $pos2===false)) {
                 $pos = $pos1;
-                $len = strlen(PHP_UML_PHP_Parser::T_NS_SEPARATOR);
+                $len = strlen(PHP_UML_Input_PHP_Parser::T_NS_SEPARATOR);
             } else {
                 $pos = $pos2;
                 $len = strlen($alt);
             }
         } else {
-            $pos1 = strrpos($path, PHP_UML_PHP_Parser::T_NS_SEPARATOR);
+            $pos1 = strrpos($path, PHP_UML_Input_PHP_Parser::T_NS_SEPARATOR);
             $pos2 = strrpos($path, $alt);
             if ($pos1!==false && ($pos1>$pos2 || $pos2===false)) {
                 $pos = $pos1;
-                $len = strlen(PHP_UML_PHP_Parser::T_NS_SEPARATOR);
+                $len = strlen(PHP_UML_Input_PHP_Parser::T_NS_SEPARATOR);
             } else {
                 $pos = $pos2;
                 $len = strlen($alt);
@@ -376,24 +497,47 @@ class PHP_UML_Metamodel_Superstructure
     }
     
     /**
-     * Launch the resolution of the references for all stacks from the root pkg
+     * Finalizes the main object structure that the Parser has built.
+     * Launches the resolution of the references for all stacks from the root pkg
      * 
      * Every reference (a temporary string) is replaced by a PHP reference
      * to the corresponding type (that is, a class or a datatype)
      * Must be run once the model is complete (= once PHP parsing is done)
      * 
-     * @param array $defPkg Array of PHP_UML_Metamodel_Package where to look into,
-     *                      in order to resolve the orphaned elements.
-     *                      By default, it will look in the root package. This is,
-     *                      by the way, where the PHP datatypes are.
+     * @param bool  $noEmptyPkg True to force removal of empty packages
+     * @param array $defPkg     Array of PHP_UML_Metamodel_Package where to look into,
+     *                          in order to resolve the orphaned elements.
+     *                          By default, it will look in the root package. This is,
+     *                          by the way, where the PHP datatypes are.
      */
-    public function resolveAll($defPkg = array())
+    public function finalizeAll($noEmptyPkg = true, $defPkg = array())
     {
+        if ($noEmptyPkg)
+            $this->deleteEmptyPackages($this->packages);
+
         if (empty($defPkg))
             $defPkg = array($this->packages);
         else
             $defPkg[] = &$this->packages;
         $this->resolveReferences($this->packages, $defPkg);
+    }
+    
+    /**
+     * Initialize the structure before use (we just instantiate the top objects in
+     * the logical and deployment models)
+     * 
+     * @param string $modelName Model name
+     */
+    public function initModel($modelName = 'default')
+    {
+        $this->packages       = new PHP_UML_Metamodel_Package;
+        $this->packages->name = $modelName;
+        $this->packages->id   = PHP_UML_SimpleUID::getUID();
+        $this->addInternalPhpTypes();
+
+        $this->deploymentPackages       = new PHP_UML_Metamodel_Package;
+        $this->deploymentPackages->name = 'Deployment View';
+        $this->deploymentPackages->id   = PHP_UML_SimpleUID::getUID();
     }
 }
 ?>

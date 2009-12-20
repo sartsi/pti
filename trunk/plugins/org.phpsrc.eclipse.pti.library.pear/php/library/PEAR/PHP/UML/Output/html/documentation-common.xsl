@@ -120,6 +120,7 @@
 				<xsl:with-param name="relPathTop" select="$relPathTop"/>
 				<xsl:with-param name="context" select="."/>
 			</xsl:call-template>
+			<xsl:if test="@direction='inout'">&#38;</xsl:if>
 			<xsl:value-of select="@name" />
 			<xsl:if test="defaultValue">
 				<xsl:value-of select="concat('=', defaultValue/@value)"/>
@@ -232,7 +233,7 @@
 					<xsl:with-param name="context" select="$context"/>
 				</xsl:call-template>
 			</xsl:variable>
-			<a href="{concat($relPathTop,$path,$context/@name,'.html')}" class="$linkType"><xsl:value-of select="$context/@name"/></a>
+			<a href="{concat($relPathTop,$path,$context/@name,'.html')}" class="{$style}"><xsl:value-of select="$context/@name"/></a>
 	</xsl:template>
 
 </xsl:stylesheet>

@@ -55,7 +55,7 @@ require_once 'PHP/Depend/ConstantsI.php';
  * @author    Manuel Pichler <mapi@pdepend.org>
  * @copyright 2008-2009 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.9.7
+ * @version   Release: 0.9.8
  * @link      http://pdepend.org/
  */
 interface PHP_Depend_BuilderI
@@ -333,6 +333,24 @@ interface PHP_Depend_BuilderI
     function buildASTFormalParameter();
 
     /**
+     * Builds a new expression node.
+     *
+     * @return PHP_Depend_Code_ASTExpression
+     * @since 0.9.8
+     */
+    function buildASTExpression();
+
+    /**
+     * Builds a new assignment expression node.
+     *
+     * @param string $image The assignment operator.
+     *
+     * @return PHP_Depend_Code_ASTAssignmentExpression
+     * @since 0.9.8
+     */
+    function buildASTAssignmentExpression($image);
+
+    /**
      * Builds a new allocation expression node.
      *
      * @param string $image The source image of this expression.
@@ -351,6 +369,152 @@ interface PHP_Depend_BuilderI
      * @since 0.9.6
      */
     function buildASTInstanceOfExpression($image);
+
+    /**
+     * Builds a new boolean conditional-expression.
+     *
+     * <code>
+     *         --------------
+     * $bar = ($foo ? 42 : 23);
+     *         --------------
+     * </code>
+     *
+     * @return PHP_Depend_Code_ASTConditionalExpression
+     * @since 0.9.8
+     */
+    function buildASTConditionalExpression();
+
+    /**
+     * Builds a new boolean and-expression.
+     *
+     * @return PHP_Depend_Code_ASTBooleanAndExpression
+     * @since 0.9.8
+     */
+    function buildASTBooleanAndExpression();
+
+    /**
+     * Builds a new boolean or-expression.
+     *
+     * @return PHP_Depend_Code_ASTBooleanOrExpression
+     * @since 0.9.8
+     */
+    function buildASTBooleanOrExpression();
+
+    /**
+     * Builds a new logical <b>and</b>-expression.
+     *
+     * @return PHP_Depend_Code_ASTLogicalAndExpression
+     * @since 0.9.8
+     */
+    function buildASTLogicalAndExpression();
+
+    /**
+     * Builds a new logical <b>or</b>-expression.
+     *
+     * @return PHP_Depend_Code_ASTLogicalOrExpression
+     * @since 0.9.8
+     */
+    function buildASTLogicalOrExpression();
+
+    /**
+     * Builds a new logical <b>xor</b>-expression.
+     *
+     * @return PHP_Depend_Code_ASTLogicalXorExpression
+     * @since 0.9.8
+     */
+    function buildASTLogicalXorExpression();
+
+    /**
+     * Builds a new switch-statement-node.
+     *
+     * @return PHP_Depend_Code_ASTSwitchStatement
+     * @since 0.9.8
+     */
+    function buildASTSwitchStatement();
+
+    /**
+     * Builds a new switch-label node.
+     *
+     * @param string $image The source image of this label.
+     *
+     * @return PHP_Depend_Code_ASTSwitchLabel
+     * @since 0.9.8
+     */
+    function buildASTSwitchLabel($image);
+
+    /**
+     * Builds a new catch-statement node.
+     *
+     * @param string $image The source image of this statement.
+     *
+     * @return PHP_Depend_Code_ASTCatchStatement
+     * @since 0.9.8
+     */
+    function buildASTCatchStatement($image);
+
+    /**
+     * Builds a new if statement node.
+     *
+     * @param string $image The source image of this statement.
+     *
+     * @return PHP_Depend_Code_ASTIfStatement
+     * @since 0.9.8
+     */
+    function buildASTIfStatement($image);
+
+    /**
+     * Builds a new elseif-statement node.
+     *
+     * @param string $image The source image of this statement.
+     *
+     * @return PHP_Depend_Code_ASTElseIfStatement
+     * @since 0.9.8
+     */
+    function buildASTElseIfStatement($image);
+
+    /**
+     * Builds a new for-statement node.
+     *
+     * @param string $image The source image of this statement.
+     *
+     * @return PHP_Depend_Code_ASTForStatement
+     * @since 0.9.8
+     */
+    function buildASTForStatement($image);
+
+    /**
+     * Builds a new for-init node.
+     *
+     * <code>
+     *      ------------------------
+     * for ($x = 0, $y = 23, $z = 42; $x < $y; ++$x) {}
+     *      ------------------------
+     * </code>
+     *
+     * @return PHP_Depend_Code_ASTForInit
+     * @since 0.9.8
+     */
+    function buildASTForInit();
+
+    /**
+     * Builds a new foreach-statement node.
+     *
+     * @param string $image The source image of this statement.
+     *
+     * @return PHP_Depend_Code_ASTForeachStatement
+     * @since 0.9.8
+     */
+    function buildASTForeachStatement($image);
+
+    /**
+     * Builds a new while-statement node.
+     *
+     * @param string $image The source image of this statement.
+     *
+     * @return PHP_Depend_Code_ASTWhileStatement
+     * @since 0.9.8
+     */
+    function buildASTWhileStatement($image);
 
     /**
      * Builds a new member primary expression node.
@@ -568,6 +732,16 @@ interface PHP_Depend_BuilderI
      * @since 0.9.6
      */
     function buildASTConstantDeclarator($image);
+
+    /**
+     * Builds a new comment node instance.
+     *
+     * @param string $cdata The comment text.
+     *
+     * @return PHP_Depend_Code_ASTComment
+     * @since 0.9.8
+     */
+    function buildASTComment($cdata);
 
     /**
      * Builds a new code class constant instance.

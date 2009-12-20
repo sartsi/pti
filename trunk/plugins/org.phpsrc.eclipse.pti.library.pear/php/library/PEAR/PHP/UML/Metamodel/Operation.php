@@ -9,10 +9,10 @@
  * @subpackage Metamodel
  * @author     Baptiste Autin <ohlesbeauxjours@yahoo.fr> 
  * @license    http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version    SVN: $Revision: 73 $
+ * @version    SVN: $Revision: 133 $
  * @link       http://pear.php.net/package/PHP_UML
  * @link       http://www.omg.org/mof/
- * @since      $Date: 2008-12-17 01:30:18 +0100 (mer., 17 déc. 2008) $
+ * @since      $Date: 2009-11-15 23:46:39 +0100 (dim., 15 nov. 2009) $
  *
  */
 
@@ -22,6 +22,8 @@ class PHP_UML_Metamodel_Operation extends PHP_UML_Metamodel_NamedElement
     public $isInstantiable;
     public $ownedParameter = array();
     public $class;
+    public $package;
     public $visibility;
+    public $file;
 }
 ?>

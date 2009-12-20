@@ -340,6 +340,7 @@
 	<xsl:template name="class-method-detail">
 		<xsl:param name="relPathTop"/>
 		<xsl:param name="specifiedBy"/>
+		<xsl:variable name="artifact" select="key('getElementById',key('getManifestation', @xmi:id)/@client)"/>
 		
 		<xsl:variable name="parameters">
 			<xsl:call-template name="htmlParametersBracket">
@@ -376,6 +377,13 @@
 					<xsl:call-template name="htmlDescriptionParam">
 						<xsl:with-param name="baseElement" select="@xmi:id"/>
 					</xsl:call-template>
+					<xsl:if test="count($artifact) &gt; 0">
+						<b>File: </b>
+						<xsl:for-each select="exslt:node-set($artifact)/ancestor::*[@xmi:type='uml:Package']">
+							<xsl:if test="position() &gt; 1"><xsl:value-of select="concat('/',@name)"/></xsl:if>
+						</xsl:for-each>
+						<xsl:value-of select="concat('/', $artifact/@name)"/>
+					</xsl:if>
 				</p>
 				
 				<!-- Specified By -->
@@ -420,7 +428,7 @@
 					</div>
 				</xsl:if>
 				
-				<xsl:variable name="params" select="ownedParameter[@direction='in' or not(@direction)]"/>
+				<xsl:variable name="params" select="ownedParameter[not(@direction) or @direction!='return']"/>
 				<xsl:if test="count($params) &gt; 0">
 					<h3 class="titleSmallList">Parameters</h3>
 					<div class="smallList">

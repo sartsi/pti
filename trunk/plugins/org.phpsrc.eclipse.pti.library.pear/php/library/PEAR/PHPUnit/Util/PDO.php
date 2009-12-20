@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: PDO.php 4403 2008-12-31 09:26:51Z sb $
+ * @version    SVN: $Id: PDO.php 5430 2009-12-11 19:39:56Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 3.1.4
  */
@@ -56,7 +56,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.3
+ * @version    Release: 3.4.5
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.1.4
  */
@@ -203,6 +203,11 @@ class PHPUnit_Util_PDO
      */
     public static function parseDSN( $dsn )
     {
+        if ( $dsn == 'sqlite::memory:' )
+        {
+            $dsn = 'sqlite://:memory:';
+        }
+
         $parsed = array(
             'phptype'  => FALSE,
             'dbsyntax' => FALSE,

@@ -39,7 +39,7 @@
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: ResultPrinter.php 5077 2009-08-10 06:45:13Z sb $
+ * @version    SVN: $Id: ResultPrinter.php 5419 2009-12-09 14:32:17Z sb $
  * @link       http://www.phpunit.de/
  * @since      File available since Release 2.0.0
  */
@@ -60,7 +60,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.3
+ * @version    Release: 3.4.5
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 2.0.0
  */
@@ -341,11 +341,21 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements PHPUn
             );
         }
 
+        if (function_exists('memory_get_peak_usage')) {
+            $memory = sprintf(
+              ', Memory: %4.2fMb',
+              memory_get_peak_usage(TRUE) / 1048576
+            );
+        } else {
+            $memory = '';
+        }
+
         $this->write(
           sprintf(
-            "%sTime: %s\n\n",
+            "%sTime: %s%s\n\n",
             $this->verbose ? "\n" : "\n\n",
-            $timeElapsed
+            $timeElapsed,
+            $memory
           )
         );
     }

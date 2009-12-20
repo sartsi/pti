@@ -11,6 +11,8 @@
 		<xsl:param name="relPathTop" />
 		<xsl:param name="classSet"/>
 		<xsl:param name="interfaceSet"/>
+		<xsl:param name="ownedOperationSet" select="$ownedOperationSet"/>
+		<xsl:param name="ownedAttributeSet" select="$ownedAttributeSet"/>
 		<xsl:param name="packageNamePart"/>
 		<xsl:param name="containerName"/>
 		<xsl:variable name="packageFilePath">
@@ -66,7 +68,11 @@
 					<div class="classSummary">
 						<h1 id="entityName">Package <xsl:value-of select="concat($packageNamePart, @name)" /></h1>
 					</div>
-					<p><xsl:apply-templates select="ownedComment"/></p>
+					<p>
+						<xsl:call-template name="htmlDescription">
+						<xsl:with-param name="baseElement" select="@xmi:id"/>
+						</xsl:call-template>
+					</p>
 					<hr/>
 
 					<xsl:if test="count($interfaceSet) &gt; 0">
@@ -85,6 +91,53 @@
 							<xsl:with-param name="set" select="$classSet"/>
 							<xsl:with-param name="filePrefix" select="$fileprefixClass"/>
 						</xsl:call-template>
+					</xsl:if>
+
+					<!-- added for the non-OO functions -->
+					<xsl:if test="count($ownedAttributeSet) &gt; 0">
+						<div id="fieldSummary">
+							<h2>Field Summary</h2>
+							<table border="1" class="tableSummary">
+								<xsl:for-each select="$ownedAttributeSet">
+									<xsl:call-template name="class-field-summary">
+										<xsl:with-param name="relPathTop" select="$relPathTop"/>
+									</xsl:call-template>
+								</xsl:for-each>
+							</table>
+						</div>
+					</xsl:if>
+					<xsl:if test="count($ownedOperationSet) &gt; 0">
+						<div id="methodSummary">
+							<h2>Method Summary</h2>
+							<table border="1" class="tableSummary">
+								<xsl:for-each select="$ownedOperationSet">
+									<xsl:call-template name="class-method-summary">
+										<xsl:with-param name="relPathTop" select="$relPathTop"/>
+									</xsl:call-template>
+								</xsl:for-each>
+							</table>
+						</div>
+					</xsl:if>
+					<xsl:if test="count($ownedAttributeSet) &gt; 0">
+						<div id="fieldDetail">
+							<h2>Field Detail</h2>
+							<xsl:for-each select="$ownedAttributeSet">
+								<xsl:call-template name="class-field-detail">
+									<xsl:with-param name="relPathTop" select="$relPathTop"/>
+								</xsl:call-template>
+							</xsl:for-each>
+						</div>
+					</xsl:if>
+					<xsl:if test="count($ownedOperationSet) &gt; 0">
+						<div id="methodDetail">
+							<h2>Method Detail</h2>
+							<xsl:for-each select="$ownedOperationSet">
+								<xsl:call-template name="class-method-detail">
+									<xsl:with-param name="relPathTop" select="$relPathTop"/>
+									<xsl:with-param name="specifiedBy" select="no"/>
+								</xsl:call-template>
+							</xsl:for-each>
+						</div>
 					</xsl:if>
 
 				</div>

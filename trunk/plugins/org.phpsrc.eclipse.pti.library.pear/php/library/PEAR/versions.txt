@@ -9,7 +9,7 @@ INSTALLED PACKAGES, CHANNEL DOC.PHP.NET:
 INSTALLED PACKAGES, CHANNEL PEAR.PDEPEND.ORG:
 =============================================
 PACKAGE    VERSION STATE
-PHP_Depend 0.9.7   beta
+PHP_Depend 0.9.8   beta
 
 INSTALLED PACKAGES, CHANNEL PEAR.PHP.NET:
 =========================================
@@ -30,7 +30,7 @@ PHP_Beautifier      0.1.14  beta
 PHP_CodeSniffer     1.2.1   stable
 PHP_Compat          1.5.0   stable
 PHP_CompatInfo      1.9.0   stable
-PHP_UML             1.0.1   stable
+PHP_UML             1.5.0   stable
 Structures_Graph    1.0.3   stable
 Var_Dump            1.0.3   stable
 VersionControl_SVN  0.3.3   alpha
@@ -41,8 +41,8 @@ XML_Util            1.2.1   stable
 INSTALLED PACKAGES, CHANNEL PEAR.PHPUNIT.DE:
 ============================================
 PACKAGE       VERSION STATE
-File_Iterator 1.1.0   stable
-PHPUnit       3.4.3   stable
+File_Iterator 1.1.1   stable
+PHPUnit       3.4.5   stable
 phpcpd        1.2.2   stable
 
 INSTALLED PACKAGES, CHANNEL PECL.PHP.NET:

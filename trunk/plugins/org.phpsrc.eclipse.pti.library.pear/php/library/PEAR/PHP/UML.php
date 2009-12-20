@@ -13,10 +13,10 @@
  * @package  PHP_UML
  * @author   Baptiste Autin <ohlesbeauxjours@yahoo.fr>
  * @license  http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version  SVN: $Revision: 129 $
+ * @version  SVN: $Revision: 138 $
  * @link     http://pear.php.net/package/PHP_UML
  * @link     http://www.baptisteautin.com/projects/PHP_UML/
- * @since    $Date: 2009-08-27 17:50:59 +0200 (jeu., 27 août 2009) $
+ * @since    $Date: 2009-12-13 04:23:11 +0100 (dim., 13 déc. 2009) $
  */
 
 require_once 'PEAR/Exception.php';
@@ -28,14 +28,14 @@ spl_autoload_register(array('PHP_UML', 'autoload'));
  * The main class to use, through its methods:
  * - setInput(), parse(), parseFile() and/or parseDirectory()
  * - generateXMI()
- * - saveXMI()
+ * - saveXMI() (deprecated)
+ * - export()
  * 
  * For example:
  * <code>
  * $t = new PHP_UML();
- * $t->parseDirectory('PHP_UML/');
- * $t->generateXMI(2);
- * $t->saveXMI('PHP_UML2.xmi');
+ * $t->setInput('PHP_UML/');
+ * $t->export('xmi', '/home/wwww/');
  * </code>
  * 
  * If you want to produce XMI without using the PHP parser, please refer to
@@ -95,6 +95,18 @@ class PHP_UML
     public $onlyApi = false;
 
     /**
+     * If true, only classes and namespaces are retrieved. If false, procedural
+     * functions and constants are also included
+     */
+    public $pureObject = false;
+    
+    /**
+     * If true, the empty namespaces (inc. no classes nor interfaces) are ignored
+     * @var boolean
+     */
+    public $removeEmptyNamespaces = true;
+
+    /**
      * If true, the elements marked with @internal are included in the API.
      * @var boolean
      */
@@ -111,19 +123,6 @@ class PHP_UML
      * @var PHP_UML::Metamodel::PHP_UML_Metamodel_Superstructure
      */
     public $model;
-
-    
-    /**
-     * The concatened XMI string
-     * @var string
-     */
-    private $xmi = '';
-    
-    /**
-     * A reference to a PHP_UML_XMI_BuilderImplX object
-     * @var PHP_UML_XMI_Builder
-     */
-    private $builder;
 
     /**
      * List of directories to scan
@@ -152,11 +151,21 @@ class PHP_UML
     private $ignorePatterns = array();
 
     /**
-     * Constructor
+     * Base XMI Exporter object
+     * @var PHP_UML_Output_Xmi_Exporter
+     */
+    private $xmiExporter;
+    
+    
+    /**
+     * Constructor.
+     * We create an Xmi_Exporter object to store the XMI that may be generated
      *
      */
     public function __construct()
     {
+        $this->model       = new PHP_UML_Metamodel_Superstructure;
+        $this->xmiExporter = new PHP_UML_Output_Xmi_Exporter;
     }
 
     /**
@@ -177,25 +186,14 @@ class PHP_UML
     /**
      * Read the content of an existing XMI file.
      * If the file is UML/XMI 1, a conversion to version 2 is automatically applied.
-     *
+     * 
      * @param string $filepath Filename
+     * 
+     * @deprecated Use ->xmiExporter->readXMIFile($filepath) instead
      */
     public function readXMIFile($filepath)
     {
-        if (file_exists($filepath)) {
-            $this->xmi = file_get_contents($filepath);
-        } else {
-            throw new PHP_UML_Exception('Could not open '.$filepath);
-        }
-
-        $xmlDom = new DomDocument;
-        $xmlDom->loadXML($this->xmi);
-        $version = $xmlDom->getElementsByTagName('XMI')->item(0)->getAttribute('xmi.version');
-        if ($version=='')
-            $version = $xmlDom->getElementsByTagName('XMI')->item(0)->getAttribute('xmi:version');
-        if ($version<2) {
-            $this->xmi = PHP_UML_Output_Exporter::transform('xmi1to2.xsl', $this->xmi);
-        }
+        $this->xmiExporter->readXMIFile($filepath);
     }
 
     /**
@@ -213,10 +211,13 @@ class PHP_UML
             return $this->readXMIFile($pathes[0]);
         }
         foreach ($pathes as $path) {
-            if (is_file($path))
+            if (is_file($path)) {
                 $this->files[] = $path;
+            }
             elseif (is_dir($path))
                 $this->directories[] = $path;
+            else
+                throw new PHP_UML_Exception($path.': unknown file or folder');
         }    
     }
 
@@ -258,12 +259,12 @@ class PHP_UML
     /**
      * Converts a path pattern to the format expected by FileScanner
      * (separator can only be / ; must not start by any separator)
-     * 
-     * @see PHP_UML_FilePatternFilterIterator#accept()
      *
      * @param string $p Pattern
+     * 
+     * @see PHP_UML_FilePatternFilterIterator#accept()
      */
-    public static function cleanPattern($p)
+    private static function cleanPattern($p)
     {
         $p = str_replace('/', DIRECTORY_SEPARATOR, trim($p));
         if ($p[0]==DIRECTORY_SEPARATOR)
@@ -314,17 +315,8 @@ class PHP_UML
      */
     public function parse($modelName = 'default')
     {
-        $this->visited = array();
-
-        $this->model                 = new PHP_UML_Metamodel_Superstructure();
-        $this->model->packages       = new PHP_UML_Metamodel_Package;
-        $this->model->packages->name = $modelName;
-        $this->model->packages->id   = PHP_UML_SimpleUID::getUID();
-        $this->model->addInternalPhpTypes($this->model->packages);
-
-        $this->model->deploymentPackages       = new PHP_UML_Metamodel_Package;
-        $this->model->deploymentPackages->name = 'Deployment View';
-        $this->model->deploymentPackages->id   = PHP_UML_SimpleUID::getUID();
+        $this->visited = array();    // we initialize the stack of visited files
+        $this->model->initModel($modelName);
 
         $fileScanner = new PHP_UML_FileScannerImpl();
 
@@ -333,20 +325,21 @@ class PHP_UML
         $fileScanner->matchPatterns  = $this->matchPatterns;
         $fileScanner->ignorePatterns = $this->ignorePatterns;
 
-        $fileScanner->parser = new PHP_UML_PHP_Parser($this->model, $this->docblocks, $this->dollar, !$this->showInternal, $this->onlyApi);
+        $fileScanner->parser = new PHP_UML_Input_PHP_Parser($this->model, $this->docblocks, $this->dollar, !$this->showInternal, $this->onlyApi, $this->pureObject);
         $fileScanner->scan();
 
-        $this->model->resolveAll();
+        $this->model->finalizeAll($this->removeEmptyNamespaces);
     }
- 
- 
+
+
     /**
      * Runs the XMI generator on the PHP model stored in $this->model.
-     * 
-     * After their PHP parsing, parseDirectory() or parseFile() will have set $this->model for you.
-     *
-     * If you need to use the XMI generator without any previous PHP parsing,
-     * simply set $this->model with a proper PHP_UML_Metamodel_Superstructure object
+     * After the PHP parsing, parseDirectory() (or parseFile()) will have filled
+     * $this->model for you. Note that it is now unnecessary to call this method if
+     * you intent to call the method export('xmi') later (the generation will be
+     * done implicitely, in version 2)
+     * If you want to use the XMI generator without doing any prior PHP parsing,
+     * simply set $this->model to a proper PHP_UML_Metamodel_Superstructure object
      *  
      * @param float  $version  XMI Version For XMI 1.x, any value below 2.
      *                                     For XMI 2.x, any value above or equal to 2.
@@ -354,61 +347,23 @@ class PHP_UML
      */
     public function generateXMI($version = 2.1, $encoding = 'iso-8859-1')
     {
-        if (empty($this->model)) {
-            throw new PHP_UML_Exception('No model given');
-        }
-
-        $this->builder = PHP_UML_XMI_AbstractBuilder::factory($version, $encoding);
-        $this->xmi     = $this->builder->getXmlHeader();
-        $this->xmi    .= $this->builder->getXmiHeaderOpen();
-
-        $_root      = &$this->model->packages;
-        $this->xmi .= $this->builder->getModelOpen($_root);
-        $this->xmi .= $this->builder->getNamespaceOpen();
- 
-        if ($this->logicalView) {
-            $this->addLogicalView($_root);
-        }
-
-        if ($this->componentView) {
-            $this->addComponentView($_root);
-        }
-
-        if ($this->deploymentView) {
-            $this->addDeploymentView($this->model->deploymentPackages);
-        }
-
-        $this->xmi .= $this->builder->getNamespaceClose();
-        $this->xmi .= $this->builder->getModelClose();
-
-        if ($this->docblocks) {    // = XML metadata only for the moment
-            $this->addStereotypeInstances(PHP_UML_PHP_Parser::PHP_PROFILE_NAME);
-        }
-
-        $this->xmi .= $this->builder->getXmiHeaderClose();
-        
-        if (strtolower($encoding)=='utf-8') {
-            $this->xmi = utf8_encode($this->xmi);
-        }
-
+        $this->xmiExporter->xmlEncoding = $encoding;
+        $this->xmiExporter->xmiVersion  = $version;
+        $this->bindXmiExporterData(); 
+        $this->xmiExporter->generateXMI();
     }
     
     /**
      * Saves the previously generated XMI to a file
      * You must run that method to get your XMI, or you can access the XMI property  
-     *
+     * 
      * @param string $outputFile Filename
+     * 
+     * @deprecated Use $this->xmiExporter->saveXMI() instead
      */
     public function saveXMI($outputFile)
-    {        
-        if ($ptr = fopen($outputFile, 'w+')) {
-            fwrite($ptr, $this->getXMI());
-            fclose($ptr);
-        } else {
-            throw new PHP_UML_Exception(
-                'File '.$outputFile.' could not be created.'
-            );
-        }
+    {
+        $this->xmiExporter->saveXMI($outputFile);
     }
  
     /**
@@ -428,84 +383,72 @@ class PHP_UML
      * Since the generation rely on XMI data, an XMI generation will be
      * performed in all cases.
      * 
-     * @param string $format    Desired format ("xmi", "html", "php")
+     * @param string $format    Desired format ("xmi", "html", "php"...)
      * @param string $outputDir Output directory
      */
     public function export($format='xmi', $outputDir='.')
     {
+        if (empty($outputDir))
+            throw new PHP_UML_Exception('No output folder given.');
+
         $format = strtolower($format);
-        if ($format=='xmi') {
-            if ($outputDir=='')
-                return $this->getXMI();
-            else {
-                if (strtolower(substr($outputDir, -4))=='.xmi')
-                    self::saveXMI($outputDir);
-                else
-                    self::saveXMI($outputDir.DIRECTORY_SEPARATOR.$this->model->packages->name.'.xmi');
+        switch($format) {
+        case 'xmi':
+            $this->xmiExporter->format = $format;
+            $this->bindXmiExporterData();
+            return $this->xmiExporter->generate($outputDir);
+            break;
+        case 'htmlnew':
+            if (empty($this->model->packages)) {
+                throw new PHP_UML_Exception('No model given.');
             }
-        } else {
-            PHP_UML_Output_Exporter::generateFromFormat($outputDir, $format, $this->xmi);
+            $format = 'HtmlNew';
+            $e      = PHP_UML_Output_ExporterAPI::getExporterObject($format);
+
+            $e->structure = $this->model;
+            $e->format    = $format;
+            return $e->generate($outputDir);
+            break;
+        case 'php':
+        case 'html':
+            if (empty($this->xmiExporter->xmi)) {
+                $this->generateXMI();    // since these formats rely on a XSLT of XMI
+            }
+            $e         = new PHP_UML_Output_ExporterXSL;
+            $e->format = $format;
+            $e->xmi    = $this->xmiExporter->xmi;
+            return $e->generate($outputDir);
+            break;
+        default:
+            throw new PHP_UML_Exception('Unknown export format "'.$format.'"');
         }
     }
- 
+
+    /**
+     * Some data required by xmiExporter bas to be copied from the one contained
+     * in PHP_UML before any method is called on xmiExporter
+     * This method copies the necessary information
+     *
+     */
+    private function bindXmiExporterData()
+    {
+        $this->xmiExporter->structure         = $this->model;
+        $this->xmiExporter->addDeploymentView = $this->deploymentView;
+        $this->xmiExporter->addLogicalView    = $this->logicalView;
+        $this->xmiExporter->addComponentView  = $this->componentView;
+        $this->xmiExporter->addStereotypes    = $this->docblocks;   
+    }
+
     /**
      * Public accessor to the XMI code
      *
+     * @deprecated
      * @return string The XMI code
      */
     public function getXMI()
     {
-        return $this->xmi;
+        return $this->xmiExporter->getXMI();
     }  
-
-    /**
-     * Inserts the logical view of the model
-     *
-     * @param PHP_UML_Metamodel_Package $package Package
-     */
-    private function addLogicalView(PHP_UML_Metamodel_Package $package)
-    {
-        $this->xmi .= $this->builder->getStereotypes();
-
-        $this->xmi .= $this->builder->getOwnedTypes($package);
-        foreach ($package->nestedPackage as $pkg)
-            $this->xmi .= $this->builder->getAllPackages($pkg, false);
-    }
-    
-    /**
-     * Inserts a component view of the logical system
-     *
-     * @param PHP_UML_Metamodel_Package $package Root package to browse into
-     */
-    private function addComponentView(PHP_UML_Metamodel_Package $package)
-    {
-        $this->xmi .= $this->builder->getAllComponents($package);
-    }
-
-    /**
-     * Inserts a deployment view of the scanned file system, through artifacts.
-     * A file is viewed as an artifact (artifacts exist from UML 1.4)
-     * Filesystem's folders are treated as packages.
-     * TODO: use a package-tree, like with logical packages 
-     *
-     * @param PHP_UML_Metamodel_Package $package The root deployment package
-     */
-    private function addDeploymentView(PHP_UML_Metamodel_Package $package)
-    {
-        $this->xmi .= $this->builder->getAllPackages($package);
-    }
-
-    /**
-     * Adds the instances of stereotypes
-     * At the current time, there are only XML metadata, not real UML stereotypes
-     *
-     */
-    private function addStereotypeInstances()
-    {
-        foreach ($this->model->stereotypes as $s) {
-            $this->xmi .= $this->builder->getStereotypeInstance($s);
-        }
-    }
 
     /**
      * Autoloader

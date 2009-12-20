@@ -5,21 +5,21 @@
  * @subpackage Metamodel
  * @author     Baptiste Autin <ohlesbeauxjours@yahoo.fr> 
  * @license    http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version    SVN: $Revision: 98 $
+ * @version    SVN: $Revision: 136 $
  * @link       http://pear.php.net/package/PHP_UML
- * @since      $Date: 2009-01-07 14:20:32 +0100 (mer., 07 janv. 2009) $
+ * @since      $Date: 2009-12-10 01:35:58 +0100 (jeu., 10 déc. 2009) $
  *
  */
 
 /**
  * Meta-Enumeration
- * Enumerates some basic PHP types.
+ * Enumerates some basic PHP classifiers.
  *
  */
 class PHP_UML_Metamodel_Enumeration
 {
     /**
-     * Datatypes of the language
+     * PHP datatypes
      *
      * @var array
      */
