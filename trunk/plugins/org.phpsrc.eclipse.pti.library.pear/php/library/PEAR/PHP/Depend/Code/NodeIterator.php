@@ -59,7 +59,7 @@ require_once 'PHP/Depend/Code/Filter/Collection.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2009 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.8
+ * @version    Release: 0.9.9
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_NodeIterator implements Iterator, Countable

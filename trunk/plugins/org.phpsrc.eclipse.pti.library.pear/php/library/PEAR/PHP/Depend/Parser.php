@@ -84,7 +84,7 @@ require_once 'PHP/Depend/Parser/UnexpectedTokenException.php';
  * @author    Manuel Pichler <mapi@pdepend.org>
  * @copyright 2008-2009 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.9.8
+ * @version   Release: 0.9.9
  * @link      http://pdepend.org/
  */
 class PHP_Depend_Parser implements PHP_Depend_ConstantsI
@@ -1594,12 +1594,8 @@ class PHP_Depend_Parser implements PHP_Depend_ConstantsI
                 $this->_parseQualifiedName()
             )
         );
+        $catch->addChild($this->_parseVariable());
 
-        $this->_consumeComments();
-        $token = $this->_consumeToken(self::T_VARIABLE);
-
-        $catch->addChild($this->_builder->buildASTVariable($token->image));
-        
         $this->_consumeComments();
         $this->_consumeToken(self::T_PARENTHESIS_CLOSE);
 
@@ -2357,13 +2353,18 @@ class PHP_Depend_Parser implements PHP_Depend_ConstantsI
      */
     private function _parseVariable()
     {
+        $this->_tokenStack->push();
+
         // Read variable token
+        $this->_consumeComments();
         $token = $this->_consumeToken(self::T_VARIABLE);
         $this->_consumeComments();
 
         // TODO: ASTThisVariable
-
-        return $this->_builder->buildASTVariable($token->image);
+        
+        return $this->_setNodePositionsAndReturn(
+            $this->_builder->buildASTVariable($token->image)
+        );
     }
 
     /**
