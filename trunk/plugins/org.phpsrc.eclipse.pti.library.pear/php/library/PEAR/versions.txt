@@ -14,7 +14,7 @@ PHP_Depend 0.9.9   beta
 INSTALLED PACKAGES, CHANNEL PEAR.PHP.NET:
 =========================================
 PACKAGE             VERSION   STATE
-Archive_Tar         1.3.3     stable
+Archive_Tar         1.3.5     stable
 Auth_SASL           1.0.3     stable
 Console_Color       1.0.2     stable
 Console_CommandLine 1.1.1     stable
