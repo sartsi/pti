@@ -2,7 +2,7 @@
 /**
  * phpcpd
  *
- * Copyright (c) 2009, Sebastian Bergmann <sb@sebastian-bergmann.de>.
+ * Copyright (c) 2009-2010, Sebastian Bergmann <sb@sebastian-bergmann.de>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@
  *
  * @package   phpcpd
  * @author    Sebastian Bergmann <sb@sebastian-bergmann.de>
- * @copyright 2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright 2009-2010 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @since     File available since Release 1.1.0
  */
@@ -45,9 +45,9 @@
  * Represents an exact code clone.
  *
  * @author    Sebastian Bergmann <sb@sebastian-bergmann.de>
- * @copyright 2009 Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright 2009-2010 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 1.2.2
+ * @version   Release: 1.3.0
  * @link      http://github.com/sebastianbergmann/phpcpd/tree
  * @since     Class available since Release 1.1.0
  */
