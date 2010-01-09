@@ -55,7 +55,9 @@ class ExternalPHPCheckerDelegate {
 
 		this.launcher = new PHPToolLauncher(getPHPExecutable(externalChecker.getPhpExecutable()), Path
 				.fromOSString(this.command), this.arguments.replaceFirst("%f",
-				PHPToolLauncher.COMMANDLINE_PLACEHOLDER_FILE));
+				PHPToolLauncher.COMMANDLINE_PLACEHOLDER_FILE).replaceFirst("%d",
+				PHPToolLauncher.COMMANDLINE_PLACEHOLDER_FOLDER));
+		// this.launcher.setPrintOuput(externalChecker.getPrintOutput());
 		this.launcher.setPrintOuput(true);
 	}
 

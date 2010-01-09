@@ -49,11 +49,20 @@
 				<separator name="tools" />
 			</menu>
 			<enablement>
-				<or>
-					<objectState name="extension" value="php"/>
-					<objectState name="extension" value="php4"/>
-					<objectState name="extension" value="php5"/>
-				</or>
+				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
+			</enablement>
+		</objectContribution>
+		<objectContribution
+			id="org.phpsrc.eclipse.pti.ui.phpToolsObjectContributionResource"
+			objectClass="org.eclipse.core.resources.IResource">
+			<menu
+				id="phptools"
+				path="additions"
+				label="&amp;PHP Tools">
+				<separator name="tools" />
+			</menu>
+			<enablement>
+				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
 			</enablement>
 		</objectContribution>
 		<viewerContribution

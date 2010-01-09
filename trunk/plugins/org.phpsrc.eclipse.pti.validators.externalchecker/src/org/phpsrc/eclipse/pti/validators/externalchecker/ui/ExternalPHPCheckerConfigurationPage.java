@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.dltk.core.environment.IEnvironment;
 import org.eclipse.dltk.core.environment.IFileHandle;
+import org.eclipse.dltk.internal.ui.wizards.dialogfields.SelectionButtonDialogField;
 import org.eclipse.dltk.internal.ui.wizards.dialogfields.StringDialogField;
 import org.eclipse.dltk.ui.environment.EnvironmentPathBlock;
 import org.eclipse.dltk.ui.environment.IEnvironmentPathBlockListener;
@@ -46,6 +47,7 @@ public class ExternalPHPCheckerConfigurationPage extends ValidatorConfigurationP
 	private StringDialogField fArguments;
 	private EnvironmentPathBlock fPath;
 	private StringDialogField fExtensions;
+	private SelectionButtonDialogField fDebugPrintOutput;
 
 	private Table fTable;
 	private TableViewer tableViewer;
@@ -134,6 +136,7 @@ public class ExternalPHPCheckerConfigurationPage extends ValidatorConfigurationP
 		externalChecker.setRules(rulesList.getRules());
 		externalChecker.setExtensions(this.fExtensions.getText());
 		externalChecker.setPhpExecutable(this.fPhpExecutable.getText());
+		externalChecker.setPrintOutput(fDebugPrintOutput.isSelected());
 	}
 
 	private void createPathBrowse(final Composite parent, int columns) {
@@ -153,16 +156,27 @@ public class ExternalPHPCheckerConfigurationPage extends ValidatorConfigurationP
 
 		this.fPhpExecutable.doFillIntoGrid(ancestor, columns);
 		this.fArguments.doFillIntoGrid(ancestor, columns);
-		this.fExtensions.doFillIntoGrid(ancestor, columns);
 
 		Label label = new Label(ancestor, SWT.WRAP);
-		label.setText("Comma separated list of extensions");
+		label.setText("You can use %f for source file path and %d for folder path.");
 		GridData data = new GridData(SWT.FILL, SWT.FILL, false, false);
 		data.horizontalSpan = columns;
 		data.minimumWidth = 100;
 		data.widthHint = 100;
 		label.setLayoutData(data);
+
+		this.fExtensions.doFillIntoGrid(ancestor, columns);
+
+		label = new Label(ancestor, SWT.WRAP);
+		label.setText("Comma separated list of extensions");
+		data = new GridData(SWT.FILL, SWT.FILL, false, false);
+		data.horizontalSpan = columns;
+		data.minimumWidth = 100;
+		data.widthHint = 100;
+		label.setLayoutData(data);
 		this.rulesList.getRules().clear();
+
+		this.fDebugPrintOutput.doFillIntoGrid(ancestor, columns);
 
 		// GridLayout layout = (GridLayout)ancestor.getLayout();
 
@@ -274,6 +288,7 @@ public class ExternalPHPCheckerConfigurationPage extends ValidatorConfigurationP
 		}
 
 		this.fPhpExecutable.setText(externalChecker.getPhpExecutable());
+		this.fDebugPrintOutput.setSelection(externalChecker.getPrintOutput());
 	}
 
 	private void createFields() {
@@ -283,6 +298,8 @@ public class ExternalPHPCheckerConfigurationPage extends ValidatorConfigurationP
 		this.fArguments.setLabelText("Checker arguments:");
 		this.fExtensions = new StringDialogField();
 		this.fExtensions.setLabelText("Filename extensions:");
+		this.fDebugPrintOutput = new SelectionButtonDialogField(SWT.CHECK);
+		this.fDebugPrintOutput.setLabelText("Print Output?");
 	}
 
 	public class RulesContentProvider implements IStructuredContentProvider, IRulesListViewer {

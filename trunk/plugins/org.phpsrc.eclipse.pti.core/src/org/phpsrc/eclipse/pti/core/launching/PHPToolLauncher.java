@@ -64,6 +64,7 @@ import org.phpsrc.eclipse.pti.ui.Logger;
 public class PHPToolLauncher {
 
 	public final static String COMMANDLINE_PLACEHOLDER_FILE = "%file%"; //$NON-NLS-1$
+	public final static String COMMANDLINE_PLACEHOLDER_FOLDER = "%folder%"; //$NON-NLS-1$
 
 	private final PHPexeItem phpExe;
 	private final IPath phpScript;
@@ -125,9 +126,16 @@ public class PHPToolLauncher {
 
 			if (config != null) {
 				ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
-				String phpFileName = OperatingSystem.escapeShellFileArg(phpFileLocation);
 
+				String phpFileName = OperatingSystem.escapeShellFileArg(phpFileLocation);
 				String arguments = commandLineArgs.replaceAll(COMMANDLINE_PLACEHOLDER_FILE, phpFileName);
+
+				int lastPos = phpFileLocation.lastIndexOf("\\") != -1 ? phpFileLocation.lastIndexOf("\\")
+						: phpFileLocation.lastIndexOf("/");
+				String folderPath = lastPos != -1 ? OperatingSystem.escapeShellFileArg(phpFileLocation.substring(0,
+						lastPos)) : "";
+				arguments = arguments.replaceAll(COMMANDLINE_PLACEHOLDER_FOLDER, folderPath);
+
 				wc.setAttribute(IDebugParametersKeys.EXE_CONFIG_PROGRAM_ARGUMENTS, arguments);
 				config = wc.doSave();
 
