@@ -47,7 +47,7 @@ PHP_Beautifier      0.1.14    beta
 PHP_CodeSniffer     1.2.1     stable
 PHP_Compat          1.5.0     stable
 PHP_CompatInfo      1.9.0     stable
-PHP_UML             1.5.0     stable
+PHP_UML             1.5.1     stable
 Structures_Graph    1.0.3     stable
 Var_Dump            1.0.3     stable
 VersionControl_SVN  0.3.3     alpha
