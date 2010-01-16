@@ -59,7 +59,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2010 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.6
+ * @version    Release: 3.4.7
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.2.0
  */
@@ -270,13 +270,11 @@ class PHPUnit_Util_Report_Node_File extends PHPUnit_Util_Report_Node
         $ignore = FALSE;
 
         foreach ($this->codeLines as $line) {
-            $trimmedLine = trim($line);
-
-            if ($trimmedLine == '// @codeCoverageIgnoreStart') {
+            if (strpos($line, '@codeCoverageIgnoreStart') !== FALSE) {
                 $ignore = TRUE;
             }
 
-            else if ($trimmedLine == '// @codeCoverageIgnoreEnd') {
+            else if (strpos($line, '@codeCoverageIgnoreEnd') !== FALSE) {
                 $ignore = FALSE;
             }
 
