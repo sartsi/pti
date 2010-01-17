@@ -65,7 +65,6 @@ public abstract class ResourceAction implements IWorkbenchWindowActionDelegate {
 	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		ArrayList<IResource> resources = new ArrayList<IResource>(1);
-
 		if (selection instanceof ITextSelection) {
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			if (page != null) {
@@ -92,12 +91,13 @@ public abstract class ResourceAction implements IWorkbenchWindowActionDelegate {
 						addResourceToList(resources, ((IOpenable) entry).getCorrespondingResource());
 					} else if (entry instanceof IMember) {
 						addResourceToList(resources, ((IMember) entry).getResource());
+					} else if (entry instanceof IFileEditorInput) {
+						addResourceToList(resources, ((IFileEditorInput) entry).getFile());
 					}
 				} catch (ModelException e) {
 					Logger.logException(e);
 				}
 			}
-
 		}
 
 		selectedResources = resources.toArray(new IResource[0]);
