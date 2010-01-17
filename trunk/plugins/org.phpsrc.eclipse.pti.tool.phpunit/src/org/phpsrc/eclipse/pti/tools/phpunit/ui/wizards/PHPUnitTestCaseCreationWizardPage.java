@@ -45,6 +45,7 @@ import org.eclipse.dltk.core.search.IDLTKSearchScope;
 import org.eclipse.dltk.core.search.SearchMatch;
 import org.eclipse.dltk.internal.core.SourceType;
 import org.eclipse.jface.dialogs.IDialogPage;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
@@ -57,6 +58,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -70,6 +72,7 @@ import org.phpsrc.eclipse.pti.tools.phpunit.IPHPUnitConstants;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferences;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferencesFactory;
 import org.phpsrc.eclipse.pti.tools.phpunit.ui.preferences.PHPUnitConfigurationBlock;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 
@@ -181,16 +184,28 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 		if (this.selection != null) {
 			Object element = this.selection.getFirstElement();
 			ISourceModule module = PHPToolkitUtil.getSourceModule(element);
+			boolean classFound = false;
 			if (module != null) {
 				IType[] types;
 				try {
 					types = module.getAllTypes();
 					if (types != null && types.length > 0) {
 						this.setSourceClassName(types[0].getElementName(), types[0].getResource());
+						classFound = true;
 					}
 				} catch (ModelException e1) {
-					e1.printStackTrace();
+					Logger.logException(e1);
 				}
+			}
+
+			if (!classFound) {
+				final Display display = Display.getDefault();
+				display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						MessageDialog.openError(display.getActiveShell(), "PHP Test Case Wizard",
+								"No PHP class found. Please check your source file or select it manually.");
+					}
+				});
 			}
 		}
 	}
