@@ -38,42 +38,15 @@
 			<filter name="nature" value="org.eclipse.php.core.PHPNature" />
 		</page>
 	</extension>
-	<extension point="org.eclipse.ui.popupMenus">
-		<objectContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsObjectContribution"
-			objectClass="org.eclipse.dltk.core.IModelElement">
+
+	<extension point="org.eclipse.ui.menus">
+		<menuContribution
+			locationURI="popup:org.eclipse.ui.popup.any?after=additions">
 			<menu
-				id="phptools"
-				path="additions"
-				label="&amp;PHP Tools">
-				<separator name="tools" />
+				id="org.phpsrc.eclipse.pti.ui.menus.phptools"
+				label="PHP Tools"
+				icon="icons/obj16/phpsrc.gif">
 			</menu>
-			<enablement>
-				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
-			</enablement>
-		</objectContribution>
-		<objectContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsObjectContributionResource"
-			objectClass="org.eclipse.core.resources.IResource">
-			<menu
-				id="phptools"
-				path="additions"
-				label="&amp;PHP Tools">
-				<separator name="tools" />
-			</menu>
-			<enablement>
-				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
-			</enablement>
-		</objectContribution>
-		<viewerContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsEditorContribution"
-			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
-			<menu
-				id="phptools"
-				path="additions"
-				label="&amp;PHP Tools">
-				<separator name="tools" />
-			</menu>
-		</viewerContribution>
+		</menuContribution>
 	</extension>
 </plugin>

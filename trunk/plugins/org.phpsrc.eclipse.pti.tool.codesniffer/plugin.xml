@@ -55,35 +55,6 @@
 			<filter name="nature" value="org.eclipse.php.core.PHPNature" />
 		</page>
 	</extension>
-	<extension point="org.eclipse.ui.popupMenus">
-		<objectContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsCodeSnifferObjectContribution"
-			objectClass="org.eclipse.dltk.core.IModelElement">
-			<action
-				id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.object.ValidateFilesAction"
-				label="PHP CodeSniffer"
-				style="push"
-				menubarPath="phptools/tools"
-				class="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.ValidateFilesAction"
-				enablesFor="+">
-			</action>
-			<enablement>
-				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
-			</enablement>
-		</objectContribution>
-		<viewerContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsCodeSnifferEditorContribution"
-			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
-			<action
-				id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.editor.ValidateFilesAction"
-				label="PHP CodeSniffer"
-				style="push"
-				menubarPath="phptools/tools"
-				class="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.ValidateFilesAction"
-				enablesFor="*">
-			</action>
-		</viewerContribution>
-	</extension>
 	<extension
 		point="org.eclipse.ui.ide.markerResolution">
 		<markerResolutionGenerator
@@ -92,4 +63,56 @@
 		</markerResolutionGenerator>
 	</extension>
 
+	<extension
+		point="org.eclipse.ui.commands">
+		<category 
+			id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.commands"
+			name="PHP Tools"> 
+		</category>
+		<command
+			id="org.phpsrc.eclipse.pti.ui.commands.phpcodesniffer.validateresources"
+			categoryId="org.phpsrc.eclipse.pti.tools.codesniffer.ui.commands"
+			name="PHP CodeSniffer"/>
+	</extension>
+	
+	<!-- locationURI="popup:org.phpsrc.eclipse.pti.ui.menus.phptools?after=additions"> -->
+	<!-- locationURI="popup:org.eclipse.ui.popup.any?after=additions"> -->
+	<extension 
+		point="org.eclipse.ui.menus">
+		<menuContribution
+			locationURI="popup:org.phpsrc.eclipse.pti.ui.menus.phptools?after=additions">
+			<command
+				commandId="org.phpsrc.eclipse.pti.ui.commands.phpcodesniffer.validateresources"
+				tooltip="Validate selected files or folders with PHP CodeSniffer">
+				<visibleWhen>
+					<with variable="activeMenuSelection">
+						<iterate>
+							<adapt type="org.eclipse.core.resources.IResource" />
+						</iterate>
+					</with>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+	</extension>
+	
+	<extension
+		name="PHP CodeSniffer"
+		point="org.eclipse.ui.actionSets">
+		<actionSet
+			id="org.phpsrc.eclipse.pti.ui.actionSet.phpcodesniffer"
+			label="PHP CodeSniffer"
+			visible="true">
+			<action
+				id="org.phpsrc.eclipse.pti.ui.action.ValidateResourcesAction"
+				definitionId="org.phpsrc.eclipse.pti.ui.commands.phpcodesniffer.validateresources"
+				label="PHP CodeSniffer"
+				icon="icons/obj16/phpsrc.gif"
+				toolbarPath="org.phpsrc.eclipse.pti.ui.actionSet.phpcodesniffer"
+				tooltip="Validate with PHP CodeSniffer"
+				class="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions.ValidateResourcesAction"
+				enablesFor="*">
+
+			</action>
+		</actionSet>
+	</extension>
 </plugin>

@@ -24,65 +24,22 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
+package org.phpsrc.eclipse.pti.tools.codesniffer.ui.actions;
 
-package org.phpsrc.eclipse.pti.tools.codesniffer.ui.correction;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.action.IAction;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.jobs.ValidationJob;
+import org.phpsrc.eclipse.pti.ui.actions.ResourceAction;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
-import org.eclipse.swt.graphics.Image;
-import org.phpsrc.eclipse.pti.ui.Logger;
-
-public class InvalidEndOfLineCharacterResolution extends AbstractResolution {
+public class ValidateResourcesAction extends ResourceAction {
 
 	@Override
-	public String getDescription() {
-		return "Change end of line character.";
-	}
-
-	@Override
-	public Image getImage() {
-		return null;
-	}
-
-	@Override
-	public String getLabel() {
-		return "Change end of line character";
-	}
-
-	@Override
-	public void run(IMarker marker) {
-		try {
-			String msg = (String) marker.getAttribute(IMarker.MESSAGE);
-			Integer lineNumber = (Integer) marker.getAttribute(IMarker.LINE_NUMBER);
-
-			if (lineNumber != null && lineNumber.intValue() > 0) {
-				Pattern p = Pattern.compile("End of line character is invalid; expected \"(.*)\" but found \"(.*)\"");
-				Matcher m = p.matcher(msg);
-				if (m.matches()) {
-					String expected = prepareString(m.group(1));
-					String found = prepareString(m.group(2));
-
-					IDocument doc = this.getDocument(marker);
-					IRegion line = doc.getLineInformation(lineNumber.intValue() - 1);
-
-					if (found.equals(doc.getLineDelimiter(lineNumber.intValue() - 1))) {
-						doc.replace(line.getOffset() + line.getLength(), found.length(), expected);
-
-						marker.delete();
-					}
-				}
-			}
-
-		} catch (CoreException e) {
-			Logger.logException(e);
-		} catch (BadLocationException e) {
-			Logger.logException(e);
+	public void run(IAction arg0) {
+		IResource[] resources = getSelectedResources();
+		if (resources.length > 0) {
+			ValidationJob job = new ValidationJob(resources);
+			job.setUser(false);
+			job.schedule();
 		}
 	}
 }
