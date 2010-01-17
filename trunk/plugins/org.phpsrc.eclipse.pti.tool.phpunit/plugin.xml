@@ -2,151 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
 	<extension
-		id="org.phpsrc.eclipse.pti.tools.phpunit.validator.phpToolPHPUnitMarker"
-		name="PHPUnit"
-		point="org.eclipse.core.resources.markers">
-		<persistent value="true"/>
-		<attribute name="lineNumber"/>
-		<attribute name="charStart"/>
-		<attribute name="charEnd"/>
-		<attribute name="message"/>
-		<attribute name="priority"/>
-		<attribute name="severity"/>
-		<super type="org.eclipse.core.resources.problemmarker"/>
- 	</extension>
- 	<extension
-		id="PHPUnitAutomaticTestExecutionValidatorForPHP"
-		name="PHPUnit Automatic Test Execution (for PHP Files)"
-		point="org.eclipse.wst.validation.validatorV2">
-		<validator
-			class="org.phpsrc.eclipse.pti.tools.phpunit.validator.PHPUnitValidator"
-			build="false"
-			manual="false"
-			markerId="org.phpsrc.eclipse.pti.tools.phpunit.validator.phpToolPHPUnitMarker"
-			sourceid="org.eclipse.php.core.phpsource"
-			version="1">
-			<include>
-				<rules>
-					<contentType exactMatch="true" id="org.eclipse.php.core.phpsource"></contentType>
-				</rules>
-			</include>
-			<group id="org.eclipse.wst.sse.core.structuredModelGroup" />
-		</validator>
-	</extension>
-   <extension
-         point="org.eclipse.ui.newWizards">
-		<category
-			id="org.phpsrc.eclipse.tools.phpunit.wizards"
-			parentCategory="org.eclipse.php.project.ui"
-			name="PHPUnit">
-		</category>
-		<wizard
-			id="org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard"
-			name="PHPUnit Test Case"
-			class="org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard"
-			category="org.eclipse.php.project.ui/org.phpsrc.eclipse.tools.phpunit.wizards"
-			icon="icons/full/obj16/new_testcase.gif">
-				<description>Create a PHPUnit Test Case</description>
-				<selection class="org.eclipse.core.resources.IResource"/>
-		</wizard>
-   </extension>
-	<extension point="org.eclipse.ui.popupMenus">
-		<objectContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitObjectContribution"
-			objectClass="org.eclipse.dltk.core.IModelElement">
-			<menu
-				id="phpunit"
-				path="phptools/tools"
-				label="&amp;PHPUnit">
-				<separator name="tests" />
-			</menu>
-			<enablement>
-				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
-			</enablement>
-		</objectContribution>
-		<objectContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitCreateTestCaseObjectContribution"
-			objectClass="org.eclipse.dltk.internal.core.SourceModule">
-			<enablement>
-				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
-			</enablement>
-			<action
-				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
-				label="Create Test Case"
-				style="push"
-				menubarPath="phptools/phpunit/tests"
-				class="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
-				enablesFor="+">
-			</action>
-		</objectContribution>
-		<objectContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitRunTestCaseObjectContribution"
-			objectClass="org.eclipse.dltk.internal.core.SourceModule">
-			<enablement>
-				<objectState name="CONTENT_TYPE_ID" value="org.eclipse.php.core.phpsource"/>
-			</enablement>
-			<action
-				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
-				label="Run Test Case / Test Suite"
-				style="push"
-				menubarPath="phptools/phpunit/tests"
-				class="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
-				enablesFor="+">
-			</action>
-		</objectContribution>
-		<objectContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitRunAllTestsInFolderObjectContribution"
-			objectClass="org.eclipse.dltk.core.IScriptFolder">
-			<enablement>
-				<and>
-					<objectState name="PROJECT_NATURE" value="org.eclipse.php.core.PHPNature"/>
-				</and>
-			</enablement>
-			<action
-				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunAllTestsInFolderAction"
-				label="Run all Tests in folder"
-				style="push"
-				menubarPath="phptools/phpunit/tests"
-				class="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunAllTestsInFolderAction"
-				enablesFor="1">
-			</action>
-		</objectContribution>
-		<viewerContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitViewerContribution"
-			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
-			<menu
-				id="phpunit"
-				path="phptools/tools"
-				label="&amp;PHPUnit">
-				<separator name="tests" />
-			</menu>
-		</viewerContribution>
-		<viewerContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitCreateTestCaseEditorContribution"
-			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
-			<action
-				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
-				label="Create Test Case"
-				style="push"
-				menubarPath="phptools/phpunit/tests"
-				class="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.CreateTestCaseAction"
-				enablesFor="*">
-			</action>
-		</viewerContribution>
-		<viewerContribution
-			id="org.phpsrc.eclipse.pti.ui.phpToolsPHPUnitRunTestCaseEditorContribution"
-			targetID="org.eclipse.php.core.phpsource.source.EditorContext">
-			<action
-				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
-				label="Run Test Case / Test Suite"
-				style="push"
-				menubarPath="phptools/phpunit/tests"
-				class="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
-				enablesFor="*">
-			</action>
-		</viewerContribution>
-	</extension>
-	<extension
 		point="org.eclipse.ui.preferencePages">
 		<page
 			category="org.phpsrc.eclipse.pti.ui.preferences.PHPToolsPreferencePage"
@@ -167,5 +22,118 @@
 			</enabledWhen>
 			<filter name="nature" value="org.eclipse.php.core.PHPNature" />
 		</page>
+	</extension>
+	<extension
+		id="org.phpsrc.eclipse.pti.tools.phpunit.validator.phpToolPHPUnitMarker"
+		name="PHPUnit"
+		point="org.eclipse.core.resources.markers">
+		<persistent value="true"/>
+		<attribute name="lineNumber"/>
+		<attribute name="charStart"/>
+		<attribute name="charEnd"/>
+		<attribute name="message"/>
+		<attribute name="priority"/>
+		<attribute name="severity"/>
+		<super type="org.eclipse.core.resources.problemmarker"/>
+ 	</extension>
+ 	<extension
+		point="org.eclipse.wst.validation.validatorV2"
+		id="PHPUnitAutomaticTestExecutionValidatorForPHP"
+		name="PHPUnit Automatic Test Execution (for PHP Files)">
+		<validator
+			class="org.phpsrc.eclipse.pti.tools.phpunit.validator.PHPUnitValidator"
+			build="false"
+			manual="false"
+			markerId="org.phpsrc.eclipse.pti.tools.phpunit.validator.phpToolPHPUnitMarker"
+			sourceid="org.eclipse.php.core.phpsource"
+			version="1">
+			<include>
+				<rules>
+					<contentType exactMatch="true" id="org.eclipse.php.core.phpsource"></contentType>
+				</rules>
+			</include>
+			<group id="org.eclipse.wst.sse.core.structuredModelGroup" />
+		</validator>
+	</extension>
+
+	<extension
+		point="org.eclipse.ui.newWizards">
+		<category
+			id="org.phpsrc.eclipse.tools.phpunit.wizards"
+			parentCategory="org.eclipse.php.project.ui"
+			name="PHPUnit">
+		</category>
+		<wizard
+			id="org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard"
+			name="PHPUnit Test Case"
+			class="org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard"
+			category="org.eclipse.php.project.ui/org.phpsrc.eclipse.tools.phpunit.wizards"
+			icon="icons/full/obj16/new_testcase.gif">
+				<description>Create a PHPUnit Test Case</description>
+				<selection class="org.eclipse.core.resources.IResource"/>
+		</wizard>
+	</extension>
+	<extension point="org.eclipse.ui.perspectiveExtensions">
+		<perspectiveExtension targetID="org.eclipse.php.perspective">
+			<newWizardShortcut id="org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard" />
+		</perspectiveExtension>
+	</extension>
+	
+	<extension point="org.eclipse.ui.menus">
+		<menuContribution
+			locationURI="popup:org.phpsrc.eclipse.pti.ui.menus.phptools?after=additions">
+			<menu
+				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.menus.phpunit"
+				label="PHPUnit">
+			</menu>
+		</menuContribution>
+		<menuContribution
+			locationURI="popup:org.phpsrc.eclipse.pti.tools.phpunit.ui.menus.phpunit?after=additions">
+			<command
+				commandId="org.phpsrc.eclipse.pti.tools.phpunit.ui.commands.runtest"
+				tooltip="Run PHPUnit Test"
+				icon="icons/full/obj16/testrun.gif">
+				<visibleWhen>
+					<with variable="activeMenuSelection">
+						<iterate>
+							<adapt type="org.eclipse.core.resources.IResource" />
+						</iterate>
+					</with>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+	</extension>
+	
+	<extension
+		point="org.eclipse.ui.commands">
+		<category 
+			id="org.phpsrc.eclipse.pti.tools.phpunit.ui.commands"
+			name="PHPUnit"> 
+		</category>
+		<command
+			id="org.phpsrc.eclipse.pti.tools.phpunit.ui.commands.runtest"
+			categoryId="org.phpsrc.eclipse.pti.tools.codesniffer.ui.commands"
+			name="Run PHPUnit Test">
+		</command>
+	</extension>
+
+	<extension
+		name="PHPUnit"
+		point="org.eclipse.ui.actionSets">
+		<actionSet
+			id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actionSet"
+			label="PHPUnit"
+			visible="true">
+			<action
+				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
+				definitionId="org.phpsrc.eclipse.pti.tools.phpunit.ui.commands.runtest"
+				label="Run PHPUnit Test"
+				icon="icons/full/obj16/testrun.gif"
+				toolbarPath="org.phpsrc.eclipse.pti.tools.phpunit.ui.actionSet"
+				tooltip="Run PHPUnit Test"
+				class="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
+				enablesFor="*">
+			</action>
+#		</actionSet>
 	</extension>
 </plugin>
