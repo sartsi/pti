@@ -37,7 +37,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.dltk.core.search.SearchMatch;
 import org.eclipse.dltk.core.search.SearchPattern;
 import org.eclipse.dltk.internal.core.SourceType;
+import org.eclipse.dltk.ui.DLTKPluginImages;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -50,9 +53,40 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 
 	private static final String DIALOG_SETTINGS = "org.phpsrc.eclipse.pti.core.search.ui.dialogs.FilteredPHPClassSelectionDialog";
 
+	private class DetailLabelProvider extends LabelProvider {
+		public String getText(Object element) {
+			if (!(element instanceof PHPSearchMatch))
+				return null;
+			return ((PHPSearchMatch) element).toString();
+		}
+
+		public Image getImage(Object element) {
+			if (!(element instanceof PHPSearchMatch))
+				return null;
+			return DLTKPluginImages.DESC_OBJS_CLASS.createImage();
+		}
+
+	}
+
+	private class ListLabelProvider extends LabelProvider {
+		public String getText(Object element) {
+			if (!(element instanceof PHPSearchMatch))
+				return null;
+			return ((PHPSearchMatch) element).getElement().getElementName();
+		}
+
+		public Image getImage(Object element) {
+			if (!(element instanceof PHPSearchMatch))
+				return null;
+			return DLTKPluginImages.DESC_OBJS_CLASS.createImage();
+		}
+	}
+
 	public FilteredPHPClassSelectionDialog(Shell shell, boolean multi) {
 		super(shell, multi);
 		setTitle("Select PHP Class");
+		setDetailsLabelProvider(new DetailLabelProvider());
+		setListLabelProvider(new ListLabelProvider());
 	}
 
 	@Override
@@ -66,12 +100,18 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 
 			@Override
 			public boolean isConsistentItem(Object item) {
+				if (!(item instanceof PHPSearchMatch))
+					return false;
+
 				return true;
 			}
 
 			@Override
 			public boolean matchItem(Object item) {
-				return true;
+				if (!(item instanceof PHPSearchMatch))
+					return false;
+
+				return matches(((PHPSearchMatch) item).getElement().getElementName());
 			}
 		};
 	}
@@ -99,7 +139,7 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 
 	@Override
 	public String getElementName(Object element) {
-		return element.toString();
+		return ((PHPSearchMatch) element).getElement().getElementName();
 	}
 
 	@Override
