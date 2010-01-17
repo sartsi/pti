@@ -34,6 +34,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.dltk.core.IMember;
 import org.eclipse.dltk.core.IOpenable;
+import org.eclipse.dltk.core.IScriptFolder;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.jface.action.IAction;
@@ -93,6 +94,8 @@ public abstract class ResourceAction implements IWorkbenchWindowActionDelegate {
 						addResourceToList(resources, ((IMember) entry).getResource());
 					} else if (entry instanceof IFileEditorInput) {
 						addResourceToList(resources, ((IFileEditorInput) entry).getFile());
+					} else if (entry instanceof IScriptFolder) {
+						addResourceToList(resources, ((IScriptFolder) entry).getResource());
 					}
 				} catch (ModelException e) {
 					Logger.logException(e);
