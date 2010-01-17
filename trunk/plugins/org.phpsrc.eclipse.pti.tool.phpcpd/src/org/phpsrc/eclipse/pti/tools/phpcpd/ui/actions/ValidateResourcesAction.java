@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, Sven Kiera
+ * Copyright (c) 2010, Sven Kiera
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,12 +26,8 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpcpd.ui.actions;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -39,52 +35,19 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.dltk.compiler.problem.IProblem;
-import org.eclipse.dltk.core.IOpenable;
-import org.eclipse.dltk.core.IScriptProject;
-import org.eclipse.dltk.core.ModelException;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
 import org.phpsrc.eclipse.pti.core.compiler.problem.FileProblem;
 import org.phpsrc.eclipse.pti.tools.phpcpd.IPhpcpdConstants;
 import org.phpsrc.eclipse.pti.tools.phpcpd.core.Phpcpd;
 import org.phpsrc.eclipse.pti.ui.Logger;
+import org.phpsrc.eclipse.pti.ui.actions.ResourceAction;
 
-public class ValidateResourcesAction implements IObjectActionDelegate {
-	private IResource[] resources;
+public class ValidateResourcesAction extends ResourceAction {
 
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		ISelection selection = targetPart.getSite().getSelectionProvider().getSelection();
-		if (selection instanceof IStructuredSelection) {
-			IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-			resources = new IResource[structuredSelection.size()];
-
-			ArrayList<IResource> entries = new ArrayList<IResource>(structuredSelection.size());
-
-			Iterator<?> iterator = structuredSelection.iterator();
-			while (iterator.hasNext()) {
-				Object entry = iterator.next();
-				try {
-					if (entry instanceof IScriptProject) {
-						entries.add((IProject) ((IScriptProject) entry).getResource());
-					} else if (entry instanceof IOpenable) {
-						IResource resource = ((IOpenable) entry).getCorrespondingResource();
-						if (resource != null)
-							entries.add(resource);
-					}
-				} catch (ModelException e) {
-					Logger.logException(e);
-				}
-			}
-
-			resources = entries.toArray(new IResource[0]);
-		}
-	}
-
+	@Override
 	public void run(IAction action) {
-		Job job = new Job("PHP Copy/Paste Detection") {
+		final IResource[] resources = getSelectedResources();
+		Job job = new Job("PHP Copy/Paste Detector") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				monitor.beginTask("Validation", resources.length * 2);
@@ -115,9 +78,6 @@ public class ValidateResourcesAction implements IObjectActionDelegate {
 
 		job.setUser(false);
 		job.schedule();
-	}
-
-	public void selectionChanged(IAction action, ISelection selection) {
 	}
 
 	protected void createFileMarker(IProblem[] problems) {

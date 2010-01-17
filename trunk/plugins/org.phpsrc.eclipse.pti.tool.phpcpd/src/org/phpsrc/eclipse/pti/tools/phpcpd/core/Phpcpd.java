@@ -73,6 +73,7 @@ public class Phpcpd extends AbstractPHPTool {
 
 		if (output != null && output.length() > 0) {
 			String statusMsg = "";
+			boolean error = false;
 
 			Pattern pFile = Pattern.compile("-?(.*):([0-9]+)-([0-9]+)");
 
@@ -96,13 +97,19 @@ public class Phpcpd extends AbstractPHPTool {
 						e.printStackTrace();
 					}
 				} else if (i == lines.length - 1) {
-					statusMsg += line;
+					if (line.endsWith("total lines of code.")) {
+						statusMsg += line;
+					} else {
+						statusMsg = line;
+						error = true;
+					}
+
 				} else if (line.startsWith("Found")) {
 					statusMsg += line.substring(0, line.length() - 1) + ".\n";
 				}
 			}
 
-			displayStatus(statusMsg);
+			displayStatus(statusMsg, error);
 		}
 
 		return problems.toArray(new IProblem[0]);
@@ -132,13 +139,21 @@ public class Phpcpd extends AbstractPHPTool {
 		return problems;
 	}
 
-	private void displayStatus(final String message) {
+	private void displayStatus(final String message, boolean error) {
 		final Display display = Display.getDefault();
-		display.asyncExec(new Runnable() {
-			public void run() {
-				MessageDialog.openInformation(display.getActiveShell(), "PHP Copy/Paste Detection", message);
-			}
-		});
+		if (error) {
+			display.asyncExec(new Runnable() {
+				public void run() {
+					MessageDialog.openError(display.getActiveShell(), "PHP Copy/Paste Detection", message);
+				}
+			});
+		} else {
+			display.asyncExec(new Runnable() {
+				public void run() {
+					MessageDialog.openInformation(display.getActiveShell(), "PHP Copy/Paste Detection", message);
+				}
+			});
+		}
 	}
 
 	public IProblem[] validateResource(IResource folder) {
