@@ -299,7 +299,7 @@ public class ExternalPHPCheckerConfigurationPage extends ValidatorConfigurationP
 		this.fExtensions = new StringDialogField();
 		this.fExtensions.setLabelText("Filename extensions:");
 		this.fDebugPrintOutput = new SelectionButtonDialogField(SWT.CHECK);
-		this.fDebugPrintOutput.setLabelText("Print Output?");
+		this.fDebugPrintOutput.setLabelText("print PHP output to console");
 	}
 
 	public class RulesContentProvider implements IStructuredContentProvider, IRulesListViewer {
