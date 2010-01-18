@@ -104,7 +104,7 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 		return true;
 	}
 
-	@Override
+	
 	protected IProblem[] parseOutput(ISourceFile file, String output) {
 		return parseOutput(file, output, PHPCodeSnifferPreferencesFactory.factory(file.getFile()));
 	}
@@ -181,7 +181,7 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 		return problems;
 	}
 
-	@Override
+	
 	protected PHPToolLauncher getPHPToolLauncher(IProject project) {
 		PHPToolLauncher launcher;
 		try {

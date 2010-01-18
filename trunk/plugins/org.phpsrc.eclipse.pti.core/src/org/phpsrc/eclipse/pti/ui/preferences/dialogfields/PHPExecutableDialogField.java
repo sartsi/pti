@@ -76,7 +76,7 @@ public class PHPExecutableDialogField extends DialogField {
 		link.setLayoutData(new GridData(SWT.END, SWT.BEGINNING, true, false));
 		link.setText("<a>PHP Executables...</a>");
 		link.addSelectionListener(new SelectionAdapter() {
-			@Override
+			
 			public void widgetSelected(SelectionEvent e) {
 				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(Display.getCurrent()
 						.getActiveShell(), PHP_EXE_PAGE_ID, null, null);

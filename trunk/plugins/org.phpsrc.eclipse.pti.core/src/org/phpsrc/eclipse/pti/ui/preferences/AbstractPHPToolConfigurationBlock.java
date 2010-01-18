@@ -75,7 +75,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 		super(context, project, allKeys, container);
 	}
 
-	@Override
+	
 	public Control createContents(Composite parent) {
 		setShell(parent.getShell());
 
@@ -206,7 +206,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 
 	protected abstract Key getDebugPrintOutputKey();
 
-	@Override
+	
 	protected String[] getFullBuildDialogStrings(boolean workspaceSettings) {
 		return null;
 	}
@@ -222,7 +222,7 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 		link.setLayoutData(new GridData(SWT.END, SWT.BEGINNING, true, false));
 		link.setText(label);
 		link.addSelectionListener(new SelectionAdapter() {
-			@Override
+			
 			public void widgetSelected(SelectionEvent e) {
 				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(getShell(), propertyPageID, null,
 						null);

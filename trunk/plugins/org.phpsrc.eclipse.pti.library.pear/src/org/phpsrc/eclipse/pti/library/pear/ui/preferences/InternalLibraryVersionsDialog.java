@@ -62,7 +62,7 @@ public class InternalLibraryVersionsDialog extends MessageDialog {
 		super(parent, "PEAR Versions", null, "", 0, new String[] { "OK" }, 0);
 	}
 
-	@Override
+	
 	protected Control createDialogArea(Composite parent) {
 		fTree = new Tree(parent, SWT.BORDER | SWT.FULL_SELECTION);
 		fTree.setLinesVisible(true);
@@ -139,7 +139,7 @@ public class InternalLibraryVersionsDialog extends MessageDialog {
 	/*
 	 * @see org.eclipse.jface.window.Window#configureShell(Shell)
 	 */
-	@Override
+	
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		// TODO - Add the Help contex id

@@ -84,7 +84,7 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 		return plugin;
 	}
 
-	@Override
+	
 	public IPath[] getPluginIncludePaths(IProject project) {
 
 		PHPUnitPreferences prefs = PHPUnitPreferencesFactory.factory(project);

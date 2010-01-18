@@ -61,7 +61,7 @@ public class PHPCodeSnifferPlugin extends AbstractPHPToolPlugin {
 	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
 	 * )
 	 */
-	@Override
+	
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
@@ -74,7 +74,7 @@ public class PHPCodeSnifferPlugin extends AbstractPHPToolPlugin {
 	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
 	 * )
 	 */
-	@Override
+	
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
@@ -107,7 +107,7 @@ public class PHPCodeSnifferPlugin extends AbstractPHPToolPlugin {
 		return standards;
 	}
 
-	@Override
+	
 	public IPath[] getPluginIncludePaths(IProject project) {
 		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(project);
 		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(prefs.getPearLibraryName());

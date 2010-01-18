@@ -33,7 +33,7 @@ import org.phpsrc.eclipse.pti.ui.actions.ResourceAction;
 
 public class ValidateResourcesAction extends ResourceAction {
 
-	@Override
+	
 	public void run(IAction arg0) {
 		IResource[] resources = getSelectedResources();
 		if (resources.length > 0) {

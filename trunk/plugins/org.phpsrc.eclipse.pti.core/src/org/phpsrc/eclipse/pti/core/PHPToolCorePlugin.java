@@ -56,7 +56,7 @@ public class PHPToolCorePlugin extends AbstractPHPToolPlugin {
 	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
 	 * )
 	 */
-	@Override
+	
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
@@ -69,7 +69,7 @@ public class PHPToolCorePlugin extends AbstractPHPToolPlugin {
 	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
 	 * )
 	 */
-	@Override
+	
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
@@ -84,7 +84,7 @@ public class PHPToolCorePlugin extends AbstractPHPToolPlugin {
 		return plugin;
 	}
 
-	@Override
+	
 	public IPath[] getPluginIncludePaths(IProject project) {
 		return new IPath[0];
 	}

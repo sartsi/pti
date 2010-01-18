@@ -58,7 +58,7 @@ public class PhpcpdPlugin extends AbstractPHPToolPlugin {
 		return plugin;
 	}
 
-	@Override
+	
 	public IPath[] getPluginIncludePaths(IProject project) {
 		PhpcpdPreferences prefs = PhpcpdPreferencesFactory.factory(project);
 		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(prefs.getPearLibraryName());

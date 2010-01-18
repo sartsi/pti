@@ -77,7 +77,7 @@ public class PhpcpdConfigurationBlock extends AbstractPEARPHPToolConfigurationBl
 				PREF_MIN_TOKENS, PREF_FILE_SUFFIXES };
 	}
 
-	@Override
+	
 	protected Composite createToolContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -167,7 +167,7 @@ public class PhpcpdConfigurationBlock extends AbstractPEARPHPToolConfigurationBl
 	 * @seeorg.eclipse.jdt.internal.ui.preferences.OptionsConfigurationBlock#
 	 * updateControls()
 	 */
-	@Override
+	
 	protected void updateControls() {
 		super.updateControls();
 		unpackMinLines();
@@ -175,12 +175,12 @@ public class PhpcpdConfigurationBlock extends AbstractPEARPHPToolConfigurationBl
 		unpackFileSuffixes();
 	}
 
-	@Override
+	
 	protected void validateSettings(Key changedKey, String oldValue, String newValue) {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
+	
 	protected boolean processChanges(IWorkbenchPreferenceContainer container) {
 		clearProjectLauncherCache(Phpcpd.QUALIFIED_NAME);
 
@@ -191,7 +191,7 @@ public class PhpcpdConfigurationBlock extends AbstractPEARPHPToolConfigurationBl
 		return super.processChanges(container);
 	}
 
-	@Override
+	
 	protected String[] getFullBuildDialogStrings(boolean workspaceSettings) {
 		return null;
 	}
@@ -200,17 +200,17 @@ public class PhpcpdConfigurationBlock extends AbstractPEARPHPToolConfigurationBl
 		return getKey(PhpcpdPlugin.PLUGIN_ID, key);
 	}
 
-	@Override
+	
 	protected Key getPHPExecutableKey() {
 		return PREF_PHP_EXECUTABLE;
 	}
 
-	@Override
+	
 	protected Key getDebugPrintOutputKey() {
 		return PREF_DEBUG_PRINT_OUTPUT;
 	}
 
-	@Override
+	
 	protected Key getPEARLibraryKey() {
 		return PREF_PEAR_LIBRARY;
 	}

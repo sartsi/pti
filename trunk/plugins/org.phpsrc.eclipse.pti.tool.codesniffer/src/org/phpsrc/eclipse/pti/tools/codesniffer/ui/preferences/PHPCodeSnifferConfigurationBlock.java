@@ -88,7 +88,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		public boolean custom;
 		public String path;
 
-		@Override
+		
 		public String toString() {
 			return name;
 		}
@@ -105,7 +105,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		 * @see
 		 * org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
 		 */
-		@Override
+		
 		public Image getImage(Object element) {
 			return null; // JavaPluginImages.get(JavaPluginImages.IMG_OBJS_REFACTORING_INFO);
 		}
@@ -116,7 +116,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		 * @see
 		 * org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 		 */
-		@Override
+		
 		public String getText(Object element) {
 			return getColumnText(element, 0);
 		}
@@ -265,7 +265,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 				PREF_DEFAULT_TAB_WITH, PREF_IGNORE_PATTERN, PREF_IGNORE_SNIFFS };
 	}
 
-	@Override
+	
 	protected Composite createToolContents(Composite parent) {
 		Composite standardsComposite = createStandardsTabContent(parent);
 		validateSettings(null, null, null);
@@ -348,7 +348,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		return fStandardsList.getIndexOfElement(standard) == 0;
 	}
 
-	@Override
+	
 	protected void validateSettings(Key changedKey, String oldValue, String newValue) {
 		// TODO Auto-generated method stub
 	}
@@ -403,7 +403,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		}
 	}
 
-	@Override
+	
 	protected boolean processChanges(IWorkbenchPreferenceContainer container) {
 		clearProjectLauncherCache(PHPCodeSniffer.QUALIFIED_NAME);
 
@@ -427,13 +427,13 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		fStandardsList.enableButton(IDX_DEFAULT, false);
 	}
 
-	@Override
+	
 	public void useProjectSpecificSettings(boolean enable) {
 		super.useProjectSpecificSettings(enable);
 		fStandardsList.setEnabled(enable);
 	}
 
-	@Override
+	
 	protected String[] getFullBuildDialogStrings(boolean workspaceSettings) {
 		String title = "CodeSniffer Settings Changed";
 		String message;
@@ -449,17 +449,17 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		return getKey(PHPCodeSnifferPlugin.PLUGIN_ID, key);
 	}
 
-	@Override
+	
 	protected Key getPHPExecutableKey() {
 		return PREF_PHP_EXECUTABLE;
 	}
 
-	@Override
+	
 	protected Key getDebugPrintOutputKey() {
 		return PREF_DEBUG_PRINT_OUTPUT;
 	}
 
-	@Override
+	
 	protected Key getPEARLibraryKey() {
 		return PREF_PEAR_LIBRARY;
 	}
@@ -470,7 +470,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 	 * @seeorg.eclipse.jdt.internal.ui.preferences.OptionsConfigurationBlock#
 	 * updateControls()
 	 */
-	@Override
+	
 	protected void updateControls() {
 		unpackStandards();
 		unpackTabWidth();

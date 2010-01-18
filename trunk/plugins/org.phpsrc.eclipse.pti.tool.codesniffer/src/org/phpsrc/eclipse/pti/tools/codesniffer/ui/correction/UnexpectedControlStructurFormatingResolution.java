@@ -40,22 +40,22 @@ import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class UnexpectedControlStructurFormatingResolution extends AbstractResolution {
 
-	@Override
+	
 	public String getDescription() {
 		return "Change control structure formating";
 	}
 
-	@Override
+	
 	public Image getImage() {
 		return null;
 	}
 
-	@Override
+	
 	public String getLabel() {
 		return "Change control structure formating";
 	}
 
-	@Override
+	
 	public void run(IMarker marker) {
 		try {
 			String msg = (String) marker.getAttribute(IMarker.MESSAGE);

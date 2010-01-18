@@ -89,16 +89,16 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 		setListLabelProvider(new ListLabelProvider());
 	}
 
-	@Override
+	
 	protected Control createExtendedContentArea(Composite parent) {
 		return null;
 	}
 
-	@Override
+	
 	protected ItemsFilter createFilter() {
 		return new ItemsFilter() {
 
-			@Override
+			
 			public boolean isConsistentItem(Object item) {
 				if (!(item instanceof PHPSearchMatch))
 					return false;
@@ -106,7 +106,7 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 				return true;
 			}
 
-			@Override
+			
 			public boolean matchItem(Object item) {
 				if (!(item instanceof PHPSearchMatch))
 					return false;
@@ -116,7 +116,7 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 		};
 	}
 
-	@Override
+	
 	protected void fillContentProvider(AbstractContentProvider provider, ItemsFilter filter, IProgressMonitor monitor)
 			throws CoreException {
 		int matchRule = SearchPattern.R_PREFIX_MATCH;
@@ -126,7 +126,7 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 		}
 	}
 
-	@Override
+	
 	protected IDialogSettings getDialogSettings() {
 		IDialogSettings settings = PHPToolCorePlugin.getDefault().getDialogSettings().getSection(DIALOG_SETTINGS);
 
@@ -137,12 +137,12 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 		return settings;
 	}
 
-	@Override
+	
 	public String getElementName(Object element) {
 		return ((PHPSearchMatch) element).getElement().getElementName();
 	}
 
-	@Override
+	
 	protected Comparator<Object> getItemsComparator() {
 		return new Comparator<Object>() {
 			public int compare(Object o1, Object o2) {
@@ -152,7 +152,7 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 		};
 	}
 
-	@Override
+	
 	protected IStatus validateItem(Object item) {
 		return new Status(IStatus.OK, PHPToolCorePlugin.PLUGIN_ID, IStatus.OK, "", null);
 	}

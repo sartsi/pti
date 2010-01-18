@@ -74,7 +74,7 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 		public boolean custom;
 		public String path;
 
-		@Override
+		
 		public String toString() {
 			return name;
 		}
@@ -91,7 +91,7 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 		 * @see
 		 * org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
 		 */
-		@Override
+		
 		public Image getImage(Object element) {
 			return null; // JavaPluginImages.get(JavaPluginImages.IMG_OBJS_REFACTORING_INFO);
 		}
@@ -102,7 +102,7 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 		 * @see
 		 * org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 		 */
-		@Override
+		
 		public String getText(Object element) {
 			return getColumnText(element, 0);
 		}
@@ -236,7 +236,7 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 		return new Key[] { PREF_CUSTOM_LIBRARY_NAMES, PREF_CUSTOM_LIBRARY_PATHS, PREF_DEFAULT_LIBRARY_NAME };
 	}
 
-	@Override
+	
 	protected Control createContents(Composite parent) {
 		PixelConverter conv = new PixelConverter(parent);
 
@@ -272,7 +272,7 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 		return lib.path == "";
 	}
 
-	@Override
+	
 	protected void validateSettings(Key changedKey, String oldValue, String newValue) {
 		// TODO Auto-generated method stub
 	}
@@ -338,13 +338,13 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 		fLibraryList.enableButton(IDX_DEFAULT, false);
 	}
 
-	@Override
+	
 	public void useProjectSpecificSettings(boolean enable) {
 		super.useProjectSpecificSettings(enable);
 		fLibraryList.setEnabled(enable);
 	}
 
-	@Override
+	
 	protected String[] getFullBuildDialogStrings(boolean workspaceSettings) {
 		String title = "CodeSniffer Settings Changed";
 		String message;
@@ -366,7 +366,7 @@ public class PEARConfigurationBlock extends OptionsConfigurationBlock {
 	 * @seeorg.eclipse.jdt.internal.ui.preferences.OptionsConfigurationBlock#
 	 * updateControls()
 	 */
-	@Override
+	
 	protected void updateControls() {
 		unpackLibraries();
 	}

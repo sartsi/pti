@@ -44,7 +44,7 @@ import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPUnitValidator extends AbstractValidator {
 
-	@Override
+	
 	public ValidationResult validate(IResource resource, int kind, ValidationState state, IProgressMonitor monitor) {
 		// process only PHP files
 		if (resource.getType() != IResource.FILE || !(PHPToolkitUtil.isPhpFile((IFile) resource))) {

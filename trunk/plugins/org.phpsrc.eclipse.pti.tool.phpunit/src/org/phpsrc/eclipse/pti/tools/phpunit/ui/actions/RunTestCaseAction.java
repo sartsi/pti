@@ -40,7 +40,7 @@ import org.phpsrc.eclipse.pti.ui.Logger;
 import org.phpsrc.eclipse.pti.ui.actions.ResourceAction;
 
 public class RunTestCaseAction extends ResourceAction {
-	@Override
+	
 	public void run(IAction action) {
 		final IResource[] resources = getSelectedResources();
 		if (resources.length > 0) {

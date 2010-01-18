@@ -41,22 +41,22 @@ import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class ReplaceDoubleQuotesWithSingleQuotesResolution extends AbstractResolution {
 
-	@Override
+	
 	public String getDescription() {
 		return "Replace double quotes with single quotes.";
 	}
 
-	@Override
+	
 	public Image getImage() {
 		return null;
 	}
 
-	@Override
+	
 	public String getLabel() {
 		return "Replace double quotes with single quotes";
 	}
 
-	@Override
+	
 	public void run(IMarker marker) {
 		try {
 			String msg = (String) marker.getAttribute(IMarker.MESSAGE);

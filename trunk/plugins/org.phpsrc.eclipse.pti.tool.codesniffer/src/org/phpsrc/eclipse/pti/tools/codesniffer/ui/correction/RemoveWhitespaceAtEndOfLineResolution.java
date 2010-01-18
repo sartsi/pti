@@ -37,22 +37,22 @@ import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class RemoveWhitespaceAtEndOfLineResolution extends AbstractResolution {
 
-	@Override
+	
 	public String getDescription() {
 		return "Remove all whitespaces or tabs at end of line.";
 	}
 
-	@Override
+	
 	public Image getImage() {
 		return null;
 	}
 
-	@Override
+	
 	public String getLabel() {
 		return "Remove whitespaces at end of line";
 	}
 
-	@Override
+	
 	public void run(IMarker marker) {
 		try {
 			String msg = (String) marker.getAttribute(IMarker.MESSAGE);

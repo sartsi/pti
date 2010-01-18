@@ -44,11 +44,11 @@ import org.phpsrc.eclipse.pti.ui.actions.ResourceAction;
 
 public class ValidateResourcesAction extends ResourceAction {
 
-	@Override
+	
 	public void run(IAction action) {
 		final IResource[] resources = getSelectedResources();
 		Job job = new Job("PHP Copy/Paste Detector") {
-			@Override
+			
 			protected IStatus run(IProgressMonitor monitor) {
 				monitor.beginTask("Validation", resources.length * 2);
 

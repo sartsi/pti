@@ -81,7 +81,7 @@ public class PHPUnitConfigurationBlock extends AbstractPEARPHPToolConfigurationB
 				PREF_TEST_FILE_PATTERN_FOLDER, PREF_TEST_FILE_PATTERN_FILE };
 	}
 
-	@Override
+	
 	protected Composite createToolContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -198,12 +198,12 @@ public class PHPUnitConfigurationBlock extends AbstractPEARPHPToolConfigurationB
 		}
 	}
 
-	@Override
+	
 	protected void validateSettings(Key changedKey, String oldValue, String newValue) {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
+	
 	protected boolean processChanges(IWorkbenchPreferenceContainer container) {
 		clearProjectLauncherCache(PHPUnit.QUALIFIED_NAME);
 
@@ -214,14 +214,14 @@ public class PHPUnitConfigurationBlock extends AbstractPEARPHPToolConfigurationB
 		return super.processChanges(container);
 	}
 
-	@Override
+	
 	public void useProjectSpecificSettings(boolean enable) {
 		super.useProjectSpecificSettings(enable);
 		fBootstrap.setEnabled(enable);
 		fFileButton.setEnabled(enable);
 	}
 
-	@Override
+	
 	protected String[] getFullBuildDialogStrings(boolean workspaceSettings) {
 		return null;
 	}
@@ -230,17 +230,17 @@ public class PHPUnitConfigurationBlock extends AbstractPEARPHPToolConfigurationB
 		return getKey(PHPUnitPlugin.PLUGIN_ID, key);
 	}
 
-	@Override
+	
 	protected Key getPHPExecutableKey() {
 		return PREF_PHP_EXECUTABLE;
 	}
 
-	@Override
+	
 	protected Key getDebugPrintOutputKey() {
 		return PREF_DEBUG_PRINT_OUTPUT;
 	}
 
-	@Override
+	
 	protected Key getPEARLibraryKey() {
 		return PREF_PEAR_LIBRARY;
 	}
@@ -251,7 +251,7 @@ public class PHPUnitConfigurationBlock extends AbstractPEARPHPToolConfigurationB
 	 * @seeorg.eclipse.jdt.internal.ui.preferences.OptionsConfigurationBlock#
 	 * updateControls()
 	 */
-	@Override
+	
 	protected void updateControls() {
 		super.updateControls();
 		unpackBootstrap();

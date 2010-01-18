@@ -41,7 +41,7 @@ public class PHPClassSearchRequestor extends SearchRequestor {
 		super.beginReporting();
 	}
 
-	@Override
+	
 	public void acceptSearchMatch(SearchMatch match) throws CoreException {
 		if (match.isExact()) {
 			searchMatches.add(match);

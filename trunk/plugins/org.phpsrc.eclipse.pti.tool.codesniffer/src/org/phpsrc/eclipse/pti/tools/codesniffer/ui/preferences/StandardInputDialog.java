@@ -116,7 +116,7 @@ public class StandardInputDialog extends StatusDialog {
 		return standard;
 	}
 
-	@Override
+	
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
 
@@ -184,7 +184,7 @@ public class StandardInputDialog extends StatusDialog {
 	/*
 	 * @see org.eclipse.jface.window.Window#configureShell(Shell)
 	 */
-	@Override
+	
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		// TODO - Add the Help contex id

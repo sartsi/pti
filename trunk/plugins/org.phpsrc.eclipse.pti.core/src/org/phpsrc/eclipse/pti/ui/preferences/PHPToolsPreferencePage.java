@@ -52,7 +52,7 @@ public class PHPToolsPreferencePage extends PropertyAndPreferencePage implements
 		super();
 	}
 
-	@Override
+	
 	protected Control createContents(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -66,26 +66,26 @@ public class PHPToolsPreferencePage extends PropertyAndPreferencePage implements
 		return comp;
 	}
 
-	@Override
+	
 	public void init(IWorkbench workbench) {
 	}
 
-	@Override
+	
 	protected Control createPreferenceContent(Composite composite) {
 		return null;
 	}
 
-	@Override
+	
 	protected String getPreferencePageID() {
 		return null;
 	}
 
-	@Override
+	
 	protected String getPropertyPageID() {
 		return null;
 	}
 
-	@Override
+	
 	protected boolean hasProjectSpecificOptions(IProject project) {
 		return false;
 	}

@@ -51,7 +51,7 @@ public class ValidationJob extends Job {
 		this.resources = resources;
 	}
 
-	@Override
+	
 	protected IStatus run(IProgressMonitor monitor) {
 		ArrayList<IFile> files = new ArrayList<IFile>(10);
 

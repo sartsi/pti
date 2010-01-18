@@ -40,22 +40,22 @@ import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class AddingMissingCommentResolution extends AbstractResolution {
 
-	@Override
+	
 	public String getDescription() {
 		return "A expected comment. An existing coment will be replaced.";
 	}
 
-	@Override
+	
 	public Image getImage() {
 		return null;
 	}
 
-	@Override
+	
 	public String getLabel() {
 		return "Add expected comment";
 	}
 
-	@Override
+	
 	public void run(IMarker marker) {
 		try {
 			String msg = (String) marker.getAttribute(IMarker.MESSAGE);
