@@ -53,12 +53,10 @@ import org.phpsrc.eclipse.pti.ui.Logger;
 public abstract class ResourceAction implements IWorkbenchWindowActionDelegate {
 	private IResource[] selectedResources;
 
-	@Override
 	public void dispose() {
 		selectedResources = null;
 	}
 
-	@Override
 	public void init(IWorkbenchWindow window) {
 		selectedResources = new IResource[0];
 	}
