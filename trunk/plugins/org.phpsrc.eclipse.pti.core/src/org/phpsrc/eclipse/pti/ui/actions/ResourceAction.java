@@ -63,7 +63,6 @@ public abstract class ResourceAction implements IWorkbenchWindowActionDelegate {
 		selectedResources = new IResource[0];
 	}
 
-	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		ArrayList<IResource> resources = new ArrayList<IResource>(1);
 		if (selection instanceof ITextSelection) {
