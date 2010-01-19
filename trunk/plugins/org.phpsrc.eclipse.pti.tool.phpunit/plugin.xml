@@ -76,6 +76,7 @@
 	<extension point="org.eclipse.ui.perspectiveExtensions">
 		<perspectiveExtension targetID="org.eclipse.php.perspective">
 			<newWizardShortcut id="org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards.CreatePHPUnitTestCaseWizard" />
+			<actionSet id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actionSet" />
 		</perspectiveExtension>
 	</extension>
 	
@@ -123,7 +124,7 @@
 		<actionSet
 			id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actionSet"
 			label="PHPUnit"
-			visible="true">
+			visible="false">
 			<action
 				id="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
 				definitionId="org.phpsrc.eclipse.pti.tools.phpunit.ui.commands.runtest"

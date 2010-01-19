@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PHP Copy/Paste Detection
 Bundle-SymbolicName: org.phpsrc.eclipse.pti.tools.phpcpd;singleton:=true
-Bundle-Version: 0.2.0.R20100118020000
+Bundle-Version: 0.2.0.R20100119000000
 Bundle-Activator: org.phpsrc.eclipse.pti.tools.phpcpd.PhpcpdPlugin
 Bundle-Vendor: Sven Kiera
 Require-Bundle: org.eclipse.ui,

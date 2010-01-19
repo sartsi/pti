@@ -101,7 +101,7 @@
 		<actionSet
 			id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actionSet"
 			label="PHP CodeSniffer"
-			visible="true">
+			visible="false">
 			<action
 				id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.action.ValidateResourcesAction"
 				definitionId="org.phpsrc.eclipse.pti.tools.codesniffer.ui.commands.validateresources"
@@ -113,5 +113,10 @@
 				enablesFor="*">
 			</action>
 		</actionSet>
+	</extension>
+	<extension point="org.eclipse.ui.perspectiveExtensions">
+		<perspectiveExtension targetID="org.eclipse.php.perspective">
+			<actionSet id="org.phpsrc.eclipse.pti.tools.codesniffer.ui.actionSet" />
+		</perspectiveExtension>
 	</extension>
 </plugin>

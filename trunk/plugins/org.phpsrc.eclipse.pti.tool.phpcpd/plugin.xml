@@ -75,7 +75,7 @@
 		<actionSet
 			id="org.phpsrc.eclipse.pti.tools.phpcpd.ui.actionSet"
 			label="PHP Copy/Paste Detector"
-			visible="true">
+			visible="false">
 			<action
 				id="org.phpsrc.eclipse.pti.tools.phpcpd.ui.action.ValidateResourcesAction"
 				definitionId="org.phpsrc.eclipse.pti.tools.phpcpd.ui.commands.validateresources"
@@ -87,5 +87,10 @@
 				enablesFor="*">
 			</action>
 		</actionSet>
+	</extension>
+	<extension point="org.eclipse.ui.perspectiveExtensions">
+		<perspectiveExtension targetID="org.eclipse.php.perspective">
+			<actionSet id="org.phpsrc.eclipse.pti.tools.phpcpd.ui.actionSet" />
+		</perspectiveExtension>
 	</extension>
 </plugin>
