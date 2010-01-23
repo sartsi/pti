@@ -53,6 +53,8 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 
 	private static final String DIALOG_SETTINGS = "org.phpsrc.eclipse.pti.core.search.ui.dialogs.FilteredPHPClassSelectionDialog";
 
+	private static final Image IMAGE_CLASS = DLTKPluginImages.DESC_OBJS_CLASS.createImage();
+
 	private class DetailLabelProvider extends LabelProvider {
 		public String getText(Object element) {
 			if (!(element instanceof PHPSearchMatch))
@@ -63,7 +65,7 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 		public Image getImage(Object element) {
 			if (!(element instanceof PHPSearchMatch))
 				return null;
-			return DLTKPluginImages.DESC_OBJS_CLASS.createImage();
+			return IMAGE_CLASS;
 		}
 
 	}
@@ -89,16 +91,13 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 		setListLabelProvider(new ListLabelProvider());
 	}
 
-	
 	protected Control createExtendedContentArea(Composite parent) {
 		return null;
 	}
 
-	
 	protected ItemsFilter createFilter() {
 		return new ItemsFilter() {
 
-			
 			public boolean isConsistentItem(Object item) {
 				if (!(item instanceof PHPSearchMatch))
 					return false;
@@ -106,7 +105,6 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 				return true;
 			}
 
-			
 			public boolean matchItem(Object item) {
 				if (!(item instanceof PHPSearchMatch))
 					return false;
@@ -116,7 +114,6 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 		};
 	}
 
-	
 	protected void fillContentProvider(AbstractContentProvider provider, ItemsFilter filter, IProgressMonitor monitor)
 			throws CoreException {
 		int matchRule = SearchPattern.R_PREFIX_MATCH;
@@ -126,7 +123,6 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 		}
 	}
 
-	
 	protected IDialogSettings getDialogSettings() {
 		IDialogSettings settings = PHPToolCorePlugin.getDefault().getDialogSettings().getSection(DIALOG_SETTINGS);
 
@@ -137,12 +133,10 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 		return settings;
 	}
 
-	
 	public String getElementName(Object element) {
 		return ((PHPSearchMatch) element).getElement().getElementName();
 	}
 
-	
 	protected Comparator<Object> getItemsComparator() {
 		return new Comparator<Object>() {
 			public int compare(Object o1, Object o2) {
@@ -152,7 +146,6 @@ public class FilteredPHPClassSelectionDialog extends FilteredItemsSelectionDialo
 		};
 	}
 
-	
 	protected IStatus validateItem(Object item) {
 		return new Status(IStatus.OK, PHPToolCorePlugin.PLUGIN_ID, IStatus.OK, "", null);
 	}
