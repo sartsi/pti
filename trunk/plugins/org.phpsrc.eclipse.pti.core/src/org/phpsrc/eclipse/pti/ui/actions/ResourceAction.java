@@ -81,18 +81,28 @@ public abstract class ResourceAction implements IWorkbenchWindowActionDelegate {
 					if (entry instanceof IResource) {
 						addResourceToList(resources, (IResource) entry);
 					} else if (entry instanceof ISourceModule) {
-						IFile file = (IFile) ((ISourceModule) entry).getCorrespondingResource();
-						if (PHPToolkitUtil.isPhpFile(file)) {
-							addResourceToList(resources, file);
+						if (((ISourceModule) entry).exists()) {
+							IFile file = (IFile) ((ISourceModule) entry).getCorrespondingResource();
+							if (PHPToolkitUtil.isPhpFile(file)) {
+								addResourceToList(resources, file);
+							}
 						}
 					} else if (entry instanceof IOpenable) {
-						addResourceToList(resources, ((IOpenable) entry).getCorrespondingResource());
+						if (((IOpenable) entry).exists()) {
+							addResourceToList(resources, ((IOpenable) entry).getCorrespondingResource());
+						}
 					} else if (entry instanceof IMember) {
-						addResourceToList(resources, ((IMember) entry).getResource());
+						if (((IMember) entry).exists()) {
+							addResourceToList(resources, ((IMember) entry).getResource());
+						}
 					} else if (entry instanceof IFileEditorInput) {
-						addResourceToList(resources, ((IFileEditorInput) entry).getFile());
+						if (((IFileEditorInput) entry).exists()) {
+							addResourceToList(resources, ((IFileEditorInput) entry).getFile());
+						}
 					} else if (entry instanceof IScriptFolder) {
-						addResourceToList(resources, ((IScriptFolder) entry).getResource());
+						if (((IScriptFolder) entry).exists()) {
+							addResourceToList(resources, ((IScriptFolder) entry).getResource());
+						}
 					}
 				} catch (ModelException e) {
 					Logger.logException(e);
@@ -108,7 +118,7 @@ public abstract class ResourceAction implements IWorkbenchWindowActionDelegate {
 	}
 
 	private void addResourceToList(ArrayList<IResource> list, IResource resource) {
-		if (resource != null && !list.contains(resource))
+		if (resource != null && resource.exists() && !list.contains(resource))
 			list.add(resource);
 	}
 }
