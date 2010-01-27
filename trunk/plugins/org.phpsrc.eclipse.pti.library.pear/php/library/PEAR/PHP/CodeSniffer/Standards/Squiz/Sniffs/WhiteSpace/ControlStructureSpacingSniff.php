@@ -10,14 +10,14 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ControlStructureSpacingSniff.php 274897 2009-01-29 23:39:52Z squiz $
+ * @version   CVS: $Id: ControlStructureSpacingSniff.php 291858 2009-12-08 04:27:43Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
 /**
  * Squiz_Sniffs_WhiteSpace_ControlStructureSpacingSniff.
  *
- * Checks that any array declarations are lower case.
+ * Checks that control structures have the correct spacing around brackets.
  *
  * @category  PHP
  * @package   PHP_CodeSniffer
@@ -25,7 +25,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_WhiteSpace_ControlStructureSpacingSniff implements PHP_CodeSniffer_Sniff
@@ -67,8 +67,8 @@ class Squiz_Sniffs_WhiteSpace_ControlStructureSpacingSniff implements PHP_CodeSn
      * Processes this test, when one of its tokens is encountered.
      *
      * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-     * @param int                  $stackPtr  The position of the current token in the
-     *                                        stack passed in $tokens.
+     * @param int                  $stackPtr  The position of the current token
+     *                                        in the stack passed in $tokens.
      *
      * @return void
      */
@@ -80,16 +80,46 @@ class Squiz_Sniffs_WhiteSpace_ControlStructureSpacingSniff implements PHP_CodeSn
             return;
         }
 
-        $scopeCloser = $tokens[$stackPtr]['scope_closer'];
-        $scopeOpener = $tokens[$stackPtr]['scope_opener'];
+        if (isset($tokens[$stackPtr]['parenthesis_opener']) === true) {
+            $parenOpener = $tokens[$stackPtr]['parenthesis_opener'];
+            $parenCloser = $tokens[$stackPtr]['parenthesis_closer'];
+            if ($tokens[($parenOpener + 1)]['code'] === T_WHITESPACE) {
+                $gap   = strlen($tokens[($parenOpener + 1)]['content']);
+                $error = "Expected 0 spaces after opening bracket; $gap found";
+                $phpcsFile->addError($error, ($parenOpener + 1));
+            }
 
-        $firstContent = $phpcsFile->findNext(T_WHITESPACE, ($scopeOpener + 1), null, true);
+            if ($tokens[$parenOpener]['line'] === $tokens[$parenCloser]['line']
+                && $tokens[($parenCloser - 1)]['code'] === T_WHITESPACE
+            ) {
+                $gap   = strlen($tokens[($parenCloser - 1)]['content']);
+                $error = "Expected 0 spaces before closing bracket; $gap found";
+                $phpcsFile->addError($error, ($parenCloser - 1));
+            }
+        }
+
+        $scopeOpener = $tokens[$stackPtr]['scope_opener'];
+        $scopeCloser = $tokens[$stackPtr]['scope_closer'];
+
+        $firstContent = $phpcsFile->findNext(
+            T_WHITESPACE,
+            ($scopeOpener + 1),
+            null,
+            true
+        );
+
         if ($tokens[$firstContent]['line'] !== ($tokens[$scopeOpener]['line'] + 1)) {
             $error = 'Blank line found at start of control structure';
             $phpcsFile->addError($error, $scopeOpener);
         }
 
-        $lastContent = $phpcsFile->findPrevious(T_WHITESPACE, ($scopeCloser - 1), null, true);
+        $lastContent = $phpcsFile->findPrevious(
+            T_WHITESPACE,
+            ($scopeCloser - 1),
+            null,
+            true
+        );
+
         if ($tokens[$lastContent]['line'] !== ($tokens[$scopeCloser]['line'] - 1)) {
             $errorToken = $scopeCloser;
             for ($i = ($scopeCloser - 1); $i > $lastContent; $i--) {
@@ -103,7 +133,13 @@ class Squiz_Sniffs_WhiteSpace_ControlStructureSpacingSniff implements PHP_CodeSn
             $phpcsFile->addError($error, $errorToken);
         }
 
-        $trailingContent = $phpcsFile->findNext(T_WHITESPACE, ($scopeCloser + 1), null, true);
+        $trailingContent = $phpcsFile->findNext(
+            T_WHITESPACE,
+            ($scopeCloser + 1),
+            null,
+            true
+        );
+
         if ($tokens[$trailingContent]['code'] === T_ELSE) {
             if ($tokens[$stackPtr]['code'] === T_IF) {
                 // IF with ELSE.
@@ -116,7 +152,12 @@ class Squiz_Sniffs_WhiteSpace_ControlStructureSpacingSniff implements PHP_CodeSn
                 if (substr($tokens[$trailingContent]['content'], 0, 5) === '//end') {
                     // There is an end comment, so we have to get the next piece
                     // of content.
-                    $trailingContent = $phpcsFile->findNext(T_WHITESPACE, ($trailingContent + 1), null, true);
+                    $trailingContent = $phpcsFile->findNext(
+                        T_WHITESPACE,
+                        ($trailingContent + 1),
+                        null,
+                        true
+                    );
                 }
             }
         }
@@ -126,7 +167,9 @@ class Squiz_Sniffs_WhiteSpace_ControlStructureSpacingSniff implements PHP_CodeSn
             // blank line after this control structure.
             if (isset($tokens[$trailingContent]['scope_condition']) === true) {
                 $condition = $tokens[$trailingContent]['scope_condition'];
-                if ($tokens[$condition]['code'] === T_CASE || $tokens[$condition]['code'] === T_DEFAULT) {
+                if ($tokens[$condition]['code'] === T_CASE
+                    || $tokens[$condition]['code'] === T_DEFAULT
+                ) {
                     return;
                 }
             }

@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: PostStatementCommentSniff.php 287976 2009-09-03 04:52:57Z squiz $
+ * @version   CVS: $Id: PostStatementCommentSniff.php 291580 2009-12-02 03:40:18Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -25,7 +25,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Commenting_PostStatementCommentSniff implements PHP_CodeSniffer_Sniff
@@ -83,7 +83,9 @@ class Squiz_Sniffs_Commenting_PostStatementCommentSniff implements PHP_CodeSniff
         }
 
         // Special case for JS files.
-        if ($tokens[$lastContent]['code'] === T_COMMA) {
+        if ($tokens[$lastContent]['code'] === T_COMMA
+            || $tokens[$lastContent]['code'] === T_SEMICOLON
+        ) {
             $lastContent = $phpcsFile->findPrevious(T_WHITESPACE, ($lastContent - 1), null, true);
             if ($tokens[$lastContent]['code'] === T_CLOSE_CURLY_BRACKET) {
                 return;

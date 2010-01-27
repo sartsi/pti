@@ -9,7 +9,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: DisallowSelfActionsSniff.php 265572 2008-08-28 03:43:37Z squiz $
+ * @version   CVS: $Id: DisallowSelfActionsSniff.php 292108 2009-12-14 04:00:29Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -21,7 +21,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class MySource_Sniffs_Channels_DisallowSelfActionsSniff implements PHP_CodeSniffer_Sniff
@@ -52,6 +52,12 @@ class MySource_Sniffs_Channels_DisallowSelfActionsSniff implements PHP_CodeSniff
     public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
     {
         $tokens = $phpcsFile->getTokens();
+
+        // We are not interested in abstract classes.
+        $prev = $phpcsFile->findPrevious(T_WHITESPACE, ($stackPtr - 1), null, true);
+        if ($prev !== false && $tokens[$prev]['code'] === T_ABSTRACT) {
+            return;
+        }
 
         // We are only interested in Action classes.
         $classNameToken = $phpcsFile->findNext(T_WHITESPACE, ($stackPtr + 1), null, true);

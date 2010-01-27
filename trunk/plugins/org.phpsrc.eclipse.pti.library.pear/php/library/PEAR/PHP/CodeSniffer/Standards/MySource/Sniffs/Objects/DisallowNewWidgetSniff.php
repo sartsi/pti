@@ -21,7 +21,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class MySource_Sniffs_Objects_DisallowNewWidgetSniff implements PHP_CodeSniffer_Sniff

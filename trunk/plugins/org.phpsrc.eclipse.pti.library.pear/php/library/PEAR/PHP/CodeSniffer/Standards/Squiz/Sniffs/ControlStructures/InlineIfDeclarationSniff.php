@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: InlineIfDeclarationSniff.php 244212 2007-10-15 04:46:21Z squiz $
+ * @version   CVS: $Id: InlineIfDeclarationSniff.php 292097 2009-12-14 00:35:17Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -25,7 +25,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_ControlStructures_InlineIfDeclarationSniff implements PHP_CodeSniffer_Sniff
@@ -59,7 +59,9 @@ class Squiz_Sniffs_ControlStructures_InlineIfDeclarationSniff implements PHP_Cod
 
         // Find the opening bracket of the inline IF.
         for ($i = ($stackPtr - 1); $i > 0; $i--) {
-            if (isset($tokens[$i]['parenthesis_opener']) === true && $tokens[$i]['parenthesis_opener'] < $i) {
+            if (isset($tokens[$i]['parenthesis_opener']) === true
+                && $tokens[$i]['parenthesis_opener'] < $i
+            ) {
                 $i = $tokens[$i]['parenthesis_opener'];
                 continue;
             }
@@ -70,12 +72,12 @@ class Squiz_Sniffs_ControlStructures_InlineIfDeclarationSniff implements PHP_Cod
         }
 
         if ($i <= 0) {
-            // Could not find the begining of the statement, so we can't
-            // find the end either.
-            return;
+            // Could not find the begining of the statement. Probably not
+            // wrapped with brackets, so assume it ends with a semicolon.
+            $statementEnd = $phpcsFile->findNext(T_SEMICOLON, ($stackPtr + 1));
+        } else {
+            $statementEnd = $tokens[$i]['parenthesis_closer'];
         }
-
-        $statementEnd = $tokens[$i]['parenthesis_closer'];
 
         // Make sure it's all on the same line.
         if ($tokens[$statementEnd]['line'] !== $tokens[$stackPtr]['line']) {

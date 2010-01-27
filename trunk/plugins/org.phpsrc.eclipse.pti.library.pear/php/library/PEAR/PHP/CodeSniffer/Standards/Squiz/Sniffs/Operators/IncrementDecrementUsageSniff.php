@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: IncrementDecrementUsageSniff.php 279955 2009-05-05 06:28:10Z squiz $
+ * @version   CVS: $Id: IncrementDecrementUsageSniff.php 291842 2009-12-07 23:03:37Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -26,7 +26,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Operators_IncrementDecrementUsageSniff implements PHP_CodeSniffer_Sniff
@@ -132,9 +132,9 @@ class Squiz_Sniffs_Operators_IncrementDecrementUsageSniff implements PHP_CodeSni
     {
         $tokens = $phpcsFile->getTokens();
 
-        $assignedVar = $phpcsFile->findPrevious(array(T_VARIABLE), ($stackPtr - 1), null, false);
+        $assignedVar = $phpcsFile->findPrevious(T_WHITESPACE, ($stackPtr - 1), null, true);
         // Not an assignment, return.
-        if ($assignedVar === false) {
+        if ($tokens[$assignedVar]['code'] !== T_VARIABLE) {
             return;
         }
 
@@ -194,7 +194,7 @@ class Squiz_Sniffs_Operators_IncrementDecrementUsageSniff implements PHP_CodeSni
             if ($tokens[$stackPtr]['code'] === T_EQUAL) {
                 $opToken = $phpcsFile->findNext(array(T_PLUS, T_MINUS), ($nextVar + 1), $statementEnd);
                 if ($opToken === false) {
-                    // Operator was before the varaible, like:
+                    // Operator was before the variable, like:
                     // $var = 1 + $var;
                     // So we ignore it.
                     return;

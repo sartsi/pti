@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: LowerCaseConstantSniff.php 253114 2008-02-18 00:01:06Z squiz $
+ * @version   CVS: $Id: LowerCaseConstantSniff.php 291908 2009-12-09 03:56:09Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -25,7 +25,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Generic_Sniffs_PHP_LowerCaseConstantSniff implements PHP_CodeSniffer_Sniff
@@ -73,7 +73,7 @@ class Generic_Sniffs_PHP_LowerCaseConstantSniff implements PHP_CodeSniffer_Sniff
         $keyword = $tokens[$stackPtr]['content'];
         if (strtolower($keyword) !== $keyword) {
             $error = 'TRUE, FALSE and NULL must be lowercase; expected "'.strtolower($keyword).'" but found "'.$keyword.'"';
-            $phpcsFile->addError($error, $stackPtr);
+            $phpcsFile->addError($error, $stackPtr, 'NotLowerCase');
         }
 
     }//end process()

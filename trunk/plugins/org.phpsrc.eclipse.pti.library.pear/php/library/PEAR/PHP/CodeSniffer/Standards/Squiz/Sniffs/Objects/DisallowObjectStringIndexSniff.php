@@ -9,7 +9,7 @@
  * @author    Sertan Danis <sdanis@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: DisallowObjectStringIndexSniff.php 270511 2008-12-03 23:39:56Z squiz $
+ * @version   CVS: $Id: DisallowObjectStringIndexSniff.php 291906 2009-12-09 02:19:39Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -21,7 +21,7 @@
  * @author    Sertan Danis <sdanis@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Objects_DisallowObjectStringIndexSniff implements PHP_CodeSniffer_Sniff
@@ -60,15 +60,27 @@ class Squiz_Sniffs_Objects_DisallowObjectStringIndexSniff implements PHP_CodeSni
     {
         $tokens = $phpcsFile->getTokens();
 
-        // Check if the next non white space token is a string.
-        $next = $phpcsFile->findNext(T_WHITESPACE, ($stackPtr + 1), null, true);
-        if ($tokens[$next]['code'] !== T_CONSTANT_ENCAPSED_STRING) {
+        // Check if the next non whitespace token is a string.
+        $index = $phpcsFile->findNext(T_WHITESPACE, ($stackPtr + 1), null, true);
+        if ($tokens[$index]['code'] !== T_CONSTANT_ENCAPSED_STRING) {
             return;
         }
 
         // Make sure it is the only thing in the square brackets.
-        $next = $phpcsFile->findNext(T_WHITESPACE, ($next + 1), null, true);
+        $next = $phpcsFile->findNext(T_WHITESPACE, ($index + 1), null, true);
         if ($tokens[$next]['code'] !== T_CLOSE_SQUARE_BRACKET) {
+            return;
+        }
+
+        // Allow indxes that have dots in them because we can't write
+        // them in dot notation.
+        $content = trim($tokens[$index]['content'], '"\' ');
+        if (strpos($content, '.') !== false) {
+            return;
+        }
+
+        // Also ignore reserved words.
+        if ($content === 'super') {
             return;
         }
 

@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ScopeKeywordSpacingSniff.php 244265 2007-10-16 01:29:10Z squiz $
+ * @version   CVS: $Id: ScopeKeywordSpacingSniff.php 293361 2010-01-10 22:08:39Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -25,7 +25,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_WhiteSpace_ScopeKeywordSpacingSniff implements PHP_CodeSniffer_Sniff
@@ -60,7 +60,18 @@ class Squiz_Sniffs_WhiteSpace_ScopeKeywordSpacingSniff implements PHP_CodeSniffe
         $tokens = $phpcsFile->getTokens();
 
         $nextToken = $tokens[($stackPtr + 1)];
-        if ($nextToken['code'] !== T_WHITESPACE || strlen($nextToken['content']) !== 1 || $nextToken['content'] === $phpcsFile->eolChar) {
+
+        if ($tokens[$stackPtr]['code'] === T_STATIC
+            && $nextToken['code'] === T_DOUBLE_COLON
+        ) {
+            // Late static binding, e.g., static:: usage.
+            return;
+        }
+
+        if ($nextToken['code'] !== T_WHITESPACE
+            || strlen($nextToken['content']) !== 1
+            || $nextToken['content'] === $phpcsFile->eolChar
+        ) {
             $error = 'Scope keyword "'.$tokens[$stackPtr]['content'].'" must be followed by a single space';
             $phpcsFile->addError($error, $stackPtr);
         }

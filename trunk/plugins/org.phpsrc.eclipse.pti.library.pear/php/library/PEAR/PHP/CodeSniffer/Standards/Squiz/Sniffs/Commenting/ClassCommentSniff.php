@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ClassCommentSniff.php 245547 2007-11-04 22:29:53Z squiz $
+ * @version   CVS: $Id: ClassCommentSniff.php 292513 2009-12-23 00:41:20Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -38,7 +38,7 @@ if (class_exists('PHP_CodeSniffer_CommentParser_ClassCommentParser', true) === f
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Commenting_ClassCommentSniff implements PHP_CodeSniffer_Sniff
@@ -131,11 +131,11 @@ class Squiz_Sniffs_Commenting_ClassCommentSniff implements PHP_CodeSniffer_Sniff
             }//end if
         }//end if
 
-        $comment = $phpcsFile->getTokensAsString($commentStart, ($commentEnd - $commentStart + 1));
+        $commentString = $phpcsFile->getTokensAsString($commentStart, ($commentEnd - $commentStart + 1));
 
         // Parse the class comment docblock.
         try {
-            $this->commentParser = new PHP_CodeSniffer_CommentParser_ClassCommentParser($comment, $phpcsFile);
+            $this->commentParser = new PHP_CodeSniffer_CommentParser_ClassCommentParser($commentString, $phpcsFile);
             $this->commentParser->parse();
         } catch (PHP_CodeSniffer_CommentParser_ParserException $e) {
             $line = ($e->getLineWithinComment() + $commentStart);
@@ -148,6 +148,14 @@ class Squiz_Sniffs_Commenting_ClassCommentSniff implements PHP_CodeSniffer_Sniff
             $error = 'Class doc comment is empty';
             $phpcsFile->addError($error, $commentStart);
             return;
+        }
+
+        // The first line of the comment should just be the /** code.
+        $eolPos    = strpos($commentString, $phpcsFile->eolChar);
+        $firstLine = substr($commentString, 0, $eolPos);
+        if ($firstLine !== '/**') {
+            $error = 'The open comment tag must be the only content on the line';
+            $phpcsFile->addError($error, $commentStart);
         }
 
         // Check for a comment description.

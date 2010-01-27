@@ -1,6 +1,6 @@
 <?php
 /**
- * Squiz_Sniffs_CSS_ColonSpacingSniff.
+ * Squiz_Sniffs_CSS_ClassDefinitionClosingBraceSpaceSniff.
  *
  * PHP version 5
  *
@@ -9,7 +9,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ClassDefinitionClosingBraceSpaceSniff.php 268066 2008-10-31 05:36:54Z squiz $
+ * @version   CVS: $Id: ClassDefinitionClosingBraceSpaceSniff.php 290961 2009-11-18 23:22:48Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -23,7 +23,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_CSS_ClassDefinitionClosingBraceSpaceSniff implements PHP_CodeSniffer_Sniff

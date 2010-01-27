@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: CommentedOutCodeSniff.php 268065 2008-10-31 04:53:56Z squiz $
+ * @version   CVS: $Id: CommentedOutCodeSniff.php 292392 2009-12-21 00:47:28Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -25,7 +25,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_PHP_CommentedOutCodeSniff implements PHP_CodeSniffer_Sniff
@@ -133,6 +133,10 @@ class Squiz_Sniffs_PHP_CommentedOutCodeSniff implements PHP_CodeSniffer_Sniff
         if ($phpcsFile->tokenizerType === 'PHP') {
             $content .= ' ?>';
         }
+
+        // Quite a few comments use multiple dashes, equals signs etc
+        // to frame comments and licence headers.
+        $content = preg_replace('/[-=*]+/', '-', $content);
 
         $stringTokens = PHP_CodeSniffer_File::tokenizeString($content, $phpcsFile->tokenizer, $phpcsFile->eolChar);
 

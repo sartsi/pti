@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: AbstractParser.php 289389 2009-10-09 01:10:11Z squiz $
+ * @version   CVS: $Id: AbstractParser.php 293524 2010-01-13 22:38:47Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -64,7 +64,7 @@ if (class_exists('PHP_CodeSniffer_CommentParser_ParserException', true) === fals
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 abstract class PHP_CodeSniffer_CommentParser_AbstractParser
@@ -240,7 +240,7 @@ abstract class PHP_CodeSniffer_CommentParser_AbstractParser
                 );
 
                 $this->words = array_merge($this->words, $words);
-            }
+            }//end if
         }//end foreach
 
         $this->_parseWords();
@@ -266,13 +266,11 @@ abstract class PHP_CodeSniffer_CommentParser_AbstractParser
         $wordWasEmpty    = true;
 
         foreach ($this->words as $wordPos => $word) {
-
             if (trim($word) !== '') {
                 $wordWasEmpty = false;
             }
 
             if ($word{0} === '@') {
-
                 $tag = substr($word, 1);
 
                 // Filter out @ tags in the comment description.
@@ -330,9 +328,7 @@ abstract class PHP_CodeSniffer_CommentParser_AbstractParser
                                             'line' => $this->getLine($wordPos),
                                            );
                     }
-
                 }//end if
-
             }//end if
         }//end foreach
 

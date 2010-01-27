@@ -9,7 +9,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: CLI.php 287726 2009-08-26 05:13:12Z squiz $
+ * @version   CVS: $Id: CLI.php 293524 2010-01-13 22:38:47Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -27,11 +27,18 @@ if (is_file(dirname(__FILE__).'/../CodeSniffer.php') === true) {
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PHP_CodeSniffer_CLI
 {
+
+    /**
+     * An array of values specified on the command line.
+     *
+     * @var array
+     */
+    protected $values = array();
 
 
     /**
@@ -66,6 +73,7 @@ class PHP_CodeSniffer_CLI
         $defaults['files']       = array();
         $defaults['standard']    = null;
         $defaults['verbosity']   = 0;
+        $defaults['interactive'] = false;
         $defaults['local']       = false;
         $defaults['showSources'] = false;
         $defaults['extensions']  = array();
@@ -112,6 +120,10 @@ class PHP_CodeSniffer_CLI
      */
     public function getCommandLineValues()
     {
+        if (empty($this->values) === false) {
+            return $this->values;
+        }
+
         $values = $this->getDefaults();
 
         for ($i = 1; $i < $_SERVER['argc']; $i++) {
@@ -137,9 +149,10 @@ class PHP_CodeSniffer_CLI
                 }
             } else {
                 $values = $this->processUnknownArgument($arg, $i, $values);
-            }
+            }//end if
         }//end for
 
+        $this->values = $values;
         return $values;
 
     }//end getCommandLineValues()
@@ -176,6 +189,9 @@ class PHP_CodeSniffer_CLI
         case 's' :
             $values['showSources'] = true;
             break;
+        case 'a' :
+            $values['interactive'] = true;
+            break;
         case 'n' :
             $values['showWarnings'] = false;
             break;
@@ -209,7 +225,7 @@ class PHP_CodeSniffer_CLI
             exit(0);
             break;
         case 'version':
-            echo 'PHP_CodeSniffer version 1.2.1 (stable) ';
+            echo 'PHP_CodeSniffer version 1.2.2 (stable) ';
             echo 'by Squiz Pty Ltd. (http://www.squiz.net)'.PHP_EOL;
             exit(0);
             break;
@@ -285,7 +301,7 @@ class PHP_CodeSniffer_CLI
             } else if (substr($arg, 0, 7) === 'ignore=') {
                 // Split the ignore string on commas, unless the comma is escaped
                 // using 1 or 3 slashes (\, or \\\,).
-                $values['ignored']= preg_split(
+                $values['ignored'] = preg_split(
                     '/(?<=(?<!\\\\)\\\\\\\\),|(?<!\\\\),/',
                     substr($arg, 7)
                 );
@@ -381,7 +397,11 @@ class PHP_CodeSniffer_CLI
             exit(2);
         }
 
-        $phpcs = new PHP_CodeSniffer($values['verbosity'], $values['tabWidth']);
+        $phpcs = new PHP_CodeSniffer(
+            $values['verbosity'],
+            $values['tabWidth'],
+            $values['interactive']
+        );
 
         // Set file extensions if they were specified. Otherwise,
         // let PHP_CodeSniffer decide on the defaults.
@@ -394,6 +414,7 @@ class PHP_CodeSniffer_CLI
             $phpcs->setIgnorePatterns($values['ignored']);
         }
 
+        $phpcs->setCli($this);
         $phpcs->process(
             $values['files'],
             $values['standard'],
@@ -428,69 +449,24 @@ class PHP_CodeSniffer_CLI
      * @return int The number of error and warning messages shown.
      */
     public function printErrorReport(
-        $phpcs,
+        PHP_CodeSniffer $phpcs,
         $report,
         $showWarnings,
         $showSources,
-        $reportFile='',
-        $reportWidth=80
+        $reportFile,
+        $reportWidth
     ) {
-        if ($reportFile !== '') {
-            ob_start();
-        }
+        $filesViolations = $phpcs->getFilesErrors();
 
-        switch ($report) {
-        case 'xml':
-            $numErrors = $phpcs->printXMLErrorReport($showWarnings);
-            break;
-        case 'checkstyle':
-            $numErrors = $phpcs->printCheckstyleErrorReport($showWarnings);
-            break;
-        case 'csv':
-            $numErrors = $phpcs->printCSVErrorReport($showWarnings);
-            break;
-        case 'emacs':
-            $numErrors = $phpcs->printEmacsErrorReport($showWarnings);
-            break;
-        case 'summary':
-            $numErrors = $phpcs->printErrorReportSummary(
-                $showWarnings,
-                $showSources,
-                $reportWidth
-            );
-            break;
-        case 'source':
-            $numErrors = $phpcs->printSourceReport(
-                $showWarnings,
-                $showSources,
-                $reportWidth
-            );
-            break;
-        case 'svnblame':
-            $numErrors = $phpcs->printSvnBlameReport(
-                $showWarnings,
-                $showSources,
-                $reportWidth
-            );
-            break;
-        default:
-            $numErrors = $phpcs->printErrorReport(
-                $showWarnings,
-                $showSources,
-                $reportWidth
-            );
-            break;
-        }
-
-        if ($reportFile !== '') {
-            $report = ob_get_contents();
-            ob_end_flush();
-
-            $report = trim($report);
-            file_put_contents($reportFile, "$report\n");
-        }
-
-        return $numErrors;
+        $reporting = new PHP_CodeSniffer_Reporting();
+        return $reporting->printReport(
+            $report,
+            $filesViolations,
+            $showWarnings,
+            $showSources,
+            $reportFile,
+            $reportWidth
+        );
 
     }//end printErrorReport()
 
@@ -539,7 +515,7 @@ class PHP_CodeSniffer_CLI
      */
     public function printUsage()
     {
-        echo 'Usage: phpcs [-nwlsvi] [--extensions=<extensions>] [--ignore=<patterns>]'.PHP_EOL;
+        echo 'Usage: phpcs [-nwlsavi] [--extensions=<extensions>] [--ignore=<patterns>]'.PHP_EOL;
         echo '    [--report=<report>] [--report-width=<reportWidth>] [--report-file=<reportfile>]'.PHP_EOL;
         echo '    [--config-set key value] [--config-delete key] [--config-show]'.PHP_EOL;
         echo '    [--standard=<standard>] [--sniffs=<sniffs>]'.PHP_EOL;
@@ -548,6 +524,7 @@ class PHP_CodeSniffer_CLI
         echo '        -w            Print both warnings and errors (on by default)'.PHP_EOL;
         echo '        -l            Local directory only, no recursion'.PHP_EOL;
         echo '        -s            Show sniff codes in all reports'.PHP_EOL;
+        echo '        -a            Run interactively'.PHP_EOL;
         echo '        -v[v][v]      Print verbose output'.PHP_EOL;
         echo '        -i            Show a list of installed coding standards'.PHP_EOL;
         echo '        --help        Print this help message'.PHP_EOL;

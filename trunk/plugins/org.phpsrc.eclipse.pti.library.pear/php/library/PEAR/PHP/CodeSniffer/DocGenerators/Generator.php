@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: Generator.php 270281 2008-12-02 02:38:34Z squiz $
+ * @version   CVS: $Id: Generator.php 293524 2010-01-13 22:38:47Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -26,7 +26,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PHP_CodeSniffer_DocGenerators_Generator
@@ -139,6 +139,7 @@ class PHP_CodeSniffer_DocGenerators_Generator
         } else {
             $standardDir
                 = realpath(dirname(__FILE__).'/../Standards/'.$this->_standard);
+
             $standard = $this->_standard;
         }
 
@@ -156,7 +157,7 @@ class PHP_CodeSniffer_DocGenerators_Generator
                 }
             }
 
-            $standardFile= str_replace(
+            $standardFile = str_replace(
                 DIRECTORY_SEPARATOR.'Sniffs'.DIRECTORY_SEPARATOR,
                 DIRECTORY_SEPARATOR.'Docs'.DIRECTORY_SEPARATOR,
                 $sniff
@@ -166,7 +167,7 @@ class PHP_CodeSniffer_DocGenerators_Generator
             if (is_file($standardFile) === true) {
                 $standardFiles[] = $standardFile;
             }
-        }
+        }//end foreach
 
         return $standardFiles;
 

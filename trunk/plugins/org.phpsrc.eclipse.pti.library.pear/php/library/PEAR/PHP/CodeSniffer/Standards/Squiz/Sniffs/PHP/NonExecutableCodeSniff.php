@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: NonExecutableCodeSniff.php 289552 2009-10-11 23:23:51Z squiz $
+ * @version   CVS: $Id: NonExecutableCodeSniff.php 293565 2010-01-15 01:18:35Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -26,7 +26,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_PHP_NonExecutableCodeSniff implements PHP_CodeSniffer_Sniff
@@ -63,6 +63,24 @@ class Squiz_Sniffs_PHP_NonExecutableCodeSniff implements PHP_CodeSniffer_Sniff
     {
         $tokens = $phpcsFile->getTokens();
 
+        if ($tokens[$stackPtr]['code'] === T_RETURN) {
+            $next = $phpcsFile->findNext(T_WHITESPACE, ($stackPtr + 1), null, true);
+            if ($tokens[$next]['code'] === T_SEMICOLON) {
+                $next = $phpcsFile->findNext(T_WHITESPACE, ($next + 1), null, true);
+                if ($tokens[$next]['code'] === T_CLOSE_CURLY_BRACKET) {
+                    // If this is the closing brace of a function
+                    // then this return statement doesn't return anything
+                    // and is not required anyway.
+                    $owner = $tokens[$next]['scope_condition'];
+                    if ($tokens[$owner]['code'] === T_FUNCTION) {
+                        $warning = 'Empty return statement not required here';
+                        $phpcsFile->addWarning($warning, $stackPtr, 'ReturnNotRequired');
+                        return;
+                    }
+                }
+            }
+        }
+
         if ($tokens[$stackPtr]['code'] === T_BREAK
             && isset($tokens[$stackPtr]['scope_opener']) === true
         ) {
@@ -85,7 +103,7 @@ class Squiz_Sniffs_PHP_NonExecutableCodeSniff implements PHP_CodeSniffer_Sniff
                     if ($line > $lastLine) {
                         $type    = substr($tokens[$stackPtr]['type'], 2);
                         $warning = "Code after $type statement cannot be executed";
-                        $phpcsFile->addWarning($warning, $i);
+                        $phpcsFile->addWarning($warning, $i, 'Unreachable');
                         $lastLine = $line;
                     }
                 }
@@ -212,7 +230,7 @@ class Squiz_Sniffs_PHP_NonExecutableCodeSniff implements PHP_CodeSniffer_Sniff
             if ($line > $lastLine) {
                 $type    = substr($tokens[$stackPtr]['type'], 2);
                 $warning = "Code after $type statement cannot be executed";
-                $phpcsFile->addWarning($warning, $i);
+                $phpcsFile->addWarning($warning, $i, 'Unreachable');
                 $lastLine = $line;
             }
         }

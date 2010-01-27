@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: FunctionCommentSniff.php 290854 2009-11-17 03:28:02Z squiz $
+ * @version   CVS: $Id: FunctionCommentSniff.php 292513 2009-12-23 00:41:20Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -45,7 +45,7 @@ if (class_exists('PHP_CodeSniffer_CommentParser_FunctionCommentParser', true) ==
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_Sniff
@@ -174,11 +174,11 @@ class Squiz_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_Sn
 
         // Find the first doc comment.
         $commentStart      = ($phpcsFile->findPrevious(T_DOC_COMMENT, ($commentEnd - 1), null, true) + 1);
-        $comment           = $phpcsFile->getTokensAsString($commentStart, ($commentEnd - $commentStart + 1));
+        $commentString     = $phpcsFile->getTokensAsString($commentStart, ($commentEnd - $commentStart + 1));
         $this->_methodName = $phpcsFile->getDeclarationName($stackPtr);
 
         try {
-            $this->commentParser = new PHP_CodeSniffer_CommentParser_FunctionCommentParser($comment, $phpcsFile);
+            $this->commentParser = new PHP_CodeSniffer_CommentParser_FunctionCommentParser($commentString, $phpcsFile);
             $this->commentParser->parse();
         } catch (PHP_CodeSniffer_CommentParser_ParserException $e) {
             $line = ($e->getLineWithinComment() + $commentStart);
@@ -191,6 +191,14 @@ class Squiz_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_Sn
             $error = 'Function doc comment is empty';
             $phpcsFile->addError($error, $commentStart);
             return;
+        }
+
+        // The first line of the comment should just be the /** code.
+        $eolPos    = strpos($commentString, $phpcsFile->eolChar);
+        $firstLine = substr($commentString, 0, $eolPos);
+        if ($firstLine !== '/**') {
+            $error = 'The open comment tag must be the only content on the line';
+            $phpcsFile->addError($error, $commentStart);
         }
 
         $this->processParams($commentStart, $commentEnd);

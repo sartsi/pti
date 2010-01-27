@@ -9,7 +9,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: GetRequestDataSniff.php 276662 2009-03-02 05:25:04Z squiz $
+ * @version   CVS: $Id: GetRequestDataSniff.php 292098 2009-12-14 00:36:04Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -21,7 +21,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class MySource_Sniffs_PHP_GetRequestDataSniff implements PHP_CodeSniffer_Sniff
@@ -57,6 +57,7 @@ class MySource_Sniffs_PHP_GetRequestDataSniff implements PHP_CodeSniffer_Sniff
         if ($varName !== '$_REQUEST'
             && $varName !== '$_GET'
             && $varName !== '$_POST'
+            && $varName !== '$_FILES'
         ) {
             return;
         }

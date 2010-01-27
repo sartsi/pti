@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ValidFunctionNameSniff.php 240383 2007-07-27 05:38:59Z squiz $
+ * @version   CVS: $Id: ValidFunctionNameSniff.php 291629 2009-12-03 03:32:46Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -30,7 +30,7 @@ if (class_exists('PEAR_Sniffs_NamingConventions_ValidFunctionNameSniff', true) =
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_NamingConventions_ValidFunctionNameSniff extends PEAR_Sniffs_NamingConventions_ValidFunctionNameSniff
@@ -49,6 +49,9 @@ class Squiz_Sniffs_NamingConventions_ValidFunctionNameSniff extends PEAR_Sniffs_
     protected function processTokenOutsideScope(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
     {
         $functionName = $phpcsFile->getDeclarationName($stackPtr);
+        if ($functionName === null) {
+            return;
+        }
 
         // Does this function claim to be magical?
         if (preg_match('|^__|', $functionName) !== 0) {

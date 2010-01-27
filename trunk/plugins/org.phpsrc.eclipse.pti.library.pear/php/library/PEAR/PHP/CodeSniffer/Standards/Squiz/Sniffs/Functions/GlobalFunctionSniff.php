@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: GlobalFunctionSniff.php 261303 2008-06-18 04:49:50Z squiz $
+ * @version   CVS: $Id: GlobalFunctionSniff.php 291629 2009-12-03 03:32:46Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -25,7 +25,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Functions_GlobalFunctionSniff implements PHP_CodeSniffer_Sniff
@@ -59,6 +59,10 @@ class Squiz_Sniffs_Functions_GlobalFunctionSniff implements PHP_CodeSniffer_Snif
 
         if (empty($tokens[$stackPtr]['conditions']) === true) {
             $functionName = $phpcsFile->getDeclarationName($stackPtr);
+            if ($functionName === null) {
+                return;
+            }
+
             // Special exception for __autoload as it needs to be global.
             if ($functionName !== '__autoload') {
                 $error = "Consider putting global function \"$functionName\" in a static class";

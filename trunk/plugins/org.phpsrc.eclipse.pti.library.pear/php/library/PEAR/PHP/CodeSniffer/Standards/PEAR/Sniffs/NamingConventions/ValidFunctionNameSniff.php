@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ValidFunctionNameSniff.php 283545 2009-07-06 03:16:27Z squiz $
+ * @version   CVS: $Id: ValidFunctionNameSniff.php 292390 2009-12-21 00:32:14Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -30,7 +30,7 @@ if (class_exists('PHP_CodeSniffer_Standards_AbstractScopeSniff', true) === false
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class PEAR_Sniffs_NamingConventions_ValidFunctionNameSniff extends PHP_CodeSniffer_Standards_AbstractScopeSniff
@@ -87,8 +87,13 @@ class PEAR_Sniffs_NamingConventions_ValidFunctionNameSniff extends PHP_CodeSniff
      */
     protected function processTokenWithinScope(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $currScope)
     {
-        $className  = $phpcsFile->getDeclarationName($currScope);
         $methodName = $phpcsFile->getDeclarationName($stackPtr);
+        if ($methodName === null) {
+            // Ignore closures.
+            return;
+        }
+
+        $className  = $phpcsFile->getDeclarationName($currScope);
 
         // Is this a magic method. IE. is prefixed with "__".
         if (preg_match('|^__|', $methodName) !== 0) {
@@ -166,6 +171,10 @@ class PEAR_Sniffs_NamingConventions_ValidFunctionNameSniff extends PHP_CodeSniff
     protected function processTokenOutsideScope(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
     {
         $functionName = $phpcsFile->getDeclarationName($stackPtr);
+        if ($functionName === null) {
+            // Ignore closures.
+            return;
+        }
 
         // Is this a magic function. IE. is prefixed with "__".
         if (preg_match('|^__|', $functionName) !== 0) {

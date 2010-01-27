@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: LongConditionClosingCommentSniff.php 265574 2008-08-28 04:04:02Z squiz $
+ * @version   CVS: $Id: LongConditionClosingCommentSniff.php 293754 2010-01-20 00:58:37Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -23,7 +23,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Commenting_LongConditionClosingCommentSniff implements PHP_CodeSniffer_Sniff
@@ -50,6 +50,7 @@ class Squiz_Sniffs_Commenting_LongConditionClosingCommentSniff implements PHP_Co
                                 T_FOR,
                                 T_FOREACH,
                                 T_WHILE,
+                                T_TRY,
                                );
 
     /**
@@ -130,17 +131,31 @@ class Squiz_Sniffs_Commenting_LongConditionClosingCommentSniff implements PHP_Co
             } while (isset($tokens[$nextToken]['scope_closer']) === true);
         }//end if
 
-        $lineDifference = ($endBrace['line'] - $startBrace['line']);
-        if ($lineDifference < $this->lineLimit) {
-            return;
+        if ($startCondition['code'] === T_TRY) {
+            // TRY statements need to check until the end of all CATCH statements.
+            do {
+                $nextToken = $phpcsFile->findNext(T_WHITESPACE, ($stackPtr + 1), null, true);
+                if ($tokens[$nextToken]['code'] === T_CATCH) {
+                    // The end brace becomes the CATCH's end brace.
+                    $stackPtr = $tokens[$nextToken]['scope_closer'];
+                    $endBrace = $tokens[$stackPtr];
+                } else {
+                    break;
+                }
+            } while (isset($tokens[$nextToken]['scope_closer']) === true);
         }
 
-        $expected = '//end '.$startCondition['content'];
+        $lineDifference = ($endBrace['line'] - $startBrace['line']);
 
-        $comment = $phpcsFile->findNext(array(T_COMMENT), $stackPtr, null, false);
+        $expected = '//end '.$startCondition['content'];
+        $comment  = $phpcsFile->findNext(array(T_COMMENT), $stackPtr, null, false);
+
         if (($comment === false) || ($tokens[$comment]['line'] !== $endBrace['line'])) {
-            $error = "End comment for long condition not found; expected \"$expected\"";
-            $phpcsFile->addError($error, $stackPtr);
+            if ($lineDifference >= $this->lineLimit) {
+                $error = "End comment for long condition not found; expected \"$expected\"";
+                $phpcsFile->addError($error, $stackPtr);
+            }
+
             return;
         }
 

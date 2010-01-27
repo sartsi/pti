@@ -10,7 +10,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: ClosingDeclarationCommentSniff.php 259960 2008-05-19 05:59:25Z squiz $
+ * @version   CVS: $Id: ClosingDeclarationCommentSniff.php 291629 2009-12-03 03:32:46Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -25,7 +25,7 @@
  * @author    Marc McIntyre <mmcintyre@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class Squiz_Sniffs_Commenting_ClosingDeclarationCommentSniff implements PHP_CodeSniffer_Sniff
@@ -67,6 +67,11 @@ class Squiz_Sniffs_Commenting_ClosingDeclarationCommentSniff implements PHP_Code
 
             // Abstract methods do not require a closing comment.
             if ($methodProps['is_abstract'] === true) {
+                return;
+            }
+
+            // Closures do not require a closing comment.
+            if ($methodProps['is_closure'] === true) {
                 return;
             }
 

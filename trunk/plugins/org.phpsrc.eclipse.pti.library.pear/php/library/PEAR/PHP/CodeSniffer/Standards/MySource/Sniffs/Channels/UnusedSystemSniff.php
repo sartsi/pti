@@ -9,7 +9,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   CVS: $Id: UnusedSystemSniff.php 252280 2008-02-05 00:35:03Z squiz $
+ * @version   CVS: $Id: UnusedSystemSniff.php 293522 2010-01-13 22:28:20Z squiz $
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 
@@ -21,7 +21,7 @@
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006 Squiz Pty Ltd (ABN 77 084 670 600)
  * @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licence
- * @version   Release: 1.2.1
+ * @version   Release: 1.2.2
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
 class MySource_Sniffs_Channels_UnusedSystemSniff implements PHP_CodeSniffer_Sniff
@@ -80,6 +80,23 @@ class MySource_Sniffs_Channels_UnusedSystemSniff implements PHP_CodeSniffer_Snif
         for ($i = ($stackPtr + 1); $i < $phpcsFile->numTokens; $i++) {
             if ($tokens[$i]['level'] < $level) {
                 // We have gone out of scope.
+                // If the original include was inside an IF statement that
+                // is checking if the system exists, check the outer scope
+                // as well.
+                if ($tokens[$stackPtr]['level'] === $level) {
+                    // We are still in the base level, so this is the first
+                    // time we have got here.
+                    $conditions = array_keys($tokens[$stackPtr]['conditions']);
+                    if (empty($conditions) === false) {
+                        $cond = array_pop($conditions);
+                        if ($tokens[$cond]['code'] === T_IF) {
+                            $i = $tokens[$cond]['scope_closer'];
+                            $level--;
+                            continue;
+                        }
+                    }
+                }
+
                 break;
             }
 
