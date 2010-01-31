@@ -67,9 +67,8 @@ public class PHPToolLauncher {
 
 	private final PHPexeItem phpExe;
 	private final IPath phpScript;
-	private final String commandLineArgs;
 	private final INIFileEntry[] iniEntries;
-
+	private String commandLineArgs;
 	private boolean printOutput = false;
 
 	public PHPToolLauncher(PHPexeItem phpExe, IPath phpScript) {
@@ -352,6 +351,10 @@ public class PHPToolLauncher {
 		configurationName = "pti_" + configurationName;
 
 		return DebugPlugin.getDefault().getLaunchManager().generateUniqueLaunchConfigurationNameFrom(configurationName);
+	}
+
+	public void setCommandLineArgs(String commandLineArgs) {
+		this.commandLineArgs = commandLineArgs;
 	}
 
 	public void setPrintOuput(boolean printOutput) {
