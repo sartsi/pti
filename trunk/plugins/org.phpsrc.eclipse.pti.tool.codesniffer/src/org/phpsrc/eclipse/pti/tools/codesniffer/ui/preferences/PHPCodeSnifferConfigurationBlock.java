@@ -70,6 +70,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 	private static final Key PREF_DEFAULT_STANDARD_NAME = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_NAME);
 	private static final Key PREF_DEFAULT_STANDARD_PATH = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH);
 	private static final Key PREF_DEFAULT_TAB_WITH = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH);
+	private static final Key PREF_FILE_EXTENSIONS = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_FILE_EXTENSIONS);
 	private static final Key PREF_IGNORE_PATTERN = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_IGNORE_PATTERN);
 	private static final Key PREF_IGNORE_SNIFFS = getCodeSnifferKey(PHPCodeSnifferPreferenceNames.PREF_IGNORE_SNIFFS);
 
@@ -80,6 +81,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 
 	private final ListDialogField<Standard> fStandardsList;
 	private final StringDialogField fTabWidth;
+	private final StringDialogField fFileExtension;
 	private final StringDialogField fIgnorePattern;
 	private final StringDialogField fIgnoreSniffs;
 
@@ -88,7 +90,6 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		public boolean custom;
 		public String path;
 
-		
 		public String toString() {
 			return name;
 		}
@@ -105,7 +106,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		 * @see
 		 * org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
 		 */
-		
+
 		public Image getImage(Object element) {
 			return null; // JavaPluginImages.get(JavaPluginImages.IMG_OBJS_REFACTORING_INFO);
 		}
@@ -116,7 +117,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		 * @see
 		 * org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 		 */
-		
+
 		public String getText(Object element) {
 			return getColumnText(element, 0);
 		}
@@ -248,6 +249,11 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 
 		unpackTabWidth();
 
+		fFileExtension = new StringDialogField();
+		fFileExtension.setLabelText("File Extensions:");
+
+		unpackFileExtensions();
+
 		fIgnorePattern = new StringDialogField();
 		fIgnorePattern.setLabelText("Patterns:");
 
@@ -265,7 +271,6 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 				PREF_DEFAULT_TAB_WITH, PREF_IGNORE_PATTERN, PREF_IGNORE_SNIFFS };
 	}
 
-	
 	protected Composite createToolContents(Composite parent) {
 		Composite standardsComposite = createStandardsTabContent(parent);
 		validateSettings(null, null, null);
@@ -312,6 +317,8 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		fTabWidth.doFillIntoGrid(tabWidthGroup, 3);
 		fTabWidth.getTextControl(null).addListener(SWT.Verify, new NumberOnlyVerifyListener());
 
+		createDialogFieldWithInfoText(folder, fFileExtension, "File Extensions", "Extensions are sperarated by a comma");
+
 		createDialogFieldWithInfoText(folder, fIgnorePattern, "Ignore Directories and Files",
 				"Patterns are separated by a comma (* = any string, ?= any character)");
 
@@ -348,7 +355,6 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		return fStandardsList.getIndexOfElement(standard) == 0;
 	}
 
-	
 	protected void validateSettings(Key changedKey, String oldValue, String newValue) {
 		// TODO Auto-generated method stub
 	}
@@ -403,7 +409,6 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		}
 	}
 
-	
 	protected boolean processChanges(IWorkbenchPreferenceContainer container) {
 		clearProjectLauncherCache(PHPCodeSniffer.QUALIFIED_NAME);
 
@@ -413,6 +418,7 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		} catch (Exception e) {
 		}
 		setValue(PREF_DEFAULT_TAB_WITH, "" + tabWidth);
+		setValue(PREF_FILE_EXTENSIONS, "" + fFileExtension.getText());
 		setValue(PREF_IGNORE_PATTERN, fIgnorePattern.getText());
 		setValue(PREF_IGNORE_SNIFFS, fIgnoreSniffs.getText());
 
@@ -427,13 +433,11 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		fStandardsList.enableButton(IDX_DEFAULT, false);
 	}
 
-	
 	public void useProjectSpecificSettings(boolean enable) {
 		super.useProjectSpecificSettings(enable);
 		fStandardsList.setEnabled(enable);
 	}
 
-	
 	protected String[] getFullBuildDialogStrings(boolean workspaceSettings) {
 		String title = "CodeSniffer Settings Changed";
 		String message;
@@ -449,17 +453,14 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		return getKey(PHPCodeSnifferPlugin.PLUGIN_ID, key);
 	}
 
-	
 	protected Key getPHPExecutableKey() {
 		return PREF_PHP_EXECUTABLE;
 	}
 
-	
 	protected Key getDebugPrintOutputKey() {
 		return PREF_DEBUG_PRINT_OUTPUT;
 	}
 
-	
 	protected Key getPEARLibraryKey() {
 		return PREF_PEAR_LIBRARY;
 	}
@@ -470,10 +471,11 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 	 * @seeorg.eclipse.jdt.internal.ui.preferences.OptionsConfigurationBlock#
 	 * updateControls()
 	 */
-	
+
 	protected void updateControls() {
 		unpackStandards();
 		unpackTabWidth();
+		unpackFileExtensions();
 		unpackIgnorePattern();
 		unpackIgnoreSniffs();
 	}
@@ -482,6 +484,12 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 		String tabWidth = getValue(PREF_DEFAULT_TAB_WITH);
 		if (tabWidth != null)
 			fTabWidth.setText(tabWidth);
+	}
+
+	private void unpackFileExtensions() {
+		String fileExtensions = getValue(PREF_FILE_EXTENSIONS);
+		if (fileExtensions != null)
+			fFileExtension.setText(fileExtensions);
 	}
 
 	private void unpackIgnorePattern() {

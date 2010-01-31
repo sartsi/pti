@@ -35,13 +35,16 @@ public class PHPCodeSnifferPreferences extends AbstractPEARPHPToolPreferences {
 	protected int tabWidth;
 	protected String ignorePattern;
 	protected String[] ignoreSniffs;
+	protected String[] fileExtensions;
 
 	public PHPCodeSnifferPreferences(String phpExecutable, boolean printOutput, String pearLibraryName,
-			String standard, String standardName, int tabWidth, String ignorePattern, String[] ignoreSniffs) {
+			String standard, String standardName, int tabWidth, String[] fileExtensions, String ignorePattern,
+			String[] ignoreSniffs) {
 		super(phpExecutable, printOutput, pearLibraryName);
 		this.standard = standard;
 		this.standardName = standardName;
 		this.tabWidth = tabWidth;
+		this.fileExtensions = fileExtensions;
 		if (ignorePattern != null && ignorePattern.length() > 0)
 			this.ignorePattern = ignorePattern;
 		else
@@ -59,6 +62,10 @@ public class PHPCodeSnifferPreferences extends AbstractPEARPHPToolPreferences {
 
 	public int getTabWidth() {
 		return tabWidth;
+	}
+
+	public String[] getFileExtensions() {
+		return fileExtensions;
 	}
 
 	public boolean isCustom() {

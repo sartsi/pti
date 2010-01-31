@@ -76,35 +76,49 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 
 	public IProblem[] parse(IFile file) throws CoreException, IOException {
 		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(file);
-		if (canParse(prefs.getIgnorePattern(), file))
+		if (canParse(prefs.getIgnorePattern(), prefs.getFileExtensions(), file))
 			return parseOutput(new PHPSourceFile(file), launchFile(file), prefs);
 		else
 			return new IProblem[0];
 	}
 
-	protected boolean canParse(String ignorePattern, IFile file) {
-		if (ignorePattern == null || ignorePattern.length() == 0)
-			return true;
+	protected boolean canParse(String ignorePattern, String[] fileExtensions, IFile file) {
+		boolean can = true;
 
-		String filePath = file.getFullPath().toPortableString();
+		if (fileExtensions != null && fileExtensions.length > 0) {
+			can = false;
 
-		String[] patterns = ignorePattern.split(",");
-		for (String pattern : patterns) {
-			pattern = pattern.trim();
-			if (pattern.length() > 0) {
-				pattern = pattern.replace("\\", "/").replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*").replaceAll(
-						"\\?", ".?");
-				Pattern p = Pattern.compile(pattern);
-				if (p.matcher(filePath).matches()) {
-					return false;
+			String fileName = file.getName();
+			for (String extension : fileExtensions) {
+				if (fileName.endsWith("." + extension)) {
+					can = true;
+					break;
+				}
+
+			}
+		}
+
+		if (can && ignorePattern != null && ignorePattern.length() > 0) {
+			String filePath = file.getFullPath().toPortableString();
+
+			String[] patterns = ignorePattern.split(",");
+			for (String pattern : patterns) {
+				pattern = pattern.trim();
+				if (pattern.length() > 0) {
+					pattern = pattern.replace("\\", "/").replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*").replaceAll(
+							"\\?", ".?");
+					Pattern p = Pattern.compile(pattern);
+					if (p.matcher(filePath).matches()) {
+						can = false;
+						break;
+					}
 				}
 			}
 		}
 
-		return true;
+		return can;
 	}
 
-	
 	protected IProblem[] parseOutput(ISourceFile file, String output) {
 		return parseOutput(file, output, PHPCodeSnifferPreferencesFactory.factory(file.getFile()));
 	}
@@ -181,7 +195,6 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 		return problems;
 	}
 
-	
 	protected PHPToolLauncher getPHPToolLauncher(IProject project) {
 		PHPToolLauncher launcher;
 		try {
