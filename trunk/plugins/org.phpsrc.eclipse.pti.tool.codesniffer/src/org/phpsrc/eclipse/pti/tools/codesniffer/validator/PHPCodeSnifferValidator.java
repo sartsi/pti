@@ -40,15 +40,35 @@ import org.eclipse.wst.validation.ValidationState;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.tools.codesniffer.ICodeSnifferConstants;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.PHPCodeSniffer;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferencesFactory;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPCodeSnifferValidator extends AbstractValidator {
 
-	
 	public ValidationResult validate(IResource resource, int kind, ValidationState state, IProgressMonitor monitor) {
 		// process only PHP files
-		if (resource.getType() != IResource.FILE || !(PHPToolkitUtil.isPhpFile((IFile) resource))) {
+		if (resource.getType() != IResource.FILE) {
 			return null;
+		}
+
+		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(resource);
+		String[] fileExtensions = prefs.getFileExtensions();
+		if ((fileExtensions == null || fileExtensions.length == 0)) {
+			if (!(PHPToolkitUtil.isPhpFile((IFile) resource)))
+				return null;
+		} else {
+			String fileName = resource.getName();
+			boolean allowed = false;
+			for (String ext : fileExtensions) {
+				if (fileName.endsWith("." + ext)) {
+					allowed = true;
+					break;
+				}
+			}
+
+			if (!allowed)
+				return null;
 		}
 
 		ValidationResult result = new ValidationResult();
