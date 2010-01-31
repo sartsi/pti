@@ -30,19 +30,16 @@ package org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences;
 import org.phpsrc.eclipse.pti.library.pear.core.preferences.AbstractPEARPHPToolPreferences;
 
 public class PHPCodeSnifferPreferences extends AbstractPEARPHPToolPreferences {
-	protected String standard;
-	protected String standardName;
+	protected String[] standards;
 	protected int tabWidth;
 	protected String ignorePattern;
 	protected String[] ignoreSniffs;
 	protected String[] fileExtensions;
 
 	public PHPCodeSnifferPreferences(String phpExecutable, boolean printOutput, String pearLibraryName,
-			String standard, String standardName, int tabWidth, String[] fileExtensions, String ignorePattern,
-			String[] ignoreSniffs) {
+			String[] standards, int tabWidth, String[] fileExtensions, String ignorePattern, String[] ignoreSniffs) {
 		super(phpExecutable, printOutput, pearLibraryName);
-		this.standard = standard;
-		this.standardName = standardName;
+		this.standards = standards;
 		this.tabWidth = tabWidth;
 		this.fileExtensions = fileExtensions;
 		if (ignorePattern != null && ignorePattern.length() > 0)
@@ -52,12 +49,8 @@ public class PHPCodeSnifferPreferences extends AbstractPEARPHPToolPreferences {
 		this.ignoreSniffs = ignoreSniffs;
 	}
 
-	public String getStandard() {
-		return standard;
-	}
-
-	public String getStandardName() {
-		return standardName;
+	public String[] getStandards() {
+		return standards;
 	}
 
 	public int getTabWidth() {
@@ -66,10 +59,6 @@ public class PHPCodeSnifferPreferences extends AbstractPEARPHPToolPreferences {
 
 	public String[] getFileExtensions() {
 		return fileExtensions;
-	}
-
-	public boolean isCustom() {
-		return !standard.equals(standardName);
 	}
 
 	public String getIgnorePattern() {

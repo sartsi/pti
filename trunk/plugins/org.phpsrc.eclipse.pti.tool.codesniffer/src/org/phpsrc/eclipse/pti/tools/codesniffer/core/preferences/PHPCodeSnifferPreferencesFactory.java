@@ -56,10 +56,7 @@ public class PHPCodeSnifferPreferencesFactory {
 		// Check first the standard path. Is it not empty we have a custom
 		// standard, so we must use the path instead of the name.
 		String standard = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH);
-		String standardName = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_NAME);
-		if (standard == null || standard.equals("")) {
-			standard = standardName;
-		}
+		String activeStandards = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_ACTIVE_STANDARDS);
 		String pearLibraryName = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_PEAR_LIBRARY);
 
 		int tabWidth = prefs.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH);
@@ -74,15 +71,8 @@ public class PHPCodeSnifferPreferencesFactory {
 			if (node != null) {
 				phpExe = node.get(PHPCodeSnifferPreferenceNames.PREF_PHP_EXECUTABLE, phpExe);
 
-				String projectStandard = node.get(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH, null);
-				String projectStandardName = node.get(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_NAME, null);
-				if (projectStandard == null || projectStandard.equals(""))
-					projectStandard = projectStandardName;
-				if (projectStandard != null && !projectStandard.equals("")) {
-					standard = projectStandard;
-					standardName = projectStandardName;
-				}
-
+				standard = node.get(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH, standard);
+				activeStandards = node.get(PHPCodeSnifferPreferenceNames.PREF_ACTIVE_STANDARDS, activeStandards);
 				pearLibraryName = node.get(PHPCodeSnifferPreferenceNames.PREF_PEAR_LIBRARY, pearLibraryName);
 				tabWidth = node.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH, tabWidth);
 				fileExtensions = node.get(PHPCodeSnifferPreferenceNames.PREF_FILE_EXTENSIONS, fileExtensions);
@@ -92,10 +82,17 @@ public class PHPCodeSnifferPreferencesFactory {
 			}
 		}
 
-		String[] fileExtensionsList = fileExtensions == null || fileExtensions.length() == 0 ? new String[] {}
+		String[] fileExtensionsList = fileExtensions == null || fileExtensions.length() == 0 ? new String[0]
 				: fileExtensions.split(",");
 
-		return new PHPCodeSnifferPreferences(phpExe, printOutput, pearLibraryName, standard, standardName, tabWidth,
+		String[] standards = new String[0];
+		if (activeStandards != null) {
+			standards = activeStandards.split(";");
+		} else if (standard != null) {
+			standards = new String[] { standard };
+		}
+
+		return new PHPCodeSnifferPreferences(phpExe, printOutput, pearLibraryName, standards, tabWidth,
 				fileExtensionsList, ignorePattern, ignoreSniffs == null || ignoreSniffs.length() == 0 ? null
 						: ignoreSniffs.split(","));
 	}

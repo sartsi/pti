@@ -15,4 +15,15 @@ public class CodeSnifferProblem extends DefaultProblem {
 	public String getSource() {
 		return source;
 	}
+
+	public boolean equals(Object o) {
+		if (o == null || !(o instanceof CodeSnifferProblem))
+			return false;
+
+		CodeSnifferProblem p = (CodeSnifferProblem) o;
+
+		return p.getOriginatingFileName().equals(this.getOriginatingFileName())
+				&& p.getSourceLineNumber() == this.getSourceLineNumber() && p.getColumn() == this.getColumn()
+				&& p.getMessage().equals(this.getMessage());
+	}
 }

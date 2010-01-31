@@ -46,7 +46,7 @@ import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileUtil;
 import org.phpsrc.eclipse.pti.core.php.source.ISourceFile;
 import org.phpsrc.eclipse.pti.core.php.source.PHPSourceFile;
-import org.phpsrc.eclipse.pti.core.tools.AbstractPHPToolParser;
+import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferencesFactory;
@@ -58,7 +58,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-public class PHPCodeSniffer extends AbstractPHPToolParser {
+public class PHPCodeSniffer extends AbstractPHPTool {
 
 	public final static QualifiedName QUALIFIED_NAME = new QualifiedName(PHPCodeSnifferPlugin.PLUGIN_ID,
 			"phpCodeSnifferTool");
@@ -76,10 +76,20 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 
 	public IProblem[] parse(IFile file) throws CoreException, IOException {
 		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(file);
-		if (canParse(prefs.getIgnorePattern(), prefs.getFileExtensions(), file))
-			return parseOutput(new PHPSourceFile(file), launchFile(file), prefs);
-		else
+		if (canParse(prefs.getIgnorePattern(), prefs.getFileExtensions(), file)) {
+
+			ArrayList<IProblem> list = new ArrayList<IProblem>(10);
+			for (String standard : prefs.getStandards()) {
+				IProblem[] problems = parseOutput(new PHPSourceFile(file), launchFile(file, prefs, standard), prefs);
+				for (IProblem problem : problems)
+					if (!list.contains(problem))
+						list.add(problem);
+			}
+
+			return list.toArray(new IProblem[0]);
+		} else {
 			return new IProblem[0];
+		}
 	}
 
 	protected boolean canParse(String ignorePattern, String[] fileExtensions, IFile file) {
@@ -119,8 +129,20 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 		return can;
 	}
 
-	protected IProblem[] parseOutput(ISourceFile file, String output) {
-		return parseOutput(file, output, PHPCodeSnifferPreferencesFactory.factory(file.getFile()));
+	protected String launchFile(IFile file, PHPCodeSnifferPreferences prefs, String standard) {
+
+		String output = null;
+		try {
+			PHPToolLauncher launcher = getPHPToolLauncher(file.getProject(), prefs, standard);
+			output = launcher.launch(file);
+		} catch (Exception e) {
+			Logger.logException(e);
+		}
+
+		if (output == null)
+			return "";
+		else
+			return output;
 	}
 
 	protected IProblem[] parseOutput(ISourceFile file, String output, PHPCodeSnifferPreferences prefs) {
@@ -188,24 +210,29 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 			if (column > 1)
 				lineStart += (column - 1 - (file.lineStartTabCount(lineNr) * (tabWidth - 1)));
 
-			problems.add(new CodeSnifferProblem(file.toString(), item.getTextContent(), IProblem.Syntax, new String[0],
-					type, lineStart, file.lineEnd(lineNr), lineNr, column, source));
+			problems.add(new CodeSnifferProblem(file.getFile().getFullPath().toOSString(), item.getTextContent(),
+					IProblem.Syntax, new String[0], type, lineStart, file.lineEnd(lineNr), lineNr, column, source));
 		}
 
 		return problems;
 	}
 
-	protected PHPToolLauncher getPHPToolLauncher(IProject project) {
+	protected PHPToolLauncher getPHPToolLauncher(IProject project, PHPCodeSnifferPreferences prefs, String standard) {
 		PHPToolLauncher launcher;
 		try {
 			launcher = (PHPToolLauncher) project.getSessionProperty(QUALIFIED_NAME);
-			if (launcher != null)
+			if (launcher != null) {
+				launcher.setCommandLineArgs(getCommandLineArgs(standard, prefs.getTabWidth()));
 				return launcher;
+			}
 		} catch (CoreException e) {
 			Logger.logException(e);
 		}
 
-		launcher = getProjectPHPToolLauncher(project);
+		launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(), getCommandLineArgs(
+				standard, prefs.getTabWidth()), getPHPINIEntries(prefs, project, standard));
+
+		launcher.setPrintOuput(prefs.isPrintOutput());
 
 		try {
 			project.setSessionProperty(QUALIFIED_NAME, launcher);
@@ -216,30 +243,15 @@ public class PHPCodeSniffer extends AbstractPHPToolParser {
 		return launcher;
 	}
 
-	private PHPToolLauncher getProjectPHPToolLauncher(IProject project) {
-
-		PHPCodeSnifferPreferences prefs = PHPCodeSnifferPreferencesFactory.factory(project);
-
-		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
-				getCommandLineArgs(prefs.getStandard(), prefs.getTabWidth()), getPHPINIEntries(prefs, project));
-
-		launcher.setPrintOuput(prefs.isPrintOutput());
-
-		return launcher;
-	}
-
-	private INIFileEntry[] getPHPINIEntries(PHPCodeSnifferPreferences prefs, IProject project) {
+	private INIFileEntry[] getPHPINIEntries(PHPCodeSnifferPreferences prefs, IProject project, String standard) {
 
 		IPath[] includePaths = PHPCodeSnifferPlugin.getDefault().getPluginIncludePaths(project);
 
-		if (prefs.isCustom()) {
-			IPath[] tmpIncludePaths = new IPath[includePaths.length + 2];
-			System.arraycopy(includePaths, 0, tmpIncludePaths, 2, includePaths.length);
-			tmpIncludePaths[0] = new Path(prefs.getStandard());
-			tmpIncludePaths[1] = new Path(prefs.getStandard()).removeLastSegments(1);
-
-			includePaths = tmpIncludePaths;
-		}
+		IPath[] tmpIncludePaths = new IPath[includePaths.length + 2];
+		System.arraycopy(includePaths, 0, tmpIncludePaths, 2, includePaths.length);
+		tmpIncludePaths[0] = new Path(standard);
+		tmpIncludePaths[1] = new Path(standard).removeLastSegments(1);
+		includePaths = tmpIncludePaths;
 
 		INIFileEntry[] entries;
 		if (includePaths.length > 0) {
