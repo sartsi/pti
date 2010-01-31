@@ -75,7 +75,6 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 		super(context, project, allKeys, container);
 	}
 
-	
 	public Control createContents(Composite parent) {
 		setShell(parent.getShell());
 
@@ -206,23 +205,22 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 
 	protected abstract Key getDebugPrintOutputKey();
 
-	
 	protected String[] getFullBuildDialogStrings(boolean workspaceSettings) {
 		return null;
 	}
 
-	protected void addLink(Composite parent, String label, final String propertyPageID) {
-		addLink(parent, label, propertyPageID, null);
+	protected Link addLink(Composite parent, String label, final String propertyPageID) {
+		return addLink(parent, label, propertyPageID, null);
 	}
 
-	protected void addLink(Composite parent, String label, final String propertyPageID,
+	protected Link addLink(Composite parent, String label, final String propertyPageID,
 			final IPageChangedListener listener) {
 		Link link = new Link(parent, SWT.NONE);
 		link.setFont(parent.getFont());
 		link.setLayoutData(new GridData(SWT.END, SWT.BEGINNING, true, false));
 		link.setText(label);
 		link.addSelectionListener(new SelectionAdapter() {
-			
+
 			public void widgetSelected(SelectionEvent e) {
 				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(getShell(), propertyPageID, null,
 						null);
@@ -233,9 +231,11 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 				dialog.open();
 			}
 		});
+
+		return link;
 	}
 
-	protected void makeFontItalic(Label label) {
+	protected void makeFontItalic(Control label) {
 		Font font = label.getFont();
 		FontData[] data = font.getFontData();
 		if (data.length > 0) {
