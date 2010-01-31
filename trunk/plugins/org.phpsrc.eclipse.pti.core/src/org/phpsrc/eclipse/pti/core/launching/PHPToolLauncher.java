@@ -56,7 +56,6 @@ import org.eclipse.php.internal.debug.ui.PHPDebugUIPlugin;
 import org.eclipse.swt.widgets.Display;
 import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
-import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileModifier;
 import org.phpsrc.eclipse.pti.ui.Logger;
@@ -97,13 +96,11 @@ public class PHPToolLauncher {
 
 	public String launch(IFile file) {
 		String phpFileLocation = null;
-		if (PHPToolkitUtil.isPhpFile(file)) {
-			IPath location = file.getLocation();
-			if (location != null) {
-				phpFileLocation = location.toOSString();
-			} else {
-				phpFileLocation = file.getFullPath().toString();
-			}
+		IPath location = file.getLocation();
+		if (location != null) {
+			phpFileLocation = location.toOSString();
+		} else {
+			phpFileLocation = file.getFullPath().toString();
 		}
 
 		return launch(file.getProject(), phpFileLocation);
