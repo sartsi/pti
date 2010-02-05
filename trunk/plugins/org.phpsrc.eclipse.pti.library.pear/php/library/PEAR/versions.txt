@@ -1,22 +1,18 @@
 INSTALLED PACKAGES, CHANNEL __URI:
 ==================================
 (no packages installed)
-
 INSTALLED PACKAGES, CHANNEL COMPONENTS.EZ.NO:
 =============================================
 PACKAGE      VERSION STATE
 Base         1.8     stable
 ConsoleTools 1.6     stable
-
 INSTALLED PACKAGES, CHANNEL DOC.PHP.NET:
 ========================================
 (no packages installed)
-
 INSTALLED PACKAGES, CHANNEL PEAR.PDEPEND.ORG:
 =============================================
 PACKAGE    VERSION STATE
 PHP_Depend 0.9.9   beta
-
 INSTALLED PACKAGES, CHANNEL PEAR.PHP.NET:
 =========================================
 PACKAGE             VERSION   STATE
@@ -54,20 +50,16 @@ VersionControl_SVN  0.3.3     alpha
 XML_Beautifier      1.2.0     stable
 XML_Parser          1.3.2     stable
 XML_Util            1.2.1     stable
-
 INSTALLED PACKAGES, CHANNEL PEAR.PHPUNIT.DE:
 ============================================
 PACKAGE       VERSION STATE
 File_Iterator 1.1.1   stable
 PHPUnit       3.4.9   stable
 phpcpd        1.3.0   stable
-
 INSTALLED PACKAGES, CHANNEL PEAR.SYMFONY-PROJECT.COM:
 =====================================================
 PACKAGE VERSION STATE
 YAML    1.0.2   stable
-
 INSTALLED PACKAGES, CHANNEL PECL.PHP.NET:
 =========================================
 (no packages installed)
-
