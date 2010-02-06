@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, Sven Kiera
+ * Copyright (c) 2010, Sven Kiera
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,9 @@
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.preferences;
 
 public class PHPDependPreferenceNames {
+	public static final String PREF_PHP_EXECUTABLE = "php_executable"; //$NON-NLS-1$
+	public static final String PREF_PEAR_LIBRARY = "pear_library"; //$NON-NLS-1$
+	public static final String PREF_DEBUG_PRINT_OUTPUT = "debug_print_output"; //$NON-NLS-1$
 	public static final String PREF_METRICS_NAMES = "metrics_names"; //$NON-NLS-1$
 	public static final String PREF_METRICS_IDS = "metrics_ids"; //$NON-NLS-1$
 	public static final String PREF_METRICS_ENABLED = "metrics_active"; //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, Sven Kiera
+ * Copyright (c) 2010, Sven Kiera
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jface.dialogs.StatusDialog;
 import org.eclipse.php.internal.ui.util.StatusInfo;
+import org.eclipse.php.internal.ui.wizards.fields.ComboDialogField;
 import org.eclipse.php.internal.ui.wizards.fields.DialogField;
 import org.eclipse.php.internal.ui.wizards.fields.IDialogFieldListener;
 import org.eclipse.php.internal.ui.wizards.fields.LayoutUtil;
@@ -42,7 +43,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.phpsrc.eclipse.pti.tools.phpdepend.preferences.Metric;
-import org.phpsrc.eclipse.pti.ui.wizards.fields.ComboStringDialogField;
+import org.phpsrc.eclipse.pti.ui.widgets.listener.NumberOnlyVerifyListener;
 
 /**
  * Dialog to enter a na new task tag
@@ -55,12 +56,16 @@ public class MetricInputDialog extends StatusDialog {
 		}
 	}
 
-	private final StringDialogField fIdDialogField;
-	private final StringDialogField fNameDialogField;
-	private final ComboStringDialogField fWarningDialogField;
-	private final ComboStringDialogField fErrorDialogField;
+	private final StringDialogField fId;
+	private final StringDialogField fName;
+	private final StringDialogField fWarningMin;
+	private final StringDialogField fWarningMax;
+	private final StringDialogField fErrorMin;
+	private final StringDialogField fErrorMax;
+	private final ComboDialogField fType;
 
 	private final List<String> fExistingIds;
+	private final String[] fMetricTypes;
 
 	public MetricInputDialog(Shell parent, Metric m, List<Metric> existingEntries) {
 		super(parent);
@@ -79,46 +84,65 @@ public class MetricInputDialog extends StatusDialog {
 			setTitle("Edit Metric");
 		}
 
-		fIdDialogField = new StringDialogField();
-		fIdDialogField.setLabelText("Id:");
+		fId = new StringDialogField();
+		fId.setLabelText("Id:");
 
-		fNameDialogField = new StringDialogField();
-		fNameDialogField.setLabelText("Name:");
+		fName = new StringDialogField();
+		fName.setLabelText("Name:");
 
-		fWarningDialogField = new ComboStringDialogField();
-		fWarningDialogField.setLabelText("Warning:");
+		fWarningMin = new StringDialogField();
+		fWarningMin.setLabelText("Warning min:");
 
-		fErrorDialogField = new ComboStringDialogField();
-		fErrorDialogField.setLabelText("Error:");
+		fWarningMax = new StringDialogField();
+		fWarningMax.setLabelText("Warning max:");
+
+		fErrorMin = new StringDialogField();
+		fErrorMin.setLabelText("Error min:");
+
+		fErrorMax = new StringDialogField();
+		fErrorMax.setLabelText("Error max:");
+
+		fType = new ComboDialogField(SWT.READ_ONLY);
+		fType.setLabelText("Metric type");
 
 		MetricStandardInputAdapter adapter = new MetricStandardInputAdapter();
 
-		fIdDialogField.setDialogFieldListener(adapter);
-		fIdDialogField.setText((m != null) ? m.id : ""); //$NON-NLS-1$
+		fId.setDialogFieldListener(adapter);
+		fId.setText((m != null) ? m.id : ""); //$NON-NLS-1$
 
-		fNameDialogField.setDialogFieldListener(adapter);
-		fNameDialogField.setText((m != null) ? m.name : ""); //$NON-NLS-1$	
+		fName.setDialogFieldListener(adapter);
+		fName.setText((m != null) ? m.name : ""); //$NON-NLS-1$	
 
-		fErrorDialogField.setText((m != null) ? "" + m.errorLevel : ""); //$NON-NLS-1$
-		fErrorDialogField.setSelectionItems(new String[] { Metric.COMPARE_LESS, Metric.COMPARE_LESS_OR_EQUAL,
-				Metric.COMPARE_EQUAL, Metric.COMPARE_GREATER_OR_EQUAL, Metric.COMPARE_GREATER });
-		fErrorDialogField.setSelection((m != null) ? m.errorCompare : "");
+		fWarningMin.setDialogFieldListener(adapter);
+		fWarningMin.setText((m != null && m.warningMin != null) ? "" + m.warningMin : ""); //$NON-NLS-1
+		fWarningMax.setDialogFieldListener(adapter);
+		fWarningMax.setText((m != null && m.warningMax != null) ? "" + m.warningMax : ""); //$NON-NLS-1$
 
-		fWarningDialogField.setText((m != null) ? "" + m.warningLevel : ""); //$NON-NLS-1$
-		fWarningDialogField.setSelectionItems(new String[] { Metric.COMPARE_LESS, Metric.COMPARE_LESS_OR_EQUAL,
-				Metric.COMPARE_EQUAL, Metric.COMPARE_GREATER_OR_EQUAL, Metric.COMPARE_GREATER });
-		fWarningDialogField.setSelection((m != null) ? m.warningCompare : "");
+		fErrorMin.setDialogFieldListener(adapter);
+		fErrorMin.setText((m != null && m.errorMax != null) ? "" + m.errorMax : ""); //$NON-NLS-1$
+		fErrorMax.setDialogFieldListener(adapter);
+		fErrorMax.setText((m != null && m.errorMin != null) ? "" + m.errorMin : ""); //$NON-NLS-1$
+
+		fMetricTypes = new String[] { "File", "File with type hierachy", "Folder" };
+		fType.setItems(fMetricTypes);
+		fType.selectItem(m != null && m.type > 0 ? m.type - 1 : 0);
 	}
 
 	public Metric getResult() {
 		Metric m = new Metric();
-		m.name = fNameDialogField.getText().trim();
-		m.id = fIdDialogField.getText().trim();
+		m.name = fName.getText().trim();
+		m.id = fId.getText().trim();
 		m.enabled = true;
-		m.warningCompare = fWarningDialogField.getSelection();
-		m.warningLevel = Integer.parseInt(fWarningDialogField.getText().trim());
-		m.errorCompare = fErrorDialogField.getSelection();
-		m.errorLevel = Integer.parseInt(fErrorDialogField.getText().trim());
+		String text = fWarningMin.getText().trim();
+		m.warningMin = text.length() == 0 ? null : Float.parseFloat(text);
+		text = fWarningMax.getText().trim();
+		m.warningMax = text.length() == 0 ? null : Float.parseFloat(text);
+		text = fErrorMin.getText().trim();
+		m.errorMin = text.length() == 0 ? null : Float.parseFloat(text);
+		text = fErrorMax.getText().trim();
+		m.errorMax = text.length() == 0 ? null : Float.parseFloat(text);
+
+		m.type = fType.getSelectionIndex() + 1;
 
 		return m;
 	}
@@ -134,16 +158,27 @@ public class MetricInputDialog extends StatusDialog {
 		layout.numColumns = 3;
 		inner.setLayout(layout);
 
-		fNameDialogField.doFillIntoGrid(inner, 3);
+		fName.doFillIntoGrid(inner, 3);
 
-		LayoutUtil.setHorizontalGrabbing(fNameDialogField.getTextControl(null));
-		LayoutUtil.setWidthHint(fNameDialogField.getTextControl(null), convertWidthInCharsToPixels(60));
+		LayoutUtil.setHorizontalGrabbing(fName.getTextControl(null));
+		LayoutUtil.setWidthHint(fName.getTextControl(null), convertWidthInCharsToPixels(60));
 
-		fNameDialogField.postSetFocusOnDialogField(parent.getDisplay());
+		fName.postSetFocusOnDialogField(parent.getDisplay());
+		fId.doFillIntoGrid(inner, 3);
 
-		fIdDialogField.doFillIntoGrid(inner, 3);
-		fWarningDialogField.doFillIntoGrid(inner, 3);
-		fErrorDialogField.doFillIntoGrid(inner, 3);
+		NumberOnlyVerifyListener numberOnlyListener = new NumberOnlyVerifyListener(NumberOnlyVerifyListener.TYPE_FLOAT,
+				NumberOnlyVerifyListener.SIGNED);
+
+		fWarningMin.doFillIntoGrid(inner, 3);
+		fWarningMin.getTextControl(null).addListener(SWT.Verify, numberOnlyListener);
+		fWarningMax.doFillIntoGrid(inner, 3);
+		fWarningMax.getTextControl(null).addListener(SWT.Verify, numberOnlyListener);
+		fErrorMin.doFillIntoGrid(inner, 3);
+		fErrorMin.getTextControl(null).addListener(SWT.Verify, numberOnlyListener);
+		fErrorMax.doFillIntoGrid(inner, 3);
+		fErrorMax.getTextControl(null).addListener(SWT.Verify, numberOnlyListener);
+
+		fType.doFillIntoGrid(inner, 3);
 
 		applyDialogFont(composite);
 
@@ -153,8 +188,8 @@ public class MetricInputDialog extends StatusDialog {
 	private void doValidation() {
 		StatusInfo status = new StatusInfo();
 
-		String newName = fNameDialogField.getText();
-		String newId = fIdDialogField.getText();
+		String newName = fName.getText().trim();
+		String newId = fId.getText().trim();
 
 		if (newName.length() == 0) {
 			status.setError("Enter metric name.");
@@ -171,6 +206,40 @@ public class MetricInputDialog extends StatusDialog {
 				status.setError("An entry with the same id already exists");
 			}
 		}
+
+		Float wMin = null;
+		try {
+			wMin = fWarningMin.getText().trim().length() > 0 ? Float.parseFloat(fWarningMin.getText().trim()) : null;
+		} catch (NumberFormatException e) {
+			status.setError("Warning min is not a number");
+		}
+
+		Float wMax = null;
+		try {
+			wMax = fWarningMax.getText().trim().length() > 0 ? Float.parseFloat(fWarningMax.getText().trim()) : null;
+		} catch (NumberFormatException e) {
+			status.setError("Warning max is not a number");
+		}
+
+		if (wMin != null && wMax != null && wMin > wMax)
+			status.setError("Warning min can not be higher than warning max");
+
+		Float eMin = null;
+		try {
+			eMin = fErrorMin.getText().trim().length() > 0 ? Float.parseFloat(fErrorMin.getText().trim()) : null;
+		} catch (NumberFormatException e) {
+			status.setError("Error min is not a number");
+		}
+
+		Float eMax = null;
+		try {
+			eMax = fErrorMax.getText().trim().length() > 0 ? Float.parseFloat(fErrorMax.getText().trim()) : null;
+		} catch (NumberFormatException e) {
+			status.setError("Error max is not a number");
+		}
+
+		if (eMin != null && eMax != null && eMin > eMax)
+			status.setError("Error min can not be higher than error max");
 
 		updateStatus(status);
 	}

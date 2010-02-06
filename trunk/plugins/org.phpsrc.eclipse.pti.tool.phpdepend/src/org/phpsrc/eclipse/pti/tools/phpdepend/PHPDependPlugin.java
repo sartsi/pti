@@ -2,6 +2,8 @@ package org.phpsrc.eclipse.pti.tools.phpdepend;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.osgi.framework.BundleContext;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
 
@@ -12,6 +14,10 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.phpsrc.eclipse.pti.tools.phpdepend";
+
+	public static final String IMG_METRIC_TYPE_FILE = "IMG_METRIC_TYPE_FILE";
+	public static final String IMG_METRIC_TYPE_FILE_HIERACHY = "IMG_METRIC_TYPE_FILE_HIERACHY";
+	public static final String IMG_METRIC_TYPE_FOLDER = "IMG_METRIC_TYPE_FOLDER";
 
 	// The shared instance
 	private static PHPDependPlugin plugin;
@@ -32,6 +38,15 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+	}
+
+	protected void initializeImageRegistry(ImageRegistry registry) {
+		registry.put(IMG_METRIC_TYPE_FILE, ImageDescriptor
+				.createFromURL(resolvePluginResourceURL("icons/obj16/type_file.gif")));
+		registry.put(IMG_METRIC_TYPE_FILE_HIERACHY, ImageDescriptor
+				.createFromURL(resolvePluginResourceURL("icons/obj16/type_file_hierachy.gif")));
+		registry.put(IMG_METRIC_TYPE_FOLDER, ImageDescriptor
+				.createFromURL(resolvePluginResourceURL("icons/obj16/type_folder.gif")));
 	}
 
 	/*

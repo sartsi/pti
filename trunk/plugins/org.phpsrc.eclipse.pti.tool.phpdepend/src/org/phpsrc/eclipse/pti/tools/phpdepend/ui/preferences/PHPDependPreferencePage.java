@@ -34,16 +34,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 
-public class MetricPreferencePage extends PropertyAndPreferencePage {
+public class PHPDependPreferencePage extends PropertyAndPreferencePage {
 
-	public static final String PREF_ID = "org.phpsrc.eclipse.pti.tools.phpdepend.ui.preferences.MetricPreferencePage"; //$NON-NLS-1$
-	public static final String PROP_ID = "org.phpsrc.eclipse.pti.tools.phpdepend.ui.propertyPages.MetricPreferencePage"; //$NON-NLS-1$
+	public static final String PREF_ID = "org.phpsrc.eclipse.pti.tools.phpdepend.ui.preferences.PHPDependPreferencePage"; //$NON-NLS-1$
+	public static final String PROP_ID = "org.phpsrc.eclipse.pti.tools.phpdepend.ui.propertyPages.PHPDependPreferencePage"; //$NON-NLS-1$
 
-	private MetricConfigurationBlock fConfigurationBlock;
+	private PHPDependConfigurationBlock fConfigurationBlock;
 
-	public MetricPreferencePage() {
+	public PHPDependPreferencePage() {
 		setPreferenceStore(PHPDependPlugin.getDefault().getPreferenceStore());
-		setDescription("Add, remove or edit metrics.");
+		// setDescription("Add, remove or edit metrics.");
 	}
 
 	/*
@@ -54,7 +54,7 @@ public class MetricPreferencePage extends PropertyAndPreferencePage {
 	@Override
 	public void createControl(Composite parent) {
 		IWorkbenchPreferenceContainer container = (IWorkbenchPreferenceContainer) getContainer();
-		fConfigurationBlock = new MetricConfigurationBlock(getNewStatusChangedListener(), getProject(), container);
+		fConfigurationBlock = new PHPDependConfigurationBlock(getNewStatusChangedListener(), getProject(), container);
 
 		super.createControl(parent);
 	}

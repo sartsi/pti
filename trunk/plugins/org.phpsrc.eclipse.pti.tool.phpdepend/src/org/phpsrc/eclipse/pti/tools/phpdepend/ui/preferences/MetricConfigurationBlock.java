@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, Sven Kiera
+ * Copyright (c) 2010, Sven Kiera
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,7 @@ import org.eclipse.php.internal.ui.wizards.fields.DialogField;
 import org.eclipse.php.internal.ui.wizards.fields.IDialogFieldListener;
 import org.eclipse.php.internal.ui.wizards.fields.IListAdapter;
 import org.eclipse.php.internal.ui.wizards.fields.ListDialogField;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -72,6 +73,13 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 	private final CheckedListDialogField fMetricList;
 
 	private class MetricLabelProvider extends LabelProvider implements ITableLabelProvider, IFontProvider {
+
+		private final Image IMAGE_FILE = PHPDependPlugin.getDefault().getImageRegistry().get(
+				PHPDependPlugin.IMG_METRIC_TYPE_FILE);
+		private final Image IMAGE_FILE_WITH_HIERACHY = PHPDependPlugin.getDefault().getImageRegistry().get(
+				PHPDependPlugin.IMG_METRIC_TYPE_FILE_HIERACHY);
+		private final Image IMAGE_FOLDER = PHPDependPlugin.getDefault().getImageRegistry().get(
+				PHPDependPlugin.IMG_METRIC_TYPE_FOLDER);
 
 		public MetricLabelProvider() {
 		}
@@ -106,6 +114,17 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 		 * .lang.Object, int)
 		 */
 		public Image getColumnImage(Object element, int columnIndex) {
+			Metric m = (Metric) element;
+			if (columnIndex == 4) {
+				switch (m.type) {
+				case Metric.TYPE_FILE:
+					return IMAGE_FILE;
+				case Metric.TYPE_FILE_WITH_HIERACHY:
+					return IMAGE_FILE_WITH_HIERACHY;
+				case Metric.TYPE_FOLDER:
+					return IMAGE_FOLDER;
+				}
+			}
 			return null;
 		}
 
@@ -123,15 +142,25 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 			} else if (columnIndex == 1) {
 				return m.id;
 			} else if (columnIndex == 2) {
-				return m.warningCompare != null && !"".equals(m.warningCompare) ? (m.warningCompare + " " + m.warningLevel)
-						.trim()
-						: "";
+				return formatNumberRange(m.warningMin, m.warningMax);
 			} else if (columnIndex == 3) {
-				return m.errorCompare != null && !"".equals(m.errorCompare) ? (m.errorCompare + " " + m.errorLevel)
-						.trim() : "";
-			} else {
+				return formatNumberRange(m.errorMin, m.errorMax);
+			} else if (columnIndex == 4) {
 				return "";
 			}
+
+			return "";
+		}
+
+		protected String formatNumberRange(Float min, Float max) {
+			if (min != null && max != null)
+				return min + " - " + max;
+			else if (min != null)
+				return " >= " + min;
+			else if (max != null)
+				return " <= " + max;
+			else
+				return "";
 		}
 
 		/*
@@ -193,7 +222,7 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 		fMetricList.setDialogFieldListener(adapter);
 		fMetricList.setRemoveButtonIndex(IDX_REMOVE);
 
-		String[] columnsHeaders = new String[] { "Name", "Id", "Warning", "Error" };
+		String[] columnsHeaders = new String[] { "Name", "Id", "Warning", "Error", "Type" };
 
 		fMetricList.setTableColumns(new ListDialogField.ColumnsDescription(columnsHeaders, true));
 		fMetricList.setViewerSorter(new ViewerSorter());
@@ -214,20 +243,22 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 
 	@Override
 	protected Control createContents(Composite parent) {
-		PixelConverter conv = new PixelConverter(parent);
+
+		Composite group = new Composite(parent, SWT.NULL);
+		PixelConverter conv = new PixelConverter(group);
 
 		GridLayout markersLayout = new GridLayout();
 		markersLayout.marginHeight = 5;
 		markersLayout.marginWidth = 0;
 		markersLayout.numColumns = 3;
-		parent.setLayout(markersLayout);
+		group.setLayout(markersLayout);
 
 		GridData listData = new GridData(GridData.FILL_BOTH);
 		listData.widthHint = conv.convertWidthInCharsToPixels(50);
-		Control listControl = fMetricList.getListControl(parent);
+		Control listControl = fMetricList.getListControl(group);
 		listControl.setLayoutData(listData);
 
-		Control buttonsControl = fMetricList.getButtonBox(parent);
+		Control buttonsControl = fMetricList.getButtonBox(group);
 		buttonsControl.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_BEGINNING));
 
 		GridLayout tabWidthLayout = new GridLayout();
@@ -237,7 +268,7 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 		tabWidthLayout.marginLeft = 4;
 		tabWidthLayout.marginRight = 4;
 
-		return buttonsControl;
+		return group;
 	}
 
 	final boolean isDefaultLibrary(Metric lib) {
@@ -289,15 +320,17 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 				metricIds.append(elem.id);
 				metricNames.append(elem.name);
 				metricEnabled.append(elem.enabled ? '1' : '0');
-				metricWarnings.append(elem.warningCompare + ',' + elem.warningLevel);
-				metricErrors.append(elem.errorCompare + ',' + elem.errorLevel);
+				// metricWarnings.append(elem.warningCompare + ',' +
+				// elem.warningLevel);
+				// metricErrors.append(elem.errorCompare + ',' +
+				// elem.errorLevel);
 			}
 
-			setValue(PREF_METRICS_IDS, metricIds.toString());
-			setValue(PREF_METRICS_NAMES, metricNames.toString());
-			setValue(PREF_METRICS_ENABLED, metricEnabled.toString());
-			setValue(PREF_METRICS_WARNINGS, metricWarnings.toString());
-			setValue(PREF_METRICS_ERRORS, metricErrors.toString());
+			// setValue(PREF_METRICS_IDS, metricIds.toString());
+			// setValue(PREF_METRICS_NAMES, metricNames.toString());
+			// setValue(PREF_METRICS_ENABLED, metricEnabled.toString());
+			// setValue(PREF_METRICS_WARNINGS, metricWarnings.toString());
+			// setValue(PREF_METRICS_ERRORS, metricErrors.toString());
 
 			// validateSettings(PREF_METRICS, null, null);
 		}
@@ -365,17 +398,17 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 				m.name = names[i];
 				m.enabled = enabled[i].equals("1");
 
-				String[] warning = getTokens(warnings[i], ",");
-				if (warning != null && warning.length == 2) {
-					m.warningCompare = warning[0];
-					m.warningLevel = Integer.parseInt(warning[1]);
-				}
-
-				String[] error = getTokens(errors[i], ",");
-				if (error != null && error.length == 2) {
-					m.errorCompare = error[0];
-					m.errorLevel = Integer.parseInt(error[1]);
-				}
+				// String[] warning = getTokens(warnings[i], ",");
+				// if (warning != null && warning.length == 2) {
+				// m.warningCompare = warning[0];
+				// m.warningLevel = Integer.parseInt(warning[1]);
+				// }
+				//
+				// String[] error = getTokens(errors[i], ",");
+				// if (error != null && error.length == 2) {
+				// m.errorCompare = error[0];
+				// m.errorLevel = Integer.parseInt(error[1]);
+				// }
 
 				elements.add(m);
 			}
