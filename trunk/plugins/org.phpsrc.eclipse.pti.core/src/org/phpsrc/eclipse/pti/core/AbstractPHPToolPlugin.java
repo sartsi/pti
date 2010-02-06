@@ -37,17 +37,23 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
 public abstract class AbstractPHPToolPlugin extends AbstractUIPlugin {
-	public IPath resolvePluginResource(String resource) {
+	public URL resolvePluginResourceURL(String resource) {
 		URL u = getBundle().getEntry(resource);
 		if (u != null) {
 			try {
-				u = FileLocator.resolve(u);
-
-				return new Path(new java.io.File(u.getFile()).getAbsolutePath());
+				return FileLocator.resolve(u);
 			} catch (IOException e) {
 				Logger.logException(e);
 			}
 		}
+
+		return null;
+	}
+
+	public IPath resolvePluginResource(String resource) {
+		URL u = resolvePluginResourceURL(resource);
+		if (u != null)
+			return new Path(new java.io.File(u.getFile()).getAbsolutePath());
 
 		return null;
 	}

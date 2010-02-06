@@ -31,14 +31,36 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 public class NumberOnlyVerifyListener implements Listener {
+
+	public static final int TYPE_INT = 1;
+	public static final int TYPE_FLOAT = 2;
+
+	public static final char SIGNED = '-';
+	public static final char UNSIGNED = '+';
+
+	private int type;
+	private int sign;
+
+	public NumberOnlyVerifyListener() {
+		this(TYPE_INT, UNSIGNED);
+	}
+
+	public NumberOnlyVerifyListener(int type, char sign) {
+		this.type = type;
+		this.sign = sign;
+	}
+
 	public void handleEvent(Event e) {
 		String string = e.text;
+
 		char[] chars = new char[string.length()];
 		string.getChars(0, chars.length, chars, 0);
 		for (int i = 0; i < chars.length; i++) {
 			if (!('0' <= chars[i] && chars[i] <= '9')) {
-				e.doit = false;
-				return;
+				if ((type == TYPE_INT || chars[i] != '.') && (sign == UNSIGNED || chars[i] != '-')) {
+					e.doit = false;
+					return;
+				}
 			}
 		}
 	}
