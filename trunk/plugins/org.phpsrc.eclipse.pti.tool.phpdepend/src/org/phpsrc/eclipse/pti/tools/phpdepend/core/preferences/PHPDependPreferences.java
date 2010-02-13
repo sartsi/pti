@@ -24,20 +24,18 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package org.phpsrc.eclipse.pti.tools.phpdepend.ui.preferences;
 
-public class PHPDependPreferenceNames {
-	public static final String PREF_PHP_EXECUTABLE = "php_executable"; //$NON-NLS-1$
-	public static final String PREF_PEAR_LIBRARY = "pear_library"; //$NON-NLS-1$
-	public static final String PREF_DEBUG_PRINT_OUTPUT = "debug_print_output"; //$NON-NLS-1$
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences;
 
-	public static final String PREF_METRICS_ENABLED = "metrics_enabled"; //$NON-NLS-1$
-	public static final String PREF_METRICS_NAMES = "metrics_names"; //$NON-NLS-1$
-	public static final String PREF_METRICS_IDS = "metrics_ids"; //$NON-NLS-1$
-	public static final String PREF_METRICS_WARNING_MIN = "metrics_warning_min"; //$NON-NLS-1$
-	public static final String PREF_METRICS_WARNING_MAX = "metrics_warning_max"; //$NON-NLS-1$
-	public static final String PREF_METRICS_ERROR_MIN = "metrics_error_min"; //$NON-NLS-1$
-	public static final String PREF_METRICS_ERROR_MAX = "metrics_error_max"; //$NON-NLS-1$
-	public static final String PREF_METRICS_TYPES = "metrics_types"; //$NON-NLS-1$
+import org.phpsrc.eclipse.pti.library.pear.core.preferences.AbstractPEARPHPToolPreferences;
 
+public class PHPDependPreferences extends AbstractPEARPHPToolPreferences {
+
+	public Metric[] metrics;
+
+	protected PHPDependPreferences(String phpExecutable, boolean printOutput, String pearLibraryName, Metric[] metrics) {
+		super(phpExecutable, printOutput, pearLibraryName);
+
+		this.metrics = metrics;
+	}
 }

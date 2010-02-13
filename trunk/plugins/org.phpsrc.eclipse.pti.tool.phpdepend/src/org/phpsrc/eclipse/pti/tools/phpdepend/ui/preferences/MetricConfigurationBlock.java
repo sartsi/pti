@@ -53,18 +53,23 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
-import org.phpsrc.eclipse.pti.tools.phpdepend.preferences.Metric;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.Metric;
 
 public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 	private static final Key PREF_METRICS_ENABLED = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_ENABLED);
 	private static final Key PREF_METRICS_NAMES = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_NAMES);
 	private static final Key PREF_METRICS_IDS = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_IDS);
-	private static final Key PREF_METRICS_WARNINGS = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_WARNINGS);
-	private static final Key PREF_METRICS_ERRORS = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_ERRORS);
+	private static final Key PREF_METRICS_WARNING_MIN = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_WARNING_MIN);
+	private static final Key PREF_METRICS_WARNING_MAX = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_WARNING_MAX);
+	private static final Key PREF_METRICS_ERROR_MIN = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_ERROR_MIN);
+	private static final Key PREF_METRICS_ERROR_MAX = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_ERROR_MAX);
+	private static final Key PREF_METRICS_TYPES = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_TYPES);
 
 	public static final String[] DEFAULT_METRIC_IDS = new String[] { "cr", "rcr", "ccn", "ccn2" };
 	public static final String[] DEFAULT_METRIC_NAMES = new String[] { "Code Rank", "Reverse Code Rank",
 			"Cyclomatic Complexity 1", "Cyclomatic Complexity 2" };
+	public static final Integer[] DEFAULT_METRIC_TYPES = new Integer[] { Metric.TYPE_PACKAGE, Metric.TYPE_PACKAGE,
+			Metric.TYPE_FILE, Metric.TYPE_FILE };
 
 	private static final int IDX_ADD = 0;
 	private static final int IDX_EDIT = 1;
@@ -78,8 +83,8 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 				PHPDependPlugin.IMG_METRIC_TYPE_FILE);
 		private final Image IMAGE_FILE_WITH_HIERACHY = PHPDependPlugin.getDefault().getImageRegistry().get(
 				PHPDependPlugin.IMG_METRIC_TYPE_FILE_HIERACHY);
-		private final Image IMAGE_FOLDER = PHPDependPlugin.getDefault().getImageRegistry().get(
-				PHPDependPlugin.IMG_METRIC_TYPE_FOLDER);
+		private final Image IMAGE_PACKAGE = PHPDependPlugin.getDefault().getImageRegistry().get(
+				PHPDependPlugin.IMG_METRIC_TYPE_PACKAGE);
 
 		public MetricLabelProvider() {
 		}
@@ -115,14 +120,14 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 		 */
 		public Image getColumnImage(Object element, int columnIndex) {
 			Metric m = (Metric) element;
-			if (columnIndex == 4) {
+			if (columnIndex == 0) {
 				switch (m.type) {
 				case Metric.TYPE_FILE:
 					return IMAGE_FILE;
 				case Metric.TYPE_FILE_WITH_HIERACHY:
 					return IMAGE_FILE_WITH_HIERACHY;
-				case Metric.TYPE_FOLDER:
-					return IMAGE_FOLDER;
+				case Metric.TYPE_PACKAGE:
+					return IMAGE_PACKAGE;
 				}
 			}
 			return null;
@@ -145,8 +150,6 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 				return formatNumberRange(m.warningMin, m.warningMax);
 			} else if (columnIndex == 3) {
 				return formatNumberRange(m.errorMin, m.errorMax);
-			} else if (columnIndex == 4) {
-				return "";
 			}
 
 			return "";
@@ -222,7 +225,7 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 		fMetricList.setDialogFieldListener(adapter);
 		fMetricList.setRemoveButtonIndex(IDX_REMOVE);
 
-		String[] columnsHeaders = new String[] { "Name", "Id", "Warning", "Error", "Type" };
+		String[] columnsHeaders = new String[] { "Name", "Id", "Warning", "Error", };
 
 		fMetricList.setTableColumns(new ListDialogField.ColumnsDescription(columnsHeaders, true));
 		fMetricList.setViewerSorter(new ViewerSorter());
@@ -237,8 +240,8 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 	}
 
 	private static Key[] getKeys() {
-		return new Key[] { PREF_METRICS_ENABLED, PREF_METRICS_NAMES, PREF_METRICS_IDS, PREF_METRICS_WARNINGS,
-				PREF_METRICS_ERRORS };
+		return new Key[] { PREF_METRICS_IDS, PREF_METRICS_ENABLED, PREF_METRICS_NAMES, PREF_METRICS_WARNING_MIN,
+				PREF_METRICS_WARNING_MAX, PREF_METRICS_ERROR_MIN, PREF_METRICS_ERROR_MAX, PREF_METRICS_TYPES };
 	}
 
 	@Override
@@ -300,47 +303,51 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 	protected final void updateModel(DialogField field) {
 		if (field == fMetricList) {
 
-			StringBuffer metricIds = new StringBuffer();
-			StringBuffer metricNames = new StringBuffer();
 			StringBuffer metricEnabled = new StringBuffer();
-			StringBuffer metricWarnings = new StringBuffer();
-			StringBuffer metricErrors = new StringBuffer();
+			StringBuffer metricNames = new StringBuffer();
+			StringBuffer metricIds = new StringBuffer();
+			StringBuffer metricWarningMin = new StringBuffer();
+			StringBuffer metricWarningMax = new StringBuffer();
+			StringBuffer metricErrorMin = new StringBuffer();
+			StringBuffer metricErrorMax = new StringBuffer();
+			StringBuffer metricTypes = new StringBuffer();
 
 			List<Metric> list = fMetricList.getElements();
 			for (int i = 0; i < list.size(); i++) {
 				Metric elem = list.get(i);
 				if (i > 0) {
+					metricEnabled.append(';');
 					metricIds.append(';');
 					metricNames.append(';');
 					metricEnabled.append(';');
-					metricWarnings.append(';');
-					metricErrors.append(';');
+					metricWarningMin.append(';');
+					metricWarningMax.append(';');
+					metricErrorMin.append(';');
+					metricErrorMax.append(';');
+					metricTypes.append(';');
 				}
 
+				metricEnabled.append(elem.enabled ? '1' : '0');
 				metricIds.append(elem.id);
 				metricNames.append(elem.name);
-				metricEnabled.append(elem.enabled ? '1' : '0');
-				// metricWarnings.append(elem.warningCompare + ',' +
-				// elem.warningLevel);
-				// metricErrors.append(elem.errorCompare + ',' +
-				// elem.errorLevel);
+				metricWarningMin.append(elem.warningMin);
+				metricWarningMax.append(elem.warningMax);
+				metricErrorMin.append(elem.errorMin);
+				metricErrorMax.append(elem.errorMax);
+				metricTypes.append(elem.type);
 			}
 
-			// setValue(PREF_METRICS_IDS, metricIds.toString());
-			// setValue(PREF_METRICS_NAMES, metricNames.toString());
-			// setValue(PREF_METRICS_ENABLED, metricEnabled.toString());
-			// setValue(PREF_METRICS_WARNINGS, metricWarnings.toString());
-			// setValue(PREF_METRICS_ERRORS, metricErrors.toString());
+			setValue(PREF_METRICS_ENABLED, metricEnabled.toString());
+			setValue(PREF_METRICS_IDS, metricIds.toString());
+			setValue(PREF_METRICS_NAMES, metricNames.toString());
+			setValue(PREF_METRICS_WARNING_MIN, metricWarningMin.toString());
+			setValue(PREF_METRICS_WARNING_MAX, metricWarningMax.toString());
+			setValue(PREF_METRICS_ERROR_MIN, metricErrorMin.toString());
+			setValue(PREF_METRICS_ERROR_MAX, metricErrorMax.toString());
+			setValue(PREF_METRICS_TYPES, metricTypes.toString());
 
 			// validateSettings(PREF_METRICS, null, null);
 		}
-	}
-
-	private void setToDefaultLibrary(Metric m) {
-		List<Metric> elements = fMetricList.getElements();
-		elements.remove(m);
-		elements.add(0, m);
-		fMetricList.setElements(elements);
 	}
 
 	@Override
@@ -377,38 +384,52 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 	}
 
 	private void unpackMetrics() {
+		String enabledPrefs = getValue(PREF_METRICS_ENABLED);
 		String idPrefs = getValue(PREF_METRICS_IDS);
 		String namePrefs = getValue(PREF_METRICS_NAMES);
-		String enabledPrefs = getValue(PREF_METRICS_ENABLED);
-		String warningPrefs = getValue(PREF_METRICS_WARNINGS);
-		String errorPrefs = getValue(PREF_METRICS_ERRORS);
+		String warningMinPrefs = getValue(PREF_METRICS_WARNING_MIN);
+		String warningMaxPrefs = getValue(PREF_METRICS_WARNING_MAX);
+		String errorMinPrefs = getValue(PREF_METRICS_ERROR_MIN);
+		String errorMaxPrefs = getValue(PREF_METRICS_ERROR_MAX);
+		String typePrefs = getValue(PREF_METRICS_TYPES);
 
 		if (idPrefs != null) {
+			String[] enabled = getTokens(enabledPrefs, ";");
 			String[] ids = getTokens(idPrefs, ";");
 			String[] names = getTokens(namePrefs, ";");
-			String[] enabled = getTokens(enabledPrefs, ";");
-			String[] warnings = getTokens(warningPrefs, ";");
-			String[] errors = getTokens(errorPrefs, ";");
+			String[] warningMin = getTokens(warningMinPrefs, ";");
+			String[] warningMax = getTokens(warningMaxPrefs, ";");
+			String[] errorMin = getTokens(errorMinPrefs, ";");
+			String[] errorMax = getTokens(errorMaxPrefs, ";");
+			String[] type = getTokens(typePrefs, ";");
 
 			ArrayList<Metric> elements = new ArrayList<Metric>(ids.length);
 
 			for (int i = 0; i < ids.length; i++) {
 				Metric m = new Metric();
+				m.enabled = enabled[i].equals("1");
 				m.id = ids[i];
 				m.name = names[i];
-				m.enabled = enabled[i].equals("1");
-
-				// String[] warning = getTokens(warnings[i], ",");
-				// if (warning != null && warning.length == 2) {
-				// m.warningCompare = warning[0];
-				// m.warningLevel = Integer.parseInt(warning[1]);
-				// }
-				//
-				// String[] error = getTokens(errors[i], ",");
-				// if (error != null && error.length == 2) {
-				// m.errorCompare = error[0];
-				// m.errorLevel = Integer.parseInt(error[1]);
-				// }
+				try {
+					m.warningMin = Float.parseFloat(warningMin[i]);
+				} catch (Exception e) {
+				}
+				try {
+					m.warningMax = Float.parseFloat(warningMax[i]);
+				} catch (Exception e) {
+				}
+				try {
+					m.errorMin = Float.parseFloat(errorMin[i]);
+				} catch (Exception e) {
+				}
+				try {
+					m.errorMax = Float.parseFloat(errorMax[i]);
+				} catch (Exception e) {
+				}
+				try {
+					m.type = Integer.parseInt(type[i]);
+				} catch (Exception e) {
+				}
 
 				elements.add(m);
 			}
@@ -425,6 +446,7 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 			m.enabled = false;
 			m.id = DEFAULT_METRIC_IDS[i];
 			m.name = DEFAULT_METRIC_NAMES[i];
+			m.type = DEFAULT_METRIC_TYPES[i];
 			elements.add(m);
 		}
 

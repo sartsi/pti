@@ -1,9 +1,9 @@
-package org.phpsrc.eclipse.pti.tools.phpdepend.preferences;
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences;
 
 public class Metric {
 	public static final int TYPE_FILE = 1;
 	public static final int TYPE_FILE_WITH_HIERACHY = 2;
-	public static final int TYPE_FOLDER = 3;
+	public static final int TYPE_PACKAGE = 3;
 
 	public boolean enabled;
 	public String name;

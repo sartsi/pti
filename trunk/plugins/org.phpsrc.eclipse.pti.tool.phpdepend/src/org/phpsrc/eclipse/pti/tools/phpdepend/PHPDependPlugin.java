@@ -6,6 +6,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.osgi.framework.BundleContext;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
+import org.phpsrc.eclipse.pti.library.pear.PHPLibraryPEARPlugin;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferences;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferencesFactory;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -15,9 +18,9 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.phpsrc.eclipse.pti.tools.phpdepend";
 
-	public static final String IMG_METRIC_TYPE_FILE = "IMG_METRIC_TYPE_FILE";
-	public static final String IMG_METRIC_TYPE_FILE_HIERACHY = "IMG_METRIC_TYPE_FILE_HIERACHY";
-	public static final String IMG_METRIC_TYPE_FOLDER = "IMG_METRIC_TYPE_FOLDER";
+	public static final String IMG_METRIC_TYPE_FILE = "IMG_METRIC_TYPE_FILE"; //$NON-NLS-1$
+	public static final String IMG_METRIC_TYPE_FILE_HIERACHY = "IMG_METRIC_TYPE_FILE_HIERACHY"; //$NON-NLS-1$
+	public static final String IMG_METRIC_TYPE_PACKAGE = "IMG_METRIC_TYPE_FOLDER"; //$NON-NLS-1$
 
 	// The shared instance
 	private static PHPDependPlugin plugin;
@@ -45,7 +48,7 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 				.createFromURL(resolvePluginResourceURL("icons/obj16/type_file.gif")));
 		registry.put(IMG_METRIC_TYPE_FILE_HIERACHY, ImageDescriptor
 				.createFromURL(resolvePluginResourceURL("icons/obj16/type_file_hierachy.gif")));
-		registry.put(IMG_METRIC_TYPE_FOLDER, ImageDescriptor
+		registry.put(IMG_METRIC_TYPE_PACKAGE, ImageDescriptor
 				.createFromURL(resolvePluginResourceURL("icons/obj16/type_folder.gif")));
 	}
 
@@ -72,16 +75,13 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 
 	@Override
 	public IPath[] getPluginIncludePaths(IProject project) {
-		// PHPCodeSnifferPreferences prefs =
-		// PHPCodeSnifferPreferencesFactory.factory(project);
-		// IPath[] pearPaths =
-		// PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(prefs.getPearLibraryName());
-		//
-		// IPath[] includePaths = new IPath[pearPaths.length + 1];
-		// includePaths[0] = resolvePluginResource("/php/tools");
-		// System.arraycopy(pearPaths, 0, includePaths, 1, pearPaths.length);
-		//
-		// return includePaths;
-		return new IPath[0];
+		PHPDependPreferences prefs = PHPDependPreferencesFactory.factory(project);
+		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(prefs.getPearLibraryName());
+
+		IPath[] includePaths = new IPath[pearPaths.length + 1];
+		includePaths[0] = resolvePluginResource("/php/tools");
+		System.arraycopy(pearPaths, 0, includePaths, 1, pearPaths.length);
+
+		return includePaths;
 	}
 }

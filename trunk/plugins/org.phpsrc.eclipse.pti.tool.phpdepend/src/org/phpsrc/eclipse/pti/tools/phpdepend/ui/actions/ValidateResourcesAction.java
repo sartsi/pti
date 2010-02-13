@@ -24,20 +24,56 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package org.phpsrc.eclipse.pti.tools.phpdepend.ui.preferences;
+package org.phpsrc.eclipse.pti.tools.phpdepend.ui.actions;
 
-public class PHPDependPreferenceNames {
-	public static final String PREF_PHP_EXECUTABLE = "php_executable"; //$NON-NLS-1$
-	public static final String PREF_PEAR_LIBRARY = "pear_library"; //$NON-NLS-1$
-	public static final String PREF_DEBUG_PRINT_OUTPUT = "debug_print_output"; //$NON-NLS-1$
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.IAction;
+import org.phpsrc.eclipse.pti.tools.phpdepend.IPHPDependConstants;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.PHPDepend;
+import org.phpsrc.eclipse.pti.ui.actions.ResourceAction;
 
-	public static final String PREF_METRICS_ENABLED = "metrics_enabled"; //$NON-NLS-1$
-	public static final String PREF_METRICS_NAMES = "metrics_names"; //$NON-NLS-1$
-	public static final String PREF_METRICS_IDS = "metrics_ids"; //$NON-NLS-1$
-	public static final String PREF_METRICS_WARNING_MIN = "metrics_warning_min"; //$NON-NLS-1$
-	public static final String PREF_METRICS_WARNING_MAX = "metrics_warning_max"; //$NON-NLS-1$
-	public static final String PREF_METRICS_ERROR_MIN = "metrics_error_min"; //$NON-NLS-1$
-	public static final String PREF_METRICS_ERROR_MAX = "metrics_error_max"; //$NON-NLS-1$
-	public static final String PREF_METRICS_TYPES = "metrics_types"; //$NON-NLS-1$
+public class ValidateResourcesAction extends ResourceAction {
 
+	public void run(IAction arg0) {
+		final IResource[] resources = getSelectedResources();
+		if (resources.length > 0) {
+			Job job = new Job("PHP Depend") {
+
+				protected IStatus run(IProgressMonitor monitor) {
+					monitor.beginTask("Validation", resources.length * 2);
+
+					PHPDepend pdepend = PHPDepend.getInstance();
+
+					int completed = 0;
+					for (IResource resource : resources) {
+						if (monitor.isCanceled())
+							return Status.CANCEL_STATUS;
+
+						try {
+							resource.deleteMarkers(IPHPDependConstants.VALIDATOR_PHP_DEPEND_MARKER, false,
+									IResource.DEPTH_INFINITE);
+						} catch (CoreException e) {
+						}
+
+						monitor.worked(++completed);
+
+						// createFileMarker(pdepend.validateResource(resource));
+						pdepend.validateResource(resource);
+
+						monitor.worked(++completed);
+					}
+
+					return Status.OK_STATUS;
+				}
+			};
+
+			job.setUser(false);
+			job.schedule();
+		}
+	}
 }

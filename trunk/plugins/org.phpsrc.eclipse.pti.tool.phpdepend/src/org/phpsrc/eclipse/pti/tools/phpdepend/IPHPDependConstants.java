@@ -24,20 +24,13 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package org.phpsrc.eclipse.pti.tools.phpdepend.ui.preferences;
+package org.phpsrc.eclipse.pti.tools.phpdepend;
 
-public class PHPDependPreferenceNames {
-	public static final String PREF_PHP_EXECUTABLE = "php_executable"; //$NON-NLS-1$
-	public static final String PREF_PEAR_LIBRARY = "pear_library"; //$NON-NLS-1$
-	public static final String PREF_DEBUG_PRINT_OUTPUT = "debug_print_output"; //$NON-NLS-1$
+public interface IPHPDependConstants {
+	public static final String PLUGIN_ID = PHPDependPlugin.PLUGIN_ID;
 
-	public static final String PREF_METRICS_ENABLED = "metrics_enabled"; //$NON-NLS-1$
-	public static final String PREF_METRICS_NAMES = "metrics_names"; //$NON-NLS-1$
-	public static final String PREF_METRICS_IDS = "metrics_ids"; //$NON-NLS-1$
-	public static final String PREF_METRICS_WARNING_MIN = "metrics_warning_min"; //$NON-NLS-1$
-	public static final String PREF_METRICS_WARNING_MAX = "metrics_warning_max"; //$NON-NLS-1$
-	public static final String PREF_METRICS_ERROR_MIN = "metrics_error_min"; //$NON-NLS-1$
-	public static final String PREF_METRICS_ERROR_MAX = "metrics_error_max"; //$NON-NLS-1$
-	public static final String PREF_METRICS_TYPES = "metrics_types"; //$NON-NLS-1$
+	public static final String PREFERENCE_PAGE_ID = PLUGIN_ID + ".preferences.PHPToolsPreferencePage"; //$NON-NLS-1$
+	public static final String PROJECT_PAGE_ID = PLUGIN_ID + ".properties.PHPToolsPreferencePage"; //$NON-NLS-1$
 
+	public static final String VALIDATOR_PHP_DEPEND_MARKER = PLUGIN_ID + ".validator.phpToolPHPDependMarke"; //$NON-NLS-1$
 }
