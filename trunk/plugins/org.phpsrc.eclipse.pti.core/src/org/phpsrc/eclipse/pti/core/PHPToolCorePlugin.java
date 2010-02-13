@@ -28,6 +28,8 @@ package org.phpsrc.eclipse.pti.core;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.osgi.framework.BundleContext;
@@ -39,6 +41,8 @@ public class PHPToolCorePlugin extends AbstractPHPToolPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.phpsrc.eclipse.pti.core";
+
+	public static final String IMG_ACTIVITY = "IMG_ACTIVITY";
 
 	// The shared instance
 	private static PHPToolCorePlugin plugin;
@@ -56,10 +60,14 @@ public class PHPToolCorePlugin extends AbstractPHPToolPlugin {
 	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
 	 * )
 	 */
-	
+
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+	}
+
+	protected void initializeImageRegistry(ImageRegistry registry) {
+		registry.put(IMG_ACTIVITY, ImageDescriptor.createFromURL(resolvePluginResourceURL("icons/obj16/activity.gif")));
 	}
 
 	/*
@@ -69,7 +77,7 @@ public class PHPToolCorePlugin extends AbstractPHPToolPlugin {
 	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
 	 * )
 	 */
-	
+
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
@@ -84,7 +92,6 @@ public class PHPToolCorePlugin extends AbstractPHPToolPlugin {
 		return plugin;
 	}
 
-	
 	public IPath[] getPluginIncludePaths(IProject project) {
 		return new IPath[0];
 	}

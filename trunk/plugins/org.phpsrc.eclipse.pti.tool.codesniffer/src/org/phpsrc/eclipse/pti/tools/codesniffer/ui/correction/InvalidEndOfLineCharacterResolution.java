@@ -36,26 +36,23 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.swt.graphics.Image;
+import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class InvalidEndOfLineCharacterResolution extends AbstractResolution {
 
-	
 	public String getDescription() {
 		return "Change end of line character.";
 	}
 
-	
 	public Image getImage() {
-		return null;
+		return PHPToolCorePlugin.getDefault().getImageRegistry().get(PHPToolCorePlugin.IMG_ACTIVITY);
 	}
 
-	
 	public String getLabel() {
 		return "Change end of line character";
 	}
 
-	
 	public void run(IMarker marker) {
 		try {
 			String msg = (String) marker.getAttribute(IMarker.MESSAGE);

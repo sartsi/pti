@@ -33,26 +33,23 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.swt.graphics.Image;
+import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class RemoveWhitespaceAtEndOfLineResolution extends AbstractResolution {
 
-	
 	public String getDescription() {
 		return "Remove all whitespaces or tabs at end of line.";
 	}
 
-	
 	public Image getImage() {
-		return null;
+		return PHPToolCorePlugin.getDefault().getImageRegistry().get(PHPToolCorePlugin.IMG_ACTIVITY);
 	}
 
-	
 	public String getLabel() {
 		return "Remove whitespaces at end of line";
 	}
 
-	
 	public void run(IMarker marker) {
 		try {
 			String msg = (String) marker.getAttribute(IMarker.MESSAGE);
