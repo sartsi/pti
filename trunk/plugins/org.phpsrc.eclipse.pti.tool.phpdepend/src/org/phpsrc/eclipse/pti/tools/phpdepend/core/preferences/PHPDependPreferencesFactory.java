@@ -51,17 +51,17 @@ public class PHPDependPreferencesFactory {
 	public static PHPDependPreferences factory(IProject project) {
 		Preferences prefs = PHPDependPlugin.getDefault().getPluginPreferences();
 
-		String phpExe = prefs.getString(PHPDependPreferenceNames.PREF_PHP_EXECUTABLE);
-		boolean printOutput = prefs.getBoolean(PHPDependPreferenceNames.PREF_DEBUG_PRINT_OUTPUT);
-		String pearLibraryName = prefs.getString(PHPDependPreferenceNames.PREF_PEAR_LIBRARY);
+		String phpExe = prefs.getString(PHPDependPreferenceNames.PREF_PHPDEPEND_PHP_EXECUTABLE);
+		boolean printOutput = prefs.getBoolean(PHPDependPreferenceNames.PREF_PHPDEPEND_DEBUG_PRINT_OUTPUT);
+		String pearLibraryName = prefs.getString(PHPDependPreferenceNames.PREF_PHPDEPEND_PEAR_LIBRARY);
 
 		IScopeContext[] preferenceScopes = createPreferenceScopes(project);
 		if (preferenceScopes[0] instanceof ProjectScope) {
 			IEclipsePreferences node = preferenceScopes[0].getNode(PHPDependPlugin.PLUGIN_ID);
 			if (node != null) {
-				phpExe = node.get(PHPDependPreferenceNames.PREF_PHP_EXECUTABLE, phpExe);
-				printOutput = node.getBoolean(PHPDependPreferenceNames.PREF_DEBUG_PRINT_OUTPUT, printOutput);
-				pearLibraryName = node.get(PHPDependPreferenceNames.PREF_PEAR_LIBRARY, pearLibraryName);
+				phpExe = node.get(PHPDependPreferenceNames.PREF_PHPDEPEND_PHP_EXECUTABLE, phpExe);
+				printOutput = node.getBoolean(PHPDependPreferenceNames.PREF_PHPDEPEND_DEBUG_PRINT_OUTPUT, printOutput);
+				pearLibraryName = node.get(PHPDependPreferenceNames.PREF_PHPDEPEND_PEAR_LIBRARY, pearLibraryName);
 			}
 		}
 

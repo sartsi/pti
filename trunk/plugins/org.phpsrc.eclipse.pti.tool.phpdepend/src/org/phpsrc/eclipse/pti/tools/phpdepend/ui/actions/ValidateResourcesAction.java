@@ -38,7 +38,6 @@ import org.phpsrc.eclipse.pti.tools.phpdepend.core.PHPDepend;
 import org.phpsrc.eclipse.pti.ui.actions.ResourceAction;
 
 public class ValidateResourcesAction extends ResourceAction {
-
 	public void run(IAction arg0) {
 		final IResource[] resources = getSelectedResources();
 		if (resources.length > 0) {

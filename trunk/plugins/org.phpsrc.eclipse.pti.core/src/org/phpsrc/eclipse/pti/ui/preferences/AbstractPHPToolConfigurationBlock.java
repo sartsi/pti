@@ -40,6 +40,8 @@ import org.eclipse.php.internal.debug.core.preferences.PHPexes;
 import org.eclipse.php.internal.ui.preferences.IStatusChangeListener;
 import org.eclipse.php.internal.ui.preferences.OptionsConfigurationBlock;
 import org.eclipse.php.internal.ui.preferences.util.Key;
+import org.eclipse.php.internal.ui.wizards.fields.DialogField;
+import org.eclipse.php.internal.ui.wizards.fields.StringDialogField;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -259,5 +261,73 @@ public abstract class AbstractPHPToolConfigurationBlock extends OptionsConfigura
 				}
 			}
 		}
+	}
+
+	protected Group createDialogFieldsWithInfoText(Composite folder, DialogField[] fields, String groupText,
+			String[] infoTexts) {
+		GridLayout fieldLayout = new GridLayout();
+		fieldLayout.marginHeight = 5;
+		fieldLayout.marginWidth = 0;
+		fieldLayout.numColumns = 3;
+		fieldLayout.marginLeft = 4;
+		fieldLayout.marginRight = 4;
+
+		Group fieldGroup = new Group(folder, SWT.NULL);
+		fieldGroup.setText(groupText);
+		fieldGroup.setLayout(fieldLayout);
+		fieldGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		for (int i = 0; i < fields.length; i++) {
+			fields[i].doFillIntoGrid(fieldGroup, 3);
+
+			if (infoTexts != null && infoTexts.length > i && infoTexts[i] != null && !"".equals(infoTexts[i])) {
+				Label ignorePatternInfoLabel = new Label(fieldGroup, SWT.NULL);
+				ignorePatternInfoLabel.setText(infoTexts[i]);
+				GridData infoData = new GridData(GridData.FILL_HORIZONTAL);
+				infoData.horizontalSpan = 3;
+				ignorePatternInfoLabel.setLayoutData(infoData);
+				makeFontItalic(ignorePatternInfoLabel);
+			}
+		}
+
+		return fieldGroup;
+	}
+
+	protected void createDialogFieldWithInfoLink(Composite folder, DialogField field, String groupText,
+			String infoText, String propertyPageID) {
+		GridLayout fieldLayout = new GridLayout();
+		fieldLayout.marginHeight = 5;
+		fieldLayout.marginWidth = 0;
+		fieldLayout.numColumns = 3;
+		fieldLayout.marginLeft = 4;
+		fieldLayout.marginRight = 4;
+
+		Group fieldGroup = new Group(folder, SWT.NULL);
+		fieldGroup.setText(groupText);
+		fieldGroup.setLayout(fieldLayout);
+		fieldGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		field.doFillIntoGrid(fieldGroup, 3);
+
+		// Label ignorePatternInfoLabel = new Label(ignorePatternGroup,
+		// SWT.NULL);
+		// ignorePatternInfoLabel.setText(infoText);
+		Link link = addLink(fieldGroup, infoText, propertyPageID);
+		GridData infoData = new GridData(GridData.FILL_HORIZONTAL);
+		infoData.horizontalSpan = 3;
+		link.setLayoutData(infoData);
+		makeFontItalic(link);
+	}
+
+	protected void unpackPrefValue(StringDialogField field, Key key) {
+		unpackPrefValue(field, key, null);
+	}
+
+	protected void unpackPrefValue(StringDialogField field, Key key, String defaultValue) {
+		String value = getValue(key);
+		if (value != null)
+			field.setText(value);
+		else if (defaultValue != null)
+			field.setText(defaultValue);
 	}
 }

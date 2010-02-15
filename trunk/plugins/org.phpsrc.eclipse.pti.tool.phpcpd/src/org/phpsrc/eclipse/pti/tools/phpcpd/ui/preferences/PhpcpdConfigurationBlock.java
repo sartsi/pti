@@ -77,13 +77,14 @@ public class PhpcpdConfigurationBlock extends AbstractPEARPHPToolConfigurationBl
 				PREF_MIN_TOKENS, PREF_FILE_SUFFIXES };
 	}
 
-	
 	protected Composite createToolContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 1;
 		layout.verticalSpacing = 10;
 		layout.horizontalSpacing = 0;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
 		composite.setLayout(layout);
 
 		Composite phpcpdComposite = createPhpcpdTabContent(composite);
@@ -140,25 +141,15 @@ public class PhpcpdConfigurationBlock extends AbstractPEARPHPToolConfigurationBl
 	}
 
 	private void unpackMinLines() {
-		String minLines = getValue(PREF_MIN_LINES);
-		if (minLines != null)
-			fMinLines.setText(minLines);
-		else
-			fMinLines.setText("5");
+		unpackPrefValue(fMinLines, PREF_MIN_LINES, "5");
 	}
 
 	private void unpackMinTokens() {
-		String minTokens = getValue(PREF_MIN_TOKENS);
-		if (minTokens != null)
-			fMinTokens.setText(minTokens);
-		else
-			fMinTokens.setText("70");
+		unpackPrefValue(fMinTokens, PREF_MIN_TOKENS, "70");
 	}
 
 	private void unpackFileSuffixes() {
-		String fileSuffixes = getValue(PREF_FILE_SUFFIXES);
-		if (fileSuffixes != null)
-			fFileSuffixes.setText(fileSuffixes);
+		unpackPrefValue(fFileSuffixes, PREF_FILE_SUFFIXES);
 	}
 
 	/*
@@ -167,7 +158,7 @@ public class PhpcpdConfigurationBlock extends AbstractPEARPHPToolConfigurationBl
 	 * @seeorg.eclipse.jdt.internal.ui.preferences.OptionsConfigurationBlock#
 	 * updateControls()
 	 */
-	
+
 	protected void updateControls() {
 		super.updateControls();
 		unpackMinLines();
@@ -175,12 +166,10 @@ public class PhpcpdConfigurationBlock extends AbstractPEARPHPToolConfigurationBl
 		unpackFileSuffixes();
 	}
 
-	
 	protected void validateSettings(Key changedKey, String oldValue, String newValue) {
 		// TODO Auto-generated method stub
 	}
 
-	
 	protected boolean processChanges(IWorkbenchPreferenceContainer container) {
 		clearProjectLauncherCache(Phpcpd.QUALIFIED_NAME);
 
@@ -191,7 +180,6 @@ public class PhpcpdConfigurationBlock extends AbstractPEARPHPToolConfigurationBl
 		return super.processChanges(container);
 	}
 
-	
 	protected String[] getFullBuildDialogStrings(boolean workspaceSettings) {
 		return null;
 	}
@@ -200,17 +188,14 @@ public class PhpcpdConfigurationBlock extends AbstractPEARPHPToolConfigurationBl
 		return getKey(PhpcpdPlugin.PLUGIN_ID, key);
 	}
 
-	
 	protected Key getPHPExecutableKey() {
 		return PREF_PHP_EXECUTABLE;
 	}
 
-	
 	protected Key getDebugPrintOutputKey() {
 		return PREF_DEBUG_PRINT_OUTPUT;
 	}
 
-	
 	protected Key getPEARLibraryKey() {
 		return PREF_PEAR_LIBRARY;
 	}

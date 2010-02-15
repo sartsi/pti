@@ -53,8 +53,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.phpsrc.eclipse.pti.library.pear.ui.preferences.AbstractPEARPHPToolConfigurationBlock;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
@@ -316,62 +314,13 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 				"Extensions are sperarated by a comma. If empty, all files associated with the <a>PHP Content Type</a> will be checked.",
 				"org.eclipse.ui.preferencePages.ContentTypes");
 
-		createDialogFieldWithInfoText(folder, fIgnorePattern, "Ignore Directories and Files",
-				"Patterns are separated by a comma (* = any string, ?= any character)");
+		createDialogFieldsWithInfoText(folder, new DialogField[] { fIgnorePattern }, "Ignore Directories and Files",
+				new String[] { "Patterns are separated by a comma (* = any string, ?= any character)" });
 
-		createDialogFieldWithInfoText(folder, fIgnoreSniffs, "Ignore Sniffs", "Sniffs are separated by a comma");
+		createDialogFieldsWithInfoText(folder, new DialogField[] { fIgnoreSniffs }, "Ignore Sniffs",
+				new String[] { "Sniffs are separated by a comma" });
 
 		return markersGroup;
-	}
-
-	private void createDialogFieldWithInfoText(Composite folder, StringDialogField field, String groupText,
-			String infoText) {
-		GridLayout ignorePatternLayout = new GridLayout();
-		ignorePatternLayout.marginHeight = 5;
-		ignorePatternLayout.marginWidth = 0;
-		ignorePatternLayout.numColumns = 3;
-		ignorePatternLayout.marginLeft = 4;
-		ignorePatternLayout.marginRight = 4;
-
-		Group ignorePatternGroup = new Group(folder, SWT.NULL);
-		ignorePatternGroup.setText(groupText);
-		ignorePatternGroup.setLayout(ignorePatternLayout);
-		ignorePatternGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		field.doFillIntoGrid(ignorePatternGroup, 3);
-
-		Label ignorePatternInfoLabel = new Label(ignorePatternGroup, SWT.NULL);
-		ignorePatternInfoLabel.setText(infoText);
-		GridData infoData = new GridData(GridData.FILL_HORIZONTAL);
-		infoData.horizontalSpan = 3;
-		ignorePatternInfoLabel.setLayoutData(infoData);
-		makeFontItalic(ignorePatternInfoLabel);
-	}
-
-	private void createDialogFieldWithInfoLink(Composite folder, StringDialogField field, String groupText,
-			String infoText, String propertyPageID) {
-		GridLayout ignorePatternLayout = new GridLayout();
-		ignorePatternLayout.marginHeight = 5;
-		ignorePatternLayout.marginWidth = 0;
-		ignorePatternLayout.numColumns = 3;
-		ignorePatternLayout.marginLeft = 4;
-		ignorePatternLayout.marginRight = 4;
-
-		Group ignorePatternGroup = new Group(folder, SWT.NULL);
-		ignorePatternGroup.setText(groupText);
-		ignorePatternGroup.setLayout(ignorePatternLayout);
-		ignorePatternGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		field.doFillIntoGrid(ignorePatternGroup, 3);
-
-		// Label ignorePatternInfoLabel = new Label(ignorePatternGroup,
-		// SWT.NULL);
-		// ignorePatternInfoLabel.setText(infoText);
-		Link link = addLink(ignorePatternGroup, infoText, propertyPageID);
-		GridData infoData = new GridData(GridData.FILL_HORIZONTAL);
-		infoData.horizontalSpan = 3;
-		link.setLayoutData(infoData);
-		makeFontItalic(link);
 	}
 
 	protected void validateSettings(Key changedKey, String oldValue, String newValue) {

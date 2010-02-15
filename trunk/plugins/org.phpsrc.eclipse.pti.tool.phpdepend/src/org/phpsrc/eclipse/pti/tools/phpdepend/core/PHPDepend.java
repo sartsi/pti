@@ -25,6 +25,8 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpdepend.core;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IProject;
@@ -44,6 +46,11 @@ import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferen
 public class PHPDepend extends AbstractPHPTool {
 
 	public final static QualifiedName QUALIFIED_NAME = new QualifiedName(PHPDependPlugin.PLUGIN_ID, "phpdepend");
+	protected final static String TMP_FILE_SUMMARY_XML = "summary.xml";
+	protected final static String TMP_FILE_SUMMARY_PYRAMID = "pyramid.svg";
+	protected final static String TMP_FILE_JDEPEND_CHART = "jdepend.svg";
+	protected final static String ATTR_FILE_SUMMARY_XML = "ATTR_FILE_SUMMARY_XML";
+
 	private static PHPDepend instance;
 
 	protected PHPDepend() {
@@ -56,28 +63,61 @@ public class PHPDepend extends AbstractPHPTool {
 		return instance;
 	}
 
-	protected IProblem[] parseOutput(IProject project, String output) {
+	protected IProblem[] parseOutput(IProject project, PHPToolLauncher launcher, String output) {
 		ArrayList<IProblem> problems = new ArrayList<IProblem>();
 
 		if (output != null && output.length() > 0) {
-			System.out.println(output);
 		}
+
+		String summaryFile = launcher.getAttribute(ATTR_FILE_SUMMARY_XML);
+		System.out.println(summaryFile);
 
 		return problems.toArray(new IProblem[0]);
 	}
 
 	public IProblem[] validateResource(IResource folder) {
 		String cmdLineArgs = OperatingSystem.escapeShellFileArg(folder.getLocation().toOSString());
-		PHPToolLauncher launcher = getProjectPHPToolLauncher(folder.getProject(), cmdLineArgs, folder.getLocation());
-		return parseOutput(folder.getProject(), launcher.launch(folder.getProject()));
+		try {
+			PHPToolLauncher launcher = getProjectPHPToolLauncher(folder.getProject(), cmdLineArgs, folder.getLocation());
+			return parseOutput(folder.getProject(), launcher, launcher.launch(folder.getProject()));
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+		return new IProblem[0];
 	}
 
-	private PHPToolLauncher getProjectPHPToolLauncher(IProject project, String cmdLineArgs, IPath fileIncludePath) {
+	private PHPToolLauncher getProjectPHPToolLauncher(IProject project, String cmdLineArgs, IPath fileIncludePath)
+			throws IOException {
 
 		PHPDependPreferences prefs = PHPDependPreferencesFactory.factory(project);
 
+		File tempDir = new File(System.getProperty("java.io.tmpdir"), "pti_php_depend"); //$NON-NLS-2$
+		if (!tempDir.exists()) {
+			tempDir.mkdir();
+			tempDir.deleteOnExit();
+		}
+
+		File summaryFile = new File(tempDir, TMP_FILE_SUMMARY_XML);
+		summaryFile.createNewFile();
+		summaryFile.deleteOnExit();
+
+		cmdLineArgs = "--summary-xml=" + OperatingSystem.escapeShellFileArg(summaryFile.toString()) + " " + cmdLineArgs;
+
+		// cmdLineArgs = "--jdepend-chart="
+		// +
+		// OperatingSystem.escapeShellFileArg(summaryFile.toString().replace("summary.xml",
+		// "jdepend.svg"))
+		// + " " + cmdLineArgs;
+		// cmdLineArgs = "--overview-pyramid="
+		// +
+		// OperatingSystem.escapeShellFileArg(summaryFile.toString().replace("summary.xml",
+		// "pyramid.svg"))
+		// + " " + cmdLineArgs;
+
 		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
 				cmdLineArgs, getPHPINIEntries(project, fileIncludePath));
+
+		launcher.setAttribute(ATTR_FILE_SUMMARY_XML, summaryFile.toString());
 
 		launcher.setPrintOuput(prefs.isPrintOutput());
 

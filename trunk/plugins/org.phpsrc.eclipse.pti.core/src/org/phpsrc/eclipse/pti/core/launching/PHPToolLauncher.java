@@ -28,6 +28,7 @@ package org.phpsrc.eclipse.pti.core.launching;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Hashtable;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -70,6 +71,7 @@ public class PHPToolLauncher {
 	private final INIFileEntry[] iniEntries;
 	private String commandLineArgs;
 	private boolean printOutput = false;
+	private Hashtable<String, String> attributes = new Hashtable<String, String>();
 
 	public PHPToolLauncher(PHPexeItem phpExe, IPath phpScript) {
 		this(phpExe, phpScript, "");
@@ -359,5 +361,13 @@ public class PHPToolLauncher {
 
 	public void setPrintOuput(boolean printOutput) {
 		this.printOutput = printOutput;
+	}
+
+	public void setAttribute(String key, String value) {
+		attributes.put(key, value);
+	}
+
+	public String getAttribute(String key) {
+		return attributes.get(key);
 	}
 }
