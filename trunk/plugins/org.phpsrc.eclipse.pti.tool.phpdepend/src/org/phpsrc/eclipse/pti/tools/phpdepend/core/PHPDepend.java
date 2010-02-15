@@ -103,16 +103,25 @@ public class PHPDepend extends AbstractPHPTool {
 
 		cmdLineArgs = "--summary-xml=" + OperatingSystem.escapeShellFileArg(summaryFile.toString()) + " " + cmdLineArgs;
 
-		// cmdLineArgs = "--jdepend-chart="
-		// +
-		// OperatingSystem.escapeShellFileArg(summaryFile.toString().replace("summary.xml",
-		// "jdepend.svg"))
-		// + " " + cmdLineArgs;
-		// cmdLineArgs = "--overview-pyramid="
-		// +
-		// OperatingSystem.escapeShellFileArg(summaryFile.toString().replace("summary.xml",
-		// "pyramid.svg"))
-		// + " " + cmdLineArgs;
+		cmdLineArgs = "--jdepend-chart="
+				+ OperatingSystem.escapeShellFileArg(summaryFile.toString().replace(TMP_FILE_SUMMARY_XML,
+						TMP_FILE_JDEPEND_CHART)) + " " + cmdLineArgs;
+		cmdLineArgs = "--overview-pyramid="
+				+ OperatingSystem.escapeShellFileArg(summaryFile.toString().replace(TMP_FILE_SUMMARY_XML,
+						TMP_FILE_SUMMARY_PYRAMID)) + " " + cmdLineArgs;
+
+		if (prefs.badDocumentation)
+			cmdLineArgs = "--bad-documentation " + cmdLineArgs;
+		if (prefs.withoutAnnotations)
+			cmdLineArgs = "--without-annotations " + cmdLineArgs;
+		if (prefs.coderankMode != null && !"".equals(prefs.coderankMode))
+			cmdLineArgs = "--coderank-mode=" + OperatingSystem.escapeShellArg(prefs.coderankMode) + " " + cmdLineArgs;
+		if (prefs.optimization != null && !"".equals(prefs.optimization))
+			cmdLineArgs = "--optimization=" + OperatingSystem.escapeShellArg(prefs.optimization) + " " + cmdLineArgs;
+		if (prefs.validFileExtensions != null && !"".equals(prefs.validFileExtensions))
+			cmdLineArgs = "--suffix=" + OperatingSystem.escapeShellArg(prefs.validFileExtensions) + " " + cmdLineArgs;
+		if (prefs.excludePackages != null && !"".equals(prefs.excludePackages))
+			cmdLineArgs = "--exclude=" + OperatingSystem.escapeShellArg(prefs.excludePackages) + " " + cmdLineArgs;
 
 		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
 				cmdLineArgs, getPHPINIEntries(project, fileIncludePath));

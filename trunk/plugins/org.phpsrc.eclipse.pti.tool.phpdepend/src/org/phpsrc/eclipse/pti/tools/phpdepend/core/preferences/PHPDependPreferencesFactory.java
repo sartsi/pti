@@ -54,6 +54,12 @@ public class PHPDependPreferencesFactory {
 		String phpExe = prefs.getString(PHPDependPreferenceNames.PREF_PHPDEPEND_PHP_EXECUTABLE);
 		boolean printOutput = prefs.getBoolean(PHPDependPreferenceNames.PREF_PHPDEPEND_DEBUG_PRINT_OUTPUT);
 		String pearLibraryName = prefs.getString(PHPDependPreferenceNames.PREF_PHPDEPEND_PEAR_LIBRARY);
+		boolean withoutAnnotation = prefs.getBoolean(PHPDependPreferenceNames.PREF_PHPDEPEND_WITHOUT_ANNOTATIONS);
+		boolean badDocumentation = prefs.getBoolean(PHPDependPreferenceNames.PREF_PHPDEPEND_BAD_DOCUMENTATION);
+		String coderankMode = prefs.getString(PHPDependPreferenceNames.PREF_PHPDEPEND_CODERANK_MODE);
+		String optimization = prefs.getString(PHPDependPreferenceNames.PREF_PHPDEPEND_OPTIMIZATION);
+		String validFileExtensions = prefs.getString(PHPDependPreferenceNames.PREF_PHPDEPEND_VALID_FILE_EXTENSIONS);
+		String excludePackages = prefs.getString(PHPDependPreferenceNames.PREF_PHPDEPEND_EXCLUDE_PACKAGES);
 
 		IScopeContext[] preferenceScopes = createPreferenceScopes(project);
 		if (preferenceScopes[0] instanceof ProjectScope) {
@@ -62,10 +68,20 @@ public class PHPDependPreferencesFactory {
 				phpExe = node.get(PHPDependPreferenceNames.PREF_PHPDEPEND_PHP_EXECUTABLE, phpExe);
 				printOutput = node.getBoolean(PHPDependPreferenceNames.PREF_PHPDEPEND_DEBUG_PRINT_OUTPUT, printOutput);
 				pearLibraryName = node.get(PHPDependPreferenceNames.PREF_PHPDEPEND_PEAR_LIBRARY, pearLibraryName);
+				withoutAnnotation = node.getBoolean(PHPDependPreferenceNames.PREF_PHPDEPEND_WITHOUT_ANNOTATIONS,
+						withoutAnnotation);
+				badDocumentation = node.getBoolean(PHPDependPreferenceNames.PREF_PHPDEPEND_BAD_DOCUMENTATION,
+						badDocumentation);
+				coderankMode = node.get(PHPDependPreferenceNames.PREF_PHPDEPEND_CODERANK_MODE, coderankMode);
+				optimization = node.get(PHPDependPreferenceNames.PREF_PHPDEPEND_OPTIMIZATION, optimization);
+				validFileExtensions = node.get(PHPDependPreferenceNames.PREF_PHPDEPEND_VALID_FILE_EXTENSIONS,
+						validFileExtensions);
+				excludePackages = node.get(PHPDependPreferenceNames.PREF_PHPDEPEND_EXCLUDE_PACKAGES, excludePackages);
 			}
 		}
 
-		return new PHPDependPreferences(phpExe, printOutput, pearLibraryName, new Metric[] {});
+		return new PHPDependPreferences(phpExe, printOutput, pearLibraryName, withoutAnnotation, badDocumentation,
+				coderankMode, optimization, validFileExtensions, excludePackages, new Metric[] {});
 	}
 
 	protected static IScopeContext[] createPreferenceScopes(IProject project) {
