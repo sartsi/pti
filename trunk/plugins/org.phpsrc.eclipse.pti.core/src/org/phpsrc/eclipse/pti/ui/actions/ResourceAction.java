@@ -65,7 +65,7 @@ public abstract class ResourceAction implements IWorkbenchWindowActionDelegate {
 		ArrayList<IResource> resources = new ArrayList<IResource>(1);
 		if (selection instanceof ITextSelection) {
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			if (page != null) {
+			if (page != null && page.getActiveEditor() != null) {
 				IEditorInput input = page.getActiveEditor().getEditorInput();
 				if (input != null && input instanceof IFileEditorInput) {
 					addResourceToList(resources, ((IFileEditorInput) input).getFile());
