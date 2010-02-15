@@ -25,24 +25,46 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences;
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
 
-public class Metric {
-	public static final int TYPE_FILE = 1;
-	public static final int TYPE_FILE_WITH_HIERACHY = 2;
-	public static final int TYPE_PACKAGE = 3;
+import java.util.ArrayList;
 
-	public boolean enabled;
-	public String name;
-	public String id;
-	public Float warningMin;
-	public Float warningMax;
-	public Float errorMax;
-	public Float errorMin;
-	public int type;
+public abstract class AbstractElement implements IElement {
+
+	protected String name;
+	protected IElement parent;
+	protected ArrayList<IElement> members = new ArrayList<IElement>();
+	protected MetricResult[] results;
+
+	public AbstractElement(IElement parent, String name, MetricResult[] results) {
+		this.parent = parent;
+		if (parent != null && parent instanceof AbstractElement)
+			((AbstractElement) parent).addMember(this);
+		this.name = name;
+		this.results = results;
+	}
 
 	@Override
-	public String toString() {
+	public String getName() {
 		return name;
+	}
+
+	@Override
+	public IElement getParent() {
+		return parent;
+	}
+
+	@Override
+	public IElement[] members() {
+		return members.toArray(new IElement[0]);
+	}
+
+	protected void addMember(IElement child) {
+		if (!members.contains(child))
+			members.add(child);
+	}
+
+	public MetricResult[] getResults() {
+		return results;
 	}
 }

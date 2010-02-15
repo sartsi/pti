@@ -26,6 +26,7 @@
 package org.phpsrc.eclipse.pti.tools.phpdepend.core;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -40,8 +41,12 @@ import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileUtil;
 import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.ElementFactory;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.MetricSummary;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferences;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferencesFactory;
+import org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.PHPDependSummaryView;
+import org.xml.sax.SAXException;
 
 public class PHPDepend extends AbstractPHPTool {
 
@@ -70,7 +75,17 @@ public class PHPDepend extends AbstractPHPTool {
 		}
 
 		String summaryFile = launcher.getAttribute(ATTR_FILE_SUMMARY_XML);
-		System.out.println(summaryFile);
+
+		try {
+			MetricSummary element = ElementFactory.fromXML(summaryFile);
+			PHPDependSummaryView.showSummary(element);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		return problems.toArray(new IProblem[0]);
 	}

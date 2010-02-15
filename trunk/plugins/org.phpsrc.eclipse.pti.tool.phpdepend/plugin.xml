@@ -110,4 +110,11 @@
 			<actionSet id="org.phpsrc.eclipse.pti.tools.phpdepend.ui.actionSet" />
 		</perspectiveExtension>
 	</extension>
+	<extension point="org.eclipse.ui.views">
+		<view id="org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.summary"
+			name="PHP Depend Summary"
+			category="org.eclipse.php.ui.views"
+			class="org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.PHPDependSummaryView"
+			icon="icons/obj16/php_depend.gif" />
+	</extension>
 </plugin>

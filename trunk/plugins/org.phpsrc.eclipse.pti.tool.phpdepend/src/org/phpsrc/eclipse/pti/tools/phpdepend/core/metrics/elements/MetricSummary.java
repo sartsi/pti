@@ -25,24 +25,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences;
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
 
-public class Metric {
-	public static final int TYPE_FILE = 1;
-	public static final int TYPE_FILE_WITH_HIERACHY = 2;
-	public static final int TYPE_PACKAGE = 3;
+import java.util.Date;
 
-	public boolean enabled;
-	public String name;
-	public String id;
-	public Float warningMin;
-	public Float warningMax;
-	public Float errorMax;
-	public Float errorMin;
-	public int type;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.swt.graphics.Image;
+import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 
-	@Override
-	public String toString() {
-		return name;
+public class MetricSummary extends AbstractElement {
+
+	protected Date generated;
+
+	private final static Image IMAGE = PHPDependPlugin.getDefault().getImageRegistry().get(
+			PHPDependPlugin.IMG_PHP_DEPEND);
+
+	public MetricSummary(IElement parent, String name, MetricResult[] results, Date generated) {
+		super(parent, name, results);
+		this.generated = generated;
+	}
+
+	public Image getImage() {
+		return IMAGE;
+	}
+
+	public IResource getResource() {
+		return null;
+	}
+
+	public Date getGenerated() {
+		return generated;
 	}
 }
