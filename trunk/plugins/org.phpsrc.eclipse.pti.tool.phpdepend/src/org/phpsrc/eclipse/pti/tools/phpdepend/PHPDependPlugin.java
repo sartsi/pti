@@ -26,6 +26,7 @@
  *******************************************************************************/
 
 package org.phpsrc.eclipse.pti.tools.phpdepend;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -35,7 +36,6 @@ import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
 import org.phpsrc.eclipse.pti.library.pear.PHPLibraryPEARPlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferences;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferencesFactory;
-
 
 /**
  * The activator class controls the plug-in life cycle

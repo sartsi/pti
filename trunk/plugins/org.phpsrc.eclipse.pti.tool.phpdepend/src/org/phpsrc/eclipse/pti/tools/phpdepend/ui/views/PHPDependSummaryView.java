@@ -29,21 +29,29 @@ package org.phpsrc.eclipse.pti.tools.phpdepend.ui.views;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -53,22 +61,82 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.IElement;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.MetricResult;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.MetricSummary;
+import org.phpsrc.eclipse.pti.ui.images.OverlayImageIcon;
 
 public class PHPDependSummaryView extends ViewPart {
 
 	public static final String VIEW_ID = "org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.summary";
 
 	protected Tree tree;
+	protected Table table;
 	protected ArrayList<MetricSummary> summaries = new ArrayList<MetricSummary>();
 	protected int showIndex = -1;
 
+	protected static final class ElementDecorator implements IElement {
+		protected static final ImageRegistry imageRegistry = new ImageRegistry();
+
+		protected final IElement element;
+
+		protected ElementDecorator(IElement element) {
+			this.element = element;
+		}
+
+		public Image getImage() {
+			String key = element.getClass().getName() + "#error";
+			Image img = imageRegistry.get(key);
+			if (img == null) {
+				img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault().getImageRegistry().get(
+						PHPToolCorePlugin.IMG_OVERLAY_ERROR), OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
+				imageRegistry.put(key, img);
+			}
+
+			return img;
+		}
+
+		public String getName() {
+			return element.getName();
+		}
+
+		public IElement getParent() {
+			return element.getParent();
+		}
+
+		public IResource getResource() {
+			return element.getResource();
+		}
+
+		public MetricResult[] getResults() {
+			return element.getResults();
+		}
+
+		public IElement[] members() {
+			return element.members();
+		}
+	}
+
 	public void createPartControl(Composite parent) {
-		tree = new Tree(parent, SWT.VIRTUAL | SWT.BORDER | SWT.FULL_SELECTION);
+		Composite comp = new Composite(parent, SWT.NULL);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		layout.horizontalSpacing = 0;
+		layout.verticalSpacing = 0;
+		comp.setLayout(layout);
+
+		tree = new Tree(comp, SWT.VIRTUAL | SWT.BORDER | SWT.FULL_SELECTION);
 		tree.setHeaderVisible(false);
+		tree.setLinesVisible(false);
+
+		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
+		data.grabExcessHorizontalSpace = true;
+		data.grabExcessVerticalSpace = true;
+		tree.setLayoutData(data);
 
 		TreeColumn element = new TreeColumn(tree, SWT.LEFT);
 		element.setText("Element");
@@ -77,6 +145,10 @@ public class PHPDependSummaryView extends ViewPart {
 		TreeColumn infos = new TreeColumn(tree, SWT.LEFT);
 		infos.setText("Metrics");
 		infos.setWidth(400);
+
+		// final Menu treeMenu = new Menu(tree);
+		// MenuItem item = new MenuItem(treeMenu, SWT.PUSH);
+		// item.setText("open resource");
 
 		tree.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(Event event) {
@@ -91,18 +163,19 @@ public class PHPDependSummaryView extends ViewPart {
 					IElement[] members = parentElement.members();
 					element = members[parentItem.indexOf(item)];
 				}
+				ElementDecorator decorator = new ElementDecorator(element);
 
 				StringBuffer m = new StringBuffer();
-				for (MetricResult r : element.getResults()) {
+				for (MetricResult r : decorator.getResults()) {
 					if (m.length() > 0)
 						m.append(", ");
 					m.append(r.id + ": " + r.value);
 				}
 
-				item.setData("element", element);
-				item.setText(new String[] { element.getName(), m.toString() });
-				item.setImage(element.getImage());
-				int length = element.members().length;
+				item.setData("element", decorator);
+				item.setText(new String[] { decorator.getName(), m.toString() });
+				item.setImage(decorator.getImage());
+				int length = decorator.members().length;
 				item.setItemCount(length);
 
 				for (TreeColumn c : tree.getColumns()) {
@@ -110,6 +183,41 @@ public class PHPDependSummaryView extends ViewPart {
 				}
 			}
 		});
+
+		tree.addSelectionListener(new SelectionListener() {
+
+			public void widgetSelected(SelectionEvent e) {
+				TreeItem select = (TreeItem) e.item;
+				table.removeAll();
+				IElement element = (IElement) select.getData("element");
+				if (element != null) {
+					for (MetricResult result : element.getResults()) {
+						TableItem item = new TableItem(table, SWT.NULL);
+						item.setText(new String[] { result.id, "" + result.value });
+					}
+				}
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+
+		table = new Table(comp, SWT.BORDER | SWT.V_SCROLL);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+
+		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
+		data.grabExcessVerticalSpace = true;
+		data.minimumWidth = 270;
+		table.setLayoutData(data);
+
+		TableColumn names = new TableColumn(table, SWT.NONE);
+		names.setText("Metric");
+		names.setWidth(200);
+
+		TableColumn values = new TableColumn(table, SWT.NONE);
+		values.setText("Value");
+		values.setWidth(70);
 
 		createToolbar();
 	}
@@ -186,13 +294,14 @@ public class PHPDependSummaryView extends ViewPart {
 	}
 
 	public void setFocus() {
-
+		tree.setFocus();
 	}
 
 	public static void showSummary(MetricSummary summary) {
 		Assert.isNotNull(summary);
 
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		System.out.println(window);
 		if (window != null) {
 			IWorkbenchPage page = window.getActivePage();
 			if (page != null) {

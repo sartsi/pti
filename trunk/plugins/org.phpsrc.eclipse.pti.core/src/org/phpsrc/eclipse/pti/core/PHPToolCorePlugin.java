@@ -43,6 +43,8 @@ public class PHPToolCorePlugin extends AbstractPHPToolPlugin {
 	public static final String PLUGIN_ID = "org.phpsrc.eclipse.pti.core";
 
 	public static final String IMG_ACTIVITY = "IMG_ACTIVITY";
+	public static final String IMG_OVERLAY_ERROR = "IMG_OVERLAY_ERROR";
+	public static final String IMG_OVERLAY_WARNING = "IMG_OVERLAY_WARNING";
 
 	// The shared instance
 	private static PHPToolCorePlugin plugin;
@@ -68,6 +70,10 @@ public class PHPToolCorePlugin extends AbstractPHPToolPlugin {
 
 	protected void initializeImageRegistry(ImageRegistry registry) {
 		registry.put(IMG_ACTIVITY, ImageDescriptor.createFromURL(resolvePluginResourceURL("icons/obj16/activity.gif")));
+		registry.put(IMG_OVERLAY_ERROR, ImageDescriptor
+				.createFromURL(resolvePluginResourceURL("icons/ovr16/error_co.gif")));
+		registry.put(IMG_OVERLAY_WARNING, ImageDescriptor
+				.createFromURL(resolvePluginResourceURL("icons/obj16/warning_co.gif")));
 	}
 
 	/*

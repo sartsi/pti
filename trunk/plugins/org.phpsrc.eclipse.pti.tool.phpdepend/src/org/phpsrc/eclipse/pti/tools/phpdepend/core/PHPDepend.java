@@ -46,6 +46,7 @@ import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.MetricSummar
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferences;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferencesFactory;
 import org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.PHPDependSummaryView;
+import org.phpsrc.eclipse.pti.ui.Logger;
 import org.xml.sax.SAXException;
 
 public class PHPDepend extends AbstractPHPTool {
@@ -96,7 +97,7 @@ public class PHPDepend extends AbstractPHPTool {
 			PHPToolLauncher launcher = getProjectPHPToolLauncher(folder.getProject(), cmdLineArgs, folder.getLocation());
 			return parseOutput(folder.getProject(), launcher, launcher.launch(folder.getProject()));
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			Logger.logException(e);
 		}
 		return new IProblem[0];
 	}
