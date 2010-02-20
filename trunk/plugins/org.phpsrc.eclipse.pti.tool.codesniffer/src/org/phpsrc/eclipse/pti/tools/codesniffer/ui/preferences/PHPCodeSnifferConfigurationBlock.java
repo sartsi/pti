@@ -57,6 +57,7 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.phpsrc.eclipse.pti.library.pear.ui.preferences.AbstractPEARPHPToolConfigurationBlock;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.PHPCodeSniffer;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.Standard;
 import org.phpsrc.eclipse.pti.ui.widgets.listener.NumberOnlyVerifyListener;
 
 public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigurationBlock {
@@ -83,16 +84,6 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 	private final StringDialogField fFileExtension;
 	private final StringDialogField fIgnorePattern;
 	private final StringDialogField fIgnoreSniffs;
-
-	public static class Standard {
-		public String name;
-		public boolean custom;
-		public String path;
-
-		public String toString() {
-			return name;
-		}
-	}
 
 	private class CodeSnifferLabelProvider extends LabelProvider implements ITableLabelProvider, IFontProvider {
 
@@ -373,14 +364,13 @@ public class PHPCodeSnifferConfigurationBlock extends AbstractPEARPHPToolConfigu
 				checkedStandards.append(elem.name);
 			}
 
-			Standard defaultStandard = (Standard) fStandardsList.getElement(0);
-			if (defaultStandard != null) {
-				setValue(PREF_DEFAULT_STANDARD_NAME, defaultStandard.name);
-				setValue(PREF_DEFAULT_STANDARD_PATH, defaultStandard.path);
-			}
 			setValue(PREF_CUSTOM_STANDARD_NAMES, customStandards.toString());
 			setValue(PREF_CUSTOM_STANDARD_PATHS, customPaths.toString());
 			setValue(PREF_ACTIVE_STANDARDS, checkedStandards.toString());
+
+			// delete old entries
+			setValue(PREF_DEFAULT_STANDARD_NAME, null);
+			setValue(PREF_DEFAULT_STANDARD_PATH, null);
 
 			validateSettings(PREF_CUSTOM_STANDARD_NAMES, null, null);
 		}

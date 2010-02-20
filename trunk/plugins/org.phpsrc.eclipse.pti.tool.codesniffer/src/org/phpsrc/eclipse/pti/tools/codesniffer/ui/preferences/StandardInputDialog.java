@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.phpsrc.eclipse.pti.tools.codesniffer.ui.preferences.PHPCodeSnifferConfigurationBlock.Standard;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.Standard;
 
 /**
  * Dialog to enter a na new task tag
@@ -116,7 +116,6 @@ public class StandardInputDialog extends StatusDialog {
 		return standard;
 	}
 
-	
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
 
@@ -184,7 +183,7 @@ public class StandardInputDialog extends StatusDialog {
 	/*
 	 * @see org.eclipse.jface.window.Window#configureShell(Shell)
 	 */
-	
+
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		// TODO - Add the Help contex id

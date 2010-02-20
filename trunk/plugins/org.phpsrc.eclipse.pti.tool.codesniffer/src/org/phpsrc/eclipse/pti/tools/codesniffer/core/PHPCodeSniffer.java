@@ -50,6 +50,7 @@ import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
 import org.phpsrc.eclipse.pti.tools.codesniffer.PHPCodeSnifferPlugin;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferences;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.PHPCodeSnifferPreferencesFactory;
+import org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences.Standard;
 import org.phpsrc.eclipse.pti.tools.codesniffer.core.problem.CodeSnifferProblem;
 import org.phpsrc.eclipse.pti.ui.Logger;
 import org.w3c.dom.Document;
@@ -79,7 +80,7 @@ public class PHPCodeSniffer extends AbstractPHPTool {
 		if (canParse(prefs.getIgnorePattern(), prefs.getFileExtensions(), file)) {
 
 			ArrayList<IProblem> list = new ArrayList<IProblem>(10);
-			for (String standard : prefs.getStandards()) {
+			for (Standard standard : prefs.getStandards()) {
 				IProblem[] problems = parseOutput(new PHPSourceFile(file), launchFile(file, prefs, standard), prefs);
 				for (IProblem problem : problems)
 					if (!list.contains(problem))
@@ -129,7 +130,7 @@ public class PHPCodeSniffer extends AbstractPHPTool {
 		return can;
 	}
 
-	protected String launchFile(IFile file, PHPCodeSnifferPreferences prefs, String standard) {
+	protected String launchFile(IFile file, PHPCodeSnifferPreferences prefs, Standard standard) {
 
 		String output = null;
 		try {
@@ -217,7 +218,7 @@ public class PHPCodeSniffer extends AbstractPHPTool {
 		return problems;
 	}
 
-	protected PHPToolLauncher getPHPToolLauncher(IProject project, PHPCodeSnifferPreferences prefs, String standard) {
+	protected PHPToolLauncher getPHPToolLauncher(IProject project, PHPCodeSnifferPreferences prefs, Standard standard) {
 		PHPToolLauncher launcher;
 		try {
 			launcher = (PHPToolLauncher) project.getSessionProperty(QUALIFIED_NAME);
@@ -243,15 +244,17 @@ public class PHPCodeSniffer extends AbstractPHPTool {
 		return launcher;
 	}
 
-	private INIFileEntry[] getPHPINIEntries(PHPCodeSnifferPreferences prefs, IProject project, String standard) {
+	private INIFileEntry[] getPHPINIEntries(PHPCodeSnifferPreferences prefs, IProject project, Standard standard) {
 
 		IPath[] includePaths = PHPCodeSnifferPlugin.getDefault().getPluginIncludePaths(project);
 
-		IPath[] tmpIncludePaths = new IPath[includePaths.length + 2];
-		System.arraycopy(includePaths, 0, tmpIncludePaths, 2, includePaths.length);
-		tmpIncludePaths[0] = new Path(standard);
-		tmpIncludePaths[1] = new Path(standard).removeLastSegments(1);
-		includePaths = tmpIncludePaths;
+		if (standard.custom) {
+			IPath[] tmpIncludePaths = new IPath[includePaths.length + 2];
+			System.arraycopy(includePaths, 0, tmpIncludePaths, 2, includePaths.length);
+			tmpIncludePaths[0] = new Path(standard.path);
+			tmpIncludePaths[1] = new Path(standard.path).removeLastSegments(1);
+			includePaths = tmpIncludePaths;
+		}
 
 		INIFileEntry[] entries;
 		if (includePaths.length > 0) {
@@ -267,9 +270,10 @@ public class PHPCodeSniffer extends AbstractPHPTool {
 		return PHPCodeSnifferPlugin.getDefault().resolvePluginResource("/php/tools/phpcs.php");
 	}
 
-	private String getCommandLineArgs(String standard, int tabWidth) {
+	private String getCommandLineArgs(Standard standard, int tabWidth) {
 
-		String args = "--report=xml --standard=" + OperatingSystem.escapeShellFileArg(standard);
+		String args = "--report=xml --standard="
+				+ OperatingSystem.escapeShellFileArg(standard.custom ? standard.path : standard.name);
 
 		if (tabWidth > 0)
 			args += " --tab-width=" + tabWidth;

@@ -27,6 +27,8 @@
 
 package org.phpsrc.eclipse.pti.tools.codesniffer.core.preferences;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -55,9 +57,11 @@ public class PHPCodeSnifferPreferencesFactory {
 
 		// Check first the standard path. Is it not empty we have a custom
 		// standard, so we must use the path instead of the name.
-		String standard = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH);
+		String defaultStandard = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH);
 		String activeStandards = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_ACTIVE_STANDARDS);
 		String pearLibraryName = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_PEAR_LIBRARY);
+		String customStandardNames = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_CUSTOM_STANDARD_NAMES);
+		String customStandardPaths = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_CUSTOM_STANDARD_PATHS);
 
 		int tabWidth = prefs.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH);
 		String fileExtensions = prefs.getString(PHPCodeSnifferPreferenceNames.PREF_FILE_EXTENSIONS);
@@ -71,9 +75,14 @@ public class PHPCodeSnifferPreferencesFactory {
 			if (node != null) {
 				phpExe = node.get(PHPCodeSnifferPreferenceNames.PREF_PHP_EXECUTABLE, phpExe);
 
-				standard = node.get(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH, standard);
+				defaultStandard = node.get(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_STANDARD_PATH, defaultStandard);
 				activeStandards = node.get(PHPCodeSnifferPreferenceNames.PREF_ACTIVE_STANDARDS, activeStandards);
 				pearLibraryName = node.get(PHPCodeSnifferPreferenceNames.PREF_PEAR_LIBRARY, pearLibraryName);
+				customStandardNames = node.get(PHPCodeSnifferPreferenceNames.PREF_CUSTOM_STANDARD_NAMES,
+						customStandardNames);
+				customStandardPaths = node.get(PHPCodeSnifferPreferenceNames.PREF_CUSTOM_STANDARD_PATHS,
+						customStandardPaths);
+
 				tabWidth = node.getInt(PHPCodeSnifferPreferenceNames.PREF_DEFAULT_TAB_WITH, tabWidth);
 				fileExtensions = node.get(PHPCodeSnifferPreferenceNames.PREF_FILE_EXTENSIONS, fileExtensions);
 				printOutput = node.getBoolean(PHPCodeSnifferPreferenceNames.PREF_DEBUG_PRINT_OUTPUT, printOutput);
@@ -85,15 +94,35 @@ public class PHPCodeSnifferPreferencesFactory {
 		String[] fileExtensionsList = fileExtensions == null || fileExtensions.length() == 0 ? new String[0]
 				: fileExtensions.split(",");
 
-		String[] standards = new String[0];
+		String[] activeList = new String[0];
 		if (activeStandards != null) {
-			standards = activeStandards.split(";");
-		} else if (standard != null) {
-			standards = new String[] { standard };
+			activeList = activeStandards.split(";");
+		} else if (defaultStandard != null) {
+			activeList = new String[] { defaultStandard };
 		}
 
-		return new PHPCodeSnifferPreferences(phpExe, printOutput, pearLibraryName, standards, tabWidth,
-				fileExtensionsList, ignorePattern, ignoreSniffs == null || ignoreSniffs.length() == 0 ? null
+		String[] customNameList = customStandardNames.split(";");
+		String[] customPathList = customStandardPaths.split(";");
+
+		ArrayList<Standard> standards = new ArrayList<Standard>(activeList.length);
+
+		for (String s : activeList) {
+			Standard standard = new Standard();
+			standard.name = s;
+
+			for (int i = 0; i < customNameList.length; i++) {
+				if (customNameList[i].equals(s)) {
+					standard.path = customPathList[i];
+					standard.custom = true;
+					break;
+				}
+			}
+
+			standards.add(standard);
+		}
+
+		return new PHPCodeSnifferPreferences(phpExe, printOutput, pearLibraryName, standards.toArray(new Standard[0]),
+				tabWidth, fileExtensionsList, ignorePattern, ignoreSniffs == null || ignoreSniffs.length() == 0 ? null
 						: ignoreSniffs.split(","));
 	}
 
