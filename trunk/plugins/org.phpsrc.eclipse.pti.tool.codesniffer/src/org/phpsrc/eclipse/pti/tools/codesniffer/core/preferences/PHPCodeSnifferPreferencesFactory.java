@@ -101,8 +101,12 @@ public class PHPCodeSnifferPreferencesFactory {
 			activeList = new String[] { defaultStandard };
 		}
 
-		String[] customNameList = customStandardNames.split(";");
-		String[] customPathList = customStandardPaths.split(";");
+		String[] customNameList = new String[0];
+		String[] customPathList = new String[0];
+		if (customStandardNames != null && customStandardPaths != null) {
+			customNameList = customStandardNames.split(";");
+			customPathList = customStandardPaths.split(";");
+		}
 
 		ArrayList<Standard> standards = new ArrayList<Standard>(activeList.length);
 
