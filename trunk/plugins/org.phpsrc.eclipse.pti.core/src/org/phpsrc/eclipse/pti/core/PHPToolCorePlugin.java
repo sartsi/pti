@@ -73,7 +73,7 @@ public class PHPToolCorePlugin extends AbstractPHPToolPlugin {
 		registry.put(IMG_OVERLAY_ERROR, ImageDescriptor
 				.createFromURL(resolvePluginResourceURL("icons/ovr16/error_co.gif")));
 		registry.put(IMG_OVERLAY_WARNING, ImageDescriptor
-				.createFromURL(resolvePluginResourceURL("icons/obj16/warning_co.gif")));
+				.createFromURL(resolvePluginResourceURL("icons/ovr16/warning_co.gif")));
 	}
 
 	/*
