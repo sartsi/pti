@@ -28,6 +28,10 @@ import org.eclipse.dltk.core.DLTKCore;
 import org.eclipse.dltk.core.IMember;
 import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.ISourceModule;
+import org.eclipse.dltk.core.IType;
+import org.eclipse.dltk.core.ModelException;
+import org.eclipse.dltk.core.search.SearchMatch;
+import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPToolkitUtil {
@@ -205,5 +209,38 @@ public class PHPToolkitUtil {
 			Logger.logException(e);
 		}
 		return tmpFile;
+	}
+
+	public static boolean hasSuperClass(IResource resource, String className) {
+		ISourceModule module = PHPToolkitUtil.getSourceModule(resource);
+		if (module != null)
+			return hasSuperClass(module, className);
+
+		return false;
+	}
+
+	public static boolean hasSuperClass(ISourceModule module, String className) {
+		try {
+			IType[] types = module.getAllTypes();
+			if (types.length > 0) {
+				String[] classes = types[0].getSuperClasses();
+				for (String c : classes) {
+					if (c.equals(className)) {
+						return true;
+					} else {
+						SearchMatch[] matches = PHPSearchEngine.findClass(c, PHPSearchEngine.createProjectScope(module
+								.getScriptProject().getProject()));
+						for (SearchMatch match : matches) {
+							if (hasSuperClass(match.getResource(), className))
+								return true;
+						}
+					}
+				}
+			}
+		} catch (ModelException e) {
+			Logger.logException(e);
+		}
+
+		return false;
 	}
 }

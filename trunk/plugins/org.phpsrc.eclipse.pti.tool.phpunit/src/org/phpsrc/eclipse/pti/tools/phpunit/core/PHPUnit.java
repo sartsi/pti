@@ -302,17 +302,11 @@ public class PHPUnit extends AbstractPHPTool {
 
 	static public IFile searchTestCase(IFile file) {
 		ISourceModule module = PHPToolkitUtil.getSourceModule(file);
-
-		IType[] types;
 		try {
-			types = module.getAllTypes();
+			IType[] types = module.getAllTypes();
 			if (types.length > 0) {
-				String[] classes = types[0].getSuperClasses();
-				for (String c : classes) {
-					if (c.equals("PHPUnit_Framework_TestCase")) {
-						return file;
-					}
-				}
+				if (PHPToolkitUtil.hasSuperClass(module, "PHPUnit_Framework_TestCase"))
+					return file;
 
 				SearchMatch[] matches = PHPSearchEngine.findClass(types[0].getElementName() + "Test", PHPSearchEngine
 						.createProjectScope(file.getProject()));
@@ -328,18 +322,6 @@ public class PHPUnit extends AbstractPHPTool {
 	}
 
 	static public boolean isTestSuite(IFile file) {
-		ISourceModule module = PHPToolkitUtil.getSourceModule(file);
-
-		IType[] types;
-		try {
-			types = module.getAllTypes();
-			if (types.length > 0) {
-				return types[0].getSource().indexOf("PHPUnit_Framework_TestSuite") != -1 ? true : false;
-			}
-		} catch (ModelException e) {
-			Logger.logException(e);
-		}
-
-		return false;
+		return PHPToolkitUtil.hasSuperClass(file, "PHPUnit_Framework_TestSuite");
 	}
 }
