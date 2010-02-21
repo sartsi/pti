@@ -119,9 +119,9 @@ public class MetricInputDialog extends StatusDialog {
 		fWarningMax.setText((m != null && m.warningMax != null) ? "" + m.warningMax : ""); //$NON-NLS-1$
 
 		fErrorMin.setDialogFieldListener(adapter);
-		fErrorMin.setText((m != null && m.errorMax != null) ? "" + m.errorMax : ""); //$NON-NLS-1$
+		fErrorMin.setText((m != null && m.errorMin != null) ? "" + m.errorMin : ""); //$NON-NLS-1$
 		fErrorMax.setDialogFieldListener(adapter);
-		fErrorMax.setText((m != null && m.errorMin != null) ? "" + m.errorMin : ""); //$NON-NLS-1$
+		fErrorMax.setText((m != null && m.errorMax != null) ? "" + m.errorMax : ""); //$NON-NLS-1$
 
 		fMetricTypes = new String[] { "File", "File with type hierachy", "Folder" };
 		fType.setItems(fMetricTypes);
@@ -142,7 +142,7 @@ public class MetricInputDialog extends StatusDialog {
 		text = fErrorMax.getText().trim();
 		m.errorMax = text.length() == 0 ? null : Float.parseFloat(text);
 
-		m.type = 1; // fType.getSelectionIndex() + 1;
+		// m.type = 1; // fType.getSelectionIndex() + 1;
 
 		return m;
 	}
