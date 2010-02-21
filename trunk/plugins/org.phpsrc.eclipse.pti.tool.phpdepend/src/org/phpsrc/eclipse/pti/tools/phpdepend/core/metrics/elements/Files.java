@@ -29,24 +29,30 @@ package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
-public interface IElement {
-	public String getName();
+public class Files extends AbstractElement {
 
-	public Image getImage();
+	private final static Image IMAGE = PlatformUI.getWorkbench().getSharedImages().getImage(
+			ISharedImages.IMG_OBJ_FOLDER);
 
-	public IElement getParent();
+	public Files(IElement parent, String name, MetricResult[] results) {
+		super(parent, name, results);
+		Assert.isNotNull(parent);
+	}
 
-	public IElement[] members();
+	public Image getImage() {
+		return IMAGE;
+	}
 
-	public IResource getResource();
+	public IResource getResource() {
+		return null;
+	}
 
-	public IMarker getFileMarker();
-
-	public MetricResult[] getResults();
-
-	public boolean hasErrors();
-
-	public boolean hasWarnings();
+	public IMarker getFileMarker() {
+		return null;
+	}
 }

@@ -27,7 +27,9 @@
 
 package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.dltk.ui.DLTKPluginImages;
 import org.eclipse.swt.graphics.Image;
 
@@ -37,6 +39,7 @@ public class Method extends AbstractElement {
 
 	public Method(IElement parent, String name, MetricResult[] results) {
 		super(parent, name, results);
+		Assert.isNotNull(parent);
 	}
 
 	public Image getImage() {
@@ -44,7 +47,10 @@ public class Method extends AbstractElement {
 	}
 
 	public IResource getResource() {
-		return null;
+		return getParent().getResource();
 	}
 
+	public IMarker getFileMarker() {
+		return getParent().getFileMarker();
+	}
 }

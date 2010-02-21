@@ -29,16 +29,21 @@ package org.phpsrc.eclipse.pti.tools.phpdepend.ui.views;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -56,21 +61,25 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ViewPart;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.IElement;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.MetricResult;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.MetricSummary;
+import org.phpsrc.eclipse.pti.ui.Logger;
 import org.phpsrc.eclipse.pti.ui.images.OverlayImageIcon;
 
 public class PHPDependSummaryView extends ViewPart {
 
 	public static final String VIEW_ID = "org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.summary";
+	private static final String ELEMENT_DATA_KEY = "element";
 
 	protected Tree tree;
 	protected Table table;
@@ -87,11 +96,21 @@ public class PHPDependSummaryView extends ViewPart {
 		}
 
 		public Image getImage() {
-			String key = element.getClass().getName() + "#error";
+			String key = element.getClass().getName();
+			if (element.hasErrors())
+				key += "#error";
+			else if (element.hasWarnings())
+				key += "#warning";
 			Image img = imageRegistry.get(key);
 			if (img == null) {
-				img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault().getImageRegistry().get(
-						PHPToolCorePlugin.IMG_OVERLAY_ERROR), OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
+				if (element.hasErrors())
+					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault().getImageRegistry()
+							.get(PHPToolCorePlugin.IMG_OVERLAY_ERROR), OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
+				else if (element.hasWarnings())
+					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault().getImageRegistry()
+							.get(PHPToolCorePlugin.IMG_OVERLAY_WARNING), OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
+				else
+					img = element.getImage();
 				imageRegistry.put(key, img);
 			}
 
@@ -116,6 +135,18 @@ public class PHPDependSummaryView extends ViewPart {
 
 		public IElement[] members() {
 			return element.members();
+		}
+
+		public boolean hasErrors() {
+			return element.hasErrors();
+		}
+
+		public boolean hasWarnings() {
+			return element.hasWarnings();
+		}
+
+		public IMarker getFileMarker() {
+			return element.getFileMarker();
 		}
 	}
 
@@ -159,7 +190,7 @@ public class PHPDependSummaryView extends ViewPart {
 				if (parentItem == null) {
 					element = summaries.get(showIndex);
 				} else {
-					IElement parentElement = (IElement) parentItem.getData("element");
+					IElement parentElement = (IElement) parentItem.getData(ELEMENT_DATA_KEY);
 					IElement[] members = parentElement.members();
 					element = members[parentItem.indexOf(item)];
 				}
@@ -172,7 +203,7 @@ public class PHPDependSummaryView extends ViewPart {
 					m.append(r.id + ": " + r.value);
 				}
 
-				item.setData("element", decorator);
+				item.setData(ELEMENT_DATA_KEY, decorator);
 				item.setText(new String[] { decorator.getName(), m.toString() });
 				item.setImage(decorator.getImage());
 				int length = decorator.members().length;
@@ -184,16 +215,66 @@ public class PHPDependSummaryView extends ViewPart {
 			}
 		});
 
+		tree.addMouseListener(new MouseListener() {
+
+			public void mouseUp(MouseEvent e) {
+			}
+
+			public void mouseDown(MouseEvent e) {
+			}
+
+			public void mouseDoubleClick(MouseEvent e) {
+				if (e.button == 1 && e.count == 2) {
+					Tree t = (Tree) e.widget;
+					TreeItem[] items = t.getSelection();
+					if (items.length > 0) {
+						IElement element = (IElement) items[0].getData(ELEMENT_DATA_KEY);
+						if (element != null) {
+							IMarker m = element.getFileMarker();
+							if (m != null) {
+								try {
+									IDE.openEditor(
+											PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), m);
+								} catch (PartInitException e1) {
+									Logger.logException(e1);
+								}
+								try {
+									m.delete();
+								} catch (CoreException e1) {
+									Logger.logException(e1);
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+
 		tree.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent e) {
 				TreeItem select = (TreeItem) e.item;
 				table.removeAll();
-				IElement element = (IElement) select.getData("element");
+				IElement element = (IElement) select.getData(ELEMENT_DATA_KEY);
 				if (element != null) {
 					for (MetricResult result : element.getResults()) {
 						TableItem item = new TableItem(table, SWT.NULL);
-						item.setText(new String[] { result.id, "" + result.value });
+						String name = "";
+						Image img = null;
+						if (result.metric != null) {
+							name = result.metric.name;
+							if (result.hasError()) {
+								img = PlatformUI.getWorkbench().getSharedImages().getImage(
+										ISharedImages.IMG_OBJS_ERROR_TSK);
+								item.setForeground(new Color(item.getDisplay(), 255, 0, 0));
+							} else if (result.hasWarning()) {
+								img = PlatformUI.getWorkbench().getSharedImages().getImage(
+										ISharedImages.IMG_OBJS_WARN_TSK);
+							}
+						}
+
+						item.setText(new String[] { name, result.id, "" + result.value });
+						item.setImage(img);
 					}
 				}
 			}
@@ -208,12 +289,16 @@ public class PHPDependSummaryView extends ViewPart {
 
 		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
 		data.grabExcessVerticalSpace = true;
-		data.minimumWidth = 270;
+		data.minimumWidth = 320;
 		table.setLayoutData(data);
 
 		TableColumn names = new TableColumn(table, SWT.NONE);
-		names.setText("Metric");
+		names.setText("Name");
 		names.setWidth(200);
+
+		TableColumn ids = new TableColumn(table, SWT.NONE);
+		ids.setText("Id");
+		ids.setWidth(50);
 
 		TableColumn values = new TableColumn(table, SWT.NONE);
 		values.setText("Value");
@@ -231,7 +316,7 @@ public class PHPDependSummaryView extends ViewPart {
 					ToolItem ti = (ToolItem) e.widget;
 					Menu m = mc.getMenu(ti.getParent());
 					if (m != null) {
-						Point point = ti.getParent().toDisplay(new Point(e.x, e.y + 21));
+						Point point = ti.getParent().toDisplay(new Point(e.x, e.y + ti.getBounds().height));
 						m.setLocation(point.x, point.y);
 						m.setVisible(true);
 					}
@@ -279,6 +364,25 @@ public class PHPDependSummaryView extends ViewPart {
 							}
 						});
 					}
+
+					new MenuItem(listMenu, SWT.SEPARATOR);
+					MenuItem m = new MenuItem(listMenu, SWT.PUSH);
+					m.setText("Clear History");
+					m.addSelectionListener(new SelectionListener() {
+						public void widgetSelected(SelectionEvent e) {
+							tree.removeAll();
+							table.removeAll();
+							showIndex = -1;
+							int size = summaries.size();
+							for (int i = size - 1; i >= 0; i--) {
+								summaries.remove(i);
+							}
+						}
+
+						public void widgetDefaultSelected(SelectionEvent e) {
+						}
+					});
+
 				}
 
 				return listMenu;
@@ -301,7 +405,6 @@ public class PHPDependSummaryView extends ViewPart {
 		Assert.isNotNull(summary);
 
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		System.out.println(window);
 		if (window != null) {
 			IWorkbenchPage page = window.getActivePage();
 			if (page != null) {

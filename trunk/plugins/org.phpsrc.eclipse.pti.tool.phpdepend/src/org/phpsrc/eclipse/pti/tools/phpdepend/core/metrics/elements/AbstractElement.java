@@ -29,12 +29,17 @@ package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
 
 import java.util.ArrayList;
 
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.Metric;
+
 public abstract class AbstractElement implements IElement {
 
 	protected String name;
 	protected IElement parent;
 	protected ArrayList<IElement> members = new ArrayList<IElement>();
+	protected Metric[] metrics;
 	protected MetricResult[] results;
+	protected boolean errors = false;
+	protected boolean warnings = false;
 
 	public AbstractElement(IElement parent, String name, MetricResult[] results) {
 		this.parent = parent;
@@ -42,19 +47,26 @@ public abstract class AbstractElement implements IElement {
 			((AbstractElement) parent).addMember(this);
 		this.name = name;
 		this.results = results;
+
+		for (MetricResult r : results) {
+			if (r.hasError()) {
+				setHasErrors(true);
+			} else if (r.hasWarning()) {
+				setHasWarnings(true);
+			}
+			if (errors)
+				break;
+		}
 	}
 
-	@Override
 	public String getName() {
 		return name;
 	}
 
-	@Override
 	public IElement getParent() {
 		return parent;
 	}
 
-	@Override
 	public IElement[] members() {
 		return members.toArray(new IElement[0]);
 	}
@@ -66,5 +78,28 @@ public abstract class AbstractElement implements IElement {
 
 	public MetricResult[] getResults() {
 		return results;
+	}
+
+	protected void setHasErrors(boolean errors) {
+		this.errors = errors;
+		this.warnings = false;
+		if (parent != null && parent instanceof AbstractElement)
+			((AbstractElement) parent).setHasErrors(errors);
+	}
+
+	public boolean hasErrors() {
+		return errors;
+	}
+
+	protected void setHasWarnings(boolean warnings) {
+		if (!this.errors) {
+			this.warnings = warnings;
+			if (parent != null && parent instanceof AbstractElement)
+				((AbstractElement) parent).setHasWarnings(warnings);
+		}
+	}
+
+	public boolean hasWarnings() {
+		return warnings;
 	}
 }

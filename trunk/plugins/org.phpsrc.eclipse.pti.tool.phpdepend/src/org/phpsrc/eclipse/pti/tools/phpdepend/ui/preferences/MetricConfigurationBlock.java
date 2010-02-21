@@ -27,6 +27,7 @@
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.preferences;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -54,6 +55,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.Metric;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.MetricList;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferenceNames;
 
 public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 	private static final Key PREF_METRICS_ENABLED = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_ENABLED);
@@ -64,12 +67,6 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 	private static final Key PREF_METRICS_ERROR_MIN = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_ERROR_MIN);
 	private static final Key PREF_METRICS_ERROR_MAX = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_ERROR_MAX);
 	private static final Key PREF_METRICS_TYPES = getMetricKey(PHPDependPreferenceNames.PREF_METRICS_TYPES);
-
-	public static final String[] DEFAULT_METRIC_IDS = new String[] { "cr", "rcr", "ccn", "ccn2" };
-	public static final String[] DEFAULT_METRIC_NAMES = new String[] { "Code Rank", "Reverse Code Rank",
-			"Cyclomatic Complexity 1", "Cyclomatic Complexity 2" };
-	public static final Integer[] DEFAULT_METRIC_TYPES = new Integer[] { Metric.TYPE_PACKAGE, Metric.TYPE_PACKAGE,
-			Metric.TYPE_FILE, Metric.TYPE_FILE };
 
 	private static final int IDX_ADD = 0;
 	private static final int IDX_EDIT = 1;
@@ -304,8 +301,8 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 		if (field == fMetricList) {
 
 			StringBuffer metricEnabled = new StringBuffer();
-			StringBuffer metricNames = new StringBuffer();
 			StringBuffer metricIds = new StringBuffer();
+			StringBuffer metricNames = new StringBuffer();
 			StringBuffer metricWarningMin = new StringBuffer();
 			StringBuffer metricWarningMax = new StringBuffer();
 			StringBuffer metricErrorMin = new StringBuffer();
@@ -319,7 +316,6 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 					metricEnabled.append(';');
 					metricIds.append(';');
 					metricNames.append(';');
-					metricEnabled.append(';');
 					metricWarningMin.append(';');
 					metricWarningMax.append(';');
 					metricErrorMin.append(';');
@@ -327,13 +323,13 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 					metricTypes.append(';');
 				}
 
-				metricEnabled.append(elem.enabled ? '1' : '0');
+				metricEnabled.append(fMetricList.isChecked(elem) ? '1' : '0');
 				metricIds.append(elem.id);
 				metricNames.append(elem.name);
-				metricWarningMin.append(elem.warningMin);
-				metricWarningMax.append(elem.warningMax);
-				metricErrorMin.append(elem.errorMin);
-				metricErrorMax.append(elem.errorMax);
+				metricWarningMin.append(elem.warningMin != null ? elem.warningMin : "");
+				metricWarningMax.append(elem.warningMax != null ? elem.warningMax : "");
+				metricErrorMin.append(elem.errorMin != null ? elem.errorMin : "");
+				metricErrorMax.append(elem.errorMax != null ? elem.errorMax : "");
 				metricTypes.append(elem.type);
 			}
 
@@ -404,6 +400,7 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 			String[] type = getTokens(typePrefs, ";");
 
 			ArrayList<Metric> elements = new ArrayList<Metric>(ids.length);
+			ArrayList<Metric> selectedElements = new ArrayList<Metric>(ids.length);
 
 			for (int i = 0; i < ids.length; i++) {
 				Metric m = new Metric();
@@ -432,25 +429,19 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 				}
 
 				elements.add(m);
+				if (m.enabled)
+					selectedElements.add(m);
 			}
 
 			fMetricList.setElements(elements);
+			fMetricList.setCheckedElements(selectedElements);
 		}
 	}
 
 	public void performDefaults() {
-
-		ArrayList<Metric> elements = new ArrayList<Metric>(DEFAULT_METRIC_IDS.length);
-		for (int i = 0; i < DEFAULT_METRIC_IDS.length; i++) {
-			Metric m = new Metric();
-			m.enabled = false;
-			m.id = DEFAULT_METRIC_IDS[i];
-			m.name = DEFAULT_METRIC_NAMES[i];
-			m.type = DEFAULT_METRIC_TYPES[i];
-			elements.add(m);
-		}
-
-		fMetricList.setElements(elements);
+		List metrics = Arrays.asList(MetricList.getAll());
+		fMetricList.setElements(metrics);
+		fMetricList.setCheckedElements(metrics);
 
 		settingsUpdated();
 		updateControls();

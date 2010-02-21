@@ -24,7 +24,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package org.phpsrc.eclipse.pti.tools.phpdepend.ui.preferences;
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences;
 
 public class PHPDependPreferenceNames {
 	public static final String PREF_PHPDEPEND_PHP_EXECUTABLE = "phpdepend_php_executable"; //$NON-NLS-1$

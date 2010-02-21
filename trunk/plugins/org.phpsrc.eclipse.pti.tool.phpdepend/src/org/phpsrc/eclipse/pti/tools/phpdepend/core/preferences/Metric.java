@@ -33,15 +33,23 @@ public class Metric {
 	public static final int TYPE_PACKAGE = 3;
 
 	public boolean enabled;
-	public String name;
 	public String id;
+	public String name;
 	public Float warningMin;
 	public Float warningMax;
 	public Float errorMax;
 	public Float errorMin;
 	public int type;
 
-	@Override
+	public Metric() {
+	}
+
+	public Metric(String id, String name) {
+		this.enabled = false;
+		this.id = id;
+		this.name = name;
+	}
+
 	public String toString() {
 		return name;
 	}

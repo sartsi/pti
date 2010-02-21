@@ -29,6 +29,7 @@ package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
 
 import java.util.Date;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.swt.graphics.Image;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
@@ -50,6 +51,10 @@ public class MetricSummary extends AbstractElement {
 	}
 
 	public IResource getResource() {
+		return null;
+	}
+
+	public IMarker getFileMarker() {
 		return null;
 	}
 

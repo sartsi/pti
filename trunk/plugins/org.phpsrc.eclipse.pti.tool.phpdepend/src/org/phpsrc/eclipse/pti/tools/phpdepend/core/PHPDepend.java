@@ -75,17 +75,18 @@ public class PHPDepend extends AbstractPHPTool {
 		if (output != null && output.length() > 0) {
 		}
 
+		PHPDependPreferences prefs = PHPDependPreferencesFactory.factory(project);
 		String summaryFile = launcher.getAttribute(ATTR_FILE_SUMMARY_XML);
 
 		try {
-			MetricSummary element = ElementFactory.fromXML(summaryFile);
+			MetricSummary element = ElementFactory.fromXML(summaryFile, prefs.metrics);
 			PHPDependSummaryView.showSummary(element);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		} catch (SAXException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 
 		return problems.toArray(new IProblem[0]);
@@ -114,6 +115,8 @@ public class PHPDepend extends AbstractPHPTool {
 		}
 
 		File summaryFile = new File(tempDir, TMP_FILE_SUMMARY_XML);
+		if (summaryFile.exists())
+			summaryFile.delete();
 		summaryFile.createNewFile();
 		summaryFile.deleteOnExit();
 

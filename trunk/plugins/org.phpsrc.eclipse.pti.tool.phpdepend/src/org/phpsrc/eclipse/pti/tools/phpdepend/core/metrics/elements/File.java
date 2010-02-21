@@ -27,26 +27,54 @@
 
 package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
-public interface IElement {
-	public String getName();
+public class File extends AbstractElement {
 
-	public Image getImage();
+	private final static Image IMAGE_PROJECT = PlatformUI.getWorkbench().getSharedImages().getImage(
+			ISharedImages.IMG_OBJ_FILE);
+	private final static Image IMAGE_NON_PROJECT = PlatformUI.getWorkbench().getSharedImages().getImage(
+			ISharedImages.IMG_OBJ_FILE);
 
-	public IElement getParent();
+	protected IFile file;
 
-	public IElement[] members();
+	public File(IElement parent, String name, MetricResult[] results) {
+		super(parent, name, results);
+		Assert.isNotNull(parent);
 
-	public IResource getResource();
+		IFile[] files = ResourcesPlugin.getWorkspace().getRoot()
+				.findFilesForLocationURI(new java.io.File(name).toURI());
+		if (files.length > 0) {
+			file = files[0];
+			this.name = file.getProject().getName() + " - " + file.getProjectRelativePath().toPortableString();
+		}
+	}
 
-	public IMarker getFileMarker();
+	public Image getImage() {
+		if (file != null)
+			return IMAGE_PROJECT;
+		else
+			return IMAGE_NON_PROJECT;
+	}
 
-	public MetricResult[] getResults();
+	public IResource getResource() {
+		return file;
+	}
 
-	public boolean hasErrors();
-
-	public boolean hasWarnings();
+	public IMarker getFileMarker() {
+		try {
+			return file.createMarker(IMarker.TEXT);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

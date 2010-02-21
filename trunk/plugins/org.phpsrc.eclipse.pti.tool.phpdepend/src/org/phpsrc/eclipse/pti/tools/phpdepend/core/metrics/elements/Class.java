@@ -26,17 +26,21 @@
  *******************************************************************************/
 
 package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
+
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.dltk.ui.DLTKPluginImages;
 import org.eclipse.swt.graphics.Image;
-
 
 public class Class extends AbstractElement {
 
 	private final static Image IMAGE = DLTKPluginImages.DESC_OBJS_CLASS.createImage();
+	private File file;
 
 	public Class(IElement parent, String name, MetricResult[] results) {
 		super(parent, name, results);
+		Assert.isNotNull(parent);
 	}
 
 	public Image getImage() {
@@ -44,7 +48,32 @@ public class Class extends AbstractElement {
 	}
 
 	public IResource getResource() {
+		File f = getFile();
+		if (f != null)
+			return f.getResource();
+
 		return null;
 	}
 
+	public IMarker getFileMarker() {
+		File f = getFile();
+		if (f != null)
+			return f.getFileMarker();
+
+		return null;
+	}
+
+	protected File getFile() {
+		if (file == null) {
+			for (IElement member : members()) {
+				if (member instanceof File) {
+
+				}
+				file = (File) member;
+				break;
+			}
+		}
+
+		return file;
+	}
 }

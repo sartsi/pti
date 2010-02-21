@@ -142,7 +142,7 @@ public class MetricInputDialog extends StatusDialog {
 		text = fErrorMax.getText().trim();
 		m.errorMax = text.length() == 0 ? null : Float.parseFloat(text);
 
-		m.type = fType.getSelectionIndex() + 1;
+		m.type = 1; // fType.getSelectionIndex() + 1;
 
 		return m;
 	}
@@ -178,7 +178,7 @@ public class MetricInputDialog extends StatusDialog {
 		fErrorMax.doFillIntoGrid(inner, 3);
 		fErrorMax.getTextControl(null).addListener(SWT.Verify, numberOnlyListener);
 
-		fType.doFillIntoGrid(inner, 3);
+		// fType.doFillIntoGrid(inner, 3);
 
 		applyDialogFont(composite);
 

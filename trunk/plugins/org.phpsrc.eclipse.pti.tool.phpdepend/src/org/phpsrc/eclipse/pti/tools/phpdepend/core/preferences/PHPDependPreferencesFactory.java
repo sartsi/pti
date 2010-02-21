@@ -27,6 +27,8 @@
 
 package org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -37,7 +39,6 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
-import org.phpsrc.eclipse.pti.tools.phpdepend.ui.preferences.PHPDependPreferenceNames;
 
 public class PHPDependPreferencesFactory {
 	public static PHPDependPreferences factory(IFile file) {
@@ -61,6 +62,15 @@ public class PHPDependPreferencesFactory {
 		String validFileExtensions = prefs.getString(PHPDependPreferenceNames.PREF_PHPDEPEND_VALID_FILE_EXTENSIONS);
 		String excludePackages = prefs.getString(PHPDependPreferenceNames.PREF_PHPDEPEND_EXCLUDE_PACKAGES);
 
+		String enabledPrefs = prefs.getString(PHPDependPreferenceNames.PREF_METRICS_ENABLED);
+		String idPrefs = prefs.getString(PHPDependPreferenceNames.PREF_METRICS_IDS);
+		String namePrefs = prefs.getString(PHPDependPreferenceNames.PREF_METRICS_NAMES);
+		String warningMinPrefs = prefs.getString(PHPDependPreferenceNames.PREF_METRICS_WARNING_MIN);
+		String warningMaxPrefs = prefs.getString(PHPDependPreferenceNames.PREF_METRICS_WARNING_MAX);
+		String errorMinPrefs = prefs.getString(PHPDependPreferenceNames.PREF_METRICS_ERROR_MIN);
+		String errorMaxPrefs = prefs.getString(PHPDependPreferenceNames.PREF_METRICS_ERROR_MAX);
+		String typePrefs = prefs.getString(PHPDependPreferenceNames.PREF_METRICS_TYPES);
+
 		IScopeContext[] preferenceScopes = createPreferenceScopes(project);
 		if (preferenceScopes[0] instanceof ProjectScope) {
 			IEclipsePreferences node = preferenceScopes[0].getNode(PHPDependPlugin.PLUGIN_ID);
@@ -77,11 +87,60 @@ public class PHPDependPreferencesFactory {
 				validFileExtensions = node.get(PHPDependPreferenceNames.PREF_PHPDEPEND_VALID_FILE_EXTENSIONS,
 						validFileExtensions);
 				excludePackages = node.get(PHPDependPreferenceNames.PREF_PHPDEPEND_EXCLUDE_PACKAGES, excludePackages);
+
+				enabledPrefs = node.get(PHPDependPreferenceNames.PREF_METRICS_ENABLED, enabledPrefs);
+				idPrefs = node.get(PHPDependPreferenceNames.PREF_METRICS_IDS, idPrefs);
+				namePrefs = node.get(PHPDependPreferenceNames.PREF_METRICS_NAMES, namePrefs);
+				warningMinPrefs = node.get(PHPDependPreferenceNames.PREF_METRICS_WARNING_MIN, warningMinPrefs);
+				warningMaxPrefs = node.get(PHPDependPreferenceNames.PREF_METRICS_WARNING_MAX, warningMaxPrefs);
+				errorMinPrefs = node.get(PHPDependPreferenceNames.PREF_METRICS_ERROR_MIN, errorMinPrefs);
+				errorMaxPrefs = node.get(PHPDependPreferenceNames.PREF_METRICS_ERROR_MAX, errorMaxPrefs);
+				typePrefs = node.get(PHPDependPreferenceNames.PREF_METRICS_TYPES, typePrefs);
 			}
 		}
 
+		Metric[] metrics = new Metric[0];
+
+		if (enabledPrefs != null && !"".equals(enabledPrefs)) {
+			String[] enabledList = enabledPrefs.split(";");
+			String[] idList = idPrefs.split(";");
+			String[] nameList = namePrefs.split(";");
+			String[] warningMinList = warningMinPrefs.split(";");
+			String[] warningMaxList = warningMaxPrefs.split(";");
+			String[] errorMinList = errorMinPrefs.split(";");
+			String[] errorMaxList = errorMaxPrefs.split(";");
+
+			ArrayList<Metric> metricList = new ArrayList<Metric>(enabledList.length);
+			for (int i = 0; i < enabledList.length; i++) {
+				Metric m = new Metric();
+				m.enabled = "1".equals(enabledList[i]) ? true : false;
+				m.id = idList[i];
+				m.name = nameList[i];
+				try {
+					m.warningMin = Float.parseFloat(warningMinList[i]);
+				} catch (Exception e) {
+				}
+				try {
+					m.warningMax = Float.parseFloat(warningMaxList[i]);
+				} catch (Exception e) {
+				}
+				try {
+					m.errorMin = Float.parseFloat(errorMinList[i]);
+				} catch (Exception e) {
+				}
+				try {
+					m.errorMax = Float.parseFloat(errorMaxList[i]);
+				} catch (Exception e) {
+				}
+
+				metricList.add(m);
+			}
+
+			metrics = metricList.toArray(metrics);
+		}
+
 		return new PHPDependPreferences(phpExe, printOutput, pearLibraryName, withoutAnnotation, badDocumentation,
-				coderankMode, optimization, validFileExtensions, excludePackages, new Metric[] {});
+				coderankMode, optimization, validFileExtensions, excludePackages, metrics);
 	}
 
 	protected static IScopeContext[] createPreferenceScopes(IProject project) {

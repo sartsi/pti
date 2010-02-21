@@ -34,8 +34,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import org.apache.xerces.parsers.DOMParser;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.Metric;
+import org.phpsrc.eclipse.pti.ui.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -44,17 +47,23 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class ElementFactory {
-	public static MetricSummary fromXML(String filePath) throws FileNotFoundException, SAXException, IOException {
+	public static MetricSummary fromXML(String filePath, Metric[] metrics) throws FileNotFoundException, SAXException,
+			IOException {
 
 		DOMParser parser = new DOMParser();
 		parser.parse(new InputSource(new FileInputStream(filePath)));
 
 		Document doc = parser.getDocument();
 
-		return (MetricSummary) parseXMLNode(doc.getFirstChild(), null);
+		HashMap<String, Metric> map = new HashMap<String, Metric>(metrics.length);
+		for (int i = 0; i < metrics.length; i++) {
+			map.put(metrics[i].id, metrics[i]);
+		}
+
+		return (MetricSummary) parseXMLNode(doc.getFirstChild(), null, map);
 	}
 
-	protected static IElement parseXMLNode(Node node, IElement parent) {
+	protected static IElement parseXMLNode(Node node, IElement parent, HashMap<String, Metric> metrics) {
 		String name = node.getNodeName();
 		NamedNodeMap attr = node.getAttributes();
 
@@ -65,8 +74,13 @@ public class ElementFactory {
 			String n = a.getNodeName();
 			if (!"".equals(n) && !"name".equals(n) && !"generated".equals(n) && !"pdepend".equals(n)) {
 				try {
-					results.add(new MetricResult(n, Float.parseFloat(a.getNodeValue())));
+					Metric m = metrics.get(n);
+					if (m != null)
+						results.add(new MetricResult(m, Float.parseFloat(a.getNodeValue())));
+					else
+						results.add(new MetricResult(n, Float.parseFloat(a.getNodeValue())));
 				} catch (Exception e) {
+					Logger.logException(e);
 				}
 			}
 		}
@@ -80,29 +94,34 @@ public class ElementFactory {
 			} catch (ParseException e) {
 			}
 			element = new MetricSummary(parent, "Summary", results.toArray(new MetricResult[0]), generated);
-		} else if ("package".equals(name))
+		} else if ("package".equals(name)) {
 			element = new Package(parent, attr.getNamedItem("name").getTextContent(), results
 					.toArray(new MetricResult[0]));
-		else if ("class".equals(name))
+		} else if ("class".equals(name)) {
 			element = new Class(parent, attr.getNamedItem("name").getTextContent(), results
 					.toArray(new MetricResult[0]));
-		else if ("method".equals(name))
+		} else if ("method".equals(name)) {
 			element = new Method(parent, attr.getNamedItem("name").getTextContent(), results
 					.toArray(new MetricResult[0]));
-		else if ("function".equals(name))
+		} else if ("function".equals(name)) {
 			element = new Function(parent, attr.getNamedItem("name").getTextContent(), results
 					.toArray(new MetricResult[0]));
+		} else if ("file".equals(name)) {
+			element = new File(parent, attr.getNamedItem("name").getTextContent(), results.toArray(new MetricResult[0]));
+		} else if ("files".equals(name)) {
+			element = new Files(parent, "files", results.toArray(new MetricResult[0]));
+		}
 
 		if (element != null)
-			parseXMLNodeList(node.getChildNodes(), element);
+			parseXMLNodeList(node.getChildNodes(), element, metrics);
 
 		return element;
 	}
 
-	protected static void parseXMLNodeList(NodeList list, IElement parent) {
+	protected static void parseXMLNodeList(NodeList list, IElement parent, HashMap<String, Metric> metrics) {
 		int length = list.getLength();
 		for (int i = 0; i < length; i++) {
-			parseXMLNode(list.item(i), parent);
+			parseXMLNode(list.item(i), parent, metrics);
 		}
 	}
 }

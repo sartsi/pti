@@ -40,6 +40,7 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.phpsrc.eclipse.pti.library.pear.ui.preferences.AbstractPEARPHPToolConfigurationBlock;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.PHPDepend;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferenceNames;
 
 public class PHPDependConfigurationBlock extends AbstractPEARPHPToolConfigurationBlock {
 
