@@ -113,7 +113,6 @@ public class LibraryInputDialog extends StatusDialog {
 		return lib;
 	}
 
-	
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
 
@@ -150,7 +149,7 @@ public class LibraryInputDialog extends StatusDialog {
 		if (newName.length() == 0 && newPath.length() > 0) {
 			int lastIndex = WINDOWS ? newPath.lastIndexOf("\\") : newPath.lastIndexOf("/");
 			if (lastIndex > 0) {
-				newName = newPath.substring(lastIndex + 1).replaceAll(" ", "_");
+				newName = newPath.substring(lastIndex + 1).replace(' ', '_');
 				fNameDialogField.setText(newName);
 			}
 		}
@@ -171,7 +170,7 @@ public class LibraryInputDialog extends StatusDialog {
 	/*
 	 * @see org.eclipse.jface.window.Window#configureShell(Shell)
 	 */
-	
+
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		// TODO - Add the Help contex id
