@@ -125,14 +125,14 @@ public class PHPToolLauncher {
 			if (config != null) {
 				ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
 
-				String phpFileName = OperatingSystem.escapeShellFileArg(phpFileLocation);
-				String arguments = commandLineArgs.replaceAll(COMMANDLINE_PLACEHOLDER_FILE, phpFileName);
+				String arguments = commandLineArgs.replace(COMMANDLINE_PLACEHOLDER_FILE, OperatingSystem
+						.escapeShellFileArg(phpFileLocation));
 
 				int lastPos = phpFileLocation.lastIndexOf("\\") != -1 ? phpFileLocation.lastIndexOf("\\")
 						: phpFileLocation.lastIndexOf("/");
 				String folderPath = lastPos != -1 ? OperatingSystem.escapeShellFileArg(phpFileLocation.substring(0,
 						lastPos)) : "";
-				arguments = arguments.replaceAll(COMMANDLINE_PLACEHOLDER_FOLDER, folderPath);
+				arguments = arguments.replace(COMMANDLINE_PLACEHOLDER_FOLDER, folderPath);
 
 				wc.setAttribute(IDebugParametersKeys.EXE_CONFIG_PROGRAM_ARGUMENTS, arguments);
 				config = wc.doSave();

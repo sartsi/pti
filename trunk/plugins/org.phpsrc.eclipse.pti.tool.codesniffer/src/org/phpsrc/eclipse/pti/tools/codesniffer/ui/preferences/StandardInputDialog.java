@@ -152,7 +152,7 @@ public class StandardInputDialog extends StatusDialog {
 		if (newName.length() == 0 && newPath.length() > 0) {
 			int lastIndex = WINDOWS ? newPath.lastIndexOf("\\") : newPath.lastIndexOf("/");
 			if (lastIndex > 0) {
-				newName = newPath.substring(lastIndex + 1).replaceAll(" ", "_");
+				newName = newPath.substring(lastIndex + 1).replace(' ', '_');
 				fNameDialogField.setText(newName);
 			}
 		}

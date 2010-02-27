@@ -116,8 +116,7 @@ public class PHPCodeSniffer extends AbstractPHPTool {
 			for (String pattern : patterns) {
 				pattern = pattern.trim();
 				if (pattern.length() > 0) {
-					pattern = pattern.replace("\\", "/").replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*").replaceAll(
-							"\\?", ".?");
+					pattern = pattern.replace("\\", "/").replace(".", "\\.").replace("*", ".*").replace("?", ".?");
 					Pattern p = Pattern.compile(pattern);
 					if (p.matcher(filePath).matches()) {
 						can = false;
@@ -273,7 +272,8 @@ public class PHPCodeSniffer extends AbstractPHPTool {
 	private String getCommandLineArgs(Standard standard, int tabWidth) {
 
 		String args = "--report=xml --standard="
-				+ OperatingSystem.escapeShellFileArg(standard.custom ? standard.path : standard.name);
+				+ (standard.custom ? OperatingSystem.escapeShellFileArg(standard.path) : OperatingSystem
+						.escapeShellArg(standard.name));
 
 		if (tabWidth > 0)
 			args += " --tab-width=" + tabWidth;

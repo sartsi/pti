@@ -53,6 +53,6 @@ public abstract class AbstractResolution implements IMarkerResolution2 {
 	}
 
 	protected String prepareString(String str) {
-		return str.replaceAll("\\\\n", "\n").replaceAll("\\\\r", "\r");
+		return str.replace("\\n", "\n").replace("\\r", "\r");
 	}
 }

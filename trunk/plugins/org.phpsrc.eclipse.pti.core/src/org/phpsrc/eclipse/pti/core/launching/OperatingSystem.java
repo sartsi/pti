@@ -32,16 +32,13 @@ public class OperatingSystem {
 
 	public static String escapeShellArg(String arg) {
 		if (WINDOWS) {
-			return "\"" + arg + "\"";
+			return "\"" + arg.replace("\"", "\\\"") + "\"";
 		} else {
-			return arg.replaceAll(" ", "\t");
+			return arg.replace(" ", "\t");
 		}
 	}
 
 	public static String escapeShellFileArg(String fileName) {
-		if (WINDOWS)
-			fileName = fileName.replace('\\', '/');
-
 		return escapeShellArg(fileName);
 	}
 }

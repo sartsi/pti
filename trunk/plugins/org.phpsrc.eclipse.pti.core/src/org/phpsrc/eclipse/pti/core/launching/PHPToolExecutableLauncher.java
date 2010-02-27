@@ -137,7 +137,7 @@ public class PHPToolExecutableLauncher {
 		String[] args = PHPLaunchUtilities.getProgramArguments(launch.getLaunchConfiguration());
 
 		for (int i = 0; i < args.length; i++) {
-			args[i] = args[i].replaceAll("\t", " ");
+			args[i] = args[i].replace("\t", " ");
 		}
 
 		String[] cmdLine = PHPLaunchUtilities.getCommandLine(launch.getLaunchConfiguration(), phpExeString,
