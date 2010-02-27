@@ -231,10 +231,10 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 			patternProject = path;
 		}
 
-		patternFolder = patternFolder.replaceAll(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_PROJECT,
-				patternProject.replaceAll("\\\\", "\\\\\\\\"));
-		patternFolder = patternFolder.replaceAll(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_DIR, patternPath
-				.replaceAll("\\\\", "\\\\\\\\"));
+		patternFolder = patternFolder.replace(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_PROJECT, patternProject
+				.replace("\\", "\\\\"));
+		patternFolder = patternFolder.replace(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_DIR, patternPath.replace(
+				"\\", "\\\\"));
 		containerText.setText(patternFolder);
 
 		if (patternFile == null)
@@ -243,9 +243,9 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 		String fileName = resource.getName();
 		int firstDotPos = fileName.indexOf(".");
 		int lastDotPos = fileName.lastIndexOf(".");
-		patternFile = patternFile.replaceAll(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_FILENAME, fileName
-				.substring(0, firstDotPos));
-		patternFile = patternFile.replaceAll(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_FILE_EXTENSION, fileName
+		patternFile = patternFile.replace(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_FILENAME, fileName.substring(
+				0, firstDotPos));
+		patternFile = patternFile.replace(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_FILE_EXTENSION, fileName
 				.substring(lastDotPos + 1));
 		fileText.setText(patternFile);
 	}
