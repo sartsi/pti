@@ -86,10 +86,15 @@ public class PHPToolLauncher {
 		this(phpExe, phpScript, "", iniEntries);
 	}
 
+	/**
+	 * 
+	 * @param phpExe
+	 * @param phpScript
+	 * @param commandLineArgs
+	 * @param iniEntries
+	 * @throws NullPointerException
+	 */
 	public PHPToolLauncher(PHPexeItem phpExe, IPath phpScript, String commandLineArgs, INIFileEntry[] iniEntries) {
-		if (phpExe == null)
-			throw new NullPointerException("No php executable");
-
 		this.phpExe = phpExe;
 		this.phpScript = phpScript;
 		this.commandLineArgs = commandLineArgs;
@@ -113,6 +118,9 @@ public class PHPToolLauncher {
 	}
 
 	protected String launch(IProject project, String phpFileLocation) {
+		if (phpExe == null)
+			return null;
+
 		try {
 			if (phpFileLocation == null) {
 				// Could not find target to launch
