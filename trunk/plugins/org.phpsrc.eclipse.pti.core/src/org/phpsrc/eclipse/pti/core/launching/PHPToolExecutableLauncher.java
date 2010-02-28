@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -60,8 +61,11 @@ import org.eclipse.php.internal.debug.core.preferences.PHPexeItem;
 import org.eclipse.php.internal.debug.core.preferences.PHPexes;
 import org.eclipse.swt.widgets.Display;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
+import org.phpsrc.eclipse.pti.core.listener.IOutputListener;
 
 public class PHPToolExecutableLauncher {
+	protected ListenerList outputListenerList = new ListenerList();
+
 	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
 		return new PHPLaunch(configuration, mode, null);
 	}
@@ -136,12 +140,11 @@ public class PHPToolExecutableLauncher {
 
 		String[] args = PHPLaunchUtilities.getProgramArguments(launch.getLaunchConfiguration());
 
-		for (int i = 0; i < args.length; i++) {
-			args[i] = args[i].replace("\t", " ");
-		}
+		String[] cmdLine = PHPLaunchUtilities.getCommandLine(launch.getLaunchConfiguration(), OperatingSystem
+				.escapeShellFileArg(phpExeString), phpConfigDir, OperatingSystem.escapeShellFileArg(fileName),
+				sapiType == PHPexeItem.SAPI_CLI ? args : null);
 
-		String[] cmdLine = PHPLaunchUtilities.getCommandLine(launch.getLaunchConfiguration(), phpExeString,
-				phpConfigDir, fileName, sapiType == PHPexeItem.SAPI_CLI ? args : null);
+		notifyOutputListener(cmdLine, ' ');
 
 		// Set library search path:
 		if (!OperatingSystem.WINDOWS) {
@@ -241,5 +244,29 @@ public class PHPToolExecutableLauncher {
 						message);
 			}
 		});
+	}
+
+	protected void notifyOutputListener(String output) {
+		for (Object listener : outputListenerList.getListeners()) {
+			((IOutputListener) listener).handleOutput(output);
+		}
+	}
+
+	protected void notifyOutputListener(String[] output, char glue) {
+		StringBuffer str = new StringBuffer();
+		for (String line : output) {
+			if (str.length() > 0)
+				str.append(glue);
+			str.append(line);
+		}
+		notifyOutputListener(str.toString());
+	}
+
+	public void addOutputListener(IOutputListener listener) {
+		outputListenerList.add(listener);
+	}
+
+	public void removeOutputListener(IOutputListener listener) {
+		outputListenerList.remove(listener);
 	}
 }

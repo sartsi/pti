@@ -57,6 +57,7 @@ import org.eclipse.php.internal.debug.ui.PHPDebugUIPlugin;
 import org.eclipse.swt.widgets.Display;
 import org.phpsrc.eclipse.pti.core.IPHPCoreConstants;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
+import org.phpsrc.eclipse.pti.core.listener.IOutputListener;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileModifier;
 import org.phpsrc.eclipse.pti.ui.Logger;
@@ -137,11 +138,16 @@ public class PHPToolLauncher {
 				wc.setAttribute(IDebugParametersKeys.EXE_CONFIG_PROGRAM_ARGUMENTS, arguments);
 				config = wc.doSave();
 
-				if (printOutput)
-					Logger.logToConsole(phpExe.getExecutable().toString() + " " + phpScript.toOSString() + " "
-							+ arguments);
-
 				PHPToolExecutableLauncher php = new PHPToolExecutableLauncher();
+
+				if (printOutput) {
+					php.addOutputListener(new IOutputListener() {
+						public void handleOutput(String output) {
+							Logger.logToConsole(output);
+						}
+					});
+				}
+
 				IProcess process = php.launch(config);
 				IStreamsProxy proxy = process.getStreamsProxy();
 				String output = proxy.getOutputStreamMonitor().getContents();

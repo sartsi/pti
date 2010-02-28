@@ -23,6 +23,7 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.phpsrc.eclipse.pti.core,
  org.phpsrc.eclipse.pti.core.compiler.problem,
  org.phpsrc.eclipse.pti.core.launching,
+ org.phpsrc.eclipse.pti.core.listener,
  org.phpsrc.eclipse.pti.core.php.inifile,
  org.phpsrc.eclipse.pti.core.php.source,
  org.phpsrc.eclipse.pti.core.preferences,

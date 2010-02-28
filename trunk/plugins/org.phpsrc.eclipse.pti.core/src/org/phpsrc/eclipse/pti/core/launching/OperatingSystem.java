@@ -28,13 +28,14 @@ package org.phpsrc.eclipse.pti.core.launching;
 
 public class OperatingSystem {
 	public static final boolean WINDOWS = java.io.File.separatorChar == '\\'; //$NON-NLS-1$
-	public static final boolean MAC = System.getProperty("os.name").startsWith("Mac");
+	public static final boolean LINUX = java.io.File.separatorChar == '/'; //$NON-NLS-1$
+	public static final boolean MAC = System.getProperty("os.name").startsWith("Mac"); //$NON-NLS-1$
 
 	public static String escapeShellArg(String arg) {
 		if (WINDOWS) {
 			return "\"" + arg.replace("\"", "\\\"") + "\"";
 		} else {
-			return arg.replace(" ", "\t");
+			return arg.replace(" ", "\\ ");
 		}
 	}
 
