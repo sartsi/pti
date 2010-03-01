@@ -231,10 +231,8 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 			patternProject = path;
 		}
 
-		patternFolder = patternFolder.replace(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_PROJECT, patternProject
-				.replace("\\", "\\\\"));
-		patternFolder = patternFolder.replace(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_DIR, patternPath.replace(
-				"\\", "\\\\"));
+		patternFolder = patternFolder.replace(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_PROJECT, patternProject);
+		patternFolder = patternFolder.replace(IPHPUnitConstants.TEST_FILE_PATTERN_PLACEHOLDER_DIR, patternPath);
 		containerText.setText(patternFolder);
 
 		if (patternFile == null)
