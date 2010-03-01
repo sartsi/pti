@@ -57,8 +57,6 @@ import org.eclipse.php.internal.debug.core.PHPDebugCoreMessages;
 import org.eclipse.php.internal.debug.core.launching.PHPLaunch;
 import org.eclipse.php.internal.debug.core.launching.PHPLaunchUtilities;
 import org.eclipse.php.internal.debug.core.phpIni.PHPINIUtil;
-import org.eclipse.php.internal.debug.core.preferences.PHPexeItem;
-import org.eclipse.php.internal.debug.core.preferences.PHPexes;
 import org.eclipse.swt.widgets.Display;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.core.listener.IOutputListener;
@@ -128,21 +126,10 @@ public class PHPToolExecutableLauncher {
 			phpConfigDir = new File(phpIniLocation).getParent();
 		}
 
-		// Detect PHP SAPI type:
-		String sapiType = null;
-		PHPexeItem[] items = PHPexes.getInstance().getAllItems();
-		for (PHPexeItem item : items) {
-			if (item.getExecutable().equals(phpExeFile)) {
-				sapiType = item.getSapiType();
-				break;
-			}
-		}
-
 		String[] args = PHPLaunchUtilities.getProgramArguments(launch.getLaunchConfiguration());
 
 		String[] cmdLine = PHPLaunchUtilities.getCommandLine(launch.getLaunchConfiguration(), OperatingSystem
-				.escapeShellFileArg(phpExeString), phpConfigDir, OperatingSystem.escapeShellFileArg(fileName),
-				sapiType == PHPexeItem.SAPI_CLI ? args : null);
+				.escapeShellFileArg(phpExeString), phpConfigDir, OperatingSystem.escapeShellFileArg(fileName), args);
 
 		notifyOutputListener(cmdLine, ' ');
 
