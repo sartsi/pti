@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage TextUI
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://pdepend.org/
@@ -60,9 +60,9 @@ require_once 'PHP/Depend/Util/Log.php';
  * @package    PHP_Depend
  * @subpackage TextUI
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://pdepend.org/
  */
 class PHP_Depend_TextUI_Command
@@ -166,6 +166,9 @@ class PHP_Depend_TextUI_Command
 
                 if (isset($analyzerOptions[$option]['value']) && is_bool($value)) {
                     echo 'Option ', $option, ' requires a value.', PHP_EOL;
+                    return self::INPUT_ERROR;
+                } else if ($analyzerOptions[$option]['value'] === 'file' && file_exists($value) === false) {
+                    echo 'Specifie file ', $option, '=', $value, ' not exists.', PHP_EOL;
                     return self::INPUT_ERROR;
                 } else if ($analyzerOptions[$option]['value'] === '*') {
                     $value = array_map('trim', explode(',', $value));
@@ -377,7 +380,7 @@ class PHP_Depend_TextUI_Command
      */
     protected function printVersion()
     {
-        echo 'PHP_Depend 0.9.9 by Manuel Pichler', PHP_EOL, PHP_EOL;
+        echo 'PHP_Depend 0.9.11 by Manuel Pichler', PHP_EOL, PHP_EOL;
     }
 
     /**
@@ -574,6 +577,8 @@ class PHP_Depend_TextUI_Command
             if (isset($info['value'])) {
                 if ($info['value'] === '*') {
                     $option .= '=<*[,...]>';
+                } else if ($info['value'] === 'file') {
+                    $option .= '=<file>';
                 } else {
                     $option .= '=<value>';
                 }

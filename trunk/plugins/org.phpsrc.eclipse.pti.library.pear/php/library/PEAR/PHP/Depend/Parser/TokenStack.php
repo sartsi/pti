@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Parser
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://www.pdepend.org/
@@ -54,9 +54,9 @@
  * @package    PHP_Depend
  * @subpackage Parser
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://www.pdepend.org/
  * @since      0.9.6
  */
@@ -77,14 +77,21 @@ class PHP_Depend_Parser_TokenStack
     private $_stack = array();
 
     /**
+     * The current stack offset.
+     *
+     * @var integer
+     */
+    private $_offset = 0;
+
+    /**
      * This method will push a new token scope onto the stack,
      *
      * @return void
      */
     public function push()
     {
-        array_push($this->_stack, $this->_tokens);
-        $this->_tokens = array();
+        $this->_stack[$this->_offset++] = $this->_tokens;
+        $this->_tokens                  = array();
     }
 
     /**
@@ -96,8 +103,11 @@ class PHP_Depend_Parser_TokenStack
      */
     public function pop()
     {
-        $tokens = $this->_tokens;
-        $this->_tokens = array_pop($this->_stack);
+        $tokens        = $this->_tokens;
+        $this->_tokens = $this->_stack[--$this->_offset];
+
+        unset($this->_stack[$this->_offset]);
+
         foreach ($tokens as $token) {
             $this->_tokens[] = $token;
         }
@@ -116,4 +126,3 @@ class PHP_Depend_Parser_TokenStack
         return ($this->_tokens[] = $token);
     }
 }
-?>

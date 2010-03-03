@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Util
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://www.pdepend.org/
@@ -54,9 +54,9 @@
  * @package    PHP_Depend
  * @subpackage Util
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://www.pdepend.org/
  */
 final class PHP_Depend_Util_MathUtil
@@ -72,7 +72,7 @@ final class PHP_Depend_Util_MathUtil
      */
     public static function mul($left, $right)
     {
-        if (function_exists('bcmul') === true) {
+        if (function_exists('bcmul')) {
             return bcmul($left, $right);
         }
         return (string) ((int) $left * (int) $right);
@@ -89,7 +89,7 @@ final class PHP_Depend_Util_MathUtil
      */
     public static function add($left, $right)
     {
-        if (function_exists('bcadd') === true) {
+        if (function_exists('bcadd')) {
             return bcadd($left, $right);
         }
         return (string) ((int) $left + (int) $right);

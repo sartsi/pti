@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@
  * @category  QualityAssurance
  * @package   PHP_Depend
  * @author    Manuel Pichler <mapi@pdepend.org>
- * @copyright 2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright 2008-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version   SVN: $Id$
  * @link      http://pdepend.org/
@@ -53,9 +53,9 @@ require_once 'PHP/Depend/ConstantsI.php';
  * @category  QualityAssurance
  * @package   PHP_Depend
  * @author    Manuel Pichler <mapi@pdepend.org>
- * @copyright 2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright 2008-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.9.9
+ * @version   Release: 0.9.11
  * @link      http://pdepend.org/
  */
 interface PHP_Depend_BuilderI
@@ -675,6 +675,26 @@ interface PHP_Depend_BuilderI
      * @since 0.9.6
      */
     function buildASTLiteral($image);
+
+    /**
+     * Builds a new php string node.
+     *
+     * <code>
+     * $string = "Manuel $Pichler <{$email}>";
+     *
+     * // PHP_Depend_Code_ASTString
+     * // |-- ASTLiteral             -  "Manuel ")
+     * // |-- ASTVariable            -  $Pichler
+     * // |-- ASTLiteral             -  " <"
+     * // |-- ASTCompoundExpression  -  {...}
+     * // |   |-- ASTVariable        -  $email
+     * // |-- ASTLiteral             -  ">"
+     * </code>
+     *
+     * @return PHP_Depend_Code_ASTString
+     * @since 0.9.10
+     */
+    function buildASTString();
 
     /**
      * Builds a new constant definition node.

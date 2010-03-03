@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Metrics
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://pdepend.org/
@@ -62,9 +62,9 @@ require_once 'PHP/Depend/Metrics/CyclomaticComplexity/Analyzer.php';
  * @package    PHP_Depend
  * @subpackage Metrics
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Metrics_ClassLevel_Analyzer
@@ -81,8 +81,7 @@ class PHP_Depend_Metrics_ClassLevel_Analyzer
     /**
      * Metrics provided by the analyzer implementation.
      */
-    const M_DEPTH_OF_INHERITANCE_TREE    = 'dit',
-          M_IMPLEMENTED_INTERFACES       = 'impl',
+    const M_IMPLEMENTED_INTERFACES       = 'impl',
           M_CLASS_INTERFACE_SIZE         = 'cis',
           M_CLASS_SIZE                   = 'csz',
           M_PROPERTIES                   = 'vars',
@@ -212,7 +211,6 @@ class PHP_Depend_Metrics_ClassLevel_Analyzer
         $this->fireStartClass($class);
 
         $this->_nodeMetrics[$class->getUUID()] = array(
-            self::M_DEPTH_OF_INHERITANCE_TREE    => $this->_calculateDIT($class),
             self::M_IMPLEMENTED_INTERFACES       => $class->getInterfaces()->count(),
             self::M_CLASS_INTERFACE_SIZE         => 0,
             self::M_CLASS_SIZE                   => 0,
@@ -309,22 +307,6 @@ class PHP_Depend_Metrics_ClassLevel_Analyzer
         }
 
         $this->fireEndProperty($property);
-    }
-
-    /**
-     * Returns the depth of inheritance tree value for the given class.
-     *
-     * @param PHP_Depend_Code_Class $class The context code class instance.
-     *
-     * @return integer
-     */
-    private function _calculateDIT(PHP_Depend_Code_Class $class)
-    {
-        $dit = 0;
-        while (($class = $class->getParentClass()) !== null) {
-            ++$dit;
-        }
-        return $dit;
     }
 
     /**

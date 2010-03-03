@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,13 +40,13 @@
  * @package    PHP_Depend
  * @subpackage Parser
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://www.pdepend.org/
  */
 
-require_once 'PHP/Depend/Parser/Exception.php';
+require_once 'PHP/Depend/Parser/TokenException.php';
 
 /**
  * This type of exception is thrown when the parser reaches the end of the token
@@ -56,12 +56,13 @@ require_once 'PHP/Depend/Parser/Exception.php';
  * @package    PHP_Depend
  * @subpackage Parser
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://www.pdepend.org/
  */
-class PHP_Depend_Parser_TokenStreamEndException extends PHP_Depend_Parser_Exception
+class PHP_Depend_Parser_TokenStreamEndException 
+    extends PHP_Depend_Parser_TokenException
 {
     /**
      * Constructs a new end of token stream exception.
@@ -77,6 +78,4 @@ class PHP_Depend_Parser_TokenStreamEndException extends PHP_Depend_Parser_Except
             )
         );
     }
-
 }
-?>

@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@
  * @category  QualityAssurance
  * @package   PHP_Depend
  * @author    Manuel Pichler <mapi@pdepend.org>
- * @copyright 2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright 2008-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version   SVN: $Id$
  * @link      http://pdepend.org/
@@ -47,15 +47,25 @@
 
 require_once 'PHP/Depend/Visitor/ListenerI.php';
 
+require_once 'PHP/Depend/Code/Class.php';
+require_once 'PHP/Depend/Code/Closure.php';
+require_once 'PHP/Depend/Code/File.php';
+require_once 'PHP/Depend/Code/Function.php';
+require_once 'PHP/Depend/Code/Interface.php';
+require_once 'PHP/Depend/Code/Method.php';
+require_once 'PHP/Depend/Code/Package.php';
+require_once 'PHP/Depend/Code/Parameter.php';
+require_once 'PHP/Depend/Code/Property.php';
+
 /**
  * Base interface for visitors that work on the generated node tree.
  *
  * @category  QualityAssurance
  * @package   PHP_Depend
  * @author    Manuel Pichler <mapi@pdepend.org>
- * @copyright 2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright 2008-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.9.9
+ * @version   Release: 0.9.11
  * @link      http://pdepend.org/
  */
 interface PHP_Depend_VisitorI

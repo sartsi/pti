@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,9 +40,9 @@
  * @package    PHP_Depend
  * @subpackage Builder
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: Default.php 675 2009-03-05 07:40:28Z mapi $
+ * @version    SVN: $Id$
  * @link       http://pdepend.org/
  */
 
@@ -65,9 +65,9 @@ require_once 'PHP/Depend/Util/Type.php';
  * @package    PHP_Depend
  * @subpackage Builder
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
@@ -1271,6 +1271,33 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
     }
 
     /**
+     * Builds a new php string node.
+     *
+     * <code>
+     * $string = "Manuel $Pichler <{$email}>";
+     *
+     * // PHP_Depend_Code_ASTString
+     * // |-- ASTLiteral             -  "Manuel ")
+     * // |-- ASTVariable            -  $Pichler
+     * // |-- ASTLiteral             -  " <"
+     * // |-- ASTCompoundExpression  -  {...}
+     * // |   |-- ASTVariable        -  $email
+     * // |-- ASTLiteral             -  ">"
+     * </code>
+     *
+     * @return PHP_Depend_Code_ASTString
+     * @since 0.9.10
+     */
+    public function buildASTString()
+    {
+        include_once 'PHP/Depend/Code/ASTString.php';
+
+        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTString');
+
+        return new PHP_Depend_Code_ASTString();
+    }
+
+    /**
      * Builds a new constant definition node.
      *
      * <code>
@@ -1360,6 +1387,23 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
         PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTComment()');
 
         return new PHP_Depend_Code_ASTComment($cdata);
+    }
+
+    /**
+     * Builds a new unary expression node instance.
+     *
+     * @param string $image The unary expression image/character.
+     *
+     * @return PHP_Depend_Code_ASTUnaryExpression
+     * @since 0.9.11
+     */
+    public function buildASTUnaryExpression($image)
+    {
+        include_once 'PHP/Depend/Code/ASTUnaryExpression.php';
+
+        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTUnaryExpression()');
+
+        return new PHP_Depend_Code_ASTUnaryExpression($image);
     }
 
     /**

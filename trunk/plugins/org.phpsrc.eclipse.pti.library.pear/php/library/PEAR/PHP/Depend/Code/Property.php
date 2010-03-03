@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Code
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://pdepend.org/
@@ -58,9 +58,9 @@ require_once 'PHP/Depend/Code/AbstractItem.php';
  * @package    PHP_Depend
  * @subpackage Code
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_Property 
@@ -70,7 +70,7 @@ class PHP_Depend_Code_Property
     /**
      * The unique identifier for this function.
      *
-     * @var PHP_Depend_Util_UUID $_uuid
+     * @var string $_uuid
      */
     private $_uuid = null;
 
@@ -120,7 +120,7 @@ class PHP_Depend_Code_Property
         $this->_fieldDeclaration   = $fieldDeclaration;
         $this->_variableDeclarator = $variableDeclarator;
 
-        $this->_uuid = new PHP_Depend_Util_UUID();
+        $this->_uuid = spl_object_hash($this);
     }
 
     /**
@@ -140,7 +140,7 @@ class PHP_Depend_Code_Property
      */
     public function getUUID()
     {
-        return (string) $this->_uuid;
+        return $this->_uuid;
     }
 
     /**

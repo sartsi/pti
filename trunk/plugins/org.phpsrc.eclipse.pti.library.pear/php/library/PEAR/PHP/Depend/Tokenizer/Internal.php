@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Tokenizer
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://pdepend.org/
@@ -59,9 +59,9 @@ require_once 'PHP/Depend/Tokenizer/PHP53NamespaceHelper.php';
  * @package    PHP_Depend
  * @subpackage Tokenizer
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://pdepend.org/
  *
  */
@@ -188,7 +188,7 @@ class PHP_Depend_Tokenizer_Internal
         T_PAAMAYIM_NEKUDOTAYIM      =>  self::T_DOUBLE_COLON,
         T_ENCAPSED_AND_WHITESPACE   =>  self::T_ENCAPSED_AND_WHITESPACE,
         T_CONSTANT_ENCAPSED_STRING  =>  self::T_CONSTANT_ENCAPSED_STRING,
-        T_DOLLAR_OPEN_CURLY_BRACES  =>  self::T_CURLY_BRACE_OPEN,
+        //T_DOLLAR_OPEN_CURLY_BRACES  =>  self::T_CURLY_BRACE_OPEN,
     );
 
     /**
@@ -237,6 +237,14 @@ class PHP_Depend_Tokenizer_Internal
         'namespace'      =>  self::T_NAMESPACE,
         '__dir__'        =>  self::T_DIR,
         '__namespace__'  =>  self::T_NS_C,
+    );
+
+    /**
+     *
+     * @var array(mixed=>array)
+     */
+    protected static $substituteTokens = array(
+        T_DOLLAR_OPEN_CURLY_BRACES  =>  array('$', '{'),
     );
 
     /**
@@ -417,6 +425,32 @@ class PHP_Depend_Tokenizer_Internal
     }
 
     /**
+     * This method takes an array of tokens returned by <b>token_get_all()</b>
+     * and substitutes some of the tokens with those required by PHP_Depend's
+     * parser implementation.
+     *
+     * @param array(array) $tokens Unprepared array of php tokens.
+     *
+     * @return array(array)
+     */
+    private function _substituteTokens(array $tokens)
+    {
+        $result = array();
+        foreach ($tokens as $token) {
+            $temp = (array) $token;
+            $temp = $temp[0];
+            if (isset(self::$substituteTokens[$temp])) {
+                foreach (self::$substituteTokens[$temp] as $token) {
+                    $result[] = $token;
+                }
+            } else {
+                $result[] = $token;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Tokenizes the content of the source file with {@link token_get_all()} and
      * filters this token stream.
      *
@@ -443,7 +477,7 @@ class PHP_Depend_Tokenizer_Internal
             $tokens = token_get_all($source);
         }
 
-        reset($tokens);
+        $tokens = $this->_substituteTokens($tokens);
 
         // Is the current token between an opening and a closing php tag?
         $inTag = false;
@@ -519,12 +553,13 @@ class PHP_Depend_Tokenizer_Internal
             }
 
             if ($type) {
-                $lines = substr_count(rtrim($image), "\n");
+                $rtrim = rtrim($image);
+                $lines = substr_count($rtrim, "\n");
                 if ($lines === 0) {
-                    $endColumn = $startColumn + strlen(rtrim($image)) - 1;
+                    $endColumn = $startColumn + strlen($rtrim) - 1;
                 } else {
                     $endColumn = strlen(
-                        substr(rtrim($image), strrpos(rtrim($image), "\n") + 1)
+                        substr($rtrim, strrpos($rtrim, "\n") + 1)
                     );
                 }
 
@@ -532,7 +567,7 @@ class PHP_Depend_Tokenizer_Internal
 
                 $token = new PHP_Depend_Token(
                     $type,
-                    rtrim($image),
+                    $rtrim,
                     $startLine,
                     $endLine,
                     $startColumn, 

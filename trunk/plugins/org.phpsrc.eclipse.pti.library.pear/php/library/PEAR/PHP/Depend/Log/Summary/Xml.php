@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Log
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://pdepend.org/
@@ -62,9 +62,9 @@ require_once 'PHP/Depend/Metrics/ProjectAwareI.php';
  * @package    PHP_Depend
  * @subpackage Log
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Log_Summary_Xml
@@ -95,19 +95,20 @@ class PHP_Depend_Log_Summary_Xml
     protected $fileSet = array();
 
     /**
-     * List of all generated project metrics.
-     *
-     * @var array(string=>mixed) $projectMetrics
-     */
-    protected $projectMetrics = array();
-
-    /**
      * List of all analyzers that implement the node aware interface
      * {@link PHP_Depend_Metrics_NodeAwareI}.
      *
-     * @var array(PHP_Depend_Metrics_AnalyzerI) $_nodeAwareAnalyzers
+     * @var array(PHP_Depend_Metrics_AnalyzerI)
      */
     private $_nodeAwareAnalyzers = array();
+
+    /**
+     * List of all analyzers that implement the node aware interface
+     * {@link PHP_Depend_Metrics_ProjectAwareI}.
+     *
+     * @var array(PHP_Depend_Metrics_ProjectAwareI)
+     */
+    private $_projectAwareAnalyzers = array();
 
     /**
      * The internal used xml stack.
@@ -164,23 +165,18 @@ class PHP_Depend_Log_Summary_Xml
      */
     public function log(PHP_Depend_Metrics_AnalyzerI $analyzer)
     {
-        $accept = false;
-
+        $accepted = false;
         if ($analyzer instanceof PHP_Depend_Metrics_ProjectAwareI) {
-            // Get project metrics
-            $metrics = $analyzer->getProjectMetrics();
-            // Merge with existing metrics.
-            $this->projectMetrics = array_merge($this->projectMetrics, $metrics);
+            $this->_projectAwareAnalyzers[] = $analyzer;
 
-            $accept = true;
+            $accepted = true;
         }
         if ($analyzer instanceof PHP_Depend_Metrics_NodeAwareI) {
             $this->_nodeAwareAnalyzers[] = $analyzer;
-
-            $accept = true;
+            
+            $accepted = true;
         }
-
-        return $accept;
+        return $accepted;
     }
 
     /**
@@ -199,13 +195,11 @@ class PHP_Depend_Log_Summary_Xml
 
         $dom->formatOutput = true;
 
-        ksort($this->projectMetrics);
-
         $metrics = $dom->createElement('metrics');
         $metrics->setAttribute('generated', date('Y-m-d\TH:i:s'));
-        $metrics->setAttribute('pdepend', '0.9.9');
+        $metrics->setAttribute('pdepend', '0.9.11');
 
-        foreach ($this->projectMetrics as $name => $value) {
+        foreach ($this->_getProjectMetrics() as $name => $value) {
             $metrics->setAttribute($name, $value);
         }
 
@@ -234,6 +228,26 @@ class PHP_Depend_Log_Summary_Xml
     }
 
     /**
+     * Returns an array with all collected project metrics.
+     *
+     * @return array(string=>mixed)
+     * @since 0.9.10
+     */
+    private function _getProjectMetrics()
+    {
+        $projectMetrics = array();
+        foreach ($this->_projectAwareAnalyzers as $analyzer) {
+            $projectMetrics = array_merge(
+                $projectMetrics,
+                $analyzer->getProjectMetrics()
+            );
+        }
+        ksort($projectMetrics);
+
+        return $projectMetrics;
+    }
+
+    /**
      * Visits a class node.
      *
      * @param PHP_Depend_Code_Class $class The current class node.
@@ -243,6 +257,10 @@ class PHP_Depend_Log_Summary_Xml
      */
     public function visitClass(PHP_Depend_Code_Class $class)
     {
+        if (!$class->isUserDefined()) {
+            return;
+        }
+
         $xml = end($this->_xmlStack);
         $doc = $xml->ownerDocument;
 
@@ -351,6 +369,10 @@ class PHP_Depend_Log_Summary_Xml
 
         array_pop($this->_xmlStack);
 
+        if ($packageXml->firstChild === null) {
+            return;
+        }
+
         $xml->appendChild($packageXml);
     }
 
@@ -394,10 +416,6 @@ class PHP_Depend_Log_Summary_Xml
         DOMElement $xml,
         PHP_Depend_Code_File $file = null
     ) {
-        if ($file === null || $file->getFileName() === null) {
-            return;
-        }
-
         if (in_array($file, $this->fileSet, true) === false) {
             $this->fileSet[] = $file;
         }

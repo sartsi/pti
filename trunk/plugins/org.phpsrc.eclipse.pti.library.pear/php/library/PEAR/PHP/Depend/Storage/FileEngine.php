@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Storage
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://www.pdepend.org/
@@ -56,9 +56,9 @@ require_once 'PHP/Depend/Util/FileUtil.php';
  * @package    PHP_Depend
  * @subpackage Storage
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://www.pdepend.org/
  */
 class PHP_Depend_Storage_FileEngine extends PHP_Depend_Storage_AbstractEngine
@@ -71,6 +71,13 @@ class PHP_Depend_Storage_FileEngine extends PHP_Depend_Storage_AbstractEngine
     private $_dirname = '';
 
     /**
+     * Microtime when the engine instance was created.
+     *
+     * @var string
+     */
+    private $_engineInstanceKey = '';
+
+    /**
      * List of all storage groups that were used with this storage engine.
      *
      * @var array(string=>string) $_groups
@@ -80,11 +87,18 @@ class PHP_Depend_Storage_FileEngine extends PHP_Depend_Storage_AbstractEngine
     /**
      * Constructs a new file storage instance and calculates the root directory
      * for the file storage.
+     *
+     * @param string $cacheDir Optional cache directory.
      */
-    public function __construct()
+    public function __construct($cacheDir = null)
     {
-        $this->_dirname = PHP_Depend_Util_FileUtil::getSysTempDir()
-                        . '/pdepend_storage';
+        $this->_engineInstanceKey = strtr(microtime(), ' ', '_');
+
+        if ($cacheDir === null) {
+            $cacheDir = PHP_Depend_Util_FileUtil::getSysTempDir();
+        }
+
+        $this->_dirname = $cacheDir . '/pdepend_storage';
 
         // Append the user identifier on *NIX systems
         if (function_exists('posix_getuid') === true) {
@@ -104,10 +118,15 @@ class PHP_Depend_Storage_FileEngine extends PHP_Depend_Storage_AbstractEngine
      *
      * @return void
      */
-    public function store($data, $key, $group, $version = '0.9.9')
+    public function store($data, $key, $group, $version = '0.9.11')
     {
         $pathname = $this->_createPathname($key, $group, $version);
-        file_put_contents($pathname, serialize($data));
+
+        $fp = fopen($pathname, 'w');
+        flock($fp, LOCK_EX);
+        fwrite($fp, serialize($data));
+        flock($fp, LOCK_UN);
+        fclose($fp);
     }
 
     /**
@@ -122,11 +141,19 @@ class PHP_Depend_Storage_FileEngine extends PHP_Depend_Storage_AbstractEngine
      *
      * @return mixed
      */
-    public function restore($key, $group, $version = '0.9.9')
+    public function restore($key, $group, $version = '0.9.11')
     {
         $pathname = $this->_createPathname($key, $group, $version);
         if (file_exists($pathname)) {
-            return unserialize(file_get_contents($pathname));
+            $fp = fopen($pathname, 'r');
+            flock($fp, LOCK_EX);
+
+            $data = unserialize(fread($fp, filesize($pathname)));
+
+            flock($fp, LOCK_UN);
+            fclose($fp);
+
+            return $data;
         }
         return null;
     }
@@ -147,12 +174,12 @@ class PHP_Depend_Storage_FileEngine extends PHP_Depend_Storage_AbstractEngine
             }
         }
 
-        $lifetime = time() + $this->getMaxLifetime();
+        $lifetime = time() - $this->getMaxLifetime();
 
         foreach ($directories as $directory) {
             foreach (glob($directory . '/*.data') as $filename) {
-                if (filemtime($filename) <= $lifetime) {
-                    unlink($filename);
+                if (filemtime($filename) < $lifetime) {
+                    @unlink($filename);
                 }
             }
         }
@@ -183,7 +210,10 @@ class PHP_Depend_Storage_FileEngine extends PHP_Depend_Storage_AbstractEngine
             mkdir($storageDirname, 0755, true);
         }
 
+        if ($this->hasPrune()) {
+            $key .= '.' . $this->_engineInstanceKey;
+        }
+
         return $storageDirname . '/' . $key . '.' . $version . '.data';
     }
 }
-?>

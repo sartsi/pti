@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Tokenizer
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://www.pdepend.org/
@@ -57,9 +57,9 @@ require_once 'PHP/Depend/Code/File.php';
  * @package    PHP_Depend
  * @subpackage Tokenizer
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://www.pdepend.org/
  */
 class PHP_Depend_Tokenizer_CacheDecorator implements PHP_Depend_TokenizerI
@@ -130,7 +130,7 @@ class PHP_Depend_Tokenizer_CacheDecorator implements PHP_Depend_TokenizerI
     {
         $storage = PHP_Depend_StorageRegistry::get(PHP_Depend::PARSER_STORAGE);
 
-        $id    = '$Id$-0.9.9';
+        $id    = '$Id$-0.9.11';
         $key   = md5_file($sourceFile);
         $group = get_class($this->_tokenizer);
 
@@ -173,7 +173,7 @@ class PHP_Depend_Tokenizer_CacheDecorator implements PHP_Depend_TokenizerI
      */
     public function peek()
     {
-        if (isset($this->_tokens[$this->_index])) {
+        if ($this->_index < $this->_count) {
             return $this->_tokens[$this->_index]->type;
         }
         return self::T_EOF;

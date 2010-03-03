@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,14 +40,12 @@
  * @package    PHP_Depend
  * @subpackage Code
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://pdepend.org/
  */
 
-require_once 'PHP/Depend/Code/NodeI.php';
-require_once 'PHP/Depend/Code/Filter/Composite.php';
 require_once 'PHP/Depend/Code/Filter/Collection.php';
 
 /**
@@ -57,9 +55,9 @@ require_once 'PHP/Depend/Code/Filter/Collection.php';
  * @package    PHP_Depend
  * @subpackage Code
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_NodeIterator implements Iterator, Countable
@@ -72,6 +70,20 @@ class PHP_Depend_Code_NodeIterator implements Iterator, Countable
     private $_nodes = array();
 
     /**
+     * Total number of available nodes.
+     *
+     * @var integer
+     */
+    private $_count = 0;
+
+    /**
+     * Current internal offset.
+     *
+     * @var integer
+     */
+    private $_offset = 0;
+
+    /**
      * Constructs a new node iterator from the given {@link PHP_Depend_Code_NodeI}
      * node array.
      *
@@ -82,34 +94,18 @@ class PHP_Depend_Code_NodeIterator implements Iterator, Countable
      */
     public function __construct(array $nodes)
     {
-        // Workaround for php 5.2.0 where array_multisort results in fatal error
-        // because it performs a to deep recursion > 100
-        $nodeObjects = array();
-        $nodeNames   = array();
+        $filter = PHP_Depend_Code_Filter_Collection::getInstance();
 
-        // First check all input nodes
+        $nodeKeys = array();
         foreach ($nodes as $node) {
-            if (!($node instanceof PHP_Depend_Code_NodeI)) {
-                throw new RuntimeException('Invalid object given.');
-            }
-            
-            $id = $node->getUUID();
-            if (!isset($nodeNames[$id])) {
-                $nodeNames[$id]   = $node->getName();
-                $nodeObjects[$id] = $node;
+            $uuid = $node->getUUID();
+            if (!isset($nodeKeys[$uuid]) && $filter->accept($node)) {
+                $nodeKeys[$uuid] = $uuid;
+                $this->_nodes[]  = $node;
+
+                ++$this->_count;
             }
         }
-
-        // Sort node names and then apply to nodes
-        asort($nodeNames);
-
-        // Apply sorting to nodes, PHP 5.2.0 workaround for array_multisort
-        $this->_nodes = array();
-        foreach (array_keys($nodeNames) as $index) {
-            $this->_nodes[] = $nodeObjects[$index];
-        }
-
-        $this->_init(PHP_Depend_Code_Filter_Collection::getInstance());
     }
 
     /**
@@ -133,7 +129,7 @@ class PHP_Depend_Code_NodeIterator implements Iterator, Countable
      */
     public function count()
     {
-        return count($this->_nodes);
+        return $this->_count;
     }
 
     /**
@@ -143,7 +139,10 @@ class PHP_Depend_Code_NodeIterator implements Iterator, Countable
      */
     public function current()
     {
-        return current($this->_nodes);
+        if ($this->_offset >= $this->_count) {
+            return false;
+        }
+        return $this->_nodes[$this->_offset];
     }
 
     /**
@@ -153,8 +152,7 @@ class PHP_Depend_Code_NodeIterator implements Iterator, Countable
      */
     public function key()
     {
-        $node = current($this->_nodes);
-        return (is_object($node) === true ? $node->getName() : null);
+        return $this->_nodes[$this->_offset]->getName();
     }
 
     /**
@@ -164,7 +162,7 @@ class PHP_Depend_Code_NodeIterator implements Iterator, Countable
      */
     public function next()
     {
-        next($this->_nodes);
+        ++$this->_offset;
     }
 
     /**
@@ -174,7 +172,7 @@ class PHP_Depend_Code_NodeIterator implements Iterator, Countable
      */
     public function rewind()
     {
-        reset($this->_nodes);
+        $this->_offset = 0;
     }
 
     /**
@@ -184,27 +182,6 @@ class PHP_Depend_Code_NodeIterator implements Iterator, Countable
      */
     public function valid()
     {
-        return (current($this->_nodes) !== false);
-    }
-
-    /**
-     * This method initializes a filtered list of nodes. If no filter is
-     * registered, this method will simply use the input node list.
-     *
-     * @param PHP_Depend_Code_FilterI $filter A newly added node filter.
-     *
-     * @return void
-     */
-    private function _init(PHP_Depend_Code_FilterI $filter)
-    {
-        $nodes = array();
-        foreach ($this->_nodes as $name => $node) {
-            if ($filter->accept($node) === true) {
-                $nodes[$name] = $node;
-            }
-        }
-
-        $this->_nodes = $nodes;
-        reset($this->_nodes);
+        return ($this->_offset < $this->_count);
     }
 }

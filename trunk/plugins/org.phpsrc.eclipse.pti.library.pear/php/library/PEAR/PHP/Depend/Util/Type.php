@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Util
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://www.pdepend.org/
@@ -53,9 +53,9 @@
  * @package    PHP_Depend
  * @subpackage Util
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://www.pdepend.org/
  */
 final class PHP_Depend_Util_Type
@@ -119,6 +119,15 @@ final class PHP_Depend_Util_Type
      * @var array(string=>string) $_typeNameToExtension
      */
     private static $_typeNameToExtension = null;
+
+    /**
+     * Hash with all internal packages/extensions. Key and value are identical
+     * and contain the name of the extension.
+     *
+     * @var array(string=>string)
+     * @since 0.9.10
+     */
+    private static $_internalPackages = null;
 
     /**
      * List of scalar php types.
@@ -196,7 +205,10 @@ final class PHP_Depend_Util_Type
     {
         self::_initTypeToExtension();
 
-        return isset(self::$_typeNameToExtension[strtolower($typeName)]);
+        $normalizedName = ltrim($typeName, '\\');
+        $normalizedName = strtolower($normalizedName);
+
+        return isset(self::$_typeNameToExtension[$normalizedName]);
     }
 
     /**
@@ -211,9 +223,10 @@ final class PHP_Depend_Util_Type
     {
         self::_initTypeToExtension();
 
-        $typeName = strtolower($typeName);
-        if (isset(self::$_typeNameToExtension[$typeName])) {
-            return self::$_typeNameToExtension[$typeName];
+        $normalizedName = ltrim($typeName, '\\');
+        $normalizedName = strtolower($normalizedName);
+        if (isset(self::$_typeNameToExtension[$normalizedName])) {
+            return self::$_typeNameToExtension[$normalizedName];
         }
         return null;
     }
@@ -225,9 +238,13 @@ final class PHP_Depend_Util_Type
      */
     public static function getInternalPackages()
     {
-        self::_initTypeToExtension();
+        if (self::$_internalPackages === null) {
+            $extensions = array_values(self::_initTypeToExtension());
+            $extensions = array_unique($extensions);
 
-        return array_unique(array_values(self::$_typeNameToExtension));
+            self::$_internalPackages = array_combine($extensions, $extensions);
+        }
+        return self::$_internalPackages;
     }
 
     /**
@@ -240,8 +257,8 @@ final class PHP_Depend_Util_Type
      */
     public static function isInternalPackage($packageName)
     {
-        $packageName = strtolower($packageName);
-        return in_array($packageName, self::getInternalPackages());
+        $packageNames = self::getInternalPackages();
+        return isset($packageNames[strtolower($packageName)]);
     }
 
     /**
@@ -316,31 +333,31 @@ final class PHP_Depend_Util_Type
      * this type belongs to an extension or is internal. All internal and extension
      * classes are collected in an internal data structure.
      *
-     * @return void
+     * @return array(string=>string)
      */
     private static function _initTypeToExtension()
     {
         // Skip when already done.
         if (self::$_typeNameToExtension !== null) {
-            return;
+            return self::$_typeNameToExtension;
         }
 
-        self::$_typeNameToExtension = array();
+        self::$_typeNameToExtension = array('iterator' => '+standard');
 
-        // Collect all available classes and interfaces
-        $typeNames = array_merge(get_declared_classes(), get_declared_interfaces());
+        $extensionNames = get_loaded_extensions();
+        $extensionNames = array_map('strtolower', $extensionNames);
 
-        foreach ($typeNames as $typeName) {
-            $reflection = new ReflectionClass($typeName);
-            if ($reflection->isInternal() === false) {
-                continue;
+        foreach ($extensionNames as $extensionName) {
+            $extension = new ReflectionExtension($extensionName);
+
+            $classNames = $extension->getClassNames();
+            $classNames = array_map('strtolower', $classNames);
+
+            foreach ($classNames as $className) {
+                self::$_typeNameToExtension[$className] = '+' . $extensionName;
             }
-            $extensionName = strtolower($reflection->getExtensionName());
-            $extensionName = ($extensionName === '' ? 'standard' : $extensionName);
-            $extensionName = '+' . $extensionName;
-
-            self::$_typeNameToExtension[strtolower($typeName)] = $extensionName;
         }
+
+        return self::$_typeNameToExtension;
     }
 }
-?>

@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Code
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://pdepend.org/
@@ -48,7 +48,6 @@
 
 require_once 'PHP/Depend/Code/NodeI.php';
 require_once 'PHP/Depend/Code/NodeIterator.php';
-require_once 'PHP/Depend/Util/UUID.php';
 
 /**
  * Represents a php package node.
@@ -57,9 +56,9 @@ require_once 'PHP/Depend/Util/UUID.php';
  * @package    PHP_Depend
  * @subpackage Code
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_Package implements PHP_Depend_Code_NodeI
@@ -74,7 +73,7 @@ class PHP_Depend_Code_Package implements PHP_Depend_Code_NodeI
     /**
      * The unique identifier for this function.
      *
-     * @var PHP_Depend_Util_UUID $uuid
+     * @var string $uuid
      */
     protected $uuid = null;
 
@@ -90,9 +89,16 @@ class PHP_Depend_Code_Package implements PHP_Depend_Code_NodeI
      * List of all standalone {@link PHP_Depend_Code_Function} objects in this
      * package.
      *
-     * @var array(PHP_Depend_Code_Function) $functions
+     * @var array(PHP_Depend_Code_Function)
      */
     protected $functions = array();
+
+    /**
+     * Does this package contain user defined functions, classes or interfaces?
+     *
+     * @var boolean
+     */
+    private $_userDefined = null;
 
     /**
      * Constructs a new package for the given <b>$name</b>
@@ -102,8 +108,7 @@ class PHP_Depend_Code_Package implements PHP_Depend_Code_NodeI
     public function __construct($name)
     {
         $this->name = $name;
-
-        $this->uuid = new PHP_Depend_Util_UUID();
+        $this->uuid = spl_object_hash($this);
     }
 
     /**
@@ -123,7 +128,41 @@ class PHP_Depend_Code_Package implements PHP_Depend_Code_NodeI
      */
     public function getUUID()
     {
-        return (string) $this->uuid;
+        return $this->uuid;
+    }
+
+    /**
+     * Returns <b>true</b> when at least one artifact <b>function</b> or a
+     * <b>class/method</b> is user defined. Otherwise this method will return
+     * <b>false</b>.
+     *
+     * @return boolean
+     * @since 0.9.10
+     */
+    public function isUserDefined()
+    {
+        if ($this->_userDefined === null) {
+            $this->_userDefined = $this->_isUserDefined();
+        }
+        return $this->_userDefined;
+    }
+
+    /**
+     * Returns <b>true</b> when at least one artifact <b>function</b> or a
+     * <b>class/method</b> is user defined. Otherwise this method will return
+     * <b>false</b>.
+     *
+     * @return boolean
+     * @since 0.9.10
+     */
+    private function _isUserDefined()
+    {
+        foreach ($this->types as $type) {
+            if ($type->isUserDefined()) {
+                return true;
+            }
+        }
+        return (count($this->functions) > 0);
     }
 
     /**

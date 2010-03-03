@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Tokenizer
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://www.pdepend.org/
@@ -54,10 +54,12 @@
  * @package    PHP_Depend
  * @subpackage Tokenizer
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://www.pdepend.org/
+ *
+ * @todo Rename this class into PHP52Helper and make methods none static.
  */
 final class PHP_Depend_Tokenizer_PHP53NamespaceHelper
 {
@@ -74,7 +76,7 @@ final class PHP_Depend_Tokenizer_PHP53NamespaceHelper
         // Replace backslash with valid token
         $source = preg_replace('#\\\\([^"\'`\\\\])#i', ':::\\1', $source);
 
-        $tokens = token_get_all($source);
+        $tokens = self::_tokenize($source);
 
         $result = array();
         for ($i = 0, $c = count($tokens); $i < $c; ++$i) {
@@ -93,5 +95,25 @@ final class PHP_Depend_Tokenizer_PHP53NamespaceHelper
         }
 
         return $result;
+    }
+
+    /**
+     * Executes the internal tokenizer function and decorates it with some
+     * exception handling.
+     *
+     * @param string $source The raw php source code.
+     *
+     * @return array
+     * @todo Exception should be moved into a general package.
+     */
+    private static function _tokenize($source)
+    {
+        $error  = error_get_last();
+        $tokens = @token_get_all($source);
+        
+        if ($error == error_get_last()) {
+            return $tokens;
+        }
+        throw new PHP_Depend_Parser_TokenException($error['message']);
     }
 }

@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@
  * @category  QualityAssurance
  * @package   PHP_Depend
  * @author    Manuel Pichler <mapi@pdepend.org>
- * @copyright 2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright 2008-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version   SVN: $Id$
  * @link      http://pdepend.org/
@@ -50,10 +50,8 @@ require_once 'PHP/Depend/StorageRegistry.php';
 require_once 'PHP/Depend/VisitorI.php';
 require_once 'PHP/Depend/Builder/Default.php';
 require_once 'PHP/Depend/Code/Filter/Composite.php';
-require_once 'PHP/Depend/Code/Filter/DefaultPackage.php';
-require_once 'PHP/Depend/Code/Filter/InternalPackage.php';
 require_once 'PHP/Depend/Metrics/AnalyzerLoader.php';
-require_once 'PHP/Depend/Metrics/Dependency/Analyzer.php';
+require_once 'PHP/Depend/Metrics/AnalyzerClassFileSystemLocator.php';
 require_once 'PHP/Depend/Tokenizer/CacheDecorator.php';
 require_once 'PHP/Depend/Tokenizer/Internal.php';
 require_once 'PHP/Depend/Input/CompositeFilter.php';
@@ -68,9 +66,9 @@ require_once 'PHP/Depend/Input/Iterator.php';
  * @category  QualityAssurance
  * @package   PHP_Depend
  * @author    Manuel Pichler <mapi@pdepend.org>
- * @copyright 2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright 2008-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.9.9
+ * @version   Release: 0.9.11
  * @link      http://pdepend.org/
  */
 class PHP_Depend
@@ -356,17 +354,6 @@ class PHP_Depend
 
         $this->_performParseProcess();
 
-        // Initialize defaul filters
-        if ($this->_supportBadDocumentation === false) {
-            $this->_codeFilter->addFilter(
-                new PHP_Depend_Code_Filter_DefaultPackage()
-            );
-        }
-
-        $this->_codeFilter->addFilter(
-            new PHP_Depend_Code_Filter_InternalPackage()
-        );
-
         // Get global filter collection
         $collection = PHP_Depend_Code_Filter_Collection::getInstance();
         $collection->addFilter($this->_codeFilter);
@@ -450,7 +437,14 @@ class PHP_Depend
             $msg = 'countPackages() doesn\'t work before the source was analyzed.';
             throw new RuntimeException($msg);
         }
-        return iterator_count($this->_packages);
+
+        $count = 0;
+        foreach ($this->_packages as $package) {
+            if ($package->isUserDefined()) {
+                ++$count;
+            }
+        }
+        return $count;
     }
 
     /**
@@ -745,11 +739,20 @@ class PHP_Depend
         // TODO: It's important to validate this behavior, imho there is something
         //       wrong in the iterator code used above.
         // Strange: why is the iterator not unique and why does this loop fix it?
+        $files = array();
         foreach ($fileIterator as $file) {
+            if (is_string($file)) {
+                $files[$file] = $file;
+            } else {
+                $pathname         = realpath($file->getPathname());
+                $files[$pathname] = $pathname;
+            }
         }
+
+        ksort($files);
         // END
 
-        return $fileIterator;
+        return new ArrayIterator(array_values($files));
     }
 
     /**
@@ -774,8 +777,11 @@ class PHP_Depend
             }
         }
 
-        return $this->_initAnalyseListeners(
-            new PHP_Depend_Metrics_AnalyzerLoader($analyzerSet, $options)
+        $loader = new PHP_Depend_Metrics_AnalyzerLoader($analyzerSet, $options);
+        $loader->setClassLocator(
+            new PHP_Depend_Metrics_AnalyzerClassFileSystemLocator()
         );
+
+        return $this->_initAnalyseListeners($loader);
     }
 }

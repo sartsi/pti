@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Metrics
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://pdepend.org/
@@ -78,9 +78,9 @@ require_once 'PHP/Depend/Metrics/ProjectAwareI.php';
  * @package    PHP_Depend
  * @subpackage Metrics
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Metrics_Coupling_Analyzer
@@ -216,7 +216,7 @@ class PHP_Depend_Metrics_Coupling_Analyzer
             }
         }
         foreach ($method->getExceptionClasses() as $type) {
-            if (in_array($type, $fanouts, true) === true) {
+            if (in_array($type, $fanouts, true)) {
                 continue;
             }
             if (!$type->isSubtypeOf($parent) && !$parent->isSubtypeOf($type)) {
@@ -225,7 +225,7 @@ class PHP_Depend_Metrics_Coupling_Analyzer
             }
         }
         foreach ($method->getDependencies() as $type) {
-            if (in_array($type, $fanouts, true) === true) {
+            if (in_array($type, $fanouts, true)) {
                 continue;
             }
             if (!$type->isSubtypeOf($parent) && !$parent->isSubtypeOf($type)) {

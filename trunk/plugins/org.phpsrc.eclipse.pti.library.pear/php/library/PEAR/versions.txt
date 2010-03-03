@@ -12,7 +12,7 @@ INSTALLED PACKAGES, CHANNEL DOC.PHP.NET:
 INSTALLED PACKAGES, CHANNEL PEAR.PDEPEND.ORG:
 =============================================
 PACKAGE    VERSION STATE
-PHP_Depend 0.9.9   beta
+PHP_Depend 0.9.11  beta
 INSTALLED PACKAGES, CHANNEL PEAR.PHP.NET:
 =========================================
 PACKAGE             VERSION   STATE

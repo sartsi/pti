@@ -4,7 +4,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2009, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  * @package    PHP_Depend
  * @subpackage Code
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://pdepend.org/
@@ -50,7 +50,6 @@ require_once 'PHP/Depend/Code/AbstractType.php';
 require_once 'PHP/Depend/Code/ASTClassReference.php';
 require_once 'PHP/Depend/Code/ASTInterfaceReference.php';
 require_once 'PHP/Depend/Code/Method.php';
-require_once 'PHP/Depend/Util/UUID.php';
 
 /**
  * Represents an interface or a class type.
@@ -59,9 +58,9 @@ require_once 'PHP/Depend/Util/UUID.php';
  * @package    PHP_Depend
  * @subpackage Code
  * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2009 Manuel Pichler. All rights reserved.
+ * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.9
+ * @version    Release: 0.9.11
  * @link       http://pdepend.org/
  */
 abstract class PHP_Depend_Code_AbstractClassOrInterface
@@ -153,6 +152,7 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
      * @return PHP_Depend_Code_ASTNodeI
      * @access private
      * @since 0.9.6
+     * @todo Refactor $_methods property to getAllMethods() when it exists.
      */
     public function getFirstChildOfType($targetType)
     {
@@ -161,6 +161,11 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
                 return $node;
             }
             if (($child = $node->getFirstChildOfType($targetType)) !== null) {
+                return $child;
+            }
+        }
+        foreach ($this->_methods as $method) {
+            if (($child = $method->getFirstChildOfType($targetType)) !== null) {
                 return $child;
             }
         }
@@ -176,6 +181,7 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
      * @return array(PHP_Depend_Code_ASTNodeI)
      * @access private
      * @since 0.9.6
+     * @todo Refactor $_methods property to getAllMethods() when it exists.
      */
     public function findChildrenOfType($targetType, array &$results = array())
     {
@@ -184,6 +190,9 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
                 $results[] = $node;
             }
             $node->findChildrenOfType($targetType, $results);
+        }
+        foreach ($this->_methods as $method) {
+            $method->findChildrenOfType($targetType, $results);
         }
         return $results;
     }
@@ -356,6 +365,35 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
             return $this->_constants[$name];
         }
         return false;
+    }
+
+    /**
+     * Returns a list of all methods provided by this type or one of its parents.
+     *
+     * @return array(PHP_Depend_Code_Method)
+     * @since 0.9.10
+     */
+    public function getAllMethods()
+    {
+        $methods = array();
+        foreach ($this->getInterfaces() as $interface) {
+            foreach ($interface->getAllMethods() as $method) {
+                $methods[$method->getName()] = $method;
+            }
+        }
+
+        $parentClass = $this->getParentClass();
+        if (is_object($parentClass)) {
+            foreach ($parentClass->getAllMethods() as $method) {
+                $methods[$method->getName()] = $method;
+            }
+        }
+
+        foreach ($this->_methods as $method) {
+            $methods[$method->getName()] = $method;
+        }
+
+        return $methods;
     }
 
     /**
