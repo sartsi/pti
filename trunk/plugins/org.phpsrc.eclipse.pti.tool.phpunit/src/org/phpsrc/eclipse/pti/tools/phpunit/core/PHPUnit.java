@@ -70,6 +70,7 @@ import org.phpsrc.eclipse.pti.tools.phpunit.core.model.PHPUnitModel;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestRunSession;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferences;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferencesFactory;
+import org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner.TestRunnerViewPart;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPUnit extends AbstractPHPTool {
@@ -182,6 +183,7 @@ public class PHPUnit extends AbstractPHPTool {
 				UIJob job = new UIJob("Update Test Runner") {
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						try {
+							TestRunnerViewPart.showTestResultsView();
 							TestRunSession session = PHPUnitModel.importTestRunSession(summaryFile);
 							notifyResultListener(session);
 						} catch (CoreException e) {

@@ -1425,24 +1425,26 @@ public class TestRunnerViewPart extends ViewPart {
 		});
 	}
 
-	public void showTestResultsView() {
-		IWorkbenchWindow window = getSite().getWorkbenchWindow();
-		IWorkbenchPage page = window.getActivePage();
-		TestRunnerViewPart testRunner = null;
+	public static void showTestResultsView() {
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window != null) {
+			IWorkbenchPage page = window.getActivePage();
+			TestRunnerViewPart testRunner = null;
 
-		if (page != null) {
-			try { // show the result view
-				testRunner = (TestRunnerViewPart) page.findView(TestRunnerViewPart.NAME);
-				if (testRunner == null) {
-					IWorkbenchPart activePart = page.getActivePart();
-					testRunner = (TestRunnerViewPart) page.showView(TestRunnerViewPart.NAME);
-					// restore focus
-					page.activate(activePart);
-				} else {
-					page.bringToTop(testRunner);
+			if (page != null) {
+				try { // show the result view
+					testRunner = (TestRunnerViewPart) page.findView(TestRunnerViewPart.NAME);
+					if (testRunner == null) {
+						IWorkbenchPart activePart = page.getActivePart();
+						testRunner = (TestRunnerViewPart) page.showView(TestRunnerViewPart.NAME);
+						// restore focus
+						page.activate(activePart);
+					} else {
+						page.bringToTop(testRunner);
+					}
+				} catch (PartInitException pie) {
+					Logger.logException(pie);
 				}
-			} catch (PartInitException pie) {
-				JUnitPlugin.log(pie);
 			}
 		}
 	}
