@@ -31,8 +31,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.ui.progress.UIJob;
 import org.phpsrc.eclipse.pti.tools.phpdepend.IPHPDependConstants;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.PHPDepend;
 import org.phpsrc.eclipse.pti.ui.actions.ResourceAction;
@@ -42,8 +42,8 @@ public class ValidateResourcesAction extends ResourceAction {
 		final IResource[] resources = getSelectedResources();
 		if (resources.length > 0) {
 
-			UIJob job = new UIJob("PHP Depend") {
-				public IStatus runInUIThread(IProgressMonitor monitor) {
+			Job job = new Job("PHP Depend") {
+				protected IStatus run(IProgressMonitor monitor) {
 					monitor.beginTask("Validation", resources.length * 2);
 
 					PHPDepend pdepend = PHPDepend.getInstance();

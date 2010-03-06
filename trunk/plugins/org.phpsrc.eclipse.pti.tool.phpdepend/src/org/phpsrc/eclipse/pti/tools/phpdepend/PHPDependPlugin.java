@@ -33,9 +33,13 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.osgi.framework.BundleContext;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
+import org.phpsrc.eclipse.pti.core.listener.IResultListener;
 import org.phpsrc.eclipse.pti.library.pear.PHPLibraryPEARPlugin;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.PHPDepend;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.MetricSummary;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferences;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferencesFactory;
+import org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.PHPDependSummaryView;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -53,10 +57,18 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	// The shared instance
 	private static PHPDependPlugin plugin;
 
+	private final IResultListener updateViewListener;
+
 	/**
 	 * The constructor
 	 */
 	public PHPDependPlugin() {
+		updateViewListener = new IResultListener() {
+			public void handleResult(Object result) {
+				if (result != null && result instanceof MetricSummary)
+					PHPDependSummaryView.showSummary((MetricSummary) result);
+			}
+		};
 	}
 
 	/*
@@ -69,6 +81,7 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		PHPDepend.getInstance().addResultListener(updateViewListener);
 	}
 
 	protected void initializeImageRegistry(ImageRegistry registry) {
@@ -91,6 +104,7 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
+		PHPDepend.getInstance().removeResultListener(updateViewListener);
 		super.stop(context);
 	}
 

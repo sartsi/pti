@@ -42,10 +42,8 @@ import org.phpsrc.eclipse.pti.core.php.inifile.INIFileUtil;
 import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.ElementFactory;
-import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.MetricSummary;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferences;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferencesFactory;
-import org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.PHPDependSummaryView;
 import org.phpsrc.eclipse.pti.ui.Logger;
 import org.xml.sax.SAXException;
 
@@ -79,8 +77,7 @@ public class PHPDepend extends AbstractPHPTool {
 		String summaryFile = launcher.getAttribute(ATTR_FILE_SUMMARY_XML);
 
 		try {
-			MetricSummary element = ElementFactory.fromXML(summaryFile, prefs.metrics);
-			PHPDependSummaryView.showSummary(element);
+			notifyResultListener(ElementFactory.fromXML(summaryFile, prefs.metrics));
 		} catch (FileNotFoundException e) {
 			Logger.logException(e);
 		} catch (SAXException e) {

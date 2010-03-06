@@ -33,6 +33,9 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
@@ -68,6 +71,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.UIJob;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.IElement;
@@ -401,32 +405,40 @@ public class PHPDependSummaryView extends ViewPart {
 		tree.setFocus();
 	}
 
-	public static void showSummary(MetricSummary summary) {
+	public static void showSummary(final MetricSummary summary) {
 		Assert.isNotNull(summary);
 
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window != null) {
-			IWorkbenchPage page = window.getActivePage();
-			if (page != null) {
-				PHPDependSummaryView view = (PHPDependSummaryView) page.findView(VIEW_ID);
-				if (view == null) {
-					try {
-						view = (PHPDependSummaryView) page.showView(VIEW_ID);
-					} catch (PartInitException e) {
-						e.printStackTrace();
+		UIJob uijob = new UIJob("Update View") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+
+				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				if (window != null) {
+					IWorkbenchPage page = window.getActivePage();
+					if (page != null) {
+						PHPDependSummaryView view = (PHPDependSummaryView) page.findView(VIEW_ID);
+						if (view == null) {
+							try {
+								view = (PHPDependSummaryView) page.showView(VIEW_ID);
+							} catch (PartInitException e) {
+								e.printStackTrace();
+							}
+						} else {
+							page.bringToTop(view);
+						}
+
+						if (view != null) {
+							view.summaries.add(summary);
+							view.showIndex = view.summaries.size() - 1;
+							if (view.tree.getItemCount() > 0)
+								view.tree.removeAll();
+							view.tree.setItemCount(1);
+						}
 					}
-				} else {
-					page.bringToTop(view);
 				}
 
-				if (view != null) {
-					view.summaries.add(summary);
-					view.showIndex = view.summaries.size() - 1;
-					if (view.tree.getItemCount() > 0)
-						view.tree.removeAll();
-					view.tree.setItemCount(1);
-				}
+				return Status.OK_STATUS;
 			}
-		}
+		};
+		uijob.schedule();
 	}
 }
