@@ -128,6 +128,7 @@ public class PHPUnit extends AbstractPHPTool {
 			folder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 
 			if (oldSource != null) {
+
 				StringBuffer newSource = new StringBuffer(oldSource.substring(0, oldSource.lastIndexOf("}")));
 
 				ISourceModule newModule = PHPToolkitUtil.getSourceModule(file);
@@ -223,7 +224,7 @@ public class PHPUnit extends AbstractPHPTool {
 			Pattern pFailed = Pattern.compile("[0-9]+\\) .*");
 
 			String[] lines = output.split("\n");
-			for (int i = 0; i < lines.length; i++) {
+			for (int i = 0; i < lines.length; ++i) {
 				Matcher m = pFailed.matcher(lines[i].trim());
 				if (m.matches()) {
 					++i;
@@ -234,9 +235,15 @@ public class PHPUnit extends AbstractPHPTool {
 						++i;
 					}
 
-					String lineFailureLocation = lines[i + 1];
-					if (lineFailureLocation.lastIndexOf(":") != -1) {
+					String lineFailureLocation = null;
+					for (int x = 2; x > 0; --x) {
+						if (lines[i + x].lastIndexOf(':') != -1) {
+							lineFailureLocation = lines[i + x];
+							break;
+						}
+					}
 
+					if (lineFailureLocation != null) {
 						String file = lineFailureLocation.substring(0, lineFailureLocation.lastIndexOf(":"));
 
 						IResource testFile = project.findMember(file.substring(projectLocation.length()));
