@@ -25,6 +25,7 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.core;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -41,9 +42,12 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.ProblemSeverities;
 import org.eclipse.dltk.core.IMethod;
@@ -51,6 +55,7 @@ import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
 import org.eclipse.dltk.core.search.SearchMatch;
+import org.eclipse.ui.progress.UIJob;
 import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.core.compiler.problem.FileProblem;
 import org.phpsrc.eclipse.pti.core.launching.OperatingSystem;
@@ -61,6 +66,8 @@ import org.phpsrc.eclipse.pti.core.php.source.PHPSourceFile;
 import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
 import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
 import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
+import org.phpsrc.eclipse.pti.tools.phpunit.core.model.PHPUnitModel;
+import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestRunSession;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferences;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferencesFactory;
 import org.phpsrc.eclipse.pti.ui.Logger;
@@ -154,20 +161,42 @@ public class PHPUnit extends AbstractPHPTool {
 
 	public IProblem[] runTestCase(IFile testFile) {
 		try {
+			File tempDir = createTempDir("pti_phpunit"); //$NON-NLS-2$
+			final File summaryFile = createTempFile(tempDir, "phpunit.xml");
+
 			ISourceModule module = PHPToolkitUtil.getSourceModule(testFile);
 			IType[] types = module.getAllTypes();
 			for (IType type : types) {
-				String cmdLineArgs = type.getElementName();
+				String cmdLineArgs = "--log-junit " + OperatingSystem.escapeShellFileArg(summaryFile.toString());
+
+				cmdLineArgs += " " + type.getElementName();
 				cmdLineArgs += " " + OperatingSystem.escapeShellFileArg(testFile.getLocation().toOSString());
 
 				PHPToolLauncher launcher = getProjectPHPToolLauncher(testFile.getProject(), cmdLineArgs, testFile
 						.getParent().getLocation());
 
 				String output = launcher.launch(testFile.getProject());
-				return parseOutput(testFile.getProject(), output);
+				IProblem[] problems = parseOutput(testFile.getProject(), output);
+
+				UIJob job = new UIJob("Update Test Runner") {
+					public IStatus runInUIThread(IProgressMonitor monitor) {
+						try {
+							TestRunSession session = PHPUnitModel.importTestRunSession(summaryFile);
+							notifyResultListener(session);
+						} catch (CoreException e) {
+							Logger.logException(e);
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				job.schedule();
+
+				return problems;
 			}
 		} catch (ModelException e) {
 			Logger.logException(e);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 		return new IProblem[0];

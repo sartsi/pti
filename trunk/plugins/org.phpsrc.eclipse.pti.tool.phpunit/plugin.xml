@@ -135,6 +135,13 @@
 				class="org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction"
 				enablesFor="*">
 			</action>
-#		</actionSet>
+		</actionSet>
+	</extension>
+	<extension point="org.eclipse.ui.views">
+		<view id="org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner"
+			name="PHPUnit"
+			category="org.eclipse.php.ui.views"
+			class="org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner.TestRunnerViewPart"
+			icon="icons/full/eview16/phpunit.gif" />
 	</extension>
 </plugin>
