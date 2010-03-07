@@ -13,20 +13,20 @@
  */
 package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 
 public class FailureTableDisplay implements ITraceDisplay {
 	private final Table fTable;
 
-	private final Image fExceptionIcon = JUnitPlugin.createImage("obj16/exc_catch.gif"); //$NON-NLS-1$
+	private final Image fExceptionIcon = PHPUnitPlugin.createImage("obj16/exc_catch.gif"); //$NON-NLS-1$
 
-	private final Image fStackIcon = JUnitPlugin.createImage("obj16/stkfrm_obj.gif"); //$NON-NLS-1$
+	private final Image fStackIcon = PHPUnitPlugin.createImage("obj16/stkfrm_obj.gif"); //$NON-NLS-1$
 
 	public FailureTableDisplay(Table table) {
 		fTable = table;

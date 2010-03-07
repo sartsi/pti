@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
@@ -155,6 +156,10 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 	public static ImageDescriptor getImageDescriptor(String relativePath) {
 		IPath path = ICONS_PATH.append(relativePath);
 		return createImageDescriptor(getDefault().getBundle(), path, true);
+	}
+
+	public static Image createImage(String path) {
+		return getImageDescriptor(path).createImage();
 	}
 
 	/**

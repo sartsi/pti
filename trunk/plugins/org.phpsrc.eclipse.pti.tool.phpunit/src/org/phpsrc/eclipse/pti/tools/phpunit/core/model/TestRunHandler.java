@@ -37,6 +37,7 @@ public class TestRunHandler extends DefaultHandler {
 	private Stack/* <Boolean> */fNotRun = new Stack();
 
 	private StringBuffer fFailureBuffer;
+	private String fFailureType;
 	private boolean fInExpected;
 	private boolean fInActual;
 	private StringBuffer fExpectedBuffer;
@@ -125,6 +126,7 @@ public class TestRunHandler extends DefaultHandler {
 			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=125296
 			fStatus = Status.FAILURE;
 			fFailureBuffer = new StringBuffer();
+			fFailureType = attributes.getValue(IXMLTags.ATTR_TYPE);
 
 		} else if (qName.equals(IXMLTags.NODE_EXPECTED)) {
 			fInExpected = true;
@@ -211,12 +213,48 @@ public class TestRunHandler extends DefaultHandler {
 
 	private void handleFailure(TestElement testElement) {
 		if (fFailureBuffer != null) {
+			if (fExpectedBuffer == null && fActualBuffer == null
+					&& "PHPUnit_Framework_ExpectationFailedException".equals(fFailureType))
+				determineExpectedAndActualValues(fFailureBuffer.toString());
+
 			fTestRunSession.registerTestFailureStatus(testElement, fStatus, fFailureBuffer.toString(),
 					toString(fExpectedBuffer), toString(fActualBuffer));
 			fFailureBuffer = null;
 			fExpectedBuffer = null;
 			fActualBuffer = null;
 			fStatus = null;
+			fFailureType = null;
+		}
+	}
+
+	private void determineExpectedAndActualValues(String trace) {
+		int pos = trace.indexOf("@@ @@");
+		if (pos > 0) {
+			StringBuffer expected = new StringBuffer();
+			StringBuffer actual = new StringBuffer();
+
+			String[] lines = trace.substring(pos + 5).split("\n");
+			for (String line : lines) {
+				if (line.length() > 0 && !" ".equals(line)) {
+					String str = line.substring(1).trim() + "\n";
+					switch (line.charAt(0)) {
+					case ' ':
+						expected.append(str);
+						actual.append(str);
+						break;
+					case '-':
+						expected.append(str);
+						break;
+					case '+':
+						actual.append(str);
+						break;
+					}
+				}
+			}
+			if (expected.length() > 0 && actual.length() > 0) {
+				fExpectedBuffer = new StringBuffer(expected.toString().trim());
+				fActualBuffer = new StringBuffer(actual.toString().trim());
+			}
 		}
 	}
 

@@ -82,5 +82,9 @@ public interface IXMLTags {
 	 */
 	public static final String ATTR_TIME = "time"; //$NON-NLS-1$
 	//	public static final String ATTR_MESSAGE= "message"; //$NON-NLS-1$
-	//	public static final String ATTR_TYPE= "type"; //$NON-NLS-1$
+
+	/**
+	 * value: Double
+	 */
+	public static final String ATTR_TYPE = "type"; //$NON-NLS-1$
 }
