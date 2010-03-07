@@ -224,10 +224,12 @@ public class PHPUnit extends AbstractPHPTool {
 
 		if (output != null && output.length() > 0) {
 			Pattern pFailed = Pattern.compile("[0-9]+\\) .*");
+			Pattern pFileAndLine = Pattern.compile(".*:[0-9]+");
 
 			String[] lines = output.split("\n");
+			Matcher m = null;
 			for (int i = 0; i < lines.length; ++i) {
-				Matcher m = pFailed.matcher(lines[i].trim());
+				m = pFailed.matcher(lines[i].trim());
 				if (m.matches()) {
 					++i;
 					String msg = lines[i].trim();
@@ -237,8 +239,15 @@ public class PHPUnit extends AbstractPHPTool {
 						++i;
 					}
 
+					Matcher mf = null;
+					while (i < lines.length && (mf == null || !mf.matches())) {
+						mf = pFileAndLine.matcher(lines[i].trim());
+						if (!mf.matches())
+							++i;
+					}
+
 					String lineFailureLocation = null;
-					for (int x = 2; x > 0; --x) {
+					for (int x = 1; x >= 0; --x) {
 						if (lines[i + x].lastIndexOf(':') != -1) {
 							lineFailureLocation = lines[i + x];
 							break;
