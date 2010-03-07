@@ -31,10 +31,10 @@ public class CopyFailureListAction extends Action {
 	private final TestRunnerViewPart fRunner;
 
 	public CopyFailureListAction(TestRunnerViewPart runner, Clipboard clipboard) {
-		super(JUnitMessages.CopyFailureList_action_label);
+		super(PHPUnitMessages.CopyFailureList_action_label);
 		fRunner = runner;
 		fClipboard = clipboard;
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IJUnitHelpContextIds.COPYFAILURELIST_ACTION);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IPHPUnitHelpContextIds.COPYFAILURELIST_ACTION);
 	}
 
 	/*
@@ -48,8 +48,8 @@ public class CopyFailureListAction extends Action {
 		} catch (SWTError e) {
 			if (e.code != DND.ERROR_CANNOT_SET_CLIPBOARD)
 				throw e;
-			if (MessageDialog.openQuestion(JavaPlugin.getActiveWorkbenchShell(), JUnitMessages.CopyFailureList_problem,
-					JUnitMessages.CopyFailureList_clipboard_busy))
+			if (MessageDialog.openQuestion(JavaPlugin.getActiveWorkbenchShell(), PHPUnitMessages.CopyFailureList_problem,
+					PHPUnitMessages.CopyFailureList_clipboard_busy))
 				run();
 		}
 	}

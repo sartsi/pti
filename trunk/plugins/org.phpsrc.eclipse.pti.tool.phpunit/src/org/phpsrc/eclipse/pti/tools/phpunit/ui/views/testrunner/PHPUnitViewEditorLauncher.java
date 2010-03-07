@@ -13,20 +13,19 @@ package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jdt.internal.junit.model.JUnitModel;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jdt.internal.junit.util.ExceptionHandler;
 import org.eclipse.ui.IEditorLauncher;
+import org.phpsrc.eclipse.pti.tools.phpunit.core.model.PHPUnitModel;
 
-public class JUnitViewEditorLauncher implements IEditorLauncher {
+public class PHPUnitViewEditorLauncher implements IEditorLauncher {
 
 	public void open(IPath file) {
 		try {
-			JUnitPlugin.getActivePage().showView(TestRunnerViewPart.NAME);
-			JUnitModel.importTestRunSession(file.toFile());
+			TestRunnerViewPart.showTestResultsView();
+			PHPUnitModel.importTestRunSession(file.toFile());
 		} catch (CoreException e) {
-			ExceptionHandler.handle(e, JUnitMessages.JUnitViewEditorLauncher_dialog_title,
-					JUnitMessages.JUnitViewEditorLauncher_error_occurred);
+			ExceptionHandler.handle(e, PHPUnitMessages.JUnitViewEditorLauncher_dialog_title,
+					PHPUnitMessages.JUnitViewEditorLauncher_error_occurred);
 		}
 	}
 

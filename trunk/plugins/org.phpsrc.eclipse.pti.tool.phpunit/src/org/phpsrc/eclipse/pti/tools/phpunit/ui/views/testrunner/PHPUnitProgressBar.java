@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * A progress bar with a red/green indication for success or failure.
  */
-public class JUnitProgressBar extends Canvas {
+public class PHPUnitProgressBar extends Canvas {
 	private static final int DEFAULT_WIDTH = 160;
 	private static final int DEFAULT_HEIGHT = 18;
 
@@ -42,7 +42,7 @@ public class JUnitProgressBar extends Canvas {
 	private boolean fError;
 	private boolean fStopped = false;
 
-	public JUnitProgressBar(Composite parent) {
+	public PHPUnitProgressBar(Composite parent) {
 		super(parent, SWT.NONE);
 
 		addControlListener(new ControlAdapter() {

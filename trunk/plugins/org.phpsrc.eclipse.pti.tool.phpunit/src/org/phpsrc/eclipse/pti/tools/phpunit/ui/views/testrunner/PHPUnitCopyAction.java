@@ -30,17 +30,17 @@ import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestElement;
 /**
  * Copies a test failure stack trace to the clipboard.
  */
-public class JUnitCopyAction extends SelectionListenerAction {
+public class PHPUnitCopyAction extends SelectionListenerAction {
 	private FailureTrace fView;
 
 	private final Clipboard fClipboard;
 
 	private TestElement fTestElement;
 
-	public JUnitCopyAction(FailureTrace view, Clipboard clipboard) {
-		super(JUnitMessages.CopyTrace_action_label);
+	public PHPUnitCopyAction(FailureTrace view, Clipboard clipboard) {
+		super(PHPUnitMessages.CopyTrace_action_label);
 		Assert.isNotNull(clipboard);
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IJUnitHelpContextIds.COPYTRACE_ACTION);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IPHPUnitHelpContextIds.COPYTRACE_ACTION);
 		fView = view;
 		fClipboard = clipboard;
 	}
@@ -66,8 +66,8 @@ public class JUnitCopyAction extends SelectionListenerAction {
 		} catch (SWTError e) {
 			if (e.code != DND.ERROR_CANNOT_SET_CLIPBOARD)
 				throw e;
-			if (MessageDialog.openQuestion(fView.getComposite().getShell(), JUnitMessages.CopyTraceAction_problem,
-					JUnitMessages.CopyTraceAction_clipboard_busy))
+			if (MessageDialog.openQuestion(fView.getComposite().getShell(), PHPUnitMessages.CopyTraceAction_problem,
+					PHPUnitMessages.CopyTraceAction_clipboard_busy))
 				run();
 		}
 	}

@@ -42,12 +42,13 @@ public class RerunAction extends Action {
 	public RerunAction(String actionName, TestRunnerViewPart runner, String testId, String className, String testName,
 			String launchMode) {
 		super(actionName);
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IJUnitHelpContextIds.RERUN_ACTION);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IPHPUnitHelpContextIds.RERUN_ACTION);
 		fTestRunner = runner;
 		fTestId = testId;
 		fClassName = className;
 		fTestName = testName;
 		fLaunchMode = launchMode;
+		this.setEnabled(false);
 	}
 
 	/*

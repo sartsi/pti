@@ -22,13 +22,13 @@ public class ScrollLockAction extends Action {
 	private TestRunnerViewPart fRunnerViewPart;
 
 	public ScrollLockAction(TestRunnerViewPart viewer) {
-		super(JUnitMessages.ScrollLockAction_action_label);
+		super(PHPUnitMessages.ScrollLockAction_action_label);
 		fRunnerViewPart = viewer;
-		setToolTipText(JUnitMessages.ScrollLockAction_action_tooltip);
+		setToolTipText(PHPUnitMessages.ScrollLockAction_action_tooltip);
 		setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/lock.gif")); //$NON-NLS-1$
 		setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/lock.gif")); //$NON-NLS-1$
 		setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/lock.gif")); //$NON-NLS-1$
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IJUnitHelpContextIds.OUTPUT_SCROLL_LOCK_ACTION);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IPHPUnitHelpContextIds.OUTPUT_SCROLL_LOCK_ACTION);
 		setChecked(false);
 	}
 

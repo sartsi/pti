@@ -38,7 +38,6 @@ import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestElement;
 public class FailureTrace implements IMenuListener {
 	private static final int MAX_LABEL_LENGTH = 256;
 
-	static final String FRAME_PREFIX = "at "; //$NON-NLS-1$
 	private Table fTable;
 	private TestRunnerViewPart fTestRunner;
 	private String fInputTrace;
@@ -94,7 +93,7 @@ public class FailureTrace implements IMenuListener {
 			Action a = createOpenEditorAction(getSelectedText());
 			if (a != null)
 				manager.add(a);
-			manager.add(new JUnitCopyAction(FailureTrace.this, fClipboard));
+			manager.add(new PHPUnitCopyAction(FailureTrace.this, fClipboard));
 		}
 		// fix for bug 68058
 		if (fFailure != null && fFailure.isComparisonFailure())
@@ -111,19 +110,12 @@ public class FailureTrace implements IMenuListener {
 
 	private Action createOpenEditorAction(String traceLine) {
 		try {
-			String testName = traceLine;
-			testName = testName.substring(testName.indexOf(FRAME_PREFIX));
-			testName = testName.substring(FRAME_PREFIX.length(), testName.lastIndexOf('(')).trim();
-			testName = testName.substring(0, testName.lastIndexOf('.'));
-			int innerSeparatorIndex = testName.indexOf('$');
-			if (innerSeparatorIndex != -1)
-				testName = testName.substring(0, innerSeparatorIndex);
-
-			String lineNumber = traceLine;
-			lineNumber = lineNumber.substring(lineNumber.indexOf(':') + 1, lineNumber.lastIndexOf(')'));
-			int line = Integer.valueOf(lineNumber).intValue();
-			// return new OpenEditorAtLineAction(fTestRunner, testName, line);
-			return null;
+			int pos = traceLine.lastIndexOf(':');
+			if (pos != -1) {
+				String fileName = traceLine.substring(0, pos);
+				int lineNumber = Integer.parseInt(traceLine.substring(pos + 1));
+				return new OpenEditorAtLineAction(fTestRunner, fileName, lineNumber);
+			}
 		} catch (NumberFormatException e) {
 		} catch (IndexOutOfBoundsException e) {
 		}

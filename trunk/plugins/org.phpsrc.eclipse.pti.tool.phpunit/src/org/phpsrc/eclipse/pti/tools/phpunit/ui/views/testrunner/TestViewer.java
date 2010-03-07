@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.jdt.internal.junit.ui.OpenTestAction;
 import org.eclipse.jdt.internal.ui.viewsupport.ColoringLabelProvider;
 import org.eclipse.jdt.internal.ui.viewsupport.SelectionProviderMediator;
 import org.eclipse.jface.action.Action;
@@ -103,8 +102,8 @@ public class TestViewer {
 
 	private class ExpandAllAction extends Action {
 		public ExpandAllAction() {
-			setText(JUnitMessages.ExpandAllAction_text);
-			setToolTipText(JUnitMessages.ExpandAllAction_tooltip);
+			setText(PHPUnitMessages.ExpandAllAction_text);
+			setToolTipText(PHPUnitMessages.ExpandAllAction_tooltip);
 		}
 
 		public void run() {
@@ -203,30 +202,30 @@ public class TestViewer {
 
 			String testLabel = testElement.getTestName();
 			String className = testElement.getClassName();
+
 			if (testElement instanceof TestSuiteElement) {
-				// manager.add(new OpenTestAction(fTestRunnerPart, testLabel));
+				manager.add(new OpenTestAction(fTestRunnerPart, testLabel));
 				manager.add(new Separator());
 				if (testClassExists(className) && !fTestRunnerPart.lastLaunchIsKeptAlive()) {
-					manager.add(new RerunAction(JUnitMessages.RerunAction_label_run, fTestRunnerPart, testElement
+					manager.add(new RerunAction(PHPUnitMessages.RerunAction_label_run, fTestRunnerPart, testElement
 							.getId(), className, null, ILaunchManager.RUN_MODE));
-					manager.add(new RerunAction(JUnitMessages.RerunAction_label_debug, fTestRunnerPart, testElement
-							.getId(), className, null, ILaunchManager.DEBUG_MODE));
+					// manager.add(new
+					// RerunAction(PHPUnitMessages.RerunAction_label_debug,
+					// fTestRunnerPart, testElement
+					// .getId(), className, null, ILaunchManager.DEBUG_MODE));
 				}
 			} else {
 				TestCaseElement testCaseElement = (TestCaseElement) testElement;
 				String testMethodName = testCaseElement.getTestMethodName();
-				// manager.add(new OpenTestAction(fTestRunnerPart,
-				// testCaseElement));
+				manager.add(new OpenTestAction(fTestRunnerPart, testCaseElement));
 				manager.add(new Separator());
 				if (fTestRunnerPart.lastLaunchIsKeptAlive()) {
-					manager.add(new RerunAction(JUnitMessages.RerunAction_label_rerun, fTestRunnerPart, testElement
+					manager.add(new RerunAction(PHPUnitMessages.RerunAction_label_rerun, fTestRunnerPart, testElement
 							.getId(), className, testMethodName, ILaunchManager.RUN_MODE));
 
 				} else {
-					manager.add(new RerunAction(JUnitMessages.RerunAction_label_run, fTestRunnerPart, testElement
+					manager.add(new RerunAction(PHPUnitMessages.RerunAction_label_run, fTestRunnerPart, testElement
 							.getId(), className, testMethodName, ILaunchManager.RUN_MODE));
-					manager.add(new RerunAction(JUnitMessages.RerunAction_label_debug, fTestRunnerPart, testElement
-							.getId(), className, testMethodName, ILaunchManager.DEBUG_MODE));
 				}
 			}
 			if (fLayoutMode == TestRunnerViewPart.LAYOUT_HIERARCHICAL) {

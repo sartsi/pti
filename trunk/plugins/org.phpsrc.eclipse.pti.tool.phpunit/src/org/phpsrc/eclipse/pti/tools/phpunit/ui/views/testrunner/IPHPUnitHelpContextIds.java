@@ -15,7 +15,7 @@ import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 /**
  * Help context ids for the JUnit UI.
  */
-public interface IJUnitHelpContextIds {
+public interface IPHPUnitHelpContextIds {
 	public static final String PREFIX = JUnitPlugin.PLUGIN_ID + '.';
 
 	// Actions

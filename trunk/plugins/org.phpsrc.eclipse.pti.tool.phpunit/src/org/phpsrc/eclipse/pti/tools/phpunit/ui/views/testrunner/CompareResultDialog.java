@@ -64,7 +64,7 @@ public class CompareResultDialog extends TrayDialog {
 
 		protected void createControls(Composite composite) {
 			super.createControls(composite);
-			PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, IJUnitHelpContextIds.RESULT_COMPARE_DIALOG);
+			PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, IPHPUnitHelpContextIds.RESULT_COMPARE_DIALOG);
 		}
 
 		// protected void createToolItems(ToolBarManager tbm) {
@@ -222,12 +222,12 @@ public class CompareResultDialog extends TrayDialog {
 
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText(JUnitMessages.CompareResultDialog_title);
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(newShell, IJUnitHelpContextIds.RESULT_COMPARE_DIALOG);
+		newShell.setText(PHPUnitMessages.CompareResultDialog_title);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(newShell, IPHPUnitHelpContextIds.RESULT_COMPARE_DIALOG);
 	}
 
 	protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.OK_ID, JUnitMessages.CompareResultDialog_labelOK, true);
+		createButton(parent, IDialogConstants.OK_ID, PHPUnitMessages.CompareResultDialog_labelOK, true);
 	}
 
 	protected Control createDialogArea(Composite parent) {
@@ -253,9 +253,9 @@ public class CompareResultDialog extends TrayDialog {
 
 	private Control createPreviewer(Composite parent) {
 		final CompareConfiguration compareConfiguration = new CompareConfiguration();
-		compareConfiguration.setLeftLabel(JUnitMessages.CompareResultDialog_expectedLabel);
+		compareConfiguration.setLeftLabel(PHPUnitMessages.CompareResultDialog_expectedLabel);
 		compareConfiguration.setLeftEditable(false);
-		compareConfiguration.setRightLabel(JUnitMessages.CompareResultDialog_actualLabel);
+		compareConfiguration.setRightLabel(PHPUnitMessages.CompareResultDialog_actualLabel);
 		compareConfiguration.setRightEditable(false);
 		compareConfiguration.setProperty(CompareConfiguration.IGNORE_WHITESPACE, Boolean.FALSE);
 		compareConfiguration.setProperty(PREFIX_SUFFIX_PROPERTY, fPrefixSuffix);

@@ -20,7 +20,7 @@ import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
  * Defines constants which are used to refer to values in the plugin's
  * preference store.
  */
-public class JUnitPreferencesConstants {
+public class PHPUnitPreferencesConstants {
 	/**
 	 * Boolean preference controlling whether the failure stack should be
 	 * filtered.
@@ -84,7 +84,7 @@ public class JUnitPreferencesConstants {
 			"sun.reflect.*", //$NON-NLS-1$
 	};
 
-	private JUnitPreferencesConstants() {
+	private PHPUnitPreferencesConstants() {
 		// no instance
 	}
 

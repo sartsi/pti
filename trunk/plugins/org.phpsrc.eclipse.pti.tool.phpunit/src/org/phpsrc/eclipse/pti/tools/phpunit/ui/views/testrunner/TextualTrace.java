@@ -84,7 +84,8 @@ public class TextualTrace {
 				pattern = pattern.substring(0, len);
 			} else if (Character.isUpperCase(pattern.charAt(0))) {
 				// class in the default package
-				pattern = FailureTrace.FRAME_PREFIX + pattern + '.';
+				// pattern = FailureTrace.FRAME_PREFIX + pattern + '.';
+				pattern = pattern + '.';
 			} else {
 				// class names start w/ an uppercase letter after the .
 				final int lastDotIndex = pattern.lastIndexOf('.');
@@ -122,8 +123,17 @@ public class TextualTrace {
 	}
 
 	private boolean isAStackFrame(String itemLabel) {
-		// heuristic for detecting a stack frame - works for JDK
-		return itemLabel.indexOf(" at ") >= 0; //$NON-NLS-1$
+		int pos = itemLabel.lastIndexOf(':');
+		if (pos != -1) {
+			try {
+				return Integer.parseInt(itemLabel.substring(pos + 1)) > 0 ? true : false;
+			} catch (NumberFormatException e) {
+			} catch (IndexOutOfBoundsException e) {
+			}
+		}
+
+		return false;
+		//return itemLabel.indexOf(" at ") >= 0; //$NON-NLS-1$
 	}
 
 	private String readLine(BufferedReader bufferedReader) throws IOException {

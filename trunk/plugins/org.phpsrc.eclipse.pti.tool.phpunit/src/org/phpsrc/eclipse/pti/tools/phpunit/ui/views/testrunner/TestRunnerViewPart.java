@@ -49,7 +49,6 @@ import org.eclipse.jdt.internal.junit.Messages;
 import org.eclipse.jdt.internal.junit.launcher.ITestKind;
 import org.eclipse.jdt.internal.junit.launcher.JUnitLaunchConfigurationConstants;
 import org.eclipse.jdt.internal.junit.launcher.TestKindRegistry;
-import org.eclipse.jdt.internal.junit.model.JUnitModel;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jdt.internal.ui.viewsupport.ViewHistory;
 import org.eclipse.jface.action.Action;
@@ -151,7 +150,7 @@ public class TestRunnerViewPart extends ViewPart {
 
 	// private boolean fTestIsRunning= false;
 
-	protected JUnitProgressBar fProgressBar;
+	protected PHPUnitProgressBar fProgressBar;
 	protected ProgressImages fProgressImages;
 	protected Image fViewImage;
 	protected CounterPanel fCounterPanel;
@@ -174,7 +173,7 @@ public class TestRunnerViewPart extends ViewPart {
 	private Action fPreviousAction;
 
 	private StopAction fStopAction;
-	private JUnitCopyAction fCopyAction;
+	private PHPUnitCopyAction fCopyAction;
 
 	private Action fRerunLastTestAction;
 	private IHandlerActivation fRerunLastActivation;
@@ -313,11 +312,11 @@ public class TestRunnerViewPart extends ViewPart {
 	private class RunnerViewHistory extends ViewHistory {
 
 		public void configureHistoryListAction(IAction action) {
-			action.setText(JUnitMessages.TestRunnerViewPart_history);
+			action.setText(PHPUnitMessages.TestRunnerViewPart_history);
 		}
 
 		public void configureHistoryDropDownAction(IAction action) {
-			action.setToolTipText(JUnitMessages.TestRunnerViewPart_test_run_history);
+			action.setToolTipText(PHPUnitMessages.TestRunnerViewPart_test_run_history);
 			JUnitPlugin.setLocalImageDescriptors(action, "history_list.gif"); //$NON-NLS-1$
 		}
 
@@ -326,11 +325,11 @@ public class TestRunnerViewPart extends ViewPart {
 		}
 
 		public String getHistoryListDialogTitle() {
-			return JUnitMessages.TestRunnerViewPart_test_runs;
+			return PHPUnitMessages.TestRunnerViewPart_test_runs;
 		}
 
 		public String getHistoryListDialogMessage() {
-			return JUnitMessages.TestRunnerViewPart_select_test_run;
+			return PHPUnitMessages.TestRunnerViewPart_select_test_run;
 		}
 
 		public Shell getShell() {
@@ -338,7 +337,7 @@ public class TestRunnerViewPart extends ViewPart {
 		}
 
 		public List getHistoryEntries() {
-			return JUnitPlugin.getModel().getTestRunSessions();
+			return PHPUnitPlugin.getModel().getTestRunSessions();
 		}
 
 		public Object getCurrentEntry() {
@@ -354,7 +353,7 @@ public class TestRunnerViewPart extends ViewPart {
 		public void setHistoryEntries(List remainingEntries, Object activeEntry) {
 			setActiveTestRunSession((TestRunSession) activeEntry);
 
-			List testRunSessions = JUnitPlugin.getModel().getTestRunSessions();
+			List testRunSessions = PHPUnitPlugin.getModel().getTestRunSessions();
 			testRunSessions.removeAll(remainingEntries);
 			for (Iterator iter = testRunSessions.iterator(); iter.hasNext();) {
 				PHPUnitPlugin.getModel().removeTestRunSession((TestRunSession) iter.next());
@@ -391,7 +390,7 @@ public class TestRunnerViewPart extends ViewPart {
 				return testRunLabel;
 			} else {
 				String startTime = DateFormat.getDateTimeInstance().format(new Date(session.getStartTime()));
-				return Messages.format(JUnitMessages.TestRunnerViewPart_testName_startTime, new Object[] {
+				return Messages.format(PHPUnitMessages.TestRunnerViewPart_testName_startTime, new Object[] {
 						testRunLabel, startTime });
 			}
 		}
@@ -405,17 +404,17 @@ public class TestRunnerViewPart extends ViewPart {
 		}
 
 		public String getMaxEntriesMessage() {
-			return JUnitMessages.TestRunnerViewPart_max_remembered;
+			return PHPUnitMessages.TestRunnerViewPart_max_remembered;
 		}
 
 		public int getMaxEntries() {
 			IPreferenceStore store = JUnitPlugin.getDefault().getPreferenceStore();
-			return store.getInt(JUnitPreferencesConstants.MAX_TEST_RUNS);
+			return store.getInt(PHPUnitPreferencesConstants.MAX_TEST_RUNS);
 		}
 
 		public void setMaxEntries(int maxEntries) {
 			IPreferenceStore store = JUnitPlugin.getDefault().getPreferenceStore();
-			store.setValue(JUnitPreferencesConstants.MAX_TEST_RUNS, maxEntries);
+			store.setValue(PHPUnitPreferencesConstants.MAX_TEST_RUNS, maxEntries);
 		}
 	}
 
@@ -423,13 +422,13 @@ public class TestRunnerViewPart extends ViewPart {
 		private final Shell fShell;
 
 		public ImportTestRunSessionAction(Shell shell) {
-			super(JUnitMessages.TestRunnerViewPart_ImportTestRunSessionAction_name);
+			super(PHPUnitMessages.TestRunnerViewPart_ImportTestRunSessionAction_name);
 			fShell = shell;
 		}
 
 		public void run() {
 			FileDialog importDialog = new FileDialog(fShell, SWT.OPEN);
-			importDialog.setText(JUnitMessages.TestRunnerViewPart_ImportTestRunSessionAction_title);
+			importDialog.setText(PHPUnitMessages.TestRunnerViewPart_ImportTestRunSessionAction_title);
 			IDialogSettings dialogSettings = JUnitPlugin.getDefault().getDialogSettings();
 			String lastPath = dialogSettings.get(PREF_LAST_PATH);
 			if (lastPath != null) {
@@ -444,11 +443,12 @@ public class TestRunnerViewPart extends ViewPart {
 			File file = new File(path);
 
 			try {
-				JUnitModel.importTestRunSession(file);
+				PHPUnitModel.importTestRunSession(file);
 			} catch (CoreException e) {
-				JUnitPlugin.log(e);
-				ErrorDialog.openError(fShell, JUnitMessages.TestRunnerViewPart_ImportTestRunSessionAction_error_title,
-						e.getStatus().getMessage(), e.getStatus());
+				Logger.logException(e);
+				ErrorDialog.openError(fShell,
+						PHPUnitMessages.TestRunnerViewPart_ImportTestRunSessionAction_error_title, e.getStatus()
+								.getMessage(), e.getStatus());
 			}
 		}
 	}
@@ -458,14 +458,14 @@ public class TestRunnerViewPart extends ViewPart {
 		private final Shell fShell;
 
 		public ExportTestRunSessionAction(Shell shell, TestRunSession testRunSession) {
-			super(JUnitMessages.TestRunnerViewPart_ExportTestRunSessionAction_name);
+			super(PHPUnitMessages.TestRunnerViewPart_ExportTestRunSessionAction_name);
 			fShell = shell;
 			fTestRunSession = testRunSession;
 		}
 
 		public void run() {
 			FileDialog exportDialog = new FileDialog(fShell, SWT.SAVE);
-			exportDialog.setText(JUnitMessages.TestRunnerViewPart_ExportTestRunSessionAction_title);
+			exportDialog.setText(PHPUnitMessages.TestRunnerViewPart_ExportTestRunSessionAction_title);
 			IDialogSettings dialogSettings = JUnitPlugin.getDefault().getDialogSettings();
 			String lastPath = dialogSettings.get(PREF_LAST_PATH);
 			if (lastPath != null) {
@@ -484,8 +484,9 @@ public class TestRunnerViewPart extends ViewPart {
 				PHPUnitModel.exportTestRunSession(fTestRunSession, file);
 			} catch (CoreException e) {
 				Logger.logException(e);
-				ErrorDialog.openError(fShell, JUnitMessages.TestRunnerViewPart_ExportTestRunSessionAction_error_title,
-						e.getStatus().getMessage(), e.getStatus());
+				ErrorDialog.openError(fShell,
+						PHPUnitMessages.TestRunnerViewPart_ExportTestRunSessionAction_error_title, e.getStatus()
+								.getMessage(), e.getStatus());
 			}
 		}
 
@@ -508,7 +509,7 @@ public class TestRunnerViewPart extends ViewPart {
 			String testRunLabel = BasicElementLabels.getJavaElementName(fTestRunSession.getTestRunName());
 			String msg;
 			if (testRunSession.getLaunch() != null) {
-				msg = Messages.format(JUnitMessages.TestRunnerViewPart_Launching, new Object[] { testRunLabel });
+				msg = Messages.format(PHPUnitMessages.TestRunnerViewPart_Launching, new Object[] { testRunLabel });
 			} else {
 				msg = testRunLabel;
 			}
@@ -545,7 +546,7 @@ public class TestRunnerViewPart extends ViewPart {
 			fTestViewer.registerAutoScrollTarget(null);
 
 			String[] keys = { elapsedTimeAsString(elapsedTime) };
-			String msg = Messages.format(JUnitMessages.TestRunnerViewPart_message_finish, keys);
+			String msg = Messages.format(PHPUnitMessages.TestRunnerViewPart_message_finish, keys);
 			registerInfoMessage(msg);
 
 			postSyncRunnable(new Runnable() {
@@ -571,14 +572,14 @@ public class TestRunnerViewPart extends ViewPart {
 		public void sessionStopped(final long elapsedTime) {
 			fTestViewer.registerAutoScrollTarget(null);
 
-			registerInfoMessage(JUnitMessages.TestRunnerViewPart_message_stopped);
+			registerInfoMessage(PHPUnitMessages.TestRunnerViewPart_message_stopped);
 			handleStopped();
 		}
 
 		public void sessionTerminated() {
 			fTestViewer.registerAutoScrollTarget(null);
 
-			registerInfoMessage(JUnitMessages.TestRunnerViewPart_message_terminated);
+			registerInfoMessage(PHPUnitMessages.TestRunnerViewPart_message_terminated);
 			handleStopped();
 		}
 
@@ -593,8 +594,8 @@ public class TestRunnerViewPart extends ViewPart {
 
 			String className = BasicElementLabels.getJavaElementName(testCaseElement.getClassName());
 			String method = BasicElementLabels.getJavaElementName(testCaseElement.getTestMethodName());
-			String status = Messages.format(JUnitMessages.TestRunnerViewPart_message_started, new String[] { className,
-					method });
+			String status = Messages.format(PHPUnitMessages.TestRunnerViewPart_message_started, new String[] {
+					className, method });
 			registerInfoMessage(status);
 		}
 
@@ -685,10 +686,10 @@ public class TestRunnerViewPart extends ViewPart {
 
 	private class ClearAction extends Action {
 		public ClearAction() {
-			setText(JUnitMessages.TestRunnerViewPart_clear_history_label);
+			setText(PHPUnitMessages.TestRunnerViewPart_clear_history_label);
 
 			boolean enabled = false;
-			List testRunSessions = JUnitPlugin.getModel().getTestRunSessions();
+			List testRunSessions = PHPUnitPlugin.getModel().getTestRunSessions();
 			for (Iterator iter = testRunSessions.iterator(); iter.hasNext();) {
 				TestRunSession testRunSession = (TestRunSession) iter.next();
 				if (!testRunSession.isRunning() && !testRunSession.isStarting()) {
@@ -706,7 +707,7 @@ public class TestRunnerViewPart extends ViewPart {
 		}
 
 		private List getRunningSessions() {
-			List testRunSessions = JUnitPlugin.getModel().getTestRunSessions();
+			List testRunSessions = PHPUnitPlugin.getModel().getTestRunSessions();
 			for (Iterator iter = testRunSessions.iterator(); iter.hasNext();) {
 				TestRunSession testRunSession = (TestRunSession) iter.next();
 				if (!testRunSession.isRunning() && !testRunSession.isStarting()) {
@@ -719,8 +720,8 @@ public class TestRunnerViewPart extends ViewPart {
 
 	private class StopAction extends Action {
 		public StopAction() {
-			setText(JUnitMessages.TestRunnerViewPart_stopaction_text);
-			setToolTipText(JUnitMessages.TestRunnerViewPart_stopaction_tooltip);
+			setText(PHPUnitMessages.TestRunnerViewPart_stopaction_text);
+			setToolTipText(PHPUnitMessages.TestRunnerViewPart_stopaction_tooltip);
 			JUnitPlugin.setLocalImageDescriptors(this, "stop.gif"); //$NON-NLS-1$
 		}
 
@@ -732,8 +733,8 @@ public class TestRunnerViewPart extends ViewPart {
 
 	private class RerunLastAction extends Action {
 		public RerunLastAction() {
-			setText(JUnitMessages.TestRunnerViewPart_rerunaction_label);
-			setToolTipText(JUnitMessages.TestRunnerViewPart_rerunaction_tooltip);
+			setText(PHPUnitMessages.TestRunnerViewPart_rerunaction_label);
+			setToolTipText(PHPUnitMessages.TestRunnerViewPart_rerunaction_tooltip);
 			JUnitPlugin.setLocalImageDescriptors(this, "relaunch.gif"); //$NON-NLS-1$
 			setEnabled(false);
 			setActionDefinitionId(RERUN_LAST_COMMAND);
@@ -746,8 +747,8 @@ public class TestRunnerViewPart extends ViewPart {
 
 	private class RerunLastFailedFirstAction extends Action {
 		public RerunLastFailedFirstAction() {
-			setText(JUnitMessages.TestRunnerViewPart_rerunfailuresaction_label);
-			setToolTipText(JUnitMessages.TestRunnerViewPart_rerunfailuresaction_tooltip);
+			setText(PHPUnitMessages.TestRunnerViewPart_rerunfailuresaction_label);
+			setToolTipText(PHPUnitMessages.TestRunnerViewPart_rerunfailuresaction_tooltip);
 			JUnitPlugin.setLocalImageDescriptors(this, "relaunchf.gif"); //$NON-NLS-1$
 			setEnabled(false);
 			setActionDefinitionId(RERUN_FAILED_FIRST_COMMAND);
@@ -764,18 +765,18 @@ public class TestRunnerViewPart extends ViewPart {
 		public ToggleOrientationAction(int orientation) {
 			super("", AS_RADIO_BUTTON); //$NON-NLS-1$
 			if (orientation == TestRunnerViewPart.VIEW_ORIENTATION_HORIZONTAL) {
-				setText(JUnitMessages.TestRunnerViewPart_toggle_horizontal_label);
+				setText(PHPUnitMessages.TestRunnerViewPart_toggle_horizontal_label);
 				setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/th_horizontal.gif")); //$NON-NLS-1$
 			} else if (orientation == TestRunnerViewPart.VIEW_ORIENTATION_VERTICAL) {
-				setText(JUnitMessages.TestRunnerViewPart_toggle_vertical_label);
+				setText(PHPUnitMessages.TestRunnerViewPart_toggle_vertical_label);
 				setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/th_vertical.gif")); //$NON-NLS-1$
 			} else if (orientation == TestRunnerViewPart.VIEW_ORIENTATION_AUTOMATIC) {
-				setText(JUnitMessages.TestRunnerViewPart_toggle_automatic_label);
+				setText(PHPUnitMessages.TestRunnerViewPart_toggle_automatic_label);
 				setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/th_automatic.gif")); //$NON-NLS-1$
 			}
 			fActionOrientation = orientation;
 			PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
-					IJUnitHelpContextIds.RESULTS_VIEW_TOGGLE_ORIENTATION_ACTION);
+					IPHPUnitHelpContextIds.RESULTS_VIEW_TOGGLE_ORIENTATION_ACTION);
 		}
 
 		public int getOrientation() {
@@ -801,8 +802,8 @@ public class TestRunnerViewPart extends ViewPart {
 
 	private class FailuresOnlyFilterAction extends Action {
 		public FailuresOnlyFilterAction() {
-			super(JUnitMessages.TestRunnerViewPart_show_failures_only, AS_CHECK_BOX);
-			setToolTipText(JUnitMessages.TestRunnerViewPart_show_failures_only);
+			super(PHPUnitMessages.TestRunnerViewPart_show_failures_only, AS_CHECK_BOX);
+			setToolTipText(PHPUnitMessages.TestRunnerViewPart_show_failures_only);
 			setImageDescriptor(JUnitPlugin.getImageDescriptor("obj16/failures.gif")); //$NON-NLS-1$
 		}
 
@@ -814,7 +815,7 @@ public class TestRunnerViewPart extends ViewPart {
 	private class ShowTimeAction extends Action {
 
 		public ShowTimeAction() {
-			super(JUnitMessages.TestRunnerViewPart_show_execution_time, IAction.AS_CHECK_BOX);
+			super(PHPUnitMessages.TestRunnerViewPart_show_execution_time, IAction.AS_CHECK_BOX);
 		}
 
 		public void run() {
@@ -825,7 +826,7 @@ public class TestRunnerViewPart extends ViewPart {
 	private class ShowTestHierarchyAction extends Action {
 
 		public ShowTestHierarchyAction() {
-			super(JUnitMessages.TestRunnerViewPart_hierarchical_layout, IAction.AS_CHECK_BOX);
+			super(PHPUnitMessages.TestRunnerViewPart_hierarchical_layout, IAction.AS_CHECK_BOX);
 			setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/hierarchicalLayout.gif")); //$NON-NLS-1$
 		}
 
@@ -837,7 +838,7 @@ public class TestRunnerViewPart extends ViewPart {
 
 	private class ActivateOnErrorAction extends Action {
 		public ActivateOnErrorAction() {
-			super(JUnitMessages.TestRunnerViewPart_activate_on_failure_only, IAction.AS_CHECK_BOX);
+			super(PHPUnitMessages.TestRunnerViewPart_activate_on_failure_only, IAction.AS_CHECK_BOX);
 			//setImageDescriptor(JUnitPlugin.getImageDescriptor("obj16/failures.gif")); //$NON-NLS-1$
 			update();
 		}
@@ -850,7 +851,7 @@ public class TestRunnerViewPart extends ViewPart {
 			boolean checked = isChecked();
 			fShowOnErrorOnly = checked;
 			IPreferenceStore store = JUnitPlugin.getDefault().getPreferenceStore();
-			store.setValue(JUnitPreferencesConstants.SHOW_ON_ERROR_ONLY, checked);
+			store.setValue(PHPUnitPreferencesConstants.SHOW_ON_ERROR_ONLY, checked);
 		}
 	}
 
@@ -978,7 +979,7 @@ public class TestRunnerViewPart extends ViewPart {
 	public void stopTest() {
 		if (fTestRunSession != null) {
 			if (fTestRunSession.isRunning()) {
-				setContentDescription(JUnitMessages.TestRunnerViewPart_message_stopping);
+				setContentDescription(PHPUnitMessages.TestRunnerViewPart_message_stopping);
 			}
 			fTestRunSession.stopTestRun();
 		}
@@ -990,7 +991,7 @@ public class TestRunnerViewPart extends ViewPart {
 		if (fUpdateJob != null) {
 			return;
 		}
-		fJUnitIsRunningJob = new JUnitIsRunningJob(JUnitMessages.TestRunnerViewPart_wrapperJobName);
+		fJUnitIsRunningJob = new JUnitIsRunningJob(PHPUnitMessages.TestRunnerViewPart_wrapperJobName);
 		fJUnitIsRunningLock = Job.getJobManager().newLock();
 		// acquire lock while a test run is running
 		// the lock is released when the test run terminates
@@ -998,7 +999,7 @@ public class TestRunnerViewPart extends ViewPart {
 		fJUnitIsRunningLock.acquire();
 		getProgressService().schedule(fJUnitIsRunningJob);
 
-		fUpdateJob = new UpdateUIJob(JUnitMessages.TestRunnerViewPart_jobName);
+		fUpdateJob = new UpdateUIJob(PHPUnitMessages.TestRunnerViewPart_jobName);
 		fUpdateJob.schedule(REFRESH_INTERVAL);
 	}
 
@@ -1039,8 +1040,8 @@ public class TestRunnerViewPart extends ViewPart {
 	public void rerunTestRun() {
 		if (lastLaunchIsKeptAlive()) {
 			// prompt for terminating the existing run
-			if (MessageDialog.openQuestion(getSite().getShell(), JUnitMessages.TestRunnerViewPart_terminate_title,
-					JUnitMessages.TestRunnerViewPart_terminate_message)) {
+			if (MessageDialog.openQuestion(getSite().getShell(), PHPUnitMessages.TestRunnerViewPart_terminate_title,
+					PHPUnitMessages.TestRunnerViewPart_terminate_message)) {
 				stopTest(); // TODO: wait for termination
 			}
 		}
@@ -1062,7 +1063,7 @@ public class TestRunnerViewPart extends ViewPart {
 		try {
 			String attribute = configuration.getAttribute(JUnitLaunchConfigurationConstants.ATTR_FAILURES_NAMES, ""); //$NON-NLS-1$
 			if (attribute.length() != 0) {
-				String configName = Messages.format(JUnitMessages.TestRunnerViewPart_configName, configuration
+				String configName = Messages.format(PHPUnitMessages.TestRunnerViewPart_configName, configuration
 						.getName());
 				ILaunchConfigurationWorkingCopy tmp = configuration.copy(configName);
 				tmp.setAttribute(JUnitLaunchConfigurationConstants.ATTR_FAILURES_NAMES, ""); //$NON-NLS-1$
@@ -1077,8 +1078,8 @@ public class TestRunnerViewPart extends ViewPart {
 	public void rerunTestFailedFirst() {
 		if (lastLaunchIsKeptAlive()) {
 			// prompt for terminating the existing run
-			if (MessageDialog.openQuestion(getSite().getShell(), JUnitMessages.TestRunnerViewPart_terminate_title,
-					JUnitMessages.TestRunnerViewPart_terminate_message)) {
+			if (MessageDialog.openQuestion(getSite().getShell(), PHPUnitMessages.TestRunnerViewPart_terminate_title,
+					PHPUnitMessages.TestRunnerViewPart_terminate_message)) {
 				if (fTestRunSession != null)
 					fTestRunSession.stopTestRun();
 			}
@@ -1095,20 +1096,20 @@ public class TestRunnerViewPart extends ViewPart {
 					if (oldFailuresFilename != null) {
 						configName = oldName;
 					} else {
-						configName = Messages.format(JUnitMessages.TestRunnerViewPart_rerunFailedFirstLaunchConfigName,
-								oldName);
+						configName = Messages.format(
+								PHPUnitMessages.TestRunnerViewPart_rerunFailedFirstLaunchConfigName, oldName);
 					}
 					ILaunchConfigurationWorkingCopy tmp = launchConfiguration.copy(configName);
 					tmp.setAttribute(JUnitLaunchConfigurationConstants.ATTR_FAILURES_NAMES, createFailureNamesFile());
 					relaunch(tmp, launch.getLaunchMode());
 					return;
 				} catch (CoreException e) {
-					ErrorDialog.openError(getSite().getShell(), JUnitMessages.TestRunnerViewPart_error_cannotrerun, e
+					ErrorDialog.openError(getSite().getShell(), PHPUnitMessages.TestRunnerViewPart_error_cannotrerun, e
 							.getMessage(), e.getStatus());
 				}
 			}
-			MessageDialog.openInformation(getSite().getShell(), JUnitMessages.TestRunnerViewPart_cannotrerun_title,
-					JUnitMessages.TestRunnerViewPart_cannotrerurn_message);
+			MessageDialog.openInformation(getSite().getShell(), PHPUnitMessages.TestRunnerViewPart_cannotrerun_title,
+					PHPUnitMessages.TestRunnerViewPart_cannotrerurn_message);
 		}
 	}
 
@@ -1324,7 +1325,7 @@ public class TestRunnerViewPart extends ViewPart {
 
 		String testRunLabel = BasicElementLabels.getJavaElementName(fTestRunSession.getTestRunName());
 		if (testKindDisplayStr != null)
-			setTitleToolTip(MessageFormat.format(JUnitMessages.TestRunnerViewPart_titleToolTip, new String[] {
+			setTitleToolTip(MessageFormat.format(PHPUnitMessages.TestRunnerViewPart_titleToolTip, new String[] {
 					testRunLabel, testKindDisplayStr }));
 		else
 			setTitleToolTip(testRunLabel);
@@ -1483,7 +1484,7 @@ public class TestRunnerViewPart extends ViewPart {
 		ViewForm bottom = new ViewForm(fSashForm, SWT.NONE);
 
 		CLabel label = new CLabel(bottom, SWT.NONE);
-		label.setText(JUnitMessages.TestRunnerViewPart_label_failure);
+		label.setText(PHPUnitMessages.TestRunnerViewPart_label_failure);
 		label.setImage(fStackViewIcon);
 		bottom.setTopLeft(label);
 		ToolBar failureToolBar = new ToolBar(bottom, SWT.FLAT | SWT.WRAP);
@@ -1524,13 +1525,13 @@ public class TestRunnerViewPart extends ViewPart {
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		IActionBars actionBars = getViewSite().getActionBars();
-		fCopyAction = new JUnitCopyAction(fFailureTrace, fClipboard);
+		fCopyAction = new PHPUnitCopyAction(fFailureTrace, fClipboard);
 		actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(), fCopyAction);
 		initPageSwitcher();
 
 		fOriginalViewImage = getTitleImage();
 		fProgressImages = new ProgressImages();
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IJUnitHelpContextIds.RESULTS_VIEW);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IPHPUnitHelpContextIds.RESULTS_VIEW);
 
 		getViewSite().getPage().addPartListener(fPartListener);
 
@@ -1666,7 +1667,7 @@ public class TestRunnerViewPart extends ViewPart {
 		viewMenu.add(fShowTimeAction);
 		viewMenu.add(new Separator());
 
-		MenuManager layoutSubMenu = new MenuManager(JUnitMessages.TestRunnerViewPart_layout_menu);
+		MenuManager layoutSubMenu = new MenuManager(PHPUnitMessages.TestRunnerViewPart_layout_menu);
 		for (int i = 0; i < fToggleOrientationActions.length; ++i) {
 			layoutSubMenu.add(fToggleOrientationActions[i]);
 		}
@@ -1719,7 +1720,7 @@ public class TestRunnerViewPart extends ViewPart {
 
 		fCounterPanel = new CounterPanel(composite);
 		fCounterPanel.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
-		fProgressBar = new JUnitProgressBar(composite);
+		fProgressBar = new PHPUnitProgressBar(composite);
 		fProgressBar.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
 		return composite;
 	}
@@ -1857,7 +1858,7 @@ public class TestRunnerViewPart extends ViewPart {
 
 	private static boolean getShowOnErrorOnly() {
 		IPreferenceStore store = JUnitPlugin.getDefault().getPreferenceStore();
-		return store.getBoolean(JUnitPreferencesConstants.SHOW_ON_ERROR_ONLY);
+		return store.getBoolean(PHPUnitPreferencesConstants.SHOW_ON_ERROR_ONLY);
 	}
 
 	public FailureTrace getFailureTrace() {

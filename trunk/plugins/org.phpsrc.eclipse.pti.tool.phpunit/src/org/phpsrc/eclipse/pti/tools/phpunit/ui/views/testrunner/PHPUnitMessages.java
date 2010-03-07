@@ -13,7 +13,7 @@ package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
 import org.eclipse.osgi.util.NLS;
 
-public final class JUnitMessages extends NLS {
+public final class PHPUnitMessages extends NLS {
 
 	private static final String BUNDLE_NAME = "org.eclipse.jdt.internal.junit.ui.JUnitMessages";//$NON-NLS-1$
 
@@ -328,10 +328,10 @@ public final class JUnitMessages extends NLS {
 	public static String TypeRenameParticipant_name;
 
 	static {
-		NLS.initializeMessages(BUNDLE_NAME, JUnitMessages.class);
+		NLS.initializeMessages(BUNDLE_NAME, PHPUnitMessages.class);
 	}
 
-	private JUnitMessages() {
+	private PHPUnitMessages() {
 		// Do not instantiate
 	}
 

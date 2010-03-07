@@ -23,14 +23,14 @@ public class EnableStackFilterAction extends Action {
 	private FailureTrace fView;
 
 	public EnableStackFilterAction(FailureTrace view) {
-		super(JUnitMessages.EnableStackFilterAction_action_label);
-		setDescription(JUnitMessages.EnableStackFilterAction_action_description);
-		setToolTipText(JUnitMessages.EnableStackFilterAction_action_tooltip);
+		super(PHPUnitMessages.EnableStackFilterAction_action_label);
+		setDescription(PHPUnitMessages.EnableStackFilterAction_action_description);
+		setToolTipText(PHPUnitMessages.EnableStackFilterAction_action_tooltip);
 
 		setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/cfilter.gif")); //$NON-NLS-1$
 		setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/cfilter.gif")); //$NON-NLS-1$
 		setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/cfilter.gif")); //$NON-NLS-1$
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IJUnitHelpContextIds.ENABLEFILTER_ACTION);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IPHPUnitHelpContextIds.ENABLEFILTER_ACTION);
 
 		fView = view;
 		setChecked(JUnitPreferencePage.getFilterStack());

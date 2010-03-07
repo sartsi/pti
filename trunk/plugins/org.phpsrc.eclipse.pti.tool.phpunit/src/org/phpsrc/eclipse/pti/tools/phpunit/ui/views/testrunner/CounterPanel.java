@@ -43,9 +43,9 @@ public class CounterPanel extends Composite {
 		gridLayout.marginWidth = 0;
 		setLayout(gridLayout);
 
-		fNumberOfRuns = createLabel(JUnitMessages.CounterPanel_label_runs, null, " 0/0  "); //$NON-NLS-1$
-		fNumberOfErrors = createLabel(JUnitMessages.CounterPanel_label_errors, fErrorIcon, " 0 "); //$NON-NLS-1$
-		fNumberOfFailures = createLabel(JUnitMessages.CounterPanel_label_failures, fFailureIcon, " 0 "); //$NON-NLS-1$
+		fNumberOfRuns = createLabel(PHPUnitMessages.CounterPanel_label_runs, null, " 0/0  "); //$NON-NLS-1$
+		fNumberOfErrors = createLabel(PHPUnitMessages.CounterPanel_label_errors, fErrorIcon, " 0 "); //$NON-NLS-1$
+		fNumberOfFailures = createLabel(PHPUnitMessages.CounterPanel_label_failures, fFailureIcon, " 0 "); //$NON-NLS-1$
 
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
@@ -98,10 +98,10 @@ public class CounterPanel extends Composite {
 	public void setRunValue(int value, int ignoredCount) {
 		String runString;
 		if (ignoredCount == 0)
-			runString = Messages.format(JUnitMessages.CounterPanel_runcount, new String[] { Integer.toString(value),
+			runString = Messages.format(PHPUnitMessages.CounterPanel_runcount, new String[] { Integer.toString(value),
 					Integer.toString(fTotal) });
 		else
-			runString = Messages.format(JUnitMessages.CounterPanel_runcount_ignored, new String[] {
+			runString = Messages.format(PHPUnitMessages.CounterPanel_runcount_ignored, new String[] {
 					Integer.toString(value), Integer.toString(fTotal), Integer.toString(ignoredCount) });
 		fNumberOfRuns.setText(runString);
 
