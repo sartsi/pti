@@ -29,7 +29,9 @@ package org.phpsrc.eclipse.pti.core;
 import java.io.IOException;
 import java.net.URL;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -54,6 +56,15 @@ public abstract class AbstractPHPToolPlugin extends AbstractUIPlugin {
 		URL u = resolvePluginResourceURL(resource);
 		if (u != null)
 			return new Path(new java.io.File(u.getFile()).getAbsolutePath());
+
+		return null;
+	}
+
+	public static IFile resolveProjectFile(String filePath) {
+		IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(
+				new java.io.File(filePath).toURI());
+		if (files != null && files.length > 0)
+			return files[0];
 
 		return null;
 	}

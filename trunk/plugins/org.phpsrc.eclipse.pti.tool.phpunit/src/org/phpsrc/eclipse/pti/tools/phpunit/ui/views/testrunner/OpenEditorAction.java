@@ -12,7 +12,8 @@ package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.dltk.core.search.SearchMatch;
 import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Shell;
@@ -24,12 +25,14 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.phpsrc.eclipse.pti.core.search.PHPSearchEngine;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 
 /**
  * Abstract Action for opening a Java editor.
  */
 public abstract class OpenEditorAction extends Action {
-	protected String fFilePath;
+	protected IFile fFile;
 	protected TestRunnerViewPart fTestRunner;
 	private final boolean fActivate;
 
@@ -38,8 +41,14 @@ public abstract class OpenEditorAction extends Action {
 	}
 
 	public OpenEditorAction(TestRunnerViewPart testRunner, String filePath, boolean activate) {
+		this(testRunner, PHPUnitPlugin.resolveProjectFile(filePath), activate);
+	}
+
+	public OpenEditorAction(TestRunnerViewPart testRunner, IFile file, boolean activate) {
 		super(JUnitMessages.OpenEditorAction_action_label);
-		fFilePath = filePath;
+		Assert.isNotNull(file);
+		Assert.isTrue(file.exists());
+		fFile = file;
 		fTestRunner = testRunner;
 		fActivate = activate;
 	}
@@ -48,28 +57,17 @@ public abstract class OpenEditorAction extends Action {
 	 * @see IAction#run()
 	 */
 	public void run() {
-		ITextEditor textEditor = null;
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window != null) {
+			IWorkbenchPage page = window.getActivePage();
+			IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(fFile.getName());
 
-		IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(
-				new java.io.File(fFilePath).toURI());
-		if (files.length > 0) {
-			IFile file = files[0];
-			if (file.exists()) {
-				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-				if (window != null) {
-					IWorkbenchPage page = window.getActivePage();
-
-					IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(
-							file.getName());
-
-					try {
-						IEditorPart editor = page.openEditor(new FileEditorInput(file), desc.getId());
-						if (editor instanceof ITextEditor)
-							reveal((ITextEditor) editor);
-					} catch (PartInitException e) {
-						e.printStackTrace();
-					}
-				}
+			try {
+				IEditorPart editor = page.openEditor(new FileEditorInput(fFile), desc.getId());
+				if (editor instanceof ITextEditor)
+					reveal((ITextEditor) editor);
+			} catch (PartInitException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -85,8 +83,16 @@ public abstract class OpenEditorAction extends Action {
 		return fTestRunner.getLaunchedProject();
 	}
 
-	protected String getFilePath() {
-		return fFilePath;
+	protected IFile getFile() {
+		return fFile;
+	}
+
+	protected static IFile getFileForClassName(String className, String method) {
+		SearchMatch[] matches = PHPSearchEngine.findClass(className);
+		if (matches != null && matches.length > 0)
+			return (IFile) matches[0].getResource();
+
+		return null;
 	}
 
 	protected abstract void reveal(ITextEditor editor);

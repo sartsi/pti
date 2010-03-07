@@ -107,7 +107,7 @@ public class TestRunHandler extends DefaultHandler {
 
 		} else if (qName.equals(IXMLTags.NODE_TESTCASE)) {
 			String name = attributes.getValue(IXMLTags.ATTR_NAME);
-			String classname = attributes.getValue(IXMLTags.ATTR_CLASSNAME);
+			String classname = attributes.getValue(IXMLTags.ATTR_CLASS);
 			fTestCase = (TestCaseElement) fTestRunSession.createTestElement(fTestSuite, getNextId(), name + '('
 					+ classname + ')', false, 0);
 			fNotRun.push(Boolean.valueOf(attributes.getValue(IXMLTags.ATTR_INCOMPLETE)));
