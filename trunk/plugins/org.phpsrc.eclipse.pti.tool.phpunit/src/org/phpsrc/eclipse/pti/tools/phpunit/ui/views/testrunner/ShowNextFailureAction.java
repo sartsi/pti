@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 
 class ShowNextFailureAction extends Action {
 
@@ -19,9 +19,9 @@ class ShowNextFailureAction extends Action {
 
 	public ShowNextFailureAction(TestRunnerViewPart part) {
 		super(PHPUnitMessages.ShowNextFailureAction_label);
-		setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/select_next.gif")); //$NON-NLS-1$
-		setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/select_next.gif")); //$NON-NLS-1$
-		setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/select_next.gif")); //$NON-NLS-1$
+		setDisabledImageDescriptor(PHPUnitPlugin.getImageDescriptor("dlcl16/select_next.gif")); //$NON-NLS-1$
+		setHoverImageDescriptor(PHPUnitPlugin.getImageDescriptor("elcl16/select_next.gif")); //$NON-NLS-1$
+		setImageDescriptor(PHPUnitPlugin.getImageDescriptor("elcl16/select_next.gif")); //$NON-NLS-1$
 		setToolTipText(PHPUnitMessages.ShowNextFailureAction_tooltip);
 		fPart = part;
 	}

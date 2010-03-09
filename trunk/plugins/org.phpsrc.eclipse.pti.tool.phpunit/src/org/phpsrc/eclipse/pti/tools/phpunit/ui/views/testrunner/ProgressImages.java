@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.swt.graphics.Image;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 
 /**
  * Manages a set of images that can show progress in the image itself.
@@ -39,7 +39,7 @@ public class ProgressImages {
 	}
 
 	private Image createImage(String name) {
-		return JUnitPlugin.getImageDescriptor(name).createImage();
+		return PHPUnitPlugin.getImageDescriptor(name).createImage();
 	}
 
 	public void dispose() {

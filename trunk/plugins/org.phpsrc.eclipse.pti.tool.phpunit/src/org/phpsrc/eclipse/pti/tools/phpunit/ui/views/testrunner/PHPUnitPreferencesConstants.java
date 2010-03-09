@@ -11,10 +11,7 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 
 /**
  * Defines constants which are used to refer to values in the plugin's
@@ -25,76 +22,33 @@ public class PHPUnitPreferencesConstants {
 	 * Boolean preference controlling whether the failure stack should be
 	 * filtered.
 	 */
-	public static final String DO_FILTER_STACK = JUnitPlugin.PLUGIN_ID + ".do_filter_stack"; //$NON-NLS-1$
+	public static final String DO_FILTER_STACK = PHPUnitPlugin.PLUGIN_ID + ".do_filter_stack"; //$NON-NLS-1$
 
 	/**
 	 * Boolean preference controlling whether the JUnit view should be shown on
 	 * errors only.
 	 */
-	public static final String SHOW_ON_ERROR_ONLY = JUnitPlugin.PLUGIN_ID + ".show_on_error"; //$NON-NLS-1$
+	public static final String SHOW_ON_ERROR_ONLY = PHPUnitPlugin.PLUGIN_ID + ".show_on_error"; //$NON-NLS-1$
 
 	/**
 	 * Boolean preference controlling whether the JUnit view should be shown on
 	 * errors only.
 	 */
-	public static final String ENABLE_ASSERTIONS = JUnitPlugin.PLUGIN_ID + ".enable_assertions"; //$NON-NLS-1$
-
-	/**
-	 * List of active stack filters. A String containing a comma separated list
-	 * of fully qualified type names/patterns.
-	 */
-	public static final String PREF_ACTIVE_FILTERS_LIST = JUnitPlugin.PLUGIN_ID + ".active_filters"; //$NON-NLS-1$
-
-	/**
-	 * List of inactive stack filters. A String containing a comma separated
-	 * list of fully qualified type names/patterns.
-	 */
-	public static final String PREF_INACTIVE_FILTERS_LIST = JUnitPlugin.PLUGIN_ID + ".inactive_filters"; //$NON-NLS-1$
+	public static final String ENABLE_ASSERTIONS = PHPUnitPlugin.PLUGIN_ID + ".enable_assertions"; //$NON-NLS-1$
 
 	/**
 	 * Maximum number of remembered test runs.
 	 */
-	public static final String MAX_TEST_RUNS = JUnitPlugin.PLUGIN_ID + ".max_test_runs"; //$NON-NLS-1$
-
-	/**
-	 * Javadoc location for JUnit 3
-	 */
-	public static final String JUNIT3_JAVADOC = JUnitPlugin.PLUGIN_ID + ".junit3.javadoclocation"; //$NON-NLS-1$
-
-	/**
-	 * Javadoc location for JUnit 4
-	 */
-	public static final String JUNIT4_JAVADOC = JUnitPlugin.PLUGIN_ID + ".junit4.javadoclocation"; //$NON-NLS-1$
+	public static final String MAX_TEST_RUNS = PHPUnitPlugin.PLUGIN_ID + ".max_test_runs"; //$NON-NLS-1$
 
 	/**
 	 * Javadoc location for org.hamcrest.core (JUnit 4)
 	 */
-	public static final String HAMCREST_CORE_JAVADOC = JUnitPlugin.PLUGIN_ID + ".junit4.hamcrest.core.javadoclocation"; //$NON-NLS-1$
-
-	private static final String[] fgDefaultFilterPatterns = new String[] { "org.eclipse.jdt.internal.junit.runner.*", //$NON-NLS-1$
-			"org.eclipse.jdt.internal.junit4.runner.*", //$NON-NLS-1$
-			"org.eclipse.jdt.internal.junit.ui.*", //$NON-NLS-1$
-			"junit.framework.TestCase", //$NON-NLS-1$
-			"junit.framework.TestResult", //$NON-NLS-1$
-			"junit.framework.TestResult$1", //$NON-NLS-1$
-			"junit.framework.TestSuite", //$NON-NLS-1$
-			"junit.framework.Assert", //$NON-NLS-1$
-			"org.junit.*", //$NON-NLS-1$ //TODO: filter all these?
-			"java.lang.reflect.Method.invoke", //$NON-NLS-1$
-			"sun.reflect.*", //$NON-NLS-1$
-	};
+	public static final String HAMCREST_CORE_JAVADOC = PHPUnitPlugin.PLUGIN_ID
+			+ ".junit4.hamcrest.core.javadoclocation"; //$NON-NLS-1$
 
 	private PHPUnitPreferencesConstants() {
 		// no instance
-	}
-
-	/**
-	 * Returns the default list of active stack filters.
-	 * 
-	 * @return list
-	 */
-	public static List createDefaultStackFiltersList() {
-		return Arrays.asList(fgDefaultFilterPatterns);
 	}
 
 	/**

@@ -14,7 +14,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.dltk.core.search.SearchMatch;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorDescriptor;
@@ -45,7 +44,7 @@ public abstract class OpenEditorAction extends Action {
 	}
 
 	public OpenEditorAction(TestRunnerViewPart testRunner, IFile file, boolean activate) {
-		super(JUnitMessages.OpenEditorAction_action_label);
+		super(PHPUnitMessages.OpenEditorAction_action_label);
 		Assert.isNotNull(file);
 		Assert.isTrue(file.exists());
 		fFile = file;

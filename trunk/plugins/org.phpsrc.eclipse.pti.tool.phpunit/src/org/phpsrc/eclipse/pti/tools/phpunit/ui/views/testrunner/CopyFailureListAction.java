@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
-import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWTError;
@@ -18,6 +17,7 @@ import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestElement;
 
@@ -48,8 +48,8 @@ public class CopyFailureListAction extends Action {
 		} catch (SWTError e) {
 			if (e.code != DND.ERROR_CANNOT_SET_CLIPBOARD)
 				throw e;
-			if (MessageDialog.openQuestion(JavaPlugin.getActiveWorkbenchShell(), PHPUnitMessages.CopyFailureList_problem,
-					PHPUnitMessages.CopyFailureList_clipboard_busy))
+			if (MessageDialog.openQuestion(Display.getCurrent().getActiveShell(),
+					PHPUnitMessages.CopyFailureList_problem, PHPUnitMessages.CopyFailureList_clipboard_busy))
 				run();
 		}
 	}

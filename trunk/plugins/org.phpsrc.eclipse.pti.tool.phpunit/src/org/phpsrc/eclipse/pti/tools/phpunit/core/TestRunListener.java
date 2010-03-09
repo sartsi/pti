@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.core;
 
-import org.eclipse.jdt.junit.JUnitCore;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.ITestCaseElement;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.ITestRunSession;
 

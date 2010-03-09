@@ -13,7 +13,7 @@ package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jdt.internal.junit.util.ExceptionHandler;
+import org.eclipse.php.internal.ui.util.ExceptionHandler;
 import org.eclipse.ui.IEditorLauncher;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.PHPUnitModel;
 

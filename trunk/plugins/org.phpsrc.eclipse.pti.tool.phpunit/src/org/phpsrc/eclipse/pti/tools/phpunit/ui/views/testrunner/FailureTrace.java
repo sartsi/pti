@@ -13,7 +13,6 @@
 package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jdt.internal.junit.ui.JUnitPreferencePage;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -177,8 +176,6 @@ public class FailureTrace implements IMenuListener {
 	}
 
 	private String[] getFilterPatterns() {
-		if (JUnitPreferencePage.getFilterStack())
-			return JUnitPreferencePage.getFilterPatterns();
 		return new String[0];
 	}
 

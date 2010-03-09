@@ -39,21 +39,19 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchListener;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.jdt.internal.junit.BasicElementLabels;
-import org.eclipse.jdt.internal.junit.Messages;
-import org.eclipse.jdt.internal.junit.launcher.JUnitLaunchConfigurationConstants;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
-import org.eclipse.jdt.internal.junit.ui.JUnitPreferencesConstants;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
+import org.phpsrc.eclipse.pti.core.Messages;
 import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestElement.Status;
+import org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner.PHPUnitPreferencesConstants;
 import org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner.TestRunnerViewPart;
+import org.phpsrc.eclipse.pti.ui.Logger;
+import org.phpsrc.eclipse.pti.ui.viewsupport.BasicElementLabels;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -99,32 +97,34 @@ public final class PHPUnitModel {
 		 * @see ILaunchListener#launchChanged(ILaunch)
 		 */
 		public void launchChanged(final ILaunch launch) {
-			if (!fTrackedLaunches.contains(launch))
-				return;
-
-			ILaunchConfiguration config = launch.getLaunchConfiguration();
-			if (config == null)
-				return;
-
-			final IProject project = null;// JUnitLaunchConfigurationConstants.getJavaProject(config);
-			if (project == null)
-				return;
-
-			// test whether the launch defines the JUnit attributes
-			String portStr = launch.getAttribute(JUnitLaunchConfigurationConstants.ATTR_PORT);
-			if (portStr == null)
-				return;
-			try {
-				final int port = Integer.parseInt(portStr);
-				fTrackedLaunches.remove(launch);
-				getDisplay().asyncExec(new Runnable() {
-					public void run() {
-						connectTestRunner(launch, project, port);
-					}
-				});
-			} catch (NumberFormatException e) {
-				return;
-			}
+			// if (!fTrackedLaunches.contains(launch))
+			// return;
+			//
+			// ILaunchConfiguration config = launch.getLaunchConfiguration();
+			// if (config == null)
+			// return;
+			//
+			// final IProject project = null;//
+			// JUnitLaunchConfigurationConstants.getJavaProject(config);
+			// if (project == null)
+			// return;
+			//
+			// // test whether the launch defines the JUnit attributes
+			// String portStr =
+			// launch.getAttribute(JUnitLaunchConfigurationConstants.ATTR_PORT);
+			// if (portStr == null)
+			// return;
+			// try {
+			// final int port = Integer.parseInt(portStr);
+			// fTrackedLaunches.remove(launch);
+			// getDisplay().asyncExec(new Runnable() {
+			// public void run() {
+			// connectTestRunner(launch, project, port);
+			// }
+			// });
+			// } catch (NumberFormatException e) {
+			// return;
+			// }
 		}
 
 		private void connectTestRunner(ILaunch launch, IProject javaProject, int port) {
@@ -133,8 +133,8 @@ public final class PHPUnitModel {
 			// TODO: Do notifications have to be sent in UI thread?
 			// Check concurrent access to fTestRunSessions (no problem inside
 			// asyncExec())
-			int maxCount = JUnitPlugin.getDefault().getPreferenceStore()
-					.getInt(JUnitPreferencesConstants.MAX_TEST_RUNS);
+			int maxCount = PHPUnitPlugin.getDefault().getPreferenceStore().getInt(
+					PHPUnitPreferencesConstants.MAX_TEST_RUNS);
 			int toDelete = fTestRunSessions.size() - maxCount;
 			while (toDelete > 0) {
 				toDelete--;
@@ -154,14 +154,14 @@ public final class PHPUnitModel {
 				// otherwise the UI will not be updated
 				if (testRunner != null && testRunner.isCreated())
 					return testRunner;
-				page = JUnitPlugin.getActivePage();
+				page = PHPUnitPlugin.getActivePage();
 				if (page == null)
 					return null;
 				activePart = page.getActivePart();
 				// show the result view if it isn't shown yet
 				return (TestRunnerViewPart) page.showView(TestRunnerViewPart.NAME);
 			} catch (PartInitException pie) {
-				JUnitPlugin.log(pie);
+				Logger.logException(pie);
 				return null;
 			} finally {
 				// restore focus stolen by the creation of the result view
@@ -171,7 +171,7 @@ public final class PHPUnitModel {
 		}
 
 		private TestRunnerViewPart findTestRunnerViewPartInActivePage() {
-			IWorkbenchPage page = JUnitPlugin.getActivePage();
+			IWorkbenchPage page = PHPUnitPlugin.getActivePage();
 			if (page == null)
 				return null;
 			return (TestRunnerViewPart) page.findView(TestRunnerViewPart.NAME);
@@ -210,16 +210,14 @@ public final class PHPUnitModel {
 				}
 
 				public void sessionStarted() {
-					org.eclipse.jdt.junit.ITestRunListener[] testRunListeners = JUnitPlugin.getDefault()
-							.getTestRunListeners();
+					ITestRunListener[] testRunListeners = PHPUnitPlugin.getDefault().getTestRunListeners();
 					for (int i = 0; i < testRunListeners.length; i++) {
 						testRunListeners[i].testRunStarted(fActiveTestRunSession.getTotalCount());
 					}
 				}
 
 				public void sessionTerminated() {
-					org.eclipse.jdt.junit.ITestRunListener[] testRunListeners = JUnitPlugin.getDefault()
-							.getTestRunListeners();
+					ITestRunListener[] testRunListeners = PHPUnitPlugin.getDefault().getTestRunListeners();
 					for (int i = 0; i < testRunListeners.length; i++) {
 						testRunListeners[i].testRunTerminated();
 					}
@@ -227,8 +225,7 @@ public final class PHPUnitModel {
 				}
 
 				public void sessionStopped(long elapsedTime) {
-					org.eclipse.jdt.junit.ITestRunListener[] testRunListeners = JUnitPlugin.getDefault()
-							.getTestRunListeners();
+					ITestRunListener[] testRunListeners = PHPUnitPlugin.getDefault().getTestRunListeners();
 					for (int i = 0; i < testRunListeners.length; i++) {
 						testRunListeners[i].testRunStopped(elapsedTime);
 					}
@@ -236,8 +233,7 @@ public final class PHPUnitModel {
 				}
 
 				public void sessionEnded(long elapsedTime) {
-					org.eclipse.jdt.junit.ITestRunListener[] testRunListeners = JUnitPlugin.getDefault()
-							.getTestRunListeners();
+					ITestRunListener[] testRunListeners = PHPUnitPlugin.getDefault().getTestRunListeners();
 					for (int i = 0; i < testRunListeners.length; i++) {
 						testRunListeners[i].testRunEnded(elapsedTime);
 					}
@@ -249,8 +245,7 @@ public final class PHPUnitModel {
 				}
 
 				public void testStarted(TestCaseElement testCaseElement) {
-					org.eclipse.jdt.junit.ITestRunListener[] testRunListeners = JUnitPlugin.getDefault()
-							.getTestRunListeners();
+					ITestRunListener[] testRunListeners = PHPUnitPlugin.getDefault().getTestRunListeners();
 					for (int i = 0; i < testRunListeners.length; i++) {
 						testRunListeners[i].testStarted(testCaseElement.getId(), testCaseElement.getTestName());
 					}
@@ -258,17 +253,15 @@ public final class PHPUnitModel {
 
 				public void testFailed(TestElement testElement, Status status, String trace, String expected,
 						String actual) {
-					org.eclipse.jdt.junit.ITestRunListener[] testRunListeners = JUnitPlugin.getDefault()
-							.getTestRunListeners();
+					ITestRunListener[] testRunListeners = PHPUnitPlugin.getDefault().getTestRunListeners();
 					for (int i = 0; i < testRunListeners.length; i++) {
 						testRunListeners[i].testFailed(status.getOldCode(), testElement.getId(), testElement
-								.getTestName(), trace);
+								.getTestName(), trace, expected, actual);
 					}
 				}
 
 				public void testEnded(TestCaseElement testCaseElement) {
-					org.eclipse.jdt.junit.ITestRunListener[] testRunListeners = JUnitPlugin.getDefault()
-							.getTestRunListeners();
+					ITestRunListener[] testRunListeners = PHPUnitPlugin.getDefault().getTestRunListeners();
 					for (int i = 0; i < testRunListeners.length; i++) {
 						testRunListeners[i].testEnded(testCaseElement.getId(), testCaseElement.getTestName());
 					}
@@ -276,11 +269,11 @@ public final class PHPUnitModel {
 
 				public void testReran(TestCaseElement testCaseElement, Status status, String trace,
 						String expectedResult, String actualResult) {
-					org.eclipse.jdt.junit.ITestRunListener[] testRunListeners = JUnitPlugin.getDefault()
-							.getTestRunListeners();
+					ITestRunListener[] testRunListeners = PHPUnitPlugin.getDefault().getTestRunListeners();
 					for (int i = 0; i < testRunListeners.length; i++) {
 						testRunListeners[i].testReran(testCaseElement.getId(), testCaseElement.getClassName(),
-								testCaseElement.getTestMethodName(), status.getOldCode(), trace);
+								testCaseElement.getTestMethodName(), status.getOldCode(), trace, expectedResult,
+								actualResult);
 					}
 				}
 
@@ -351,7 +344,7 @@ public final class PHPUnitModel {
 		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
 		launchManager.removeLaunchListener(fLaunchListener);
 
-		File historyDirectory = JUnitPlugin.getHistoryDirectory();
+		File historyDirectory = PHPUnitPlugin.getHistoryDirectory();
 		File[] swapFiles = historyDirectory.listFiles();
 		if (swapFiles != null) {
 			for (int i = 0; i < swapFiles.length; i++) {
@@ -481,7 +474,7 @@ public final class PHPUnitModel {
 				try {
 					out.close();
 				} catch (IOException e2) {
-					JUnitPlugin.log(e2);
+					PHPUnitPlugin.log(e2);
 				}
 			}
 		}
@@ -513,12 +506,12 @@ public final class PHPUnitModel {
 	}
 
 	private static void throwExportError(File file, Exception e) throws CoreException {
-		throw new CoreException(new org.eclipse.core.runtime.Status(IStatus.ERROR, JUnitPlugin.getPluginId(), Messages
+		throw new CoreException(new org.eclipse.core.runtime.Status(IStatus.ERROR, PHPUnitPlugin.PLUGIN_ID, Messages
 				.format(ModelMessages.JUnitModel_could_not_write, BasicElementLabels.getPathLabel(file)), e));
 	}
 
 	private static void throwImportError(File file, Exception e) throws CoreException {
-		throw new CoreException(new org.eclipse.core.runtime.Status(IStatus.ERROR, JUnitPlugin.getPluginId(), Messages
+		throw new CoreException(new org.eclipse.core.runtime.Status(IStatus.ERROR, PHPUnitPlugin.PLUGIN_ID, Messages
 				.format(ModelMessages.JUnitModel_could_not_read, BasicElementLabels.getPathLabel(file)), e));
 	}
 

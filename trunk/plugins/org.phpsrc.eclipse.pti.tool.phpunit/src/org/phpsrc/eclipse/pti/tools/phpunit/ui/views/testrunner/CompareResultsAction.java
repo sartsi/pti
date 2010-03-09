@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestElement;
 
 /**
@@ -29,9 +29,9 @@ public class CompareResultsAction extends Action {
 		setDescription(PHPUnitMessages.CompareResultsAction_description);
 		setToolTipText(PHPUnitMessages.CompareResultsAction_tooltip);
 
-		setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/compare.gif")); //$NON-NLS-1$
-		setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/compare.gif")); //$NON-NLS-1$
-		setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/compare.gif")); //$NON-NLS-1$
+		setDisabledImageDescriptor(PHPUnitPlugin.getImageDescriptor("dlcl16/compare.gif")); //$NON-NLS-1$
+		setHoverImageDescriptor(PHPUnitPlugin.getImageDescriptor("elcl16/compare.gif")); //$NON-NLS-1$
+		setImageDescriptor(PHPUnitPlugin.getImageDescriptor("elcl16/compare.gif")); //$NON-NLS-1$
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
 		// IJUnitHelpContextIds.ENABLEFILTER_ACTION);
 		fView = view;

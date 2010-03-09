@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.jdt.internal.ui.viewsupport.ColoringLabelProvider;
-import org.eclipse.jdt.internal.ui.viewsupport.SelectionProviderMediator;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -40,6 +38,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.php.internal.ui.SelectionProviderMediator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -160,14 +159,16 @@ public class TestViewer {
 		fTreeContentProvider = new TestSessionTreeContentProvider();
 		fTreeViewer.setContentProvider(fTreeContentProvider);
 		fTreeLabelProvider = new TestSessionLabelProvider(fTestRunnerPart, TestRunnerViewPart.LAYOUT_HIERARCHICAL);
-		fTreeViewer.setLabelProvider(new ColoringLabelProvider(fTreeLabelProvider));
+		// fTreeViewer.setLabelProvider(new
+		// ColoringLabelProvider(fTreeLabelProvider));
 
 		fTableViewer = new TableViewer(fViewerbook, SWT.V_SCROLL | SWT.H_SCROLL | SWT.SINGLE);
 		fTableViewer.setUseHashlookup(true);
 		fTableContentProvider = new TestSessionTableContentProvider();
 		fTableViewer.setContentProvider(fTableContentProvider);
 		fTableLabelProvider = new TestSessionLabelProvider(fTestRunnerPart, TestRunnerViewPart.LAYOUT_FLAT);
-		fTableViewer.setLabelProvider(new ColoringLabelProvider(fTableLabelProvider));
+		// fTableViewer.setLabelProvider(new
+		// ColoringLabelProvider(fTableLabelProvider));
 
 		fSelectionProvider = new SelectionProviderMediator(new StructuredViewer[] { fTreeViewer, fTableViewer },
 				fTreeViewer);

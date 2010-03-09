@@ -21,9 +21,9 @@ public abstract class TestElement implements ITestElement {
 		public static final Status RUNNING_FAILURE = new Status("RUNNING_FAILURE", 6); //$NON-NLS-1$
 		public static final Status RUNNING = new Status("RUNNING", 3); //$NON-NLS-1$
 
-		public static final Status ERROR = new Status("ERROR", /* 1 */ITestRunListener2.STATUS_ERROR); //$NON-NLS-1$
-		public static final Status FAILURE = new Status("FAILURE", /* 2 */ITestRunListener2.STATUS_FAILURE); //$NON-NLS-1$
-		public static final Status OK = new Status("OK", /* 0 */ITestRunListener2.STATUS_OK); //$NON-NLS-1$
+		public static final Status ERROR = new Status("ERROR", /* 1 */ITestRunListener.STATUS_ERROR); //$NON-NLS-1$
+		public static final Status FAILURE = new Status("FAILURE", /* 2 */ITestRunListener.STATUS_FAILURE); //$NON-NLS-1$
+		public static final Status OK = new Status("OK", /* 0 */ITestRunListener.STATUS_OK); //$NON-NLS-1$
 		public static final Status NOT_RUN = new Status("NOT_RUN", 4); //$NON-NLS-1$
 
 		private static final Status[] OLD_CODE = { OK, ERROR, FAILURE };
@@ -128,7 +128,7 @@ public abstract class TestElement implements ITestElement {
 
 		/**
 		 * @param oldStatus
-		 *            one of {@link ITestRunListener2}'s STATUS_* constants
+		 *            one of {@link ITestRunListener}'s STATUS_* constants
 		 * @return the Status
 		 */
 		public static Status convert(int oldStatus) {

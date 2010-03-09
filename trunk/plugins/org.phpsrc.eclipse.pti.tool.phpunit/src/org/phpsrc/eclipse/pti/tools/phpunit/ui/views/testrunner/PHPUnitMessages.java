@@ -15,7 +15,7 @@ import org.eclipse.osgi.util.NLS;
 
 public final class PHPUnitMessages extends NLS {
 
-	private static final String BUNDLE_NAME = "org.eclipse.jdt.internal.junit.ui.JUnitMessages";//$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner.PHPUnitMessages";//$NON-NLS-1$
 
 	public static String ClasspathVariableMarkerResolutionGenerator_use_JUnit3;
 

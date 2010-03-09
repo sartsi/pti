@@ -20,7 +20,6 @@ import org.eclipse.compare.IEncodedStreamContentAccessor;
 import org.eclipse.compare.ITypedElement;
 import org.eclipse.compare.structuremergeviewer.DiffNode;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TrayDialog;
@@ -52,6 +51,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestElement;
 
 public class CompareResultDialog extends TrayDialog {
@@ -198,7 +198,7 @@ public class CompareResultDialog extends TrayDialog {
 	 * @see org.eclipse.jface.dialogs.Dialog#getDialogBoundsSettings()
 	 */
 	protected IDialogSettings getDialogBoundsSettings() {
-		return JUnitPlugin.getDefault().getDialogSettingsSection(getClass().getName());
+		return PHPUnitPlugin.getDefault().getDialogSettingsSection(getClass().getName());
 	}
 
 	private void computePrefixSuffix() {

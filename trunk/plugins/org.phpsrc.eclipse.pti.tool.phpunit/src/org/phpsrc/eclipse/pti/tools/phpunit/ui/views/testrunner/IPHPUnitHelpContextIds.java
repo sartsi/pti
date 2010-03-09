@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 
 /**
  * Help context ids for the JUnit UI.
  */
 public interface IPHPUnitHelpContextIds {
-	public static final String PREFIX = JUnitPlugin.PLUGIN_ID + '.';
+	public static final String PREFIX = PHPUnitPlugin.PLUGIN_ID + '.';
 
 	// Actions
 	public static final String COPYTRACE_ACTION = PREFIX + "copy_trace_action_context"; //$NON-NLS-1$

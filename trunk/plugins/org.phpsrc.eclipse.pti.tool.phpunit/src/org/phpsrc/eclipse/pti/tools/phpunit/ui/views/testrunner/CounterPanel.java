@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
-import org.eclipse.jdt.internal.junit.Messages;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -21,6 +19,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.phpsrc.eclipse.pti.core.Messages;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 
 /**
  * A panel with counters for the number of Runs, Errors and Failures.
@@ -32,8 +32,8 @@ public class CounterPanel extends Composite {
 	protected int fTotal;
 	protected int fIgnoredCount;
 
-	private final Image fErrorIcon = JUnitPlugin.createImage("ovr16/error_ovr.gif"); //$NON-NLS-1$
-	private final Image fFailureIcon = JUnitPlugin.createImage("ovr16/failed_ovr.gif"); //$NON-NLS-1$
+	private final Image fErrorIcon = PHPUnitPlugin.createImage("ovr16/error_ovr.gif"); //$NON-NLS-1$
+	private final Image fFailureIcon = PHPUnitPlugin.createImage("ovr16/failed_ovr.gif"); //$NON-NLS-1$
 
 	public CounterPanel(Composite parent) {
 		super(parent, SWT.WRAP);

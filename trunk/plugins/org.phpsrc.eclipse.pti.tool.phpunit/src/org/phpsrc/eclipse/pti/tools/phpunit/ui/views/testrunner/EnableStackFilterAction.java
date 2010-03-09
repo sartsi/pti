@@ -10,10 +10,9 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
-import org.eclipse.jdt.internal.junit.ui.JUnitPreferencePage;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 
 /**
  * Action to enable/disable stack trace filtering.
@@ -27,20 +26,22 @@ public class EnableStackFilterAction extends Action {
 		setDescription(PHPUnitMessages.EnableStackFilterAction_action_description);
 		setToolTipText(PHPUnitMessages.EnableStackFilterAction_action_tooltip);
 
-		setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/cfilter.gif")); //$NON-NLS-1$
-		setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/cfilter.gif")); //$NON-NLS-1$
-		setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/cfilter.gif")); //$NON-NLS-1$
+		setDisabledImageDescriptor(PHPUnitPlugin.getImageDescriptor("dlcl16/cfilter.gif")); //$NON-NLS-1$
+		setHoverImageDescriptor(PHPUnitPlugin.getImageDescriptor("elcl16/cfilter.gif")); //$NON-NLS-1$
+		setImageDescriptor(PHPUnitPlugin.getImageDescriptor("elcl16/cfilter.gif")); //$NON-NLS-1$
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IPHPUnitHelpContextIds.ENABLEFILTER_ACTION);
 
 		fView = view;
-		setChecked(JUnitPreferencePage.getFilterStack());
+		setChecked(PHPUnitPlugin.getDefault().getPreferenceStore().getBoolean(
+				PHPUnitPreferencesConstants.DO_FILTER_STACK));
 	}
 
 	/*
 	 * @see Action#actionPerformed
 	 */
 	public void run() {
-		JUnitPreferencePage.setFilterStack(isChecked());
+		PHPUnitPlugin.getDefault().getPreferenceStore().setValue(PHPUnitPreferencesConstants.DO_FILTER_STACK,
+				isChecked());
 		fView.refresh();
 	}
 }

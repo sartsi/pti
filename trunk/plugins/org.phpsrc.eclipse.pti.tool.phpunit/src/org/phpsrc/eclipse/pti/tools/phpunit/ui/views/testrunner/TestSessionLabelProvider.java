@@ -15,14 +15,13 @@ package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
 import java.text.NumberFormat;
 
-import org.eclipse.jdt.internal.junit.BasicElementLabels;
-import org.eclipse.jdt.internal.junit.Messages;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.swt.graphics.Image;
+import org.phpsrc.eclipse.pti.core.Messages;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.ITestCaseElement;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.ITestElement;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.ITestRunSession;
@@ -30,6 +29,7 @@ import org.phpsrc.eclipse.pti.tools.phpunit.core.model.ITestSuiteElement;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestCaseElement;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestSuiteElement;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestElement.Status;
+import org.phpsrc.eclipse.pti.ui.viewsupport.BasicElementLabels;
 
 public class TestSessionLabelProvider extends LabelProvider implements IStyledLabelProvider {
 
@@ -71,8 +71,8 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
 
 		} else {
 			if (element instanceof ITestCaseElement) {
-				String className = BasicElementLabels.getJavaElementName(((ITestCaseElement) element)
-						.getTestClassName());
+				String className = BasicElementLabels
+						.getPHPElementName(((ITestCaseElement) element).getTestClassName());
 				String decorated = Messages.format(PHPUnitMessages.TestSessionLabelProvider_testMethodName_className,
 						new Object[] { label, className });
 				text = StyledCellLabelProvider.styleDecoratedString(decorated, StyledString.QUALIFIER_STYLER, text);
@@ -98,9 +98,9 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
 
 	private String getSimpleLabel(Object element) {
 		if (element instanceof ITestCaseElement) {
-			return BasicElementLabels.getJavaElementName(((ITestCaseElement) element).getTestMethodName());
+			return BasicElementLabels.getPHPElementName(((ITestCaseElement) element).getTestMethodName());
 		} else if (element instanceof ITestSuiteElement) {
-			return BasicElementLabels.getJavaElementName(((ITestSuiteElement) element).getSuiteTypeName());
+			return BasicElementLabels.getPHPElementName(((ITestSuiteElement) element).getSuiteTypeName());
 		}
 		return null;
 	}
@@ -115,16 +115,16 @@ public class TestSessionLabelProvider extends LabelProvider implements IStyledLa
 			if (testElement.getParentContainer() instanceof ITestRunSession) {
 				String testKindDisplayName = fTestRunnerPart.getTestKindDisplayName();
 				if (testKindDisplayName != null) {
-					label = Messages.format(PHPUnitMessages.TestSessionLabelProvider_testName_JUnitVersion, new Object[] {
-							label, testKindDisplayName });
+					label = Messages.format(PHPUnitMessages.TestSessionLabelProvider_testName_JUnitVersion,
+							new Object[] { label, testKindDisplayName });
 				}
 			}
 		} else {
 			if (element instanceof ITestCaseElement) {
-				String className = BasicElementLabels.getJavaElementName(((ITestCaseElement) element)
-						.getTestClassName());
-				label = Messages.format(PHPUnitMessages.TestSessionLabelProvider_testMethodName_className, new Object[] {
-						label, className });
+				String className = BasicElementLabels
+						.getPHPElementName(((ITestCaseElement) element).getTestClassName());
+				label = Messages.format(PHPUnitMessages.TestSessionLabelProvider_testMethodName_className,
+						new Object[] { label, className });
 			}
 		}
 		return addElapsedTime(label, testElement.getElapsedTimeInSeconds());

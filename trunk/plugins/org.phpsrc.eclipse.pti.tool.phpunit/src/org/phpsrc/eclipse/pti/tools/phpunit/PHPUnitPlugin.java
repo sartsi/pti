@@ -27,19 +27,36 @@
 
 package org.phpsrc.eclipse.pti.tools.phpunit;
 
+import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
 import org.phpsrc.eclipse.pti.library.pear.PHPLibraryPEARPlugin;
+import org.phpsrc.eclipse.pti.tools.phpunit.core.model.ITestRunListener;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.PHPUnitModel;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferences;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferencesFactory;
@@ -62,7 +79,10 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 	public static final String IMG_PHPUNIT_TEST_SUITE_FAIL = "IMG_PHPUNIT_TEST_SUITE_FAIL"; //$NON-NLS-1$
 	public static final String IMG_PHPUNIT_TEST_SUITE_OK = "IMG_PHPUNIT_TEST_SUITE_OK"; //$NON-NLS-1$
 
+	public static final String ID_EXTENSION_POINT_TESTRUN_LISTENERS = PLUGIN_ID + "." + "testRunListeners"; //$NON-NLS-1$ //$NON-NLS-2$
+
 	private static final IPath ICONS_PATH = new Path("$nl$/icons/full"); //$NON-NLS-1$
+	private static final String HISTORY_DIR_NAME = "history"; //$NON-NLS-1$
 
 	// The shared instance
 	private static PHPUnitPlugin plugin;
@@ -70,9 +90,22 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 	private final PHPUnitModel fJUnitModel = new PHPUnitModel();
 
 	/**
+	 * List storing the registered test run listeners
+	 */
+	private List/* <ITestRunListener> */fLegacyTestRunListeners;
+
+	/**
+	 * List storing the registered test run listeners
+	 */
+	private ListenerList/* <TestRunListener> */fNewTestRunListeners;
+
+	private static boolean fIsStopped = false;
+
+	/**
 	 * The constructor
 	 */
 	public PHPUnitPlugin() {
+		fNewTestRunListeners = new ListenerList();
 	}
 
 	/*
@@ -85,6 +118,7 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		fIsStopped = false;
 		fJUnitModel.start();
 	}
 
@@ -119,6 +153,7 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 	 * )
 	 */
 	public void stop(BundleContext context) throws Exception {
+		fIsStopped = true;
 		plugin = null;
 		try {
 			fJUnitModel.stop();
@@ -163,6 +198,42 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 	}
 
 	/**
+	 * Sets the three image descriptors for enabled, disabled, and hovered to an
+	 * action. The actions are retrieved from the *lcl16 folders.
+	 * 
+	 * @param action
+	 *            the action
+	 * @param iconName
+	 *            the icon name
+	 */
+	public static void setLocalImageDescriptors(IAction action, String iconName) {
+		setImageDescriptors(action, "lcl16", iconName); //$NON-NLS-1$
+	}
+
+	private static void setImageDescriptors(IAction action, String type, String relPath) {
+		ImageDescriptor id = createImageDescriptor("d" + type, relPath, false); //$NON-NLS-1$
+		if (id != null)
+			action.setDisabledImageDescriptor(id);
+
+		ImageDescriptor descriptor = createImageDescriptor("e" + type, relPath, true); //$NON-NLS-1$
+		action.setHoverImageDescriptor(descriptor);
+		action.setImageDescriptor(descriptor);
+	}
+
+	/*
+	 * Creates an image descriptor for the given prefix and name in the JDT UI
+	 * bundle. The path can contain variables like $NL$. If no image could be
+	 * found, <code>useMissingImageDescriptor</code> decides if either the
+	 * 'missing image descriptor' is returned or <code>null</code>. or
+	 * <code>null</code>.
+	 */
+	private static ImageDescriptor createImageDescriptor(String pathPrefix, String imageName,
+			boolean useMissingImageDescriptor) {
+		IPath path = ICONS_PATH.append(pathPrefix).append(imageName);
+		return createImageDescriptor(PHPUnitPlugin.getDefault().getBundle(), path, useMissingImageDescriptor);
+	}
+
+	/**
 	 * Creates an image descriptor for the given path in a bundle. The path can
 	 * contain variables like $NL$. If no image could be found,
 	 * <code>useMissingImageDescriptor</code> decides if either the 'missing
@@ -189,5 +260,105 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 			return ImageDescriptor.getMissingImageDescriptor();
 		}
 		return null;
+	}
+
+	public static boolean isStopped() {
+		return fIsStopped;
+	}
+
+	public IDialogSettings getDialogSettingsSection(String name) {
+		IDialogSettings dialogSettings = getDialogSettings();
+		IDialogSettings section = dialogSettings.getSection(name);
+		if (section == null) {
+			section = dialogSettings.addNewSection(name);
+		}
+		return section;
+	}
+
+	public static File getHistoryDirectory() throws IllegalStateException {
+		File historyDir = getDefault().getStateLocation().append(HISTORY_DIR_NAME).toFile();
+		if (!historyDir.isDirectory()) {
+			historyDir.mkdir();
+		}
+		System.out.println(historyDir.toString());
+
+		return historyDir;
+	}
+
+	/**
+	 * Returns the active workbench window
+	 * 
+	 * @return the active workbench window
+	 */
+	public static IWorkbenchWindow getActiveWorkbenchWindow() {
+		if (plugin == null)
+			return null;
+		IWorkbench workBench = plugin.getWorkbench();
+		if (workBench == null)
+			return null;
+		return workBench.getActiveWorkbenchWindow();
+	}
+
+	public static IWorkbenchPage getActivePage() {
+		IWorkbenchWindow activeWorkbenchWindow = getActiveWorkbenchWindow();
+		if (activeWorkbenchWindow == null)
+			return null;
+		return activeWorkbenchWindow.getActivePage();
+	}
+
+	/**
+	 * @return a <code>ListenerList</code> of all <code>TestRunListener</code>s
+	 */
+	public ListenerList/* <TestRunListener> */getNewTestRunListeners() {
+		return fNewTestRunListeners;
+	}
+
+	/**
+	 * @return an array of all TestRun listeners
+	 */
+	public ITestRunListener[] getTestRunListeners() {
+		if (fLegacyTestRunListeners == null) {
+			loadTestRunListeners();
+		}
+		return (ITestRunListener[]) fLegacyTestRunListeners
+				.toArray(new ITestRunListener[fLegacyTestRunListeners.size()]);
+	}
+
+	/**
+	 * Initializes TestRun Listener extensions
+	 * 
+	 */
+	private void loadTestRunListeners() {
+		fLegacyTestRunListeners = new ArrayList();
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(
+				ID_EXTENSION_POINT_TESTRUN_LISTENERS);
+		if (extensionPoint == null) {
+			return;
+		}
+		IConfigurationElement[] configs = extensionPoint.getConfigurationElements();
+		MultiStatus status = new MultiStatus(PLUGIN_ID, IStatus.OK,
+				"Could not load some testRunner extension points", null); //$NON-NLS-1$
+
+		for (int i = 0; i < configs.length; i++) {
+			try {
+				Object testRunListener = configs[i].createExecutableExtension("class"); //$NON-NLS-1$
+				if (testRunListener instanceof ITestRunListener) {
+					fLegacyTestRunListeners.add(testRunListener);
+				}
+			} catch (CoreException e) {
+				status.add(e.getStatus());
+			}
+		}
+		if (!status.isOK()) {
+			PHPUnitPlugin.getDefault().getLog().log(status);
+		}
+	}
+
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Error", e)); //$NON-NLS-1$
+	}
+
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
 	}
 }

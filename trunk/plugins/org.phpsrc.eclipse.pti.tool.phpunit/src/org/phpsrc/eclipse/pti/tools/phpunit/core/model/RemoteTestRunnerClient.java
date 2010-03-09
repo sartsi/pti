@@ -24,8 +24,9 @@ import java.net.SocketException;
 
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.MessageIds;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 /**
  * The client side of the RemoteTestRunner. Handles the marshaling of the
@@ -34,7 +35,7 @@ import org.phpsrc.eclipse.pti.tools.phpunit.core.MessageIds;
 public class RemoteTestRunnerClient {
 	public abstract class ListenerSafeRunnable implements ISafeRunnable {
 		public void handleException(Throwable exception) {
-			JUnitPlugin.log(exception);
+			Logger.logException(exception);
 		}
 	}
 
@@ -89,11 +90,11 @@ public class RemoteTestRunnerClient {
 				return this;
 			}
 			if (message.startsWith(MessageIds.TEST_ERROR)) {
-				extractFailure(arg, ITestRunListener2.STATUS_ERROR);
+				extractFailure(arg, ITestRunListener.STATUS_ERROR);
 				return this;
 			}
 			if (message.startsWith(MessageIds.TEST_FAILED)) {
-				extractFailure(arg, ITestRunListener2.STATUS_FAILURE);
+				extractFailure(arg, ITestRunListener.STATUS_FAILURE);
 				return this;
 			}
 			if (message.startsWith(MessageIds.TEST_RUN_END)) {
@@ -203,7 +204,7 @@ public class RemoteTestRunnerClient {
 	/**
 	 * An array of listeners that are informed about test events.
 	 */
-	private ITestRunListener2[] fListeners;
+	private ITestRunListener[] fListeners;
 
 	/**
 	 * The server socket
@@ -265,7 +266,7 @@ public class RemoteTestRunnerClient {
 			} catch (SocketException e) {
 				notifyTestRunTerminated();
 			} catch (IOException e) {
-				JUnitPlugin.log(e);
+				Logger.logException(e);
 				// fall through
 			}
 			shutDown();
@@ -281,7 +282,7 @@ public class RemoteTestRunnerClient {
 	 * @param port
 	 *            port on which the server socket will be opened
 	 */
-	public synchronized void startListening(ITestRunListener2[] listeners, int port) {
+	public synchronized void startListening(ITestRunListener[] listeners, int port) {
 		fListeners = listeners;
 		fPort = port;
 		ServerConnection connection = new ServerConnection(port);
@@ -375,14 +376,14 @@ public class RemoteTestRunnerClient {
 	}
 
 	private void notifyTestReran(String testId, String className, String testName, String status) {
-		int statusCode = ITestRunListener2.STATUS_OK;
+		int statusCode = ITestRunListener.STATUS_OK;
 		if (status.equals("FAILURE")) //$NON-NLS-1$
-			statusCode = ITestRunListener2.STATUS_FAILURE;
+			statusCode = ITestRunListener.STATUS_FAILURE;
 		else if (status.equals("ERROR")) //$NON-NLS-1$
-			statusCode = ITestRunListener2.STATUS_ERROR;
+			statusCode = ITestRunListener.STATUS_ERROR;
 
 		String trace = ""; //$NON-NLS-1$
-		if (statusCode != ITestRunListener2.STATUS_OK)
+		if (statusCode != ITestRunListener.STATUS_OK)
 			trace = fFailedRerunTrace.toString();
 		// assumption a rerun trace was sent before
 		notifyTestReran(testId, className, testName, statusCode, trace);
@@ -423,7 +424,7 @@ public class RemoteTestRunnerClient {
 	private void notifyTestReran(final String testId, final String className, final String testName,
 			final int statusCode, final String trace) {
 		for (int i = 0; i < fListeners.length; i++) {
-			final ITestRunListener2 listener = fListeners[i];
+			final ITestRunListener listener = fListeners[i];
 			SafeRunner.run(new ListenerSafeRunnable() {
 				public void run() {
 					listener.testReran(testId, className, testName, statusCode, trace, fExpectedResult.toString(),
@@ -435,7 +436,7 @@ public class RemoteTestRunnerClient {
 
 	private void notifyTestTreeEntry(final String treeEntry) {
 		for (int i = 0; i < fListeners.length; i++) {
-			ITestRunListener2 listener = fListeners[i];
+			ITestRunListener listener = fListeners[i];
 			if (!hasTestId())
 				listener.testTreeEntry(fakeTestId(treeEntry));
 			else
@@ -451,10 +452,10 @@ public class RemoteTestRunnerClient {
 	}
 
 	private void notifyTestRunStopped(final long elapsedTime) {
-		if (JUnitPlugin.isStopped())
+		if (PHPUnitPlugin.isStopped())
 			return;
 		for (int i = 0; i < fListeners.length; i++) {
-			final ITestRunListener2 listener = fListeners[i];
+			final ITestRunListener listener = fListeners[i];
 			SafeRunner.run(new ListenerSafeRunnable() {
 				public void run() {
 					listener.testRunStopped(elapsedTime);
@@ -464,10 +465,10 @@ public class RemoteTestRunnerClient {
 	}
 
 	private void testRunEnded(final long elapsedTime) {
-		if (JUnitPlugin.isStopped())
+		if (PHPUnitPlugin.isStopped())
 			return;
 		for (int i = 0; i < fListeners.length; i++) {
-			final ITestRunListener2 listener = fListeners[i];
+			final ITestRunListener listener = fListeners[i];
 			SafeRunner.run(new ListenerSafeRunnable() {
 				public void run() {
 					listener.testRunEnded(elapsedTime);
@@ -477,10 +478,10 @@ public class RemoteTestRunnerClient {
 	}
 
 	private void notifyTestEnded(final String test) {
-		if (JUnitPlugin.isStopped())
+		if (PHPUnitPlugin.isStopped())
 			return;
 		for (int i = 0; i < fListeners.length; i++) {
-			final ITestRunListener2 listener = fListeners[i];
+			final ITestRunListener listener = fListeners[i];
 			SafeRunner.run(new ListenerSafeRunnable() {
 				public void run() {
 					String s[] = extractTestId(test);
@@ -491,10 +492,10 @@ public class RemoteTestRunnerClient {
 	}
 
 	private void notifyTestStarted(final String test) {
-		if (JUnitPlugin.isStopped())
+		if (PHPUnitPlugin.isStopped())
 			return;
 		for (int i = 0; i < fListeners.length; i++) {
-			final ITestRunListener2 listener = fListeners[i];
+			final ITestRunListener listener = fListeners[i];
 			SafeRunner.run(new ListenerSafeRunnable() {
 				public void run() {
 					String s[] = extractTestId(test);
@@ -505,10 +506,10 @@ public class RemoteTestRunnerClient {
 	}
 
 	private void notifyTestRunStarted(final int count) {
-		if (JUnitPlugin.isStopped())
+		if (PHPUnitPlugin.isStopped())
 			return;
 		for (int i = 0; i < fListeners.length; i++) {
-			final ITestRunListener2 listener = fListeners[i];
+			final ITestRunListener listener = fListeners[i];
 			SafeRunner.run(new ListenerSafeRunnable() {
 				public void run() {
 					listener.testRunStarted(count);
@@ -518,10 +519,10 @@ public class RemoteTestRunnerClient {
 	}
 
 	private void notifyTestFailed() {
-		if (JUnitPlugin.isStopped())
+		if (PHPUnitPlugin.isStopped())
 			return;
 		for (int i = 0; i < fListeners.length; i++) {
-			final ITestRunListener2 listener = fListeners[i];
+			final ITestRunListener listener = fListeners[i];
 			SafeRunner.run(new ListenerSafeRunnable() {
 				public void run() {
 					listener.testFailed(fFailureKind, fFailedTestId, fFailedTest, fFailedTrace.toString(),
@@ -534,10 +535,10 @@ public class RemoteTestRunnerClient {
 	private void notifyTestRunTerminated() {
 		// fix for 77771 RemoteTestRunnerClient doing work after junit shutdown
 		// [JUnit]
-		if (JUnitPlugin.isStopped())
+		if (PHPUnitPlugin.isStopped())
 			return;
 		for (int i = 0; i < fListeners.length; i++) {
-			final ITestRunListener2 listener = fListeners[i];
+			final ITestRunListener listener = fListeners[i];
 			SafeRunner.run(new ListenerSafeRunnable() {
 				public void run() {
 					listener.testRunTerminated();

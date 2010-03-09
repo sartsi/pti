@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.core.model;
 
-public interface ITestRunListener2 {
+public interface ITestRunListener {
 
 	/**
 	 * Status constant indicating that a test passed (constant value 0).

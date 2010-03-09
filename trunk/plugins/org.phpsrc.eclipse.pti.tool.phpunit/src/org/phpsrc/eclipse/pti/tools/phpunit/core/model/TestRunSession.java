@@ -27,12 +27,11 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.ILaunchesListener2;
-import org.eclipse.jdt.internal.junit.launcher.ITestKind;
-import org.eclipse.jdt.internal.junit.launcher.JUnitLaunchConfigurationConstants;
-import org.eclipse.jdt.internal.junit.ui.JUnitMessages;
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.MessageIds;
+import org.phpsrc.eclipse.pti.tools.phpunit.core.launcher.ITestKind;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestElement.Status;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 /**
  * A test run session holds all information about a test run, i.e. launch
@@ -148,7 +147,7 @@ public class TestRunSession implements ITestRunSession {
 		ILaunchConfiguration launchConfiguration = launch.getLaunchConfiguration();
 		if (launchConfiguration != null) {
 			fTestRunName = launchConfiguration.getName();
-			fTestRunnerKind = JUnitLaunchConfigurationConstants.getTestRunnerKind(launchConfiguration);
+			fTestRunnerKind = ITestKind.NULL; // JUnitLaunchConfigurationConstants.getTestRunnerKind(launchConfiguration);
 		} else {
 			fTestRunName = project.getName();
 			fTestRunnerKind = ITestKind.NULL;
@@ -158,7 +157,7 @@ public class TestRunSession implements ITestRunSession {
 		fIdToTest = new HashMap();
 
 		fTestRunnerClient = new RemoteTestRunnerClient();
-		fTestRunnerClient.startListening(new ITestRunListener2[] { new TestSessionNotifier() }, port);
+		fTestRunnerClient.startListening(new ITestRunListener[] { new TestSessionNotifier() }, port);
 
 		final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
 		launchManager.addLaunchListener(new ILaunchesListener2() {
@@ -361,9 +360,9 @@ public class TestRunSession implements ITestRunSession {
 			fUnrootedSuite = null;
 
 		} catch (IllegalStateException e) {
-			JUnitPlugin.log(e);
+			Logger.logException(e);
 		} catch (CoreException e) {
-			JUnitPlugin.log(e);
+			Logger.logException(e);
 		}
 	}
 
@@ -378,7 +377,7 @@ public class TestRunSession implements ITestRunSession {
 	}
 
 	private File getSwapFile() throws IllegalStateException {
-		File historyDir = JUnitPlugin.getHistoryDirectory();
+		File historyDir = PHPUnitPlugin.getHistoryDirectory();
 		String isoTime = new SimpleDateFormat("yyyyMMdd-HHmmss.SSS").format(new Date(getStartTime())); //$NON-NLS-1$
 		String swapFileName = isoTime + ".xml"; //$NON-NLS-1$
 		return new File(historyDir, swapFileName);
@@ -391,11 +390,11 @@ public class TestRunSession implements ITestRunSession {
 		try {
 			PHPUnitModel.importIntoTestRunSession(getSwapFile(), this);
 		} catch (IllegalStateException e) {
-			JUnitPlugin.log(e);
+			Logger.logException(e);
 			fTestRoot = new TestRoot(this);
 			fTestResult = null;
 		} catch (CoreException e) {
-			JUnitPlugin.log(e);
+			Logger.logException(e);
 			fTestRoot = new TestRoot(this);
 			fTestResult = null;
 		}
@@ -413,18 +412,22 @@ public class TestRunSession implements ITestRunSession {
 	 *         still alive
 	 */
 	public boolean isKeptAlive() {
-		if (fTestRunnerClient != null && fLaunch != null && fTestRunnerClient.isRunning()
-				&& ILaunchManager.DEBUG_MODE.equals(fLaunch.getLaunchMode())) {
-			ILaunchConfiguration config = fLaunch.getLaunchConfiguration();
-			try {
-				return config != null && config.getAttribute(JUnitLaunchConfigurationConstants.ATTR_KEEPRUNNING, false);
-			} catch (CoreException e) {
-				return false;
-			}
-
-		} else {
-			return false;
-		}
+		return false;
+		// if (fTestRunnerClient != null && fLaunch != null &&
+		// fTestRunnerClient.isRunning()
+		// && ILaunchManager.DEBUG_MODE.equals(fLaunch.getLaunchMode())) {
+		// ILaunchConfiguration config = fLaunch.getLaunchConfiguration();
+		// try {
+		// return config != null &&
+		// config.getAttribute(JUnitLaunchConfigurationConstants.ATTR_KEEPRUNNING,
+		// false);
+		// } catch (CoreException e) {
+		// return false;
+		// }
+		//
+		// } else {
+		// return false;
+		// }
 	}
 
 	/**
@@ -574,11 +577,11 @@ public class TestRunSession implements ITestRunSession {
 	}
 
 	/**
-	 * An {@link ITestRunListener2} that listens to events from the
+	 * An {@link ITestRunListener} that listens to events from the
 	 * {@link RemoteTestRunnerClient} and translates them into high-level model
 	 * events (broadcasted to {@link ITestSessionListener}s).
 	 */
-	private class TestSessionNotifier implements ITestRunListener2 {
+	private class TestSessionNotifier implements ITestRunListener {
 
 		public void testRunStarted(int testCount) {
 			fIncompleteTestSuites = new ArrayList();
@@ -657,8 +660,7 @@ public class TestRunSession implements ITestRunSession {
 
 		private TestSuiteElement getUnrootedSuite() {
 			if (fUnrootedSuite == null) {
-				fUnrootedSuite = (TestSuiteElement) createTestElement(fTestRoot,
-						"-2", JUnitMessages.TestRunSession_unrootedTests, true, 0); //$NON-NLS-1$
+				fUnrootedSuite = (TestSuiteElement) createTestElement(fTestRoot, "-2", "Unrooted tests", true, 0);
 			}
 			return fUnrootedSuite;
 		}
@@ -778,7 +780,9 @@ public class TestRunSession implements ITestRunSession {
 		}
 
 		private void logUnexpectedTest(String testId, TestElement testElement) {
-			JUnitPlugin.log(new Exception("Unexpected TestElement type for testId '" + testId + "': " + testElement)); //$NON-NLS-1$ //$NON-NLS-2$
+			Logger
+					.logException(new Exception(
+							"Unexpected TestElement type for testId '" + testId + "': " + testElement)); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

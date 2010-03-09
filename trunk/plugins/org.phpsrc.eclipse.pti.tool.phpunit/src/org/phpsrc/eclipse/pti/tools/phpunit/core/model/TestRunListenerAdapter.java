@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.core.model;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.TestRunListener;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestElement.Status;
 
@@ -26,7 +26,7 @@ public class TestRunListenerAdapter implements ITestSessionListener {
 	}
 
 	private Object[] getListeners() {
-		return JUnitPlugin.getDefault().getNewTestRunListeners().getListeners();
+		return PHPUnitPlugin.getDefault().getNewTestRunListeners().getListeners();
 	}
 
 	private void fireSessionStarted() {

@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner;
 
-import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 
 /**
  * Toggles console auto-scroll
@@ -25,9 +25,9 @@ public class ScrollLockAction extends Action {
 		super(PHPUnitMessages.ScrollLockAction_action_label);
 		fRunnerViewPart = viewer;
 		setToolTipText(PHPUnitMessages.ScrollLockAction_action_tooltip);
-		setDisabledImageDescriptor(JUnitPlugin.getImageDescriptor("dlcl16/lock.gif")); //$NON-NLS-1$
-		setHoverImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/lock.gif")); //$NON-NLS-1$
-		setImageDescriptor(JUnitPlugin.getImageDescriptor("elcl16/lock.gif")); //$NON-NLS-1$
+		setDisabledImageDescriptor(PHPUnitPlugin.getImageDescriptor("dlcl16/lock.gif")); //$NON-NLS-1$
+		setHoverImageDescriptor(PHPUnitPlugin.getImageDescriptor("elcl16/lock.gif")); //$NON-NLS-1$
+		setImageDescriptor(PHPUnitPlugin.getImageDescriptor("elcl16/lock.gif")); //$NON-NLS-1$
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IPHPUnitHelpContextIds.OUTPUT_SCROLL_LOCK_ACTION);
 		setChecked(false);
 	}
