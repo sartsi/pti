@@ -159,16 +159,14 @@ public class TestViewer {
 		fTreeContentProvider = new TestSessionTreeContentProvider();
 		fTreeViewer.setContentProvider(fTreeContentProvider);
 		fTreeLabelProvider = new TestSessionLabelProvider(fTestRunnerPart, TestRunnerViewPart.LAYOUT_HIERARCHICAL);
-		// fTreeViewer.setLabelProvider(new
-		// ColoringLabelProvider(fTreeLabelProvider));
+		fTreeViewer.setLabelProvider(fTreeLabelProvider);
 
 		fTableViewer = new TableViewer(fViewerbook, SWT.V_SCROLL | SWT.H_SCROLL | SWT.SINGLE);
 		fTableViewer.setUseHashlookup(true);
 		fTableContentProvider = new TestSessionTableContentProvider();
 		fTableViewer.setContentProvider(fTableContentProvider);
 		fTableLabelProvider = new TestSessionLabelProvider(fTestRunnerPart, TestRunnerViewPart.LAYOUT_FLAT);
-		// fTableViewer.setLabelProvider(new
-		// ColoringLabelProvider(fTableLabelProvider));
+		fTableViewer.setLabelProvider(fTableLabelProvider);
 
 		fSelectionProvider = new SelectionProviderMediator(new StructuredViewer[] { fTreeViewer, fTableViewer },
 				fTreeViewer);
