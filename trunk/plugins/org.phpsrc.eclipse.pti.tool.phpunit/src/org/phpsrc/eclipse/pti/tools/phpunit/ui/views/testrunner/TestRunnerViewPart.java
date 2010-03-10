@@ -32,15 +32,15 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ILock;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.dltk.core.ElementChangedEvent;
 import org.eclipse.dltk.core.IElementChangedListener;
 import org.eclipse.jface.action.Action;
@@ -106,6 +106,7 @@ import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestCaseElement;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestElement;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestRunSession;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.ITestElement.Result;
+import org.phpsrc.eclipse.pti.tools.phpunit.ui.actions.RunTestCaseAction;
 import org.phpsrc.eclipse.pti.ui.viewsupport.BasicElementLabels;
 import org.phpsrc.eclipse.pti.ui.viewsupport.ViewHistory;
 
@@ -1043,83 +1044,18 @@ public class TestRunnerViewPart extends ViewPart {
 
 		if (fTestRunSession == null)
 			return;
-		ILaunch launch = fTestRunSession.getLaunch();
-		if (launch == null)
-			return;
-		ILaunchConfiguration launchConfiguration = launch.getLaunchConfiguration();
-		if (launchConfiguration == null)
-			return;
-
-		ILaunchConfiguration configuration = prepareLaunchConfigForRelaunch(launchConfiguration);
-		relaunch(configuration, launch.getLaunchMode());
-	}
-
-	private ILaunchConfiguration prepareLaunchConfigForRelaunch(ILaunchConfiguration configuration) {
-		// try {
-		//			String attribute = configuration.getAttribute(JUnitLaunchConfigurationConstants.ATTR_FAILURES_NAMES, ""); //$NON-NLS-1$
-		// if (attribute.length() != 0) {
-		// String configName =
-		// Messages.format(PHPUnitMessages.TestRunnerViewPart_configName,
-		// configuration
-		// .getName());
-		// ILaunchConfigurationWorkingCopy tmp = configuration.copy(configName);
-		//				tmp.setAttribute(JUnitLaunchConfigurationConstants.ATTR_FAILURES_NAMES, ""); //$NON-NLS-1$
-		// return tmp;
-		// }
-		// } catch (CoreException e) {
-		// // fall through
-		// }
-		return configuration;
+		IFile testFile = fTestRunSession.getTestFile();
+		if (testFile != null)
+			relaunch(testFile);
 	}
 
 	public void rerunTestFailedFirst() {
-		// if (lastLaunchIsKeptAlive()) {
-		// // prompt for terminating the existing run
-		// if (MessageDialog.openQuestion(getSite().getShell(),
-		// PHPUnitMessages.TestRunnerViewPart_terminate_title,
-		// PHPUnitMessages.TestRunnerViewPart_terminate_message)) {
-		// if (fTestRunSession != null)
-		// fTestRunSession.stopTestRun();
-		// }
-		// }
-		// ILaunch launch = fTestRunSession.getLaunch();
-		// if (launch != null && launch.getLaunchConfiguration() != null) {
-		// ILaunchConfiguration launchConfiguration =
-		// launch.getLaunchConfiguration();
-		// if (launchConfiguration != null) {
-		// try {
-		// String oldName = launchConfiguration.getName();
-		// String oldFailuresFilename = launchConfiguration.getAttribute(
-		// JUnitLaunchConfigurationConstants.ATTR_FAILURES_NAMES, (String)
-		// null);
-		// String configName;
-		// if (oldFailuresFilename != null) {
-		// configName = oldName;
-		// } else {
-		// configName = Messages.format(
-		// PHPUnitMessages.TestRunnerViewPart_rerunFailedFirstLaunchConfigName,
-		// oldName);
-		// }
-		// ILaunchConfigurationWorkingCopy tmp =
-		// launchConfiguration.copy(configName);
-		// tmp.setAttribute(JUnitLaunchConfigurationConstants.ATTR_FAILURES_NAMES,
-		// createFailureNamesFile());
-		// relaunch(tmp, launch.getLaunchMode());
-		// return;
-		// } catch (CoreException e) {
-		// ErrorDialog.openError(getSite().getShell(),
-		// PHPUnitMessages.TestRunnerViewPart_error_cannotrerun, e
-		// .getMessage(), e.getStatus());
-		// }
-		// }
-		// MessageDialog.openInformation(getSite().getShell(),
-		// PHPUnitMessages.TestRunnerViewPart_cannotrerun_title,
-		// PHPUnitMessages.TestRunnerViewPart_cannotrerurn_message);
-		// }
 	}
 
-	private void relaunch(ILaunchConfiguration configuration, String launchMode) {
-		// DebugUITools.launch(configuration, launchMode);
+	private void relaunch(IFile testFile) {
+		RunTestCaseAction action = new RunTestCaseAction();
+		action.setSelectedResources(new IResource[] { testFile });
+		action.run(null);
 	}
 
 	private String createFailureNamesFile() throws CoreException {
@@ -1282,7 +1218,7 @@ public class TestRunnerViewPart extends ViewPart {
 			fFailureTrace.clear();
 			registerInfoMessage(BasicElementLabels.getPHPElementName(fTestRunSession.getTestRunName()));
 
-			fRerunLastTestAction.setEnabled(fTestRunSession.getLaunch() != null);
+			fRerunLastTestAction.setEnabled(fTestRunSession.getTestFile() != null);
 
 			if (fTestRunSession.isRunning()) {
 				startUpdateJobs();
@@ -1535,6 +1471,12 @@ public class TestRunnerViewPart extends ViewPart {
 
 		fTestRunSessionListener = new TestRunSessionListener();
 		PHPUnitPlugin.getModel().addTestRunSessionListener(fTestRunSessionListener);
+		List sessions = PHPUnitPlugin.getModel().getTestRunSessions();
+		if (sessions.size() > 0) {
+			Object lastSession = sessions.get(0);
+			if (lastSession instanceof TestRunSession)
+				fTestRunSessionListener.sessionAdded((TestRunSession) lastSession);
+		}
 	}
 
 	private void initPageSwitcher() {
@@ -1785,7 +1727,6 @@ public class TestRunnerViewPart extends ViewPart {
 	}
 
 	public void rerunTest(String testId, String className, String testName, String launchMode) {
-		// DebugUITools.saveAndBuildBeforeLaunch();
 		// try {
 		// boolean couldLaunch = fTestRunSession.rerunTest(testId, className,
 		// testName, launchMode);

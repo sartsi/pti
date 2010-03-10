@@ -113,6 +113,10 @@ public abstract class ResourceAction implements IWorkbenchWindowActionDelegate {
 		selectedResources = resources.toArray(new IResource[0]);
 	}
 
+	public void setSelectedResources(IResource[] resources) {
+		selectedResources = resources;
+	}
+
 	public IResource[] getSelectedResources() {
 		return selectedResources;
 	}

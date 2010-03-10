@@ -84,7 +84,12 @@ public interface IXMLTags {
 	//	public static final String ATTR_MESSAGE= "message"; //$NON-NLS-1$
 
 	/**
-	 * value: Double
+	 * value: String
 	 */
 	public static final String ATTR_TYPE = "type"; //$NON-NLS-1$
+
+	/**
+	 * value: String
+	 */
+	public static final String ATTR_FILE = "file"; //$NON-NLS-1$
 }

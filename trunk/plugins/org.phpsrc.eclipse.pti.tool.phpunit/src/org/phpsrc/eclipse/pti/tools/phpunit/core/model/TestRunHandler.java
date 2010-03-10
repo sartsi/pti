@@ -15,7 +15,9 @@ package org.phpsrc.eclipse.pti.tools.phpunit.core.model;
 
 import java.util.Stack;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestElement.Status;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
@@ -92,7 +94,12 @@ public class TestRunHandler extends DefaultHandler {
 
 			if (fTestRunSession == null) {
 				// support standalone suites and Ant's 'junitreport' task:
-				fTestRunSession = new TestRunSession(name, null);
+				IFile testFile = null;
+				String file = attributes.getValue(IXMLTags.ATTR_FILE);
+				if (file != null)
+					testFile = PHPUnitPlugin.resolveProjectFile(file);
+
+				fTestRunSession = new TestRunSession(name, testFile);
 				fTestSuite = fTestRunSession.getTestRoot();
 			}
 

@@ -280,7 +280,6 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 		if (!historyDir.isDirectory()) {
 			historyDir.mkdir();
 		}
-		System.out.println(historyDir.toString());
 
 		return historyDir;
 	}

@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -48,6 +49,7 @@ public class TestRunSession implements ITestRunSession {
 	 * Java project, or <code>null</code>.
 	 */
 	private final IProject fProject;
+	private final IFile fTestFile;
 
 	private final ITestKind fTestRunnerKind;
 
@@ -112,6 +114,10 @@ public class TestRunSession implements ITestRunSession {
 
 	volatile boolean fIsStopped;
 
+	public TestRunSession(String testRunName, IFile testFile) {
+		this(testRunName, testFile != null ? testFile.getProject() : null, testFile);
+	}
+
 	/**
 	 * Creates a test run session.
 	 * 
@@ -121,12 +127,18 @@ public class TestRunSession implements ITestRunSession {
 	 *            may be <code>null</code>
 	 */
 	public TestRunSession(String testRunName, IProject project) {
+		this(testRunName, project, null);
+	}
+
+	private TestRunSession(String testRunName, IProject project, IFile testFile) {
+
 		// TODO: check assumptions about non-null fields
+		Assert.isNotNull(testRunName);
 
 		fLaunch = null;
 		fProject = project;
+		fTestFile = testFile;
 
-		Assert.isNotNull(testRunName);
 		fTestRunName = testRunName;
 		fTestRunnerKind = ITestKind.NULL; // TODO
 
@@ -143,6 +155,7 @@ public class TestRunSession implements ITestRunSession {
 
 		fLaunch = launch;
 		fProject = project;
+		fTestFile = null;
 
 		ILaunchConfiguration launchConfiguration = launch.getLaunchConfiguration();
 		if (launchConfiguration != null) {
@@ -319,8 +332,12 @@ public class TestRunSession implements ITestRunSession {
 		return fStartTime;
 	}
 
+	public IFile getTestFile() {
+		return fTestFile;
+	}
+
 	/**
-	 * @return <code>true</code> iff the session has been stopped or terminated
+	 * @return <code>true</code> if the session has been stopped or terminated
 	 */
 	public boolean isStopped() {
 		return fIsStopped;

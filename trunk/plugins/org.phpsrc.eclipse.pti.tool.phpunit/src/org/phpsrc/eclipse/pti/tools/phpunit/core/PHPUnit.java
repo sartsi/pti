@@ -70,7 +70,6 @@ import org.phpsrc.eclipse.pti.tools.phpunit.core.model.PHPUnitModel;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestRunSession;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferences;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.preferences.PHPUnitPreferencesFactory;
-import org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner.TestRunnerViewPart;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPUnit extends AbstractPHPTool {
@@ -161,7 +160,7 @@ public class PHPUnit extends AbstractPHPTool {
 		return ok;
 	}
 
-	public IProblem[] runTestCase(IFile testFile) {
+	public IProblem[] runTestCase(final IFile testFile) {
 		try {
 			File tempDir = createTempDir("pti_phpunit"); //$NON-NLS-2$
 			final File summaryFile = createTempFile(tempDir, "phpunit.xml");
@@ -183,7 +182,6 @@ public class PHPUnit extends AbstractPHPTool {
 				UIJob job = new UIJob("Update Test Runner") {
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						try {
-							TestRunnerViewPart.showTestResultsView();
 							TestRunSession session = PHPUnitModel.importTestRunSession(summaryFile);
 							notifyResultListener(session);
 						} catch (CoreException e) {
