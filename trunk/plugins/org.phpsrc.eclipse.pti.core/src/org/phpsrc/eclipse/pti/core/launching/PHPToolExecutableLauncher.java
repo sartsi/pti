@@ -48,6 +48,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.RefreshTab;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -81,7 +82,6 @@ public class PHPToolExecutableLauncher {
 		String phpExeString = configuration.getAttribute(IPHPDebugConstants.ATTR_EXECUTABLE_LOCATION, (String) null);
 		String phpIniPath = configuration.getAttribute(IPHPDebugConstants.ATTR_INI_LOCATION, (String) null);
 		String fileName = configuration.getAttribute(IPHPDebugConstants.ATTR_FILE_FULL_PATH, (String) null);
-
 		IProject project = null;
 		String file = configuration.getAttribute(IPHPDebugConstants.ATTR_FILE, (String) null);
 		if (file != null) {
@@ -186,6 +186,8 @@ public class PHPToolExecutableLauncher {
 			subMonitor.done();
 		}
 		process.setAttribute(IProcess.ATTR_CMDLINE, fileName);
+
+		IStreamMonitor sm = process.getStreamsProxy().getOutputStreamMonitor();
 
 		if (CommonTab.isLaunchInBackground(configuration)) {
 			// refresh resources after process finishes

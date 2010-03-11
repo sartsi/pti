@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -67,6 +68,7 @@ public class PHPToolLauncher {
 	public final static String COMMANDLINE_PLACEHOLDER_FILE = "%file%"; //$NON-NLS-1$
 	public final static String COMMANDLINE_PLACEHOLDER_FOLDER = "%folder%"; //$NON-NLS-1$
 
+	private final QualifiedName tool;
 	private final PHPexeItem phpExe;
 	private final IPath phpScript;
 	private final INIFileEntry[] iniEntries;
@@ -74,16 +76,16 @@ public class PHPToolLauncher {
 	private boolean printOutput = false;
 	private Hashtable<String, String> attributes = new Hashtable<String, String>();
 
-	public PHPToolLauncher(PHPexeItem phpExe, IPath phpScript) {
-		this(phpExe, phpScript, "");
+	public PHPToolLauncher(QualifiedName tool, PHPexeItem phpExe, IPath phpScript) {
+		this(tool, phpExe, phpScript, "");
 	}
 
-	public PHPToolLauncher(PHPexeItem phpExe, IPath phpScript, String commandLineArgs) {
-		this(phpExe, phpScript, commandLineArgs, new INIFileEntry[0]);
+	public PHPToolLauncher(QualifiedName tool, PHPexeItem phpExe, IPath phpScript, String commandLineArgs) {
+		this(tool, phpExe, phpScript, commandLineArgs, new INIFileEntry[0]);
 	}
 
-	public PHPToolLauncher(PHPexeItem phpExe, IPath phpScript, INIFileEntry[] iniEntries) {
-		this(phpExe, phpScript, "", iniEntries);
+	public PHPToolLauncher(QualifiedName tool, PHPexeItem phpExe, IPath phpScript, INIFileEntry[] iniEntries) {
+		this(tool, phpExe, phpScript, "", iniEntries);
 	}
 
 	/**
@@ -94,7 +96,9 @@ public class PHPToolLauncher {
 	 * @param iniEntries
 	 * @throws NullPointerException
 	 */
-	public PHPToolLauncher(PHPexeItem phpExe, IPath phpScript, String commandLineArgs, INIFileEntry[] iniEntries) {
+	public PHPToolLauncher(QualifiedName tool, PHPexeItem phpExe, IPath phpScript, String commandLineArgs,
+			INIFileEntry[] iniEntries) {
+		this.tool = tool;
 		this.phpExe = phpExe;
 		this.phpScript = phpScript;
 		this.commandLineArgs = commandLineArgs;
@@ -331,6 +335,7 @@ public class PHPToolLauncher {
 		wc.setAttribute(IDebugUIConstants.ATTR_LAUNCH_IN_BACKGROUND, false);
 		wc.setAttribute(IDebugUIConstants.ATTR_CAPTURE_IN_CONSOLE, true);
 		wc.setAttribute(PHPToolCorePlugin.PLUGIN_ID, true);
+		wc.setAttribute(IPHPToolLaunchConstants.ATTR_PHP_TOOL_QUALIFIED_NAME, tool.toString());
 
 		config = wc.doSave();
 

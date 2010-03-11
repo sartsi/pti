@@ -306,8 +306,8 @@ public class PHPUnit extends AbstractPHPTool {
 			}
 		}
 
-		PHPToolLauncher launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
-				cmdLineArgs, getPHPINIEntries(project, fileIncludePath));
+		PHPToolLauncher launcher = new PHPToolLauncher(QUALIFIED_NAME, getPHPExecutable(prefs.getPhpExecutable()),
+				getScriptFile(), cmdLineArgs, getPHPINIEntries(project, fileIncludePath));
 
 		launcher.setPrintOuput(prefs.isPrintOutput());
 

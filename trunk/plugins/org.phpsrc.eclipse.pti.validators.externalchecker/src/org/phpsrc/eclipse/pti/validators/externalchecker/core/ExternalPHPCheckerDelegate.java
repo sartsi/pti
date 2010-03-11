@@ -9,6 +9,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.dltk.compiler.CharOperation;
 import org.eclipse.dltk.core.environment.IEnvironment;
 import org.eclipse.dltk.core.environment.IExecutionEnvironment;
@@ -53,8 +54,8 @@ class ExternalPHPCheckerDelegate {
 		this.extensions = prepareExtensions(externalChecker.getExtensions());
 		this.command = prepareCommand(externalChecker.getCommand(), environment);
 
-		this.launcher = new PHPToolLauncher(getPHPExecutable(externalChecker.getPhpExecutable()), Path
-				.fromOSString(this.command), this.arguments.replaceFirst("%f",
+		this.launcher = new PHPToolLauncher(getQualifiedName(environment.getId()), getPHPExecutable(externalChecker
+				.getPhpExecutable()), Path.fromOSString(this.command), this.arguments.replaceFirst("%f",
 				PHPToolLauncher.COMMANDLINE_PLACEHOLDER_FILE).replaceFirst("%d",
 				PHPToolLauncher.COMMANDLINE_PLACEHOLDER_FOLDER));
 		// this.launcher.setPrintOuput(externalChecker.getPrintOutput());
@@ -163,5 +164,9 @@ class ExternalPHPCheckerDelegate {
 		}
 
 		return null;
+	}
+
+	public static QualifiedName getQualifiedName(String checkerId) {
+		return new QualifiedName(ExternalPHPCheckerPlugin.PLUGIN_ID, "external_checker#" + checkerId);
 	}
 }

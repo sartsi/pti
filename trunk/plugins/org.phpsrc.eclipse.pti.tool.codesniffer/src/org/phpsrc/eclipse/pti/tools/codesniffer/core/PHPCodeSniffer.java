@@ -229,8 +229,8 @@ public class PHPCodeSniffer extends AbstractPHPTool {
 			Logger.logException(e);
 		}
 
-		launcher = new PHPToolLauncher(getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(), getCommandLineArgs(
-				standard, prefs.getTabWidth()), getPHPINIEntries(prefs, project, standard));
+		launcher = new PHPToolLauncher(QUALIFIED_NAME, getPHPExecutable(prefs.getPhpExecutable()), getScriptFile(),
+				getCommandLineArgs(standard, prefs.getTabWidth()), getPHPINIEntries(prefs, project, standard));
 
 		launcher.setPrintOuput(prefs.isPrintOutput());
 
