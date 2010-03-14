@@ -47,6 +47,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.ui.CommonTab;
@@ -188,6 +189,15 @@ public class PHPToolExecutableLauncher {
 		process.setAttribute(IProcess.ATTR_CMDLINE, fileName);
 
 		IStreamMonitor sm = process.getStreamsProxy().getOutputStreamMonitor();
+		sm.addListener(new IStreamListener() {
+
+			@Override
+			public void streamAppended(String text, IStreamMonitor monitor) {
+				// System.out.println("-----");
+				// System.out.println(text);
+
+			}
+		});
 
 		if (CommonTab.isLaunchInBackground(configuration)) {
 			// refresh resources after process finishes

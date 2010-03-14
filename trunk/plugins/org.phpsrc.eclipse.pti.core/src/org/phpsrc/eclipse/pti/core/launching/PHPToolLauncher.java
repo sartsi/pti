@@ -32,6 +32,7 @@ import java.util.Hashtable;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -103,6 +104,7 @@ public class PHPToolLauncher {
 		this.phpScript = phpScript;
 		this.commandLineArgs = commandLineArgs;
 		this.iniEntries = iniEntries;
+		Assert.isNotNull(tool);
 	}
 
 	public String launch(IFile file) {
@@ -217,7 +219,10 @@ public class PHPToolLauncher {
 
 				if (isPti && phpPathString.equals(fileName) && defaultEXE.getExecutable().toString().equals(exeName)) {
 					String iniLocation = configs[i].getAttribute(IPHPDebugConstants.ATTR_INI_LOCATION, (String) null);
-					if (iniLocation == null || !(new File(iniLocation).exists())) {
+					String toolName = configs[i].getAttribute(IPHPToolLaunchConstants.ATTR_PHP_TOOL_QUALIFIED_NAME,
+							(String) null);
+					if (iniLocation == null || !(new File(iniLocation).exists()) || toolName == null
+							|| !toolName.equals(tool.toString())) {
 						configs[i].delete();
 					} else {
 						config = configs[i];
