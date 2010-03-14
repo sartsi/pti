@@ -162,57 +162,135 @@ public class PHPUnit extends AbstractPHPTool {
 
 	public IProblem[] runTestCase(final IFile testFile) {
 		try {
-			File tempDir = createTempDir("pti_phpunit"); //$NON-NLS-2$
-			final File summaryFile = createTempFile(tempDir, "phpunit.xml");
+			final File summaryFile = createTempSummaryFile("phpunit.xml");
 
 			ISourceModule module = PHPToolkitUtil.getSourceModule(testFile);
 			IType[] types = module.getAllTypes();
 			for (IType type : types) {
 				String cmdLineArgs = "--log-junit " + OperatingSystem.escapeShellFileArg(summaryFile.toString());
-
+				// cmdLineArgs += " --tap";
 				cmdLineArgs += " " + type.getElementName();
 				cmdLineArgs += " " + OperatingSystem.escapeShellFileArg(testFile.getLocation().toOSString());
 
 				PHPToolLauncher launcher = getProjectPHPToolLauncher(testFile.getProject(), cmdLineArgs, testFile
 						.getParent().getLocation());
 
+				// TestRunSession session = new TestRunSession(launcher,
+				// type.getElementName(), testFile);
+				// addTestRunSessionToModel(session);
+
 				String output = launcher.launch(testFile.getProject());
 				IProblem[] problems = parseOutput(testFile.getProject(), output);
 
-				UIJob job = new UIJob("Update Test Runner") {
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-						try {
-							TestRunSession session = PHPUnitModel.importTestRunSession(summaryFile);
-							notifyResultListener(session);
-						} catch (CoreException e) {
-							Logger.logException(e);
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				job.schedule();
+				importTestRunSession(summaryFile);
 
 				return problems;
 			}
 		} catch (ModelException e) {
 			Logger.logException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logger.logException(e);
 		}
 
 		return new IProblem[0];
 	}
 
+	private File createTempSummaryFile(String fileName) throws IOException {
+		File tempDir = createTempDir("pti_phpunit"); //$NON-NLS-2$
+		return createTempFile(tempDir, fileName);
+	}
+
+	private void addTestRunSessionToModel(final TestRunSession session) {
+		UIJob job = new UIJob("Update Test Runner") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				PHPUnitPlugin.getModel().addTestRunSession(session);
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
+	}
+
+	private void importIntoTestRunSession(final File summaryFile, final TestRunSession session) {
+		UIJob job = new UIJob("Update Test Runner") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				try {
+					PHPUnitModel.importIntoTestRunSession(summaryFile, session);
+					notifyResultListener(session);
+				} catch (CoreException e) {
+					Logger.logException(e);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
+	}
+
+	private void importTestRunSession(final File summaryFile) {
+		UIJob job = new UIJob("Update Test Runner") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				try {
+					TestRunSession session = PHPUnitModel.importTestRunSession(summaryFile);
+					notifyResultListener(session);
+				} catch (CoreException e) {
+					e.printStackTrace();
+					Logger.logException(e);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
+	}
+
 	public IProblem[] runAllTestsInFolder(IFolder folder) {
-		String cmdLineArgs = OperatingSystem.escapeShellFileArg(folder.getLocation().toOSString());
-		PHPToolLauncher launcher = getProjectPHPToolLauncher(folder.getProject(), cmdLineArgs, folder.getLocation());
-		return parseOutput(folder.getProject(), launcher.launch(folder.getProject()));
+		try {
+			String cmdLineArgs = OperatingSystem.escapeShellFileArg(folder.getLocation().toOSString());
+
+			final File summaryFile = createTempSummaryFile("phpunit.xml");
+			cmdLineArgs = "--log-junit " + OperatingSystem.escapeShellFileArg(summaryFile.toString()) + " "
+					+ cmdLineArgs;
+
+			PHPToolLauncher launcher = getProjectPHPToolLauncher(folder.getProject(), cmdLineArgs, folder.getLocation());
+
+			// TestRunSession session = new TestRunSession(launcher, "test",
+			// folder.getProject());
+			// addTestRunSessionToModel(session);
+
+			IProblem[] problems = parseOutput(folder.getProject(), launcher.launch(folder.getProject()));
+
+			importTestRunSession(summaryFile);
+
+			return problems;
+		} catch (IOException e) {
+			Logger.logException(e);
+		}
+
+		return new IProblem[0];
 	}
 
 	public IProblem[] runTestSuite(IFile file) {
-		String cmdLineArgs = OperatingSystem.escapeShellFileArg(file.getLocation().toOSString());
-		PHPToolLauncher launcher = getProjectPHPToolLauncher(file.getProject(), cmdLineArgs, file.getLocation());
-		return parseOutput(file.getProject(), launcher.launch(file.getProject()));
+		try {
+			String cmdLineArgs = OperatingSystem.escapeShellFileArg(file.getLocation().toOSString());
+
+			final File summaryFile = createTempSummaryFile("phpunit.xml");
+			cmdLineArgs = "--log-junit " + OperatingSystem.escapeShellFileArg(summaryFile.toString()) + " "
+					+ cmdLineArgs;
+
+			PHPToolLauncher launcher = getProjectPHPToolLauncher(file.getProject(), cmdLineArgs, file.getLocation());
+
+			// TestRunSession session = new TestRunSession(launcher,
+			// "testSuite", file);
+			// addTestRunSessionToModel(session);
+
+			IProblem[] problems = parseOutput(file.getProject(), launcher.launch(file.getProject()));
+
+			importTestRunSession(summaryFile);
+
+			return problems;
+		} catch (IOException e) {
+			Logger.logException(e);
+		}
+
+		return new IProblem[0];
 	}
 
 	protected IProblem[] parseOutput(IProject project, String output) {

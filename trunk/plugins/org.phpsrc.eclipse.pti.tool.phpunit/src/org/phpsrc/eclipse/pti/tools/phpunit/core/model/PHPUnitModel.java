@@ -16,7 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,25 +33,18 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchListener;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PartInitException;
 import org.phpsrc.eclipse.pti.core.Messages;
 import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.model.TestElement.Status;
-import org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner.PHPUnitPreferencesConstants;
-import org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner.TestRunnerViewPart;
-import org.phpsrc.eclipse.pti.ui.Logger;
 import org.phpsrc.eclipse.pti.ui.viewsupport.BasicElementLabels;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -60,139 +54,6 @@ import org.xml.sax.SAXException;
  */
 public final class PHPUnitModel {
 
-	private final class JUnitLaunchListener implements ILaunchListener {
-
-		/**
-		 * Used to track new launches. We need to do this so that we only attach
-		 * a TestRunner once to a launch. Once a test runner is connected, it is
-		 * removed from the set.
-		 */
-		private HashSet fTrackedLaunches = new HashSet(20);
-
-		/*
-		 * @see ILaunchListener#launchAdded(ILaunch)
-		 */
-		public void launchAdded(ILaunch launch) {
-			fTrackedLaunches.add(launch);
-		}
-
-		/*
-		 * @see ILaunchListener#launchRemoved(ILaunch)
-		 */
-		public void launchRemoved(final ILaunch launch) {
-			fTrackedLaunches.remove(launch);
-			// TODO: story for removing old test runs?
-			// getDisplay().asyncExec(new Runnable() {
-			// public void run() {
-			// TestRunnerViewPart testRunnerViewPart=
-			// findTestRunnerViewPartInActivePage();
-			// if (testRunnerViewPart != null && testRunnerViewPart.isCreated()
-			// && launch.equals(testRunnerViewPart.getLastLaunch()))
-			// testRunnerViewPart.reset();
-			// }
-			// });
-		}
-
-		/*
-		 * @see ILaunchListener#launchChanged(ILaunch)
-		 */
-		public void launchChanged(final ILaunch launch) {
-			// if (!fTrackedLaunches.contains(launch))
-			// return;
-			//
-			// ILaunchConfiguration config = launch.getLaunchConfiguration();
-			// if (config == null)
-			// return;
-			//
-			// final IProject project = null;//
-			// JUnitLaunchConfigurationConstants.getJavaProject(config);
-			// if (project == null)
-			// return;
-			//
-			// // test whether the launch defines the JUnit attributes
-			// String portStr =
-			// launch.getAttribute(JUnitLaunchConfigurationConstants.ATTR_PORT);
-			// if (portStr == null)
-			// return;
-			// try {
-			// final int port = Integer.parseInt(portStr);
-			// fTrackedLaunches.remove(launch);
-			// getDisplay().asyncExec(new Runnable() {
-			// public void run() {
-			// connectTestRunner(launch, project, port);
-			// }
-			// });
-			// } catch (NumberFormatException e) {
-			// return;
-			// }
-		}
-
-		private void connectTestRunner(ILaunch launch, IProject javaProject, int port) {
-			showTestRunnerViewPartInActivePage(findTestRunnerViewPartInActivePage());
-
-			// TODO: Do notifications have to be sent in UI thread?
-			// Check concurrent access to fTestRunSessions (no problem inside
-			// asyncExec())
-			int maxCount = PHPUnitPlugin.getDefault().getPreferenceStore().getInt(
-					PHPUnitPreferencesConstants.MAX_TEST_RUNS);
-			int toDelete = fTestRunSessions.size() - maxCount;
-			while (toDelete > 0) {
-				toDelete--;
-				TestRunSession session = (TestRunSession) fTestRunSessions.removeLast();
-				notifyTestRunSessionRemoved(session);
-			}
-
-			TestRunSession testRunSession = new TestRunSession(launch, javaProject, port);
-			addTestRunSession(testRunSession);
-		}
-
-		private TestRunnerViewPart showTestRunnerViewPartInActivePage(TestRunnerViewPart testRunner) {
-			IWorkbenchPart activePart = null;
-			IWorkbenchPage page = null;
-			try {
-				// TODO: have to force the creation of view part contents
-				// otherwise the UI will not be updated
-				if (testRunner != null && testRunner.isCreated())
-					return testRunner;
-				page = PHPUnitPlugin.getActivePage();
-				if (page == null)
-					return null;
-				activePart = page.getActivePart();
-				// show the result view if it isn't shown yet
-				return (TestRunnerViewPart) page.showView(TestRunnerViewPart.NAME);
-			} catch (PartInitException pie) {
-				Logger.logException(pie);
-				return null;
-			} finally {
-				// restore focus stolen by the creation of the result view
-				if (page != null && activePart != null)
-					page.activate(activePart);
-			}
-		}
-
-		private TestRunnerViewPart findTestRunnerViewPartInActivePage() {
-			IWorkbenchPage page = PHPUnitPlugin.getActivePage();
-			if (page == null)
-				return null;
-			return (TestRunnerViewPart) page.findView(TestRunnerViewPart.NAME);
-		}
-
-		private Display getDisplay() {
-			// Shell shell= getActiveWorkbenchShell();
-			// if (shell != null) {
-			// return shell.getDisplay();
-			// }
-			Display display = Display.getCurrent();
-			if (display == null) {
-				display = Display.getDefault();
-			}
-			return display;
-		}
-	}
-
-	/**
-	 * @deprecated to prevent deprecation warnings
-	 */
 	private static final class LegacyTestRunSessionListener implements ITestRunSessionListener {
 		private TestRunSession fActiveTestRunSession;
 		private ITestSessionListener fTestSessionListener;
@@ -298,41 +159,40 @@ public final class PHPUnitModel {
 	 * Active test run sessions, youngest first.
 	 */
 	private final LinkedList/* <TestRunSession> */fTestRunSessions = new LinkedList();
-	private final ILaunchListener fLaunchListener = new JUnitLaunchListener();
 
 	/**
 	 * Starts the model (called by the {@link JUnitPlugin} on startup).
 	 */
 	public void start() {
-		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-		launchManager.addLaunchListener(fLaunchListener);
+		PHPUnitDebugEventHandler.getDefault().start();
 
 		/*
 		 * TODO: restore on restart: - only import headers! - only import last n
 		 * sessions; remove all other files in historyDirectory
 		 */
-		// File historyDirectory= JUnitPlugin.getHistoryDirectory();
-		// File[] swapFiles= historyDirectory.listFiles();
-		// if (swapFiles != null) {
-		// Arrays.sort(swapFiles, new Comparator() {
-		// public int compare(Object o1, Object o2) {
-		// String name1= ((File) o1).getName();
-		// String name2= ((File) o2).getName();
-		// return name1.compareTo(name2);
-		// }
-		// });
-		// for (int i= 0; i < swapFiles.length; i++) {
-		// final File file= swapFiles[i];
-		// SafeRunner.run(new ISafeRunnable() {
-		// public void run() throws Exception {
-		// importTestRunSession(file );
-		// }
-		// public void handleException(Throwable exception) {
-		// JUnitPlugin.log(exception);
-		// }
-		// });
-		// }
-		// }
+		File historyDirectory = PHPUnitPlugin.getHistoryDirectory();
+		File[] swapFiles = historyDirectory.listFiles();
+		if (swapFiles != null) {
+			Arrays.sort(swapFiles, new Comparator() {
+				public int compare(Object o1, Object o2) {
+					String name1 = ((File) o1).getName();
+					String name2 = ((File) o2).getName();
+					return name1.compareTo(name2);
+				}
+			});
+			for (int i = 0; i < swapFiles.length; i++) {
+				final File file = swapFiles[i];
+				SafeRunner.run(new ISafeRunnable() {
+					public void run() throws Exception {
+						importTestRunSession(file);
+					}
+
+					public void handleException(Throwable exception) {
+						PHPUnitPlugin.log(exception);
+					}
+				});
+			}
+		}
 
 		addTestRunSessionListener(new LegacyTestRunSessionListener());
 	}
@@ -341,8 +201,7 @@ public final class PHPUnitModel {
 	 * Stops the model (called by the {@link JUnitPlugin} on shutdown).
 	 */
 	public void stop() {
-		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-		launchManager.removeLaunchListener(fLaunchListener);
+		PHPUnitDebugEventHandler.getDefault().stop();
 
 		File historyDirectory = PHPUnitPlugin.getHistoryDirectory();
 		File[] swapFiles = historyDirectory.listFiles();

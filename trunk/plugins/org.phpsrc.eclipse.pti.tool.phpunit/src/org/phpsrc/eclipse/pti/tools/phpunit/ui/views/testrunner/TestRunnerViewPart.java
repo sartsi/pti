@@ -854,18 +854,18 @@ public class TestRunnerViewPart extends ViewPart {
 	public TestRunnerViewPart() {
 		fImagesToDispose = new ArrayList();
 
-		fStackViewIcon = createManagedJUnitImage("eview16/stackframe.gif");//$NON-NLS-1$
+		fStackViewIcon = createManagedPHPUnitImage("eview16/stackframe.gif");//$NON-NLS-1$
 		fTestRunOKIcon = createManagedImage("eview16/phpunitsucc.gif"); //$NON-NLS-1$
 		fTestRunFailIcon = createManagedImage("eview16/phpuniterr.gif"); //$NON-NLS-1$
 		fTestRunOKDirtyIcon = createManagedImage("eview16/phpunitsuccq.gif"); //$NON-NLS-1$
 		fTestRunFailDirtyIcon = createManagedImage("eview16/phpuniterrq.gif"); //$NON-NLS-1$
 
-		fTestIcon = createManagedJUnitImage("obj16/test.gif"); //$NON-NLS-1$
-		fTestOkIcon = createManagedJUnitImage("obj16/testok.gif"); //$NON-NLS-1$
-		fTestErrorIcon = createManagedJUnitImage("obj16/testerr.gif"); //$NON-NLS-1$
-		fTestFailIcon = createManagedJUnitImage("obj16/testfail.gif"); //$NON-NLS-1$
-		fTestRunningIcon = createManagedJUnitImage("obj16/testrun.gif"); //$NON-NLS-1$
-		fTestIgnoredIcon = createManagedJUnitImage("obj16/testignored.gif"); //$NON-NLS-1$
+		fTestIcon = createManagedPHPUnitImage("obj16/test.gif"); //$NON-NLS-1$
+		fTestOkIcon = createManagedPHPUnitImage("obj16/testok.gif"); //$NON-NLS-1$
+		fTestErrorIcon = createManagedPHPUnitImage("obj16/testerr.gif"); //$NON-NLS-1$
+		fTestFailIcon = createManagedPHPUnitImage("obj16/testfail.gif"); //$NON-NLS-1$
+		fTestRunningIcon = createManagedPHPUnitImage("obj16/testrun.gif"); //$NON-NLS-1$
+		fTestIgnoredIcon = createManagedPHPUnitImage("obj16/testignored.gif"); //$NON-NLS-1$
 
 		fSuiteIcon = createManagedImage(fSuiteIconDescriptor);
 		fSuiteOkIcon = createManagedImage(fSuiteOkIconDescriptor);
@@ -878,7 +878,7 @@ public class TestRunnerViewPart extends ViewPart {
 		return createManagedImage(PHPUnitPlugin.getImageDescriptor(path));
 	}
 
-	private Image createManagedJUnitImage(String path) {
+	private Image createManagedPHPUnitImage(String path) {
 		return createManagedImage(PHPUnitPlugin.getImageDescriptor(path));
 	}
 
@@ -1018,11 +1018,8 @@ public class TestRunnerViewPart extends ViewPart {
 		doShowInfoMessage();
 		refreshCounters();
 
-		if (!fPartIsVisible)
-			updateViewTitleProgress();
-		else {
-			updateViewIcon();
-		}
+		updateViewTitleProgress();
+
 		boolean hasErrorsOrFailures = hasErrorsOrFailures();
 		fNextAction.setEnabled(hasErrorsOrFailures);
 		fPreviousAction.setEnabled(hasErrorsOrFailures);

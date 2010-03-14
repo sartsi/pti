@@ -44,7 +44,6 @@ import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class PHPUnitValidator extends AbstractValidator {
 
-	
 	public ValidationResult validate(IResource resource, int kind, ValidationState state, IProgressMonitor monitor) {
 		// process only PHP files
 		if (resource.getType() != IResource.FILE || !(PHPToolkitUtil.isPhpFile((IFile) resource))) {
@@ -79,7 +78,7 @@ public class PHPUnitValidator extends AbstractValidator {
 		}
 
 		PHPUnit phpunit = PHPUnit.getInstance();
-		return createFileMarker(phpunit.runTestCase(file));
+		return createFileMarker(phpunit.runTestSuite(file));
 	}
 
 	public ValidationResult validateFolder(IFolder folder) {

@@ -13,7 +13,6 @@ package org.phpsrc.eclipse.pti.tools.phpunit.core.model;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,11 +22,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.core.ILaunchesListener2;
+import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.tools.phpunit.PHPUnitPlugin;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.MessageIds;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.launcher.ITestKind;
@@ -56,7 +53,7 @@ public class TestRunSession implements ITestRunSession {
 	/**
 	 * Test runner client or <code>null</code>.
 	 */
-	private RemoteTestRunnerClient fTestRunnerClient;
+	private TapTestRunnerClient fTestRunnerClient;
 
 	private final ListenerList/* <ITestSessionListener> */fSessionListeners;
 
@@ -118,16 +115,24 @@ public class TestRunSession implements ITestRunSession {
 		this(testRunName, testFile != null ? testFile.getProject() : null, testFile);
 	}
 
-	/**
-	 * Creates a test run session.
-	 * 
-	 * @param testRunName
-	 *            name of the test run
-	 * @param project
-	 *            may be <code>null</code>
-	 */
 	public TestRunSession(String testRunName, IProject project) {
 		this(testRunName, project, null);
+	}
+
+	public TestRunSession(PHPToolLauncher launcher, String testRunName, IFile testFile) {
+		this(testRunName, testFile != null ? testFile.getProject() : null, testFile);
+
+		fTestRunnerClient = new TapTestRunnerClient();
+		fTestRunnerClient.startListening(new ITestRunListener[] { new TestSessionNotifier() });
+		addTestSessionListener(new TestRunListenerAdapter(this));
+	}
+
+	public TestRunSession(PHPToolLauncher launcher, String testRunName, IProject project) {
+		this(testRunName, project, null);
+
+		fTestRunnerClient = new TapTestRunnerClient();
+		fTestRunnerClient.startListening(new ITestRunListener[] { new TestSessionNotifier() });
+		addTestSessionListener(new TestRunListenerAdapter(this));
 	}
 
 	private TestRunSession(String testRunName, IProject project, IFile testFile) {
@@ -148,59 +153,6 @@ public class TestRunSession implements ITestRunSession {
 		fTestRunnerClient = null;
 
 		fSessionListeners = new ListenerList();
-	}
-
-	public TestRunSession(ILaunch launch, IProject project, int port) {
-		Assert.isNotNull(launch);
-
-		fLaunch = launch;
-		fProject = project;
-		fTestFile = null;
-
-		ILaunchConfiguration launchConfiguration = launch.getLaunchConfiguration();
-		if (launchConfiguration != null) {
-			fTestRunName = launchConfiguration.getName();
-			fTestRunnerKind = ITestKind.NULL; // JUnitLaunchConfigurationConstants.getTestRunnerKind(launchConfiguration);
-		} else {
-			fTestRunName = project.getName();
-			fTestRunnerKind = ITestKind.NULL;
-		}
-
-		fTestRoot = new TestRoot(this);
-		fIdToTest = new HashMap();
-
-		fTestRunnerClient = new RemoteTestRunnerClient();
-		fTestRunnerClient.startListening(new ITestRunListener[] { new TestSessionNotifier() }, port);
-
-		final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-		launchManager.addLaunchListener(new ILaunchesListener2() {
-			public void launchesTerminated(ILaunch[] launches) {
-				if (Arrays.asList(launches).contains(fLaunch)) {
-					if (fTestRunnerClient != null) {
-						fTestRunnerClient.stopWaiting();
-					}
-					launchManager.removeLaunchListener(this);
-				}
-			}
-
-			public void launchesRemoved(ILaunch[] launches) {
-				if (Arrays.asList(launches).contains(fLaunch)) {
-					if (fTestRunnerClient != null) {
-						fTestRunnerClient.stopWaiting();
-					}
-					launchManager.removeLaunchListener(this);
-				}
-			}
-
-			public void launchesChanged(ILaunch[] launches) {
-			}
-
-			public void launchesAdded(ILaunch[] launches) {
-			}
-		});
-
-		fSessionListeners = new ListenerList();
-		addTestSessionListener(new TestRunListenerAdapter(this));
 	}
 
 	void reset() {
@@ -756,6 +708,8 @@ public class TestRunSession implements ITestRunSession {
 		}
 
 		private String nullifyEmpty(String string) {
+			if (string == null)
+				return null;
 			int length = string.length();
 			if (length == 0)
 				return null;

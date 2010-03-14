@@ -34,12 +34,15 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
+import org.phpsrc.eclipse.pti.core.jobs.MutexRule;
 import org.phpsrc.eclipse.pti.tools.phpunit.core.PHPUnit;
 import org.phpsrc.eclipse.pti.tools.phpunit.validator.PHPUnitValidator;
 import org.phpsrc.eclipse.pti.ui.Logger;
 import org.phpsrc.eclipse.pti.ui.actions.ResourceAction;
 
 public class RunTestCaseAction extends ResourceAction {
+
+	final MutexRule rule = new MutexRule();
 
 	public void run(IAction action) {
 		final IResource[] resources = getSelectedResources();
@@ -76,6 +79,7 @@ public class RunTestCaseAction extends ResourceAction {
 					return Status.OK_STATUS;
 				}
 			};
+			job.setRule(rule);
 			job.setUser(false);
 			job.schedule();
 		}

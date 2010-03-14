@@ -87,7 +87,7 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 	// The shared instance
 	private static PHPUnitPlugin plugin;
 
-	private final PHPUnitModel fJUnitModel = new PHPUnitModel();
+	private final PHPUnitModel fPHPUnitModel = new PHPUnitModel();
 
 	/**
 	 * List storing the registered test run listeners
@@ -119,7 +119,7 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 		super.start(context);
 		plugin = this;
 		fIsStopped = false;
-		fJUnitModel.start();
+		fPHPUnitModel.start();
 	}
 
 	protected void initializeImageRegistry(ImageRegistry registry) {
@@ -156,14 +156,14 @@ public class PHPUnitPlugin extends AbstractPHPToolPlugin {
 		fIsStopped = true;
 		plugin = null;
 		try {
-			fJUnitModel.stop();
+			fPHPUnitModel.stop();
 		} finally {
 			super.stop(context);
 		}
 	}
 
 	public static PHPUnitModel getModel() {
-		return getDefault().fJUnitModel;
+		return getDefault().fPHPUnitModel;
 	}
 
 	/**

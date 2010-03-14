@@ -84,11 +84,10 @@ public class TestRunHandler extends DefaultHandler {
 				fTestRunSession.reset();
 			}
 			fTestSuite = fTestRunSession.getTestRoot();
-
 		} else if (qName.equals(IXMLTags.NODE_TESTSUITES)) {
-			// support Ant's 'junitreport' task; create suite from
-			// NODE_TESTSUITE
-
+			if (fTestRunSession != null) {
+				fTestRunSession.reset();
+			}
 		} else if (qName.equals(IXMLTags.NODE_TESTSUITE)) {
 			String name = attributes.getValue(IXMLTags.ATTR_NAME);
 

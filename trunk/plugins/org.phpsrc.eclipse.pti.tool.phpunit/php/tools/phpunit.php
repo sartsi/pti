@@ -35,7 +35,6 @@
  *
  * $Id: phpunit.php 4572 2009-01-28 07:37:41Z sb $
  */
-
 if (strpos('/usr/bin/php', '@php_bin') === 0) {
     set_include_path(dirname(__FILE__) . PATH_SEPARATOR . get_include_path());
 }
@@ -49,4 +48,3 @@ require 'PHPUnit/TextUI/Command.php';
 define('PHPUnit_MAIN_METHOD', 'PHPUnit_TextUI_Command::main');
 
 PHPUnit_TextUI_Command::main();
-?>
