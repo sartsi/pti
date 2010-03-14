@@ -338,8 +338,9 @@ public class PHPUnitTestCaseCreationWizardPage extends WizardPage {
 		}
 
 		this.project = null;
-		if (container != null && container.length() > 0 && container.indexOf("\\") >= 0) {
-			IContainer projectContainer = getContainer(container.substring(0, container.indexOf("\\", 1)));
+		if (container != null && container.length() > 0 && container.indexOf(java.io.File.separatorChar) >= 0) {
+			IContainer projectContainer = getContainer(container.substring(0, container.indexOf(
+					java.io.File.separatorChar, 1)));
 			if (projectContainer != null)
 				this.project = projectContainer.getProject();
 		}
