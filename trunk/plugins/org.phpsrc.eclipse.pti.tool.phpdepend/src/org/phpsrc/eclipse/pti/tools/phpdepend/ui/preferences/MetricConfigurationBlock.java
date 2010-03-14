@@ -92,7 +92,6 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 		 * @see
 		 * org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
 		 */
-		@Override
 		public Image getImage(Object element) {
 			return null; // JavaPluginImages.get(JavaPluginImages.IMG_OBJS_REFACTORING_INFO);
 		}
@@ -103,7 +102,6 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 		 * @see
 		 * org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 		 */
-		@Override
 		public String getText(Object element) {
 			return getColumnText(element, 0);
 		}
@@ -241,7 +239,6 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 				PREF_METRICS_WARNING_MAX, PREF_METRICS_ERROR_MIN, PREF_METRICS_ERROR_MAX, PREF_METRICS_TYPES };
 	}
 
-	@Override
 	protected Control createContents(Composite parent) {
 
 		Composite group = new Composite(parent, SWT.NULL);
@@ -275,7 +272,6 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 		return fMetricList.getIndexOfElement(lib) == 0;
 	}
 
-	@Override
 	protected void validateSettings(Key changedKey, String oldValue, String newValue) {
 		// TODO Auto-generated method stub
 	}
@@ -346,13 +342,11 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 		}
 	}
 
-	@Override
 	public void useProjectSpecificSettings(boolean enable) {
 		super.useProjectSpecificSettings(enable);
 		fMetricList.setEnabled(enable);
 	}
 
-	@Override
 	protected String[] getFullBuildDialogStrings(boolean workspaceSettings) {
 		String title = "PHP Depend Metrics Settings Changed";
 		String message;
@@ -374,7 +368,6 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 	 * @seeorg.eclipse.jdt.internal.ui.preferences.OptionsConfigurationBlock#
 	 * updateControls()
 	 */
-	@Override
 	protected void updateControls() {
 		unpackMetrics();
 	}

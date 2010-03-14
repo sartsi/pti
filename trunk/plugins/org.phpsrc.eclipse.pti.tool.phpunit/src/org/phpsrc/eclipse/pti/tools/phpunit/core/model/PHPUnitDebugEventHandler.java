@@ -18,7 +18,6 @@ public class PHPUnitDebugEventHandler {
 	private final static PHPUnitDebugEventHandler fDefault = new PHPUnitDebugEventHandler();
 
 	private final class PHPUnitDebugEventSetListener implements IDebugEventSetListener {
-		@Override
 		public void handleDebugEvents(DebugEvent[] events) {
 			String qualifiedName = PHPUnit.QUALIFIED_NAME.toString();
 
@@ -57,7 +56,6 @@ public class PHPUnitDebugEventHandler {
 	}
 
 	private final IStreamListener fStreamListener = new IStreamListener() {
-		@Override
 		public void streamAppended(String text, IStreamMonitor monitor) {
 			notifyListenerAppendOutput(text);
 		}

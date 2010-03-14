@@ -11,20 +11,17 @@ public class AbstractTestRunnerClient {
 
 	private ITestDebugProcessListener fDebugProcessListener = new ITestDebugProcessListener() {
 
-		@Override
 		public void startProcess() {
 			fIsRunning = true;
 			notifyTestRunStarted();
 		}
 
-		@Override
 		public void stopProcess() {
 			fIsRunning = false;
 			notifyTestRunEnded();
 			stopListening();
 		}
 
-		@Override
 		public void appendOutput(String text) {
 			parseOutput(text);
 		}

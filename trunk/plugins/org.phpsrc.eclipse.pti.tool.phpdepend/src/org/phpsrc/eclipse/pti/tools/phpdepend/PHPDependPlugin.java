@@ -117,7 +117,6 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 		return plugin;
 	}
 
-	@Override
 	public IPath[] getPluginIncludePaths(IProject project) {
 		PHPDependPreferences prefs = PHPDependPreferencesFactory.factory(project);
 		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(prefs.getPearLibraryName());

@@ -18,7 +18,6 @@ public class TestJob extends WorkspaceJob {
 		this.resources = resources;
 	}
 
-	@Override
 	public IStatus runInWorkspace(IProgressMonitor monitor) {
 		monitor.beginTask("Validation", resources.length * 2);
 
