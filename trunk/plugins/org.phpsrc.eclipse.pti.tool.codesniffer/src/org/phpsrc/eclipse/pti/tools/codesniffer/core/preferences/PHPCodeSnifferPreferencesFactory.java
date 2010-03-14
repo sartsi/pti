@@ -92,7 +92,7 @@ public class PHPCodeSnifferPreferencesFactory {
 		}
 
 		String[] fileExtensionsList = fileExtensions == null || fileExtensions.length() == 0 ? new String[0]
-				: fileExtensions.split(",");
+				: fileExtensions.split(" *, *");
 
 		String[] activeList = new String[0];
 		if (activeStandards != null) {
@@ -127,7 +127,7 @@ public class PHPCodeSnifferPreferencesFactory {
 
 		return new PHPCodeSnifferPreferences(phpExe, printOutput, pearLibraryName, standards.toArray(new Standard[0]),
 				tabWidth, fileExtensionsList, ignorePattern, ignoreSniffs == null || ignoreSniffs.length() == 0 ? null
-						: ignoreSniffs.split(","));
+						: ignoreSniffs.split(" *, *"));
 	}
 
 	protected static IScopeContext[] createPreferenceScopes(IProject project) {
