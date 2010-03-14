@@ -24,8 +24,11 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: org.phpsrc.eclipse.pti.tools.phpunit,
  org.phpsrc.eclipse.pti.tools.phpunit.core,
+ org.phpsrc.eclipse.pti.tools.phpunit.core.launcher,
+ org.phpsrc.eclipse.pti.tools.phpunit.core.model,
  org.phpsrc.eclipse.pti.tools.phpunit.core.preferences,
  org.phpsrc.eclipse.pti.tools.phpunit.ui.actions,
  org.phpsrc.eclipse.pti.tools.phpunit.ui.preferences,
+ org.phpsrc.eclipse.pti.tools.phpunit.ui.views.testrunner,
  org.phpsrc.eclipse.pti.tools.phpunit.ui.wizards,
  org.phpsrc.eclipse.pti.tools.phpunit.validator
