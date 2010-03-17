@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.dltk.core.DLTKCore;
 import org.eclipse.dltk.core.IMember;
+import org.eclipse.dltk.core.IMethod;
 import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
@@ -242,5 +243,21 @@ public class PHPToolkitUtil {
 		}
 
 		return false;
+	}
+
+	public static IMethod getClassMethod(ISourceModule module, String methodName) {
+		Assert.isNotNull(methodName);
+		try {
+			IType newClass = module.getAllTypes()[0];
+			for (IMethod method : newClass.getMethods()) {
+				if (method.getElementName().equals(methodName)) {
+					return method;
+				}
+			}
+		} catch (ModelException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 }
