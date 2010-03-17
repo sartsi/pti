@@ -50,7 +50,9 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.dltk.compiler.problem.IProblem;
 import org.eclipse.dltk.compiler.problem.ProblemSeverities;
+import org.eclipse.dltk.core.IField;
 import org.eclipse.dltk.core.IMethod;
+import org.eclipse.dltk.core.IModelElement;
 import org.eclipse.dltk.core.ISourceModule;
 import org.eclipse.dltk.core.IType;
 import org.eclipse.dltk.core.ModelException;
@@ -75,6 +77,7 @@ import org.phpsrc.eclipse.pti.ui.Logger;
 public class PHPUnit extends AbstractPHPTool {
 
 	public final static QualifiedName QUALIFIED_NAME = new QualifiedName(PHPUnitPlugin.PLUGIN_ID, "PHPUnit");
+	private final static String PHPUNIT_TEST_SUITE_CLASS = "PHPUnit_Framework_TestSuite";
 	private static PHPUnit instance;
 
 	protected PHPUnit() {
@@ -428,7 +431,7 @@ public class PHPUnit extends AbstractPHPTool {
 		try {
 			IType[] types = module.getAllTypes();
 			if (types.length > 0) {
-				if (PHPToolkitUtil.hasSuperClass(module, "PHPUnit_Framework_TestCase"))
+				if (PHPToolkitUtil.hasSuperClass(module, PHPUNIT_TEST_SUITE_CLASS))
 					return file;
 
 				SearchMatch[] matches = PHPSearchEngine.findClass(types[0].getElementName() + "Test", PHPSearchEngine
@@ -445,6 +448,40 @@ public class PHPUnit extends AbstractPHPTool {
 	}
 
 	static public boolean isTestSuite(IFile file) {
-		return PHPToolkitUtil.hasSuperClass(file, "PHPUnit_Framework_TestSuite");
+		ISourceModule module = PHPToolkitUtil.getSourceModule(file);
+		if (PHPToolkitUtil.hasSuperClass(module, PHPUNIT_TEST_SUITE_CLASS))
+			return true;
+
+		try {
+			IMethod method = PHPToolkitUtil.getClassMethod(module, "suite");
+			if (method != null) {
+				if (method.getSource().contains(PHPUNIT_TEST_SUITE_CLASS)) {
+					return true;
+				}
+
+				Pattern p = Pattern.compile(".*new ([a-zA-Z0-9_]+).*");
+
+				IModelElement[] elements = method.getChildren();
+				for (IModelElement e : elements) {
+					if (e instanceof IField) {
+						IField f = (IField) e;
+
+						Matcher m = p.matcher(f.getSource());
+						if (m.matches()) {
+							SearchMatch[] classes = PHPSearchEngine.findClass(m.group(1), PHPSearchEngine
+									.createProjectScope(file.getProject()));
+							for (SearchMatch c : classes) {
+								if (PHPToolkitUtil.hasSuperClass(c.getResource(), PHPUNIT_TEST_SUITE_CLASS))
+									return true;
+							}
+						}
+					}
+				}
+			}
+		} catch (ModelException e) {
+			e.printStackTrace();
+		}
+
+		return false;
 	}
 }
