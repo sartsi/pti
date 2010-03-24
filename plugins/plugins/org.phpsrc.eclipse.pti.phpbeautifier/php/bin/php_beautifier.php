@@ -21,7 +21,7 @@
     * @link     http://pear.php.net/package/PHP_Beautifier
     * @link     http://clbustos.dotgeek.org
     * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
-    * @version    CVS: $Id:$
+    * @version    CVS: $Id$
     */
     // First, test if the interpreter is the cli one
     if (php_sapi_name() != 'cli') {
