@@ -8,9 +8,9 @@
  * @package  PHP_UML
  * @author   Baptiste Autin <ohlesbeauxjours@yahoo.fr> 
  * @license  http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version  SVN: $Revision: 144 $
+ * @version  SVN: $Revision: 147 $
  * @link     http://pear.php.net/package/PHP_UML
- * @since    $Date: 2010-01-07 21:47:12 +0100 (jeu., 07 janv. 2010) $
+ * @since    $Date: 2010-03-19 22:00:18 +0100 (ven., 19 mars 2010) $
  */
 
 /**
@@ -200,6 +200,7 @@ class PHP_UML_Input_PHP_Parser
      */
     static private function tClass(&$tokens)
     {
+        $c = null;
         while (list($l, $v) = each($tokens)) {
             switch($v[0]) {
             case T_STRING:
@@ -218,9 +219,11 @@ class PHP_UML_Input_PHP_Parser
                 $c->superClass = self::tStringCommaList($tokens);
                 break;
             case '{':
-                $c = self::tClassifierBody($tokens, $c);
-                if (!is_null($c))
-                    self::setNestingPackageOfType($c, $classPkg);
+                if (!is_null($c)) {
+                    $c = self::tClassifierBody($tokens, $c);
+                    if (!is_null($c))
+                        self::setNestingPackageOfType($c, $classPkg);
+                }
                 return;
             }
         }
@@ -233,6 +236,7 @@ class PHP_UML_Input_PHP_Parser
      */
     static private function tInterface(&$tokens)
     {
+        $i = null;
         while (list($c, $v) = each($tokens)) {
             switch ($v[0]) {
             case T_STRING:
@@ -247,9 +251,11 @@ class PHP_UML_Input_PHP_Parser
                 $i->superClass = self::tStringCommaList($tokens);
                 break;
             case '{':
-                $i = self::tClassifierBody($tokens, $i);
-                if(!is_null($i))
-                    self::setNestingPackageOfType($i, $classPkg);
+                if (!is_null($i)) {
+                    $i = self::tClassifierBody($tokens, $i);
+                    if(!is_null($i))
+                        self::setNestingPackageOfType($i, $classPkg);
+                }
                 return;
             }
         }
@@ -268,7 +274,7 @@ class PHP_UML_Input_PHP_Parser
     {
         $operations = array();
         $attributes = array();
-        
+
         //$docs = self::getDocblocksInDocComment(self::$curDocComment);
         //$desc = self::getDescriptionInDocComment(self::$curDocComment);
         self::addDocumentation($class);

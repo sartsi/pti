@@ -7,7 +7,7 @@ and delivers an UML/XMI representation of the code.
     ]]>
     </description>
     <!-- will be automagically replaced by pear package command -->
-    <version>1.5.1</version>
+    <version>1.5.2</version>
 
     <argument name="input">
         <description>The PHP file(s) or directorie(s) to parse (eg: D:/htdocs/)

@@ -3,8 +3,8 @@
  * File containing the ezcConsoleArguments collection class.
  *
  * @package ConsoleTools
- * @version 1.6
- * @copyright Copyright (C) 2005-2009 eZ Systems AS. All rights reserved.
+ * @version 1.6.1
+ * @copyright Copyright (C) 2005-2010 eZ Systems AS. All rights reserved.
  * @license http://ez.no/licenses/new_bsd New BSD License
  * @filesource
  */
@@ -13,7 +13,7 @@
  * Collection class for ezcConsoleArgument objects. Used in {@link ezcConsoleInput}.
  * 
  * @package ConsoleTools
- * @version 1.6
+ * @version 1.6.1
  */
 class ezcConsoleArguments implements ArrayAccess, Iterator, Countable
 {
