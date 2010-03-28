@@ -31,10 +31,14 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.Metric;
 
@@ -44,7 +48,8 @@ public class MetricRunSession extends MetricElement {
 			PHPDependPlugin.IMG_PHP_DEPEND);
 
 	volatile boolean fIsRunning;
-	private IResource fDependentResource;
+	private final IResource fDependentResource;
+	private final Image fImage;
 
 	public MetricRunSession() {
 		this(null);
@@ -53,12 +58,23 @@ public class MetricRunSession extends MetricElement {
 	public MetricRunSession(IResource dependentResource) {
 		super(null, "PHP Depend", new MetricResult[0]);
 		fDependentResource = dependentResource;
-		if (dependentResource != null)
+		if (dependentResource != null) {
 			name = dependentResource.getFullPath().toPortableString();
+			if (dependentResource instanceof IProject) {
+				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(
+						org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT);
+			} else if (dependentResource instanceof IFolder) {
+				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
+			} else {
+				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
+			}
+		} else {
+			fImage = IMAGE;
+		}
 	}
 
 	public Image getImage() {
-		return IMAGE;
+		return fImage;
 	}
 
 	public IResource getResource() {

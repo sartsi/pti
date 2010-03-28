@@ -123,7 +123,7 @@ public class MetricRunnerViewPart extends ViewPart {
 	protected Clipboard fClipboard;
 	protected volatile String fInfoMessage;
 
-	private FailureTrace fFailureTrace;
+	private MetricTrace fMetricList;
 
 	private MetricViewer fTestViewer;
 	/**
@@ -700,7 +700,7 @@ public class MetricRunnerViewPart extends ViewPart {
 		if (metricRunSession == null) {
 			setTitleToolTip(null);
 			clearStatus();
-			fFailureTrace.clear();
+			fMetricList.clear();
 
 			registerInfoMessage(" "); //$NON-NLS-1$
 			stopUpdateJobs();
@@ -709,7 +709,7 @@ public class MetricRunnerViewPart extends ViewPart {
 			setTitleToolTip();
 
 			clearStatus();
-			fFailureTrace.clear();
+			fMetricList.clear();
 			registerInfoMessage(BasicElementLabels.getPHPElementName(fMetricRunSession.getName()));
 
 			if (fMetricRunSession.isRunning()) {
@@ -833,8 +833,8 @@ public class MetricRunnerViewPart extends ViewPart {
 		bottom.setTopLeft(label);
 		ToolBar failureToolBar = new ToolBar(bottom, SWT.FLAT | SWT.WRAP);
 		bottom.setTopCenter(failureToolBar);
-		fFailureTrace = new FailureTrace(bottom, fClipboard, this, failureToolBar);
-		bottom.setContent(fFailureTrace.getComposite());
+		fMetricList = new MetricTrace(bottom, fClipboard, this, failureToolBar);
+		bottom.setContent(fMetricList.getComposite());
 
 		fSashForm.setWeights(new int[] { 50, 50 });
 		return fSashForm;
@@ -1016,15 +1016,15 @@ public class MetricRunnerViewPart extends ViewPart {
 	}
 
 	public void handleElementSelected(IMetricElement element) {
-		showFailure(element);
+		showElement(element);
 		// fCopyAction.handleTestSelected(element);
 	}
 
-	private void showFailure(final IMetricElement element) {
+	private void showElement(final IMetricElement element) {
 		postSyncRunnable(new Runnable() {
 			public void run() {
 				if (!isDisposed())
-					fFailureTrace.showFailure(element);
+					fMetricList.showElement(element);
 			}
 		});
 	}
@@ -1112,8 +1112,8 @@ public class MetricRunnerViewPart extends ViewPart {
 		return store.getBoolean(PHPDependPreferencesConstants.SHOW_ON_ERROR_ONLY);
 	}
 
-	public FailureTrace getFailureTrace() {
-		return fFailureTrace;
+	public MetricTrace getFailureTrace() {
+		return fMetricList;
 	}
 
 	void setShowFailuresOnly(boolean failuresOnly) {

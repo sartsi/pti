@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner;
 
-public interface ITraceDisplay {
-	public abstract void addTraceLine(int lineType, String label);
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricResult;
+
+public interface IMetricDisplay {
+	public abstract void addMetricResult(MetricResult result);
 }

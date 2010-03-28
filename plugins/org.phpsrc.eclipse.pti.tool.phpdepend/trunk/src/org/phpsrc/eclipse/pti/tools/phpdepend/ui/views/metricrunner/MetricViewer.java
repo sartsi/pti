@@ -113,7 +113,7 @@ public class MetricViewer {
 
 	private final FailuresOnlyFilter fFailuresOnlyFilter = new FailuresOnlyFilter();
 
-	private final MetricRunnerViewPart fTestRunnerPart;
+	private final MetricRunnerViewPart fMetricRunnerPart;
 	private final Clipboard fClipboard;
 
 	private PageBook fViewerbook;
@@ -139,7 +139,7 @@ public class MetricViewer {
 	private HashSet/* <TestSuite> */fAutoExpand;
 
 	public MetricViewer(Composite parent, Clipboard clipboard, MetricRunnerViewPart runner) {
-		fTestRunnerPart = runner;
+		fMetricRunnerPart = runner;
 		fClipboard = clipboard;
 
 		fLayoutMode = MetricRunnerViewPart.LAYOUT_HIERARCHICAL;
@@ -158,14 +158,14 @@ public class MetricViewer {
 		fTreeViewer.setUseHashlookup(true);
 		fTreeContentProvider = new MetricSessionTreeContentProvider();
 		fTreeViewer.setContentProvider(fTreeContentProvider);
-		fTreeLabelProvider = new MetricSessionLabelProvider(fTestRunnerPart, MetricRunnerViewPart.LAYOUT_HIERARCHICAL);
+		fTreeLabelProvider = new MetricSessionLabelProvider(fMetricRunnerPart, MetricRunnerViewPart.LAYOUT_HIERARCHICAL);
 		fTreeViewer.setLabelProvider(fTreeLabelProvider);
 
 		fTableViewer = new TableViewer(fViewerbook, SWT.V_SCROLL | SWT.H_SCROLL | SWT.SINGLE);
 		fTableViewer.setUseHashlookup(true);
 		fTableContentProvider = new MetricSessionTableContentProvider();
 		fTableViewer.setContentProvider(fTableContentProvider);
-		fTableLabelProvider = new MetricSessionLabelProvider(fTestRunnerPart, MetricRunnerViewPart.LAYOUT_FLAT);
+		fTableLabelProvider = new MetricSessionLabelProvider(fMetricRunnerPart, MetricRunnerViewPart.LAYOUT_FLAT);
 		fTableViewer.setLabelProvider(fTableLabelProvider);
 
 		fSelectionProvider = new SelectionProviderMediator(new StructuredViewer[] { fTreeViewer, fTableViewer },
@@ -175,7 +175,7 @@ public class MetricViewer {
 		fTreeViewer.getTree().addSelectionListener(testOpenListener);
 		fTableViewer.getTable().addSelectionListener(testOpenListener);
 
-		fTestRunnerPart.getSite().setSelectionProvider(fSelectionProvider);
+		fMetricRunnerPart.getSite().setSelectionProvider(fSelectionProvider);
 
 		fViewerbook.showPage(fTreeViewer.getTree());
 	}
@@ -188,7 +188,7 @@ public class MetricViewer {
 				handleMenuAboutToShow(manager);
 			}
 		});
-		fTestRunnerPart.getSite().registerContextMenu(menuMgr, fSelectionProvider);
+		fMetricRunnerPart.getSite().registerContextMenu(menuMgr, fSelectionProvider);
 		Menu menu = menuMgr.createContextMenu(fViewerbook);
 		fTreeViewer.getTree().setMenu(menu);
 		fTableViewer.getTable().setMenu(menu);
@@ -200,11 +200,11 @@ public class MetricViewer {
 			IMetricElement element = (IMetricElement) selection.getFirstElement();
 
 			if (element instanceof MetricMethod) {
-				manager.add(new OpenFileAction(fTestRunnerPart, (MetricMethod) element));
+				manager.add(new OpenFileAction(fMetricRunnerPart, (MetricMethod) element));
 			} else if (element instanceof MetricClass) {
-				manager.add(new OpenFileAction(fTestRunnerPart, (MetricClass) element));
+				manager.add(new OpenFileAction(fMetricRunnerPart, (MetricClass) element));
 			} else if (element instanceof MetricFile) {
-				manager.add(new OpenFileAction(fTestRunnerPart, (MetricFile) element));
+				manager.add(new OpenFileAction(fMetricRunnerPart, (MetricFile) element));
 			}
 
 			if (fLayoutMode == MetricRunnerViewPart.LAYOUT_HIERARCHICAL) {
@@ -235,11 +235,11 @@ public class MetricViewer {
 
 		OpenFileAction action = null;
 		if (element instanceof MetricMethod) {
-			action = new OpenFileAction(fTestRunnerPart, (MetricMethod) element);
+			action = new OpenFileAction(fMetricRunnerPart, (MetricMethod) element);
 		} else if (element instanceof MetricClass) {
-			action = new OpenFileAction(fTestRunnerPart, (MetricClass) element);
+			action = new OpenFileAction(fMetricRunnerPart, (MetricClass) element);
 		} else if (element instanceof MetricFile) {
-			action = new OpenFileAction(fTestRunnerPart, (MetricFile) element);
+			action = new OpenFileAction(fMetricRunnerPart, (MetricFile) element);
 		} else {
 			throw new IllegalStateException(String.valueOf(element));
 		}
@@ -250,11 +250,11 @@ public class MetricViewer {
 
 	private void handleSelected() {
 		IStructuredSelection selection = (IStructuredSelection) fSelectionProvider.getSelection();
-		MetricElement MetricElement = null;
+		IMetricElement metricElement = null;
 		if (selection.size() == 1) {
-			MetricElement = (MetricElement) selection.getFirstElement();
+			metricElement = (IMetricElement) selection.getFirstElement();
 		}
-		fTestRunnerPart.handleElementSelected(MetricElement);
+		fMetricRunnerPart.handleElementSelected(metricElement);
 	}
 
 	public synchronized void setShowTime(boolean showTime) {

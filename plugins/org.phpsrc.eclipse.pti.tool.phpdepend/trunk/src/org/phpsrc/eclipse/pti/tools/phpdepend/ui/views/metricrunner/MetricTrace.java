@@ -27,31 +27,31 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.IMetricElement;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricResult;
 
 /**
  * A pane that shows a stack trace of a failed test.
  */
-public class FailureTrace implements IMenuListener {
+public class MetricTrace implements IMenuListener {
 	private static final int MAX_LABEL_LENGTH = 256;
 
 	private Table fTable;
-	private MetricRunnerViewPart fTestRunner;
-	private String fInputTrace;
+	private MetricRunnerViewPart fMetricRunner;
 	private final Clipboard fClipboard;
-	private IMetricElement fFailure;
-	private final FailureTableDisplay fFailureTableDisplay;
+	private IMetricElement fElement;
+	private final MetricTableDisplay fMetricTableDisplay;
 
-	public FailureTrace(Composite parent, Clipboard clipboard, MetricRunnerViewPart testRunner, ToolBar toolBar) {
+	public MetricTrace(Composite parent, Clipboard clipboard, MetricRunnerViewPart testRunner, ToolBar toolBar) {
 		Assert.isNotNull(clipboard);
 
-		fTable = new Table(parent, SWT.SINGLE | SWT.V_SCROLL | SWT.H_SCROLL);
-		fTestRunner = testRunner;
+		fTable = new Table(parent, SWT.BORDER | SWT.V_SCROLL | SWT.FULL_SELECTION);
+		fMetricRunner = testRunner;
 		fClipboard = clipboard;
 
 		OpenStrategy handler = new OpenStrategy(fTable);
 		initMenu();
 
-		fFailureTableDisplay = new FailureTableDisplay(fTable);
+		fMetricTableDisplay = new MetricTableDisplay(fTable);
 	}
 
 	private void initMenu() {
@@ -65,10 +65,6 @@ public class FailureTrace implements IMenuListener {
 	public void menuAboutToShow(IMenuManager manager) {
 	}
 
-	public String getTrace() {
-		return fInputTrace;
-	}
-
 	private String getSelectedText() {
 		return fTable.getSelection()[0].getText();
 	}
@@ -79,7 +75,7 @@ public class FailureTrace implements IMenuListener {
 			if (pos != -1) {
 				String fileName = traceLine.substring(0, pos);
 				int lineNumber = Integer.parseInt(traceLine.substring(pos + 1));
-				return new OpenEditorAtLineAction(fTestRunner, fileName, lineNumber);
+				return new OpenEditorAtLineAction(fMetricRunner, fileName, lineNumber);
 			}
 		} catch (NumberFormatException e) {
 		} catch (IndexOutOfBoundsException e) {
@@ -100,7 +96,7 @@ public class FailureTrace implements IMenuListener {
 	 * Refresh the table from the trace.
 	 */
 	public void refresh() {
-		updateTable(fInputTrace);
+		updateTable(fElement);
 	}
 
 	/**
@@ -109,30 +105,27 @@ public class FailureTrace implements IMenuListener {
 	 * @param test
 	 *            the failed test
 	 */
-	public void showFailure(IMetricElement test) {
-		fFailure = test;
-		String trace = ""; //$NON-NLS-1$
-		updateEnablement(test);
-		// if (test != null)
-		// trace = test.getTrace();
-		if (fInputTrace == trace)
-			return;
-		fInputTrace = trace;
-		updateTable(trace);
+	public void showElement(IMetricElement element) {
+		fElement = element;
+		updateTable(element);
 	}
 
 	public void updateEnablement(IMetricElement test) {
 	}
 
-	private void updateTable(String trace) {
-		if (trace == null || trace.trim().equals("")) { //$NON-NLS-1$
+	private void updateTable(IMetricElement fElement) {
+		if (fElement == null) { //$NON-NLS-1$
 			clear();
 			return;
 		}
-		trace = trace.trim();
+
 		fTable.setRedraw(false);
 		fTable.removeAll();
-		new TextualTrace(trace, getFilterPatterns()).display(fFailureTableDisplay, MAX_LABEL_LENGTH);
+
+		for (MetricResult result : fElement.getResults()) {
+			fMetricTableDisplay.addMetricResult(result);
+		}
+
 		fTable.setRedraw(true);
 	}
 
@@ -148,7 +141,7 @@ public class FailureTrace implements IMenuListener {
 	 */
 	public void setInformation(String text) {
 		clear();
-		TableItem tableItem = fFailureTableDisplay.newTableItem();
+		TableItem tableItem = fMetricTableDisplay.newTableItem();
 		tableItem.setText(text);
 	}
 
@@ -157,18 +150,13 @@ public class FailureTrace implements IMenuListener {
 	 */
 	public void clear() {
 		fTable.removeAll();
-		fInputTrace = null;
-	}
-
-	public IMetricElement getFailedTest() {
-		return fFailure;
 	}
 
 	public Shell getShell() {
 		return fTable.getShell();
 	}
 
-	public FailureTableDisplay getFailureTableDisplay() {
-		return fFailureTableDisplay;
+	public MetricTableDisplay getFailureTableDisplay() {
+		return fMetricTableDisplay;
 	}
 }
