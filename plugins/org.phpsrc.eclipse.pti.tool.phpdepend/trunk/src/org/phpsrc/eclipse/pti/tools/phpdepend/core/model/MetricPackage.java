@@ -25,7 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.model;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -33,11 +33,11 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.dltk.ui.DLTKPluginImages;
 import org.eclipse.swt.graphics.Image;
 
-public class Method extends AbstractElement {
+public class MetricPackage extends MetricElement {
 
-	private final static Image IMAGE = DLTKPluginImages.DESC_METHOD_DEFAULT.createImage();
+	private final static Image IMAGE = DLTKPluginImages.DESC_OBJS_PACKAGE.createImage();
 
-	public Method(IElement parent, String name, MetricResult[] results) {
+	public MetricPackage(IMetricElement parent, String name, MetricResult[] results) {
 		super(parent, name, results);
 		Assert.isNotNull(parent);
 	}
@@ -47,10 +47,10 @@ public class Method extends AbstractElement {
 	}
 
 	public IResource getResource() {
-		return getParent().getResource();
+		return null;
 	}
 
 	public IMarker getFileMarker() {
-		return getParent().getFileMarker();
+		return null;
 	}
 }

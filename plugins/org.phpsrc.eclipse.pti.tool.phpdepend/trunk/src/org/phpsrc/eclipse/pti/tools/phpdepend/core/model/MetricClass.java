@@ -25,21 +25,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.model;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.dltk.ui.DLTKPluginImages;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 
-public class Files extends AbstractElement {
+public class MetricClass extends MetricElement {
 
-	private final static Image IMAGE = PlatformUI.getWorkbench().getSharedImages().getImage(
-			ISharedImages.IMG_OBJ_FOLDER);
+	private final static Image IMAGE = DLTKPluginImages.DESC_OBJS_CLASS.createImage();
+	private MetricFile file;
 
-	public Files(IElement parent, String name, MetricResult[] results) {
+	public MetricClass(IMetricElement parent, String name, MetricResult[] results) {
 		super(parent, name, results);
 		Assert.isNotNull(parent);
 	}
@@ -49,10 +48,32 @@ public class Files extends AbstractElement {
 	}
 
 	public IResource getResource() {
+		MetricFile f = getFile();
+		if (f != null)
+			return f.getResource();
+
 		return null;
 	}
 
 	public IMarker getFileMarker() {
+		MetricFile f = getFile();
+		if (f != null)
+			return f.getFileMarker();
+
 		return null;
+	}
+
+	protected MetricFile getFile() {
+		if (file == null) {
+			for (IMetricElement member : getChildren()) {
+				if (member instanceof MetricFile) {
+
+				}
+				file = (MetricFile) member;
+				break;
+			}
+		}
+
+		return file;
 	}
 }

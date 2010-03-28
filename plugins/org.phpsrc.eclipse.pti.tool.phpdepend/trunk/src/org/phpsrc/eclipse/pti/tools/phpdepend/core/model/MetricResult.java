@@ -25,56 +25,43 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.model;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.Metric;
 
-public class File extends AbstractElement {
+public class MetricResult {
 
-	private final static Image IMAGE_PROJECT = PlatformUI.getWorkbench().getSharedImages().getImage(
-			ISharedImages.IMG_OBJ_FILE);
-	private final static Image IMAGE_NON_PROJECT = PlatformUI.getWorkbench().getSharedImages().getImage(
-			ISharedImages.IMG_OBJ_FILE);
+	public String id;
+	public float value;
+	public Metric metric;
+	protected boolean error = false;
+	protected boolean warning = false;
 
-	protected IFile file;
+	public MetricResult(Metric m, float value) {
+		Assert.isNotNull(m);
+		this.id = m.id;
+		this.value = value;
+		this.metric = m;
+		if ((m.errorMin != null || m.errorMax != null) && (m.errorMin == null || value >= m.errorMin)
+				&& (m.errorMax == null || value <= m.errorMax))
+			error = true;
+		if ((m.warningMin != null || m.warningMax != null) && (m.warningMin == null || value >= m.warningMin)
+				&& (m.warningMax == null || value <= m.warningMax))
+			warning = true;
 
-	public File(IElement parent, String name, MetricResult[] results) {
-		super(parent, name, results);
-		Assert.isNotNull(parent);
-
-		IFile[] files = ResourcesPlugin.getWorkspace().getRoot()
-				.findFilesForLocationURI(new java.io.File(name).toURI());
-		if (files.length > 0) {
-			file = files[0];
-			this.name = file.getProject().getName() + " - " + file.getProjectRelativePath().toPortableString();
-		}
 	}
 
-	public Image getImage() {
-		if (file != null)
-			return IMAGE_PROJECT;
-		else
-			return IMAGE_NON_PROJECT;
+	public MetricResult(String id, float value) {
+		this.id = id;
+		this.value = value;
 	}
 
-	public IResource getResource() {
-		return file;
+	public boolean hasError() {
+		return error;
 	}
 
-	public IMarker getFileMarker() {
-		try {
-			return file.createMarker(IMarker.TEXT);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-		return null;
+	public boolean hasWarning() {
+		return warning;
 	}
 }

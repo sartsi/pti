@@ -25,43 +25,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.model;
 
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
-import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.Metric;
+import org.eclipse.dltk.ui.DLTKPluginImages;
+import org.eclipse.swt.graphics.Image;
 
-public class MetricResult {
+public class MetricMethod extends MetricElement {
 
-	public String id;
-	public float value;
-	public Metric metric;
-	protected boolean error = false;
-	protected boolean warning = false;
+	private final static Image IMAGE = DLTKPluginImages.DESC_METHOD_DEFAULT.createImage();
 
-	public MetricResult(Metric m, float value) {
-		Assert.isNotNull(m);
-		this.id = m.id;
-		this.value = value;
-		this.metric = m;
-		if ((m.errorMin != null || m.errorMax != null) && (m.errorMin == null || value >= m.errorMin)
-				&& (m.errorMax == null || value <= m.errorMax))
-			error = true;
-		if ((m.warningMin != null || m.warningMax != null) && (m.warningMin == null || value >= m.warningMin)
-				&& (m.warningMax == null || value <= m.warningMax))
-			warning = true;
-
+	public MetricMethod(IMetricElement parent, String name, MetricResult[] results) {
+		super(parent, name, results);
+		Assert.isNotNull(parent);
 	}
 
-	public MetricResult(String id, float value) {
-		this.id = id;
-		this.value = value;
+	public Image getImage() {
+		return IMAGE;
 	}
 
-	public boolean hasError() {
-		return error;
+	public IResource getResource() {
+		return getParent().getResource();
 	}
 
-	public boolean hasWarning() {
-		return warning;
+	public IMarker getFileMarker() {
+		return getParent().getFileMarker();
 	}
 }

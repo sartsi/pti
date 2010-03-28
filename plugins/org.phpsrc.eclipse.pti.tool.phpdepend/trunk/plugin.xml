@@ -74,7 +74,7 @@
 			<command
 				commandId="org.phpsrc.eclipse.pti.tools.phpdepend.ui.commands.validateresources"
 				tooltip="Run PHP Depend"
-				icon="icons/obj16/php_depend.gif">
+				icon="icons/full/obj16/php_depend.gif">
 				<visibleWhen>
 					<with variable="activeMenuSelection">
 						<iterate>
@@ -97,7 +97,7 @@
 				id="org.phpsrc.eclipse.pti.tools.phpdepend.ui.action.ValidateResourcesAction"
 				definitionId="org.phpsrc.eclipse.pti.tools.phpdepend.ui.commands.validateresources"
 				label="PHP Depend"
-				icon="icons/obj16/php_depend.gif"
+				icon="icons/full/obj16/php_depend.gif"
 				toolbarPath="org.phpsrc.eclipse.pti.tools.phpdepend.ui.actionSet"
 				tooltip="Run PHP Depend"
 				class="org.phpsrc.eclipse.pti.tools.phpdepend.ui.actions.ValidateResourcesAction"
@@ -111,10 +111,10 @@
 		</perspectiveExtension>
 	</extension>
 	<extension point="org.eclipse.ui.views">
-		<view id="org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.summary"
-			name="PHP Depend Summary"
+		<view id="org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner"
+			name="PHP Depend"
 			category="org.eclipse.php.ui.views"
-			class="org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.PHPDependSummaryView"
-			icon="icons/obj16/php_depend.gif" />
+			class="org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner.MetricRunnerViewPart"
+			icon="icons/full/obj16/php_depend.gif" />
 	</extension>
 </plugin>

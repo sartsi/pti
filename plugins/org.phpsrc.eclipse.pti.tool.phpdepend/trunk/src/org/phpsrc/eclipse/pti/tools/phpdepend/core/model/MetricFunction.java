@@ -25,25 +25,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
-
-import java.util.Date;
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.model;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.dltk.ui.DLTKPluginImages;
 import org.eclipse.swt.graphics.Image;
-import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 
-public class MetricSummary extends AbstractElement {
+public class MetricFunction extends MetricElement {
 
-	protected Date generated;
+	private final static Image IMAGE = DLTKPluginImages.DESC_METHOD_DEFAULT.createImage();
+	private MetricFile file;
 
-	private final static Image IMAGE = PHPDependPlugin.getDefault().getImageRegistry().get(
-			PHPDependPlugin.IMG_PHP_DEPEND);
-
-	public MetricSummary(IElement parent, String name, MetricResult[] results, Date generated) {
+	public MetricFunction(IMetricElement parent, String name, MetricResult[] results) {
 		super(parent, name, results);
-		this.generated = generated;
+		Assert.isNotNull(parent);
 	}
 
 	public Image getImage() {
@@ -51,14 +48,32 @@ public class MetricSummary extends AbstractElement {
 	}
 
 	public IResource getResource() {
+		MetricFile f = getFile();
+		if (f != null)
+			return f.getResource();
+
 		return null;
 	}
 
 	public IMarker getFileMarker() {
+		MetricFile f = getFile();
+		if (f != null)
+			return f.getFileMarker();
+
 		return null;
 	}
 
-	public Date getGenerated() {
-		return generated;
+	protected MetricFile getFile() {
+		if (file == null) {
+			for (IMetricElement member : getChildren()) {
+				if (member instanceof MetricFile) {
+
+				}
+				file = (MetricFile) member;
+				break;
+			}
+		}
+
+		return file;
 	}
 }

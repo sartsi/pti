@@ -26,26 +26,30 @@
 package org.phpsrc.eclipse.pti.tools.phpdepend.core;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.dltk.compiler.problem.IProblem;
+import org.eclipse.ui.progress.UIJob;
 import org.phpsrc.eclipse.pti.core.launching.OperatingSystem;
 import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileEntry;
 import org.phpsrc.eclipse.pti.core.php.inifile.INIFileUtil;
 import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
-import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.ElementFactory;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricRunSession;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.PHPDependModel;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferences;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferencesFactory;
 import org.phpsrc.eclipse.pti.ui.Logger;
-import org.xml.sax.SAXException;
 
 public class PHPDepend extends AbstractPHPTool {
 
@@ -67,33 +71,40 @@ public class PHPDepend extends AbstractPHPTool {
 		return instance;
 	}
 
-	protected IProblem[] parseOutput(IProject project, PHPToolLauncher launcher, String output) {
+	protected IProblem[] parseOutput(IResource resource, PHPToolLauncher launcher, String output) {
 		ArrayList<IProblem> problems = new ArrayList<IProblem>();
 
 		if (output != null && output.length() > 0) {
 		}
 
-		PHPDependPreferences prefs = PHPDependPreferencesFactory.factory(project);
 		String summaryFile = launcher.getAttribute(ATTR_FILE_SUMMARY_XML);
-
-		try {
-			notifyResultListener(ElementFactory.fromXML(summaryFile, prefs.metrics));
-		} catch (FileNotFoundException e) {
-			Logger.logException(e);
-		} catch (SAXException e) {
-			Logger.logException(e);
-		} catch (IOException e) {
-			Logger.logException(e);
-		}
+		importMetricRunSession(new File(summaryFile), resource);
 
 		return problems.toArray(new IProblem[0]);
 	}
 
-	public IProblem[] validateResource(IResource folder) {
-		String cmdLineArgs = OperatingSystem.escapeShellFileArg(folder.getLocation().toOSString());
+	private void importMetricRunSession(final File summaryFile, final IResource resource) {
+		UIJob job = new UIJob("Update Metric Runner") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				try {
+					MetricRunSession session = PHPDependModel.importMetricRunSession(summaryFile, resource);
+					notifyResultListener(session);
+				} catch (CoreException e) {
+					e.printStackTrace();
+					Logger.logException(e);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
+	}
+
+	public IProblem[] validateResource(IResource resource) {
+		String cmdLineArgs = OperatingSystem.escapeShellFileArg(resource.getLocation().toOSString());
 		try {
-			PHPToolLauncher launcher = getProjectPHPToolLauncher(folder.getProject(), cmdLineArgs, folder.getLocation());
-			return parseOutput(folder.getProject(), launcher, launcher.launch(folder.getProject()));
+			PHPToolLauncher launcher = getProjectPHPToolLauncher(resource.getProject(), cmdLineArgs, resource
+					.getLocation());
+			return parseOutput(resource, launcher, launcher.launch(resource.getProject()));
 		} catch (IOException e) {
 			Logger.logException(e);
 		}

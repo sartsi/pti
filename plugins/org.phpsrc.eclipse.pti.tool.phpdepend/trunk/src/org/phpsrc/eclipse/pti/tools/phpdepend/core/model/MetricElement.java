@@ -25,26 +25,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.model;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.Assert;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.Metric;
 
-public abstract class AbstractElement implements IElement {
-
+public abstract class MetricElement implements IMetricElement {
+	private Status fStatus;
 	protected String name;
-	protected IElement parent;
-	protected ArrayList<IElement> members = new ArrayList<IElement>();
+	protected IMetricElement parent;
+	protected ArrayList<IMetricElement> members = new ArrayList<IMetricElement>();
 	protected Metric[] metrics;
 	protected MetricResult[] results;
 	protected boolean errors = false;
 	protected boolean warnings = false;
 
-	public AbstractElement(IElement parent, String name, MetricResult[] results) {
+	public MetricElement(IMetricElement parent, String name, MetricResult[] results) {
 		this.parent = parent;
-		if (parent != null && parent instanceof AbstractElement)
-			((AbstractElement) parent).addMember(this);
+		if (parent != null && parent instanceof MetricElement)
+			((MetricElement) parent).addChild(this);
 		this.name = name;
 		this.results = results;
 
@@ -57,21 +58,32 @@ public abstract class AbstractElement implements IElement {
 			if (errors)
 				break;
 		}
+
+		fStatus = Status.NOT_RUN;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public IElement getParent() {
+	public IMetricElement getParent() {
 		return parent;
 	}
 
-	public IElement[] members() {
-		return members.toArray(new IElement[0]);
+	public IMetricElement[] getChildren() {
+		return members.toArray(new IMetricElement[0]);
 	}
 
-	protected void addMember(IElement child) {
+	public boolean hasChildren() {
+		return members.size() > 0;
+	}
+
+	protected IMetricElement getFirstChild() {
+		return members.size() > 0 ? members.get(0) : null;
+	}
+
+	protected void addChild(IMetricElement child) {
+		Assert.isNotNull(child);
 		if (!members.contains(child))
 			members.add(child);
 	}
@@ -83,8 +95,8 @@ public abstract class AbstractElement implements IElement {
 	protected void setHasErrors(boolean errors) {
 		this.errors = errors;
 		this.warnings = false;
-		if (parent != null && parent instanceof AbstractElement)
-			((AbstractElement) parent).setHasErrors(errors);
+		if (parent != null && parent instanceof MetricElement)
+			((MetricElement) parent).setHasErrors(errors);
 	}
 
 	public boolean hasErrors() {
@@ -94,12 +106,16 @@ public abstract class AbstractElement implements IElement {
 	protected void setHasWarnings(boolean warnings) {
 		if (!this.errors) {
 			this.warnings = warnings;
-			if (parent != null && parent instanceof AbstractElement)
-				((AbstractElement) parent).setHasWarnings(warnings);
+			if (parent != null && parent instanceof MetricElement)
+				((MetricElement) parent).setHasWarnings(warnings);
 		}
 	}
 
 	public boolean hasWarnings() {
 		return warnings;
+	}
+
+	public Status getStatus() {
+		return fStatus;
 	}
 }

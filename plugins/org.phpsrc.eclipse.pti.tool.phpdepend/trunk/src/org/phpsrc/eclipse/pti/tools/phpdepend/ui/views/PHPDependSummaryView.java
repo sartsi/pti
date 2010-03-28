@@ -74,9 +74,9 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
-import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.IElement;
-import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.MetricResult;
-import org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements.MetricSummary;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.IMetricElement;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricResult;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricRunSession;
 import org.phpsrc.eclipse.pti.ui.Logger;
 import org.phpsrc.eclipse.pti.ui.images.OverlayImageIcon;
 
@@ -87,15 +87,15 @@ public class PHPDependSummaryView extends ViewPart {
 
 	protected Tree tree;
 	protected Table table;
-	protected ArrayList<MetricSummary> summaries = new ArrayList<MetricSummary>();
+	protected ArrayList<MetricRunSession> summaries = new ArrayList<MetricRunSession>();
 	protected int showIndex = -1;
 
-	protected static final class ElementDecorator implements IElement {
+	protected static final class ElementDecorator implements IMetricElement {
 		protected static final ImageRegistry imageRegistry = new ImageRegistry();
 
-		protected final IElement element;
+		protected final IMetricElement element;
 
-		protected ElementDecorator(IElement element) {
+		protected ElementDecorator(IMetricElement element) {
 			this.element = element;
 		}
 
@@ -125,7 +125,7 @@ public class PHPDependSummaryView extends ViewPart {
 			return element.getName();
 		}
 
-		public IElement getParent() {
+		public IMetricElement getParent() {
 			return element.getParent();
 		}
 
@@ -137,8 +137,8 @@ public class PHPDependSummaryView extends ViewPart {
 			return element.getResults();
 		}
 
-		public IElement[] members() {
-			return element.members();
+		public IMetricElement[] getChildren() {
+			return element.getChildren();
 		}
 
 		public boolean hasErrors() {
@@ -151,6 +151,18 @@ public class PHPDependSummaryView extends ViewPart {
 
 		public IMarker getFileMarker() {
 			return element.getFileMarker();
+		}
+
+		@Override
+		public org.phpsrc.eclipse.pti.tools.phpdepend.core.model.IMetricElement.Status getStatus() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public boolean hasChildren() {
+			// TODO Auto-generated method stub
+			return false;
 		}
 	}
 
@@ -190,12 +202,12 @@ public class PHPDependSummaryView extends ViewPart {
 				TreeItem item = (TreeItem) event.item;
 				TreeItem parentItem = item.getParentItem();
 
-				IElement element = null;
+				IMetricElement element = null;
 				if (parentItem == null) {
 					element = summaries.get(showIndex);
 				} else {
-					IElement parentElement = (IElement) parentItem.getData(ELEMENT_DATA_KEY);
-					IElement[] members = parentElement.members();
+					IMetricElement parentElement = (IMetricElement) parentItem.getData(ELEMENT_DATA_KEY);
+					IMetricElement[] members = parentElement.getChildren();
 					element = members[parentItem.indexOf(item)];
 				}
 				ElementDecorator decorator = new ElementDecorator(element);
@@ -210,7 +222,7 @@ public class PHPDependSummaryView extends ViewPart {
 				item.setData(ELEMENT_DATA_KEY, decorator);
 				item.setText(new String[] { decorator.getName(), m.toString() });
 				item.setImage(decorator.getImage());
-				int length = decorator.members().length;
+				int length = decorator.getChildren().length;
 				item.setItemCount(length);
 
 				for (TreeColumn c : tree.getColumns()) {
@@ -232,7 +244,7 @@ public class PHPDependSummaryView extends ViewPart {
 					Tree t = (Tree) e.widget;
 					TreeItem[] items = t.getSelection();
 					if (items.length > 0) {
-						IElement element = (IElement) items[0].getData(ELEMENT_DATA_KEY);
+						IMetricElement element = (IMetricElement) items[0].getData(ELEMENT_DATA_KEY);
 						if (element != null) {
 							IMarker m = element.getFileMarker();
 							if (m != null) {
@@ -259,7 +271,7 @@ public class PHPDependSummaryView extends ViewPart {
 			public void widgetSelected(SelectionEvent e) {
 				TreeItem select = (TreeItem) e.item;
 				table.removeAll();
-				IElement element = (IElement) select.getData(ELEMENT_DATA_KEY);
+				IMetricElement element = (IMetricElement) select.getData(ELEMENT_DATA_KEY);
 				if (element != null) {
 					for (MetricResult result : element.getResults()) {
 						TableItem item = new TableItem(table, SWT.NULL);
@@ -349,7 +361,7 @@ public class PHPDependSummaryView extends ViewPart {
 					m.setEnabled(false);
 				} else {
 					for (int i = length - 1; i >= 0; i--) {
-						MetricSummary s = summaries.get(i);
+						MetricRunSession s = summaries.get(i);
 						MenuItem m = new MenuItem(listMenu, SWT.CHECK);
 						m.setText(s.getGenerated().toString());
 						m.setSelection(i == showIndex);
@@ -405,7 +417,7 @@ public class PHPDependSummaryView extends ViewPart {
 		tree.setFocus();
 	}
 
-	public static void showSummary(final MetricSummary summary) {
+	public static void showSummary(final MetricRunSession summary) {
 		Assert.isNotNull(summary);
 
 		UIJob uijob = new UIJob("Update View") {

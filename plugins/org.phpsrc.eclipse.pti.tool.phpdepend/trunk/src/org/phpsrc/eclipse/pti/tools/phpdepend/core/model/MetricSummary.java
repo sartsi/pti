@@ -25,21 +25,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.model;
+
+import java.util.Date;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.dltk.ui.DLTKPluginImages;
 import org.eclipse.swt.graphics.Image;
+import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 
-public class Package extends AbstractElement {
+public class MetricSummary extends MetricElement {
 
-	private final static Image IMAGE = DLTKPluginImages.DESC_OBJS_PACKAGE.createImage();
+	private final static Image IMAGE = PHPDependPlugin.getDefault().getImageRegistry().get(
+			PHPDependPlugin.IMG_PHP_DEPEND);
 
-	public Package(IElement parent, String name, MetricResult[] results) {
-		super(parent, name, results);
-		Assert.isNotNull(parent);
+	protected Date generated;
+
+	public MetricSummary(MetricRunSession session, String name, MetricResult[] results, Date generated) {
+		super(session, name, results);
+		this.generated = generated;
 	}
 
 	public Image getImage() {
@@ -52,5 +56,9 @@ public class Package extends AbstractElement {
 
 	public IMarker getFileMarker() {
 		return null;
+	}
+
+	public Date getGenerated() {
+		return generated;
 	}
 }

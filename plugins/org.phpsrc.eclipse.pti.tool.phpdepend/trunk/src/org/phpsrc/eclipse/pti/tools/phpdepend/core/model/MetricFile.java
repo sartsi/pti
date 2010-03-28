@@ -25,55 +25,56 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.phpsrc.eclipse.pti.tools.phpdepend.core.metrics.elements;
+package org.phpsrc.eclipse.pti.tools.phpdepend.core.model;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.dltk.ui.DLTKPluginImages;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
-public class Class extends AbstractElement {
+public class MetricFile extends MetricElement {
 
-	private final static Image IMAGE = DLTKPluginImages.DESC_OBJS_CLASS.createImage();
-	private File file;
+	private final static Image IMAGE_PROJECT = PlatformUI.getWorkbench().getSharedImages().getImage(
+			ISharedImages.IMG_OBJ_FILE);
+	private final static Image IMAGE_NON_PROJECT = PlatformUI.getWorkbench().getSharedImages().getImage(
+			ISharedImages.IMG_OBJ_FILE);
 
-	public Class(IElement parent, String name, MetricResult[] results) {
+	protected IFile file;
+
+	public MetricFile(IMetricElement parent, String name, MetricResult[] results) {
 		super(parent, name, results);
 		Assert.isNotNull(parent);
+
+		IFile[] files = ResourcesPlugin.getWorkspace().getRoot()
+				.findFilesForLocationURI(new java.io.File(name).toURI());
+		if (files.length > 0) {
+			file = files[0];
+			this.name = file.getProject().getName() + " - " + file.getProjectRelativePath().toPortableString();
+		}
 	}
 
 	public Image getImage() {
-		return IMAGE;
+		if (file != null)
+			return IMAGE_PROJECT;
+		else
+			return IMAGE_NON_PROJECT;
 	}
 
 	public IResource getResource() {
-		File f = getFile();
-		if (f != null)
-			return f.getResource();
-
-		return null;
+		return file;
 	}
 
 	public IMarker getFileMarker() {
-		File f = getFile();
-		if (f != null)
-			return f.getFileMarker();
-
-		return null;
-	}
-
-	protected File getFile() {
-		if (file == null) {
-			for (IElement member : members()) {
-				if (member instanceof File) {
-
-				}
-				file = (File) member;
-				break;
-			}
+		try {
+			return file.createMarker(IMarker.TEXT);
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
-
-		return file;
+		return null;
 	}
 }
