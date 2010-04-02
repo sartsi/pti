@@ -36,11 +36,13 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.Metric;
+import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class MetricRunSession extends MetricElement {
 
@@ -50,6 +52,8 @@ public class MetricRunSession extends MetricElement {
 	volatile boolean fIsRunning;
 	private final IResource fDependentResource;
 	private final Image fImage;
+	private Date fGenerated;
+	private MetricSummary fSummaryRoot;
 
 	public MetricRunSession() {
 		this(null);
@@ -58,15 +62,18 @@ public class MetricRunSession extends MetricElement {
 	public MetricRunSession(IResource dependentResource) {
 		super(null, "PHP Depend", new MetricResult[0]);
 		fDependentResource = dependentResource;
+		fGenerated = new Date();
 		if (dependentResource != null) {
 			name = dependentResource.getFullPath().toPortableString();
 			if (dependentResource instanceof IProject) {
 				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(
 						org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT);
 			} else if (dependentResource instanceof IFolder) {
-				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
+				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(
+						ISharedImages.IMG_OBJ_FOLDER);
 			} else {
-				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
+				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(
+						ISharedImages.IMG_OBJ_FILE);
 			}
 		} else {
 			fImage = IMAGE;
@@ -87,8 +94,14 @@ public class MetricRunSession extends MetricElement {
 
 	protected void addChild(IMetricElement child) {
 		Assert.isNotNull(child);
-		if (child instanceof MetricSummary && !hasChildren()) {
+		if (child instanceof MetricSummary && fSummaryRoot == null) {
+			MetricSummary summary = (MetricSummary) child;
+
 			super.addChild(child);
+			Date generated = summary.getGenerated();
+			if (generated != null)
+				fGenerated = generated;
+			fSummaryRoot = summary;
 		}
 	}
 
@@ -101,44 +114,45 @@ public class MetricRunSession extends MetricElement {
 	}
 
 	public MetricSummary getSummaryRoot() {
-		return (MetricSummary) getFirstChild();
+		swapIn();
+		return fSummaryRoot;
 	}
 
 	public Date getGenerated() {
-		MetricSummary summary = getSummaryRoot();
-		if (summary != null)
-			return summary.getGenerated();
-		else
-			return null;
+		return fGenerated;
 	}
 
 	public void swapIn() {
-		if (getSummaryRoot() != null)
+		if (fSummaryRoot != null)
 			return;
 
-		// try {
-		// PHPDependModel.importIntoTestRunSession(getSwapFile(), this);
-		// } catch (IllegalStateException e) {
-		// Logger.logException(e);
-		// } catch (CoreException e) {
-		// Logger.logException(e);
-		// }
+		try {
+			PHPDependModel.importIntoMetricRunSession(getSwapFile(), this);
+			fSummaryRoot = (MetricSummary) getFirstChild();
+		} catch (IllegalStateException e) {
+			Logger.logException(e);
+		} catch (CoreException e) {
+			Logger.logException(e);
+		}
+
+		if (fSummaryRoot == null)
+			fSummaryRoot = new MetricSummary(this, "", new MetricResult[0], null, null);
 	}
 
 	public void swapOut() {
-		// if (getSummaryRoot() == null)
-		// return;
-		//
-		// try {
-		// File swapFile = getSwapFile();
-		//
-		// PHPDependModel.exportMetricRunSession(this, swapFile);
-		// reset();
-		// } catch (IllegalStateException e) {
-		// Logger.logException(e);
-		// } catch (CoreException e) {
-		// Logger.logException(e);
-		// }
+		if (fSummaryRoot == null)
+			return;
+
+		try {
+			File swapFile = getSwapFile();
+
+			PHPDependModel.exportMetricRunSession(this, swapFile);
+			reset();
+		} catch (IllegalStateException e) {
+			Logger.logException(e);
+		} catch (CoreException e) {
+			Logger.logException(e);
+		}
 	}
 
 	public void removeSwapFile() {
@@ -160,5 +174,6 @@ public class MetricRunSession extends MetricElement {
 		results = new MetricResult[0];
 		warnings = false;
 		errors = false;
+		fSummaryRoot = null;
 	}
 }
