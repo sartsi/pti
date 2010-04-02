@@ -497,7 +497,7 @@ public class MetricRunnerViewPart extends ViewPart {
 
 	private class FailuresOnlyFilterAction extends Action {
 		public FailuresOnlyFilterAction() {
-			super(PHPDependMessages.TestRunnerViewPart_show_failures_only, AS_CHECK_BOX);
+			super("Show Elements in Hierachy", AS_CHECK_BOX);
 			setToolTipText(PHPDependMessages.TestRunnerViewPart_show_failures_only);
 			setImageDescriptor(PHPDependPlugin.getImageDescriptor("obj16/failures.gif")); //$NON-NLS-1$
 		}
@@ -828,7 +828,7 @@ public class MetricRunnerViewPart extends ViewPart {
 		ViewForm bottom = new ViewForm(fSashForm, SWT.NONE);
 
 		CLabel label = new CLabel(bottom, SWT.NONE);
-		label.setText(PHPDependMessages.TestRunnerViewPart_label_failure);
+		label.setText("Metrics");
 		label.setImage(fStackViewIcon);
 		bottom.setTopLeft(label);
 		ToolBar failureToolBar = new ToolBar(bottom, SWT.FLAT | SWT.WRAP);

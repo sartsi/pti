@@ -19,11 +19,11 @@ class ShowPreviousFailureAction extends Action {
 	private MetricRunnerViewPart fPart;
 
 	public ShowPreviousFailureAction(MetricRunnerViewPart part) {
-		super(PHPDependMessages.ShowPreviousFailureAction_label);
+		super("Previous Failure");
 		setDisabledImageDescriptor(PHPDependPlugin.getImageDescriptor("dlcl16/select_prev.gif")); //$NON-NLS-1$
 		setHoverImageDescriptor(PHPDependPlugin.getImageDescriptor("elcl16/select_prev.gif")); //$NON-NLS-1$
 		setImageDescriptor(PHPDependPlugin.getImageDescriptor("elcl16/select_prev.gif")); //$NON-NLS-1$
-		setToolTipText(PHPDependMessages.ShowPreviousFailureAction_tooltip);
+		setToolTipText("Previous Failure");
 		fPart = part;
 	}
 

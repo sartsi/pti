@@ -455,10 +455,10 @@ public class MetricViewer {
 		}
 	}
 
-	private void updateElementInTable(MetricElement element) {
+	private void updateElementInTable(IMetricElement element) {
 		if (isShown(element)) {
 			if (fTableViewer.testFindItem(element) == null) {
-				MetricElement previous = getNextFailure(element, false);
+				IMetricElement previous = getNextFailure(element, false);
 				int insertionIndex = -1;
 				if (previous != null) {
 					TableItem item = (TableItem) fTableViewer.testFindItem(previous);
@@ -534,22 +534,48 @@ public class MetricViewer {
 		IMetricElement selected = (MetricElement) selection.getFirstElement();
 		IMetricElement next;
 
-		if (selected == null) {
-			next = getNextChildFailure(fMetricRunSession.getSummaryRoot(), showNext);
-		} else {
-			next = getNextFailure(selected, showNext);
-		}
-
+		if (selected == null)
+			selected = fMetricRunSession.getSummaryRoot();
+		
+		next = getNextFailure(selected, showNext);
 		if (next != null)
 			getActiveViewer().setSelection(new StructuredSelection(next), true);
 	}
 
-	private MetricElement getNextFailure(IMetricElement selected, boolean showNext) {
-		return getNextChildFailure(selected, showNext);
+	private IMetricElement getNextFailure(IMetricElement selected, boolean showNext) {
+		IMetricElement nextChild = getNextChildFailure(selected, showNext);
+		if (nextChild != null)
+			return nextChild;
+		
+		return getNextFailureSibling(selected, showNext);
+	}
+	
+	private IMetricElement getNextFailureSibling(IMetricElement current, boolean showNext) {
+		IMetricElement parent = current.getParent();
+		if (parent == null)
+			return null;
+
+		List<IMetricElement> siblings = Arrays.asList(parent.getChildren());
+		if (!showNext)
+			siblings = new ReverseList(siblings);
+
+		int nextIndex = siblings.indexOf(current) + 1;
+		for (int i = nextIndex; i < siblings.size(); i++) {
+			IMetricElement sibling = siblings.get(i);
+			if (sibling.hasErrors() || sibling.hasWarnings()) {
+				if (sibling.getStatus().isErrorOrWarning()) {
+					return sibling;
+				} else {
+					return getNextChildFailure(sibling, showNext);
+				}
+			}
+		}
+		
+		return getNextFailureSibling(parent, showNext);
 	}
 
-	private MetricElement getNextChildFailure(IMetricElement root, boolean showNext) {
-		List children = Arrays.asList(root.getChildren());
+	private IMetricElement getNextChildFailure(IMetricElement root, boolean showNext) {
+		List<IMetricElement> children = Arrays.asList(root.getChildren());
 		if (!showNext)
 			children = new ReverseList(children);
 		for (int i = 0; i < children.size(); i++) {
@@ -562,7 +588,7 @@ public class MetricViewer {
 				}
 			}
 		}
-
+		
 		return null;
 	}
 

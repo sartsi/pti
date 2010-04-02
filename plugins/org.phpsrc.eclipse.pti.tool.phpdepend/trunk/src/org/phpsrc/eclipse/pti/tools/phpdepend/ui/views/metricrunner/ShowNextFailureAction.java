@@ -18,11 +18,11 @@ class ShowNextFailureAction extends Action {
 	private MetricRunnerViewPart fPart;
 
 	public ShowNextFailureAction(MetricRunnerViewPart part) {
-		super(PHPDependMessages.ShowNextFailureAction_label);
+		super("Next Failure");
 		setDisabledImageDescriptor(PHPDependPlugin.getImageDescriptor("dlcl16/select_next.gif")); //$NON-NLS-1$
 		setHoverImageDescriptor(PHPDependPlugin.getImageDescriptor("elcl16/select_next.gif")); //$NON-NLS-1$
 		setImageDescriptor(PHPDependPlugin.getImageDescriptor("elcl16/select_next.gif")); //$NON-NLS-1$
-		setToolTipText(PHPDependMessages.ShowNextFailureAction_tooltip);
+		setToolTipText("Next Failure");
 		fPart = part;
 	}
 
