@@ -10,9 +10,9 @@
       </category>
       <command
             categoryId="Plugin_org.phpsrc.eclipse.pti.tools.phpmd.command.category"
-            description="Runs the PHPMD"
+            description="Run PHP Mess Detector"
             id="Plugin_org.phpsrc.eclipse.pti.tools.phpmd.commands.runMessDetector"
-            name="Run PHPMD">
+            name="Run PHP Mess Detector">
       </command>
    </extension>
    <extension
