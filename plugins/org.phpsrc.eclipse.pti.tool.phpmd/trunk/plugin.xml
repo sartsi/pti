@@ -5,13 +5,13 @@
          point="org.eclipse.ui.commands">
       <category
             description="Commands related to the PHPMD"
-            id="Plugin_org.phpsrc.eclipse.pti.tools.phpmd.command.category"
+            id="org.phpsrc.eclipse.pti.tools.phpmd.command.category"
             name="PHPMD">
       </category>
       <command
-            categoryId="Plugin_org.phpsrc.eclipse.pti.tools.phpmd.command.category"
+            categoryId="org.phpsrc.eclipse.pti.tools.phpmd.command.category"
             description="Run PHP Mess Detector"
-            id="Plugin_org.phpsrc.eclipse.pti.tools.phpmd.commands.runMessDetector"
+            id="org.phpsrc.eclipse.pti.tools.phpmd.commands.runMessDetector"
             name="Run PHP Mess Detector">
       </command>
    </extension>
@@ -20,7 +20,7 @@
       <menuContribution
             locationURI="popup:org.phpsrc.eclipse.pti.ui.menus.phptools?after=additions">
          <command
-               commandId="Plugin_org.phpsrc.eclipse.pti.tools.phpmd.commands.runMessDetector"
+               commandId="org.phpsrc.eclipse.pti.tools.phpmd.commands.runMessDetector"
                style="push"
                tooltip="Run PHP Mess Detector on selected files or folders">
             <visibleWhen>
@@ -35,6 +35,28 @@
             </visibleWhen>
          </command>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.phpsrc.eclipse.pti.tools.phpmd.handlers.PhpmdHandler"
+            commandId="org.phpsrc.eclipse.pti.tools.phpmd.commands.runMessDetector">
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     ifEmpty="false"
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.jface.text.ITextSelection">
+                  </instanceof>
+                  <instanceof
+                        value="org.eclipse.jface.viewers.IStructuredSelection">
+                  </instanceof>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
    </extension>
 
 </plugin>
