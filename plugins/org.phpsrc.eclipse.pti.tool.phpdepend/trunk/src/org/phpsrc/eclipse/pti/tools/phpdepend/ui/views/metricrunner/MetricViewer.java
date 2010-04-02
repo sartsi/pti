@@ -76,11 +76,7 @@ public class MetricViewer {
 		}
 
 		public boolean select(IMetricElement metricElement) {
-			Status status = metricElement.getStatus();
-			if (status.isErrorOrWarning())
-				return true;
-			else
-				return !fMetricRunSession.isRunning() && status == Status.RUNNING; // rerunning
+			return metricElement.hasWarnings() || metricElement.hasErrors();
 		}
 	}
 
