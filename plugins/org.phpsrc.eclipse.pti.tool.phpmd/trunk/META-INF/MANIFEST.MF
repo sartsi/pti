@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PHP Tool PHPUnit
+Bundle-SymbolicName: Plugin_org.phpsrc.eclipse.pti.tools.phpmd
+Bundle-Version: 0.1.0.i20100402000000
+Bundle-Activator: plugin_org.phpsrc.eclipse.pti.tools.phpmd.Activator
+Bundle-Vendor: Dejan Spasic
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
