@@ -48,10 +48,9 @@ public class MetricClass extends MetricElement {
 		if (file == null) {
 			for (IMetricElement member : getChildren()) {
 				if (member instanceof MetricFile) {
-
+					file = (MetricFile) member;
+					break;
 				}
-				file = (MetricFile) member;
-				break;
 			}
 		}
 

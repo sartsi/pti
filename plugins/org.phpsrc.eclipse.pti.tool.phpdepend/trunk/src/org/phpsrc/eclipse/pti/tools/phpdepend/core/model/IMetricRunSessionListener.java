@@ -10,8 +10,8 @@ package org.phpsrc.eclipse.pti.tools.phpdepend.core.model;
 
 public interface IMetricRunSessionListener {
 
-	void sessionAdded(MetricRunSession testRunSession);
+	void sessionAdded(MetricRunSession metricRunSession);
 
-	void sessionRemoved(MetricRunSession testRunSession);
+	void sessionRemoved(MetricRunSession metricRunSession);
 
 }

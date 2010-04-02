@@ -16,5 +16,5 @@ public interface IPHPDependConstants {
 	public static final String PROJECT_PAGE_ID = PLUGIN_ID + ".properties.PHPToolsPreferencePage"; //$NON-NLS-1$
 
 	public static final String VALIDATOR_PHP_DEPEND_MARKER = PLUGIN_ID
-			+ ".validator.phpToolPHPDependMarke"; //$NON-NLS-1$
+			+ ".validator.phpToolPHPDependMarker"; //$NON-NLS-1$
 }

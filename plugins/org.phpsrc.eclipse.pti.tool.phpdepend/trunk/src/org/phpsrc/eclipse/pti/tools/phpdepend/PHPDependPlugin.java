@@ -29,6 +29,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
 import org.phpsrc.eclipse.pti.library.pear.PHPLibraryPEARPlugin;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.listener.PHPDependProblemMarkerListener;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.PHPDependModel;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferences;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.PHPDependPreferencesFactory;
@@ -56,6 +57,7 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	private static PHPDependPlugin plugin;
 
 	private final PHPDependModel fPHPDependModel = new PHPDependModel();
+	private final PHPDependProblemMarkerListener fProblemListener = new PHPDependProblemMarkerListener();
 
 	private static boolean fIsStopped = false;
 
@@ -78,6 +80,7 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 		plugin = this;
 		fIsStopped = false;
 		fPHPDependModel.start();
+		fPHPDependModel.addMetricRunSessionListener(fProblemListener);
 	}
 
 	protected void initializeImageRegistry(ImageRegistry registry) {
@@ -105,6 +108,7 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 		fIsStopped = true;
 		plugin = null;
 		try {
+			fPHPDependModel.removeMetricRunSessionListener(fProblemListener);
 			fPHPDependModel.stop();
 		} finally {
 			super.stop(context);
