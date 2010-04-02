@@ -1,4 +1,4 @@
-package plugin_org.phpsrc.eclipse.pti.tools.phpmd;
+package org.phpsrc.eclipse.pti.tools.phpmd;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
