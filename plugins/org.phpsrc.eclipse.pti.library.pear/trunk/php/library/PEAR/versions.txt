@@ -47,6 +47,10 @@ VersionControl_SVN  0.3.3     alpha
 XML_Beautifier      1.2.0     stable
 XML_Parser          1.3.2     stable
 XML_Util            1.2.1     stable
+INSTALLED PACKAGES, CHANNEL PEAR.PHPMD.ORG:
+===========================================
+PACKAGE VERSION STATE
+PHP_PMD 0.2.4   alpha
 INSTALLED PACKAGES, CHANNEL PEAR.PHPUNIT.DE:
 ============================================
 (no packages installed)
