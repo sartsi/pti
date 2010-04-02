@@ -1,14 +1,9 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2010 Sven Kiera
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Brock Janiczak (brockj@tpg.com.au)
- *         - https://bugs.eclipse.org/bugs/show_bug.cgi?id=102236: [JUnit] display execution time next to each test
  *******************************************************************************/
 
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner;
@@ -72,11 +67,13 @@ public class MetricSessionLabelProvider extends LabelProvider implements IStyled
 			Image img = imageRegistry.get(key);
 			if (img == null) {
 				if (element.hasErrors())
-					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault().getImageRegistry()
-							.get(PHPToolCorePlugin.IMG_OVERLAY_ERROR), OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
+					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault()
+							.getImageRegistry().get(PHPToolCorePlugin.IMG_OVERLAY_ERROR),
+							OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
 				else if (element.hasWarnings())
-					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault().getImageRegistry()
-							.get(PHPToolCorePlugin.IMG_OVERLAY_WARNING), OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
+					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault()
+							.getImageRegistry().get(PHPToolCorePlugin.IMG_OVERLAY_WARNING),
+							OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
 				else
 					img = element.getImage();
 				imageRegistry.put(key, img);

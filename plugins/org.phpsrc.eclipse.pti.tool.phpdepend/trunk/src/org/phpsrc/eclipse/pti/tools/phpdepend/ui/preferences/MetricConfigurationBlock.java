@@ -1,29 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2010, Sven Kiera
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * - Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- * - Neither the name of the Organisation nor the names of its contributors may
- *   be used to endorse or promote products derived from this software without
- *   specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2010 Sven Kiera
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
+
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.preferences;
 
 import java.util.ArrayList;
@@ -74,12 +56,13 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 
 	private final CheckedListDialogField fMetricList;
 
-	private class MetricLabelProvider extends LabelProvider implements ITableLabelProvider, IFontProvider {
+	private class MetricLabelProvider extends LabelProvider implements ITableLabelProvider,
+			IFontProvider {
 
 		private final Image IMAGE_FILE = PHPDependPlugin.getDefault().getImageRegistry().get(
 				PHPDependPlugin.IMG_METRIC_TYPE_FILE);
-		private final Image IMAGE_FILE_WITH_HIERACHY = PHPDependPlugin.getDefault().getImageRegistry().get(
-				PHPDependPlugin.IMG_METRIC_TYPE_FILE_HIERACHY);
+		private final Image IMAGE_FILE_WITH_HIERACHY = PHPDependPlugin.getDefault()
+				.getImageRegistry().get(PHPDependPlugin.IMG_METRIC_TYPE_FILE_HIERACHY);
 		private final Image IMAGE_PACKAGE = PHPDependPlugin.getDefault().getImageRegistry().get(
 				PHPDependPlugin.IMG_METRIC_TYPE_PACKAGE);
 
@@ -235,8 +218,9 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 	}
 
 	private static Key[] getKeys() {
-		return new Key[] { PREF_METRICS_IDS, PREF_METRICS_ENABLED, PREF_METRICS_NAMES, PREF_METRICS_WARNING_MIN,
-				PREF_METRICS_WARNING_MAX, PREF_METRICS_ERROR_MIN, PREF_METRICS_ERROR_MAX, PREF_METRICS_TYPES };
+		return new Key[] { PREF_METRICS_IDS, PREF_METRICS_ENABLED, PREF_METRICS_NAMES,
+				PREF_METRICS_WARNING_MIN, PREF_METRICS_WARNING_MAX, PREF_METRICS_ERROR_MIN,
+				PREF_METRICS_ERROR_MAX, PREF_METRICS_TYPES };
 	}
 
 	protected Control createContents(Composite parent) {
@@ -256,7 +240,8 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 		listControl.setLayoutData(listData);
 
 		Control buttonsControl = fMetricList.getButtonBox(group);
-		buttonsControl.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_BEGINNING));
+		buttonsControl.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL
+				| GridData.VERTICAL_ALIGN_BEGINNING));
 
 		GridLayout tabWidthLayout = new GridLayout();
 		tabWidthLayout.marginHeight = 5;
@@ -282,7 +267,8 @@ public class MetricConfigurationBlock extends OptionsConfigurationBlock {
 			edited = (Metric) fMetricList.getSelectedElements().get(0);
 		}
 		if (index == IDX_ADD || index == IDX_EDIT) {
-			MetricInputDialog dialog = new MetricInputDialog(getShell(), edited, fMetricList.getElements());
+			MetricInputDialog dialog = new MetricInputDialog(getShell(), edited, fMetricList
+					.getElements());
 			if (dialog.open() == Window.OK) {
 				if (edited != null) {
 					fMetricList.replaceElement(edited, dialog.getResult());

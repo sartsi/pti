@@ -1,13 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2010 Sven Kiera
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
+
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner;
 
 import org.eclipse.core.resources.IFile;
@@ -59,7 +57,8 @@ public abstract class OpenEditorAction extends Action {
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (window != null) {
 			IWorkbenchPage page = window.getActivePage();
-			IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(fFile.getName());
+			IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry()
+					.getDefaultEditor(fFile.getName());
 
 			try {
 				IEditorPart editor = page.openEditor(new FileEditorInput(fFile), desc.getId());

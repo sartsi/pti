@@ -1,28 +1,9 @@
 /*******************************************************************************
- * Copyright (c) 2010, Sven Kiera
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * - Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- * - Neither the name of the Organisation nor the names of its contributors may
- *   be used to endorse or promote products derived from this software without
- *   specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2010 Sven Kiera
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.views;
@@ -108,11 +89,13 @@ public class PHPDependSummaryView extends ViewPart {
 			Image img = imageRegistry.get(key);
 			if (img == null) {
 				if (element.hasErrors())
-					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault().getImageRegistry()
-							.get(PHPToolCorePlugin.IMG_OVERLAY_ERROR), OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
+					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault()
+							.getImageRegistry().get(PHPToolCorePlugin.IMG_OVERLAY_ERROR),
+							OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
 				else if (element.hasWarnings())
-					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault().getImageRegistry()
-							.get(PHPToolCorePlugin.IMG_OVERLAY_WARNING), OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
+					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault()
+							.getImageRegistry().get(PHPToolCorePlugin.IMG_OVERLAY_WARNING),
+							OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
 				else
 					img = element.getImage();
 				imageRegistry.put(key, img);
@@ -206,7 +189,8 @@ public class PHPDependSummaryView extends ViewPart {
 				if (parentItem == null) {
 					element = summaries.get(showIndex);
 				} else {
-					IMetricElement parentElement = (IMetricElement) parentItem.getData(ELEMENT_DATA_KEY);
+					IMetricElement parentElement = (IMetricElement) parentItem
+							.getData(ELEMENT_DATA_KEY);
 					IMetricElement[] members = parentElement.getChildren();
 					element = members[parentItem.indexOf(item)];
 				}
@@ -244,13 +228,14 @@ public class PHPDependSummaryView extends ViewPart {
 					Tree t = (Tree) e.widget;
 					TreeItem[] items = t.getSelection();
 					if (items.length > 0) {
-						IMetricElement element = (IMetricElement) items[0].getData(ELEMENT_DATA_KEY);
+						IMetricElement element = (IMetricElement) items[0]
+								.getData(ELEMENT_DATA_KEY);
 						if (element != null) {
 							IMarker m = element.getFileMarker();
 							if (m != null) {
 								try {
-									IDE.openEditor(
-											PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), m);
+									IDE.openEditor(PlatformUI.getWorkbench()
+											.getActiveWorkbenchWindow().getActivePage(), m);
 								} catch (PartInitException e1) {
 									Logger.logException(e1);
 								}
@@ -332,7 +317,8 @@ public class PHPDependSummaryView extends ViewPart {
 					ToolItem ti = (ToolItem) e.widget;
 					Menu m = mc.getMenu(ti.getParent());
 					if (m != null) {
-						Point point = ti.getParent().toDisplay(new Point(e.x, e.y + ti.getBounds().height));
+						Point point = ti.getParent().toDisplay(
+								new Point(e.x, e.y + ti.getBounds().height));
 						m.setLocation(point.x, point.y);
 						m.setVisible(true);
 					}

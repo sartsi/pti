@@ -1,18 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2010 Sven Kiera
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Julien Ruaux: jruaux@octo.com see bug 25324 Ability to know when tests are finished [junit]
- *     Vincent Massol: vmassol@octo.com 25324 Ability to know when tests are finished [junit]
- *     Sebastian Davids: sdavids@gmx.de 35762 JUnit View wasting a lot of screen space [JUnit]
- *     Brock Janiczak (brockj@tpg.com.au)
- *         - https://bugs.eclipse.org/bugs/show_bug.cgi?id=102236: [JUnit] display execution time next to each test
  *******************************************************************************/
+
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner;
 
 import java.io.File;
@@ -227,10 +220,8 @@ public class MetricRunnerViewPart extends ViewPart {
 		}
 
 		public void configureHistoryDropDownAction(IAction action) {
-			action
-					.setToolTipText(PHPDependMessages.TestRunnerViewPart_test_run_history);
-			PHPDependPlugin
-					.setLocalImageDescriptors(action, "history_list.gif"); //$NON-NLS-1$
+			action.setToolTipText(PHPDependMessages.TestRunnerViewPart_test_run_history);
+			PHPDependPlugin.setLocalImageDescriptors(action, "history_list.gif"); //$NON-NLS-1$
 		}
 
 		public Action getClearAction() {
@@ -266,12 +257,10 @@ public class MetricRunnerViewPart extends ViewPart {
 		public void setHistoryEntries(List remainingEntries, Object activeEntry) {
 			setActiveMetricRunSession((MetricRunSession) activeEntry);
 
-			List metricRunSessions = PHPDependPlugin.getModel()
-					.getMetricRunSessions();
+			List metricRunSessions = PHPDependPlugin.getModel().getMetricRunSessions();
 			metricRunSessions.removeAll(remainingEntries);
 			for (Iterator iter = metricRunSessions.iterator(); iter.hasNext();) {
-				PHPDependPlugin.getModel().removeMetricRunSession(
-						(MetricRunSession) iter.next());
+				PHPDependPlugin.getModel().removeMetricRunSession((MetricRunSession) iter.next());
 			}
 			for (Iterator iter = remainingEntries.iterator(); iter.hasNext();) {
 				MetricRunSession remaining = (MetricRunSession) iter.next();
@@ -286,13 +275,10 @@ public class MetricRunnerViewPart extends ViewPart {
 
 		public String getText(Object element) {
 			MetricRunSession session = (MetricRunSession) element;
-			String testRunLabel = BasicElementLabels.getPHPElementName(session
-					.getName());
+			String testRunLabel = BasicElementLabels.getPHPElementName(session.getName());
 
-			String startTime = DateFormat.getDateTimeInstance().format(
-					session.getGenerated());
-			return Messages.format(
-					PHPDependMessages.TestRunnerViewPart_testName_startTime,
+			String startTime = DateFormat.getDateTimeInstance().format(session.getGenerated());
+			return Messages.format(PHPDependMessages.TestRunnerViewPart_testName_startTime,
 					new Object[] { testRunLabel, startTime });
 
 		}
@@ -302,8 +288,7 @@ public class MetricRunnerViewPart extends ViewPart {
 					new ImportMetricRunSessionAction(fParent.getShell()));
 			if (fMetricRunSession != null)
 				manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS,
-						new ExportMetricRunSessionAction(fParent.getShell(),
-								fMetricRunSession));
+						new ExportMetricRunSessionAction(fParent.getShell(), fMetricRunSession));
 		}
 
 		public String getMaxEntriesMessage() {
@@ -311,16 +296,13 @@ public class MetricRunnerViewPart extends ViewPart {
 		}
 
 		public int getMaxEntries() {
-			IPreferenceStore store = PHPDependPlugin.getDefault()
-					.getPreferenceStore();
+			IPreferenceStore store = PHPDependPlugin.getDefault().getPreferenceStore();
 			return store.getInt(PHPDependPreferencesConstants.MAX_TEST_RUNS);
 		}
 
 		public void setMaxEntries(int maxEntries) {
-			IPreferenceStore store = PHPDependPlugin.getDefault()
-					.getPreferenceStore();
-			store.setValue(PHPDependPreferencesConstants.MAX_TEST_RUNS,
-					maxEntries);
+			IPreferenceStore store = PHPDependPlugin.getDefault().getPreferenceStore();
+			store.setValue(PHPDependPreferencesConstants.MAX_TEST_RUNS, maxEntries);
 		}
 	}
 
@@ -328,8 +310,7 @@ public class MetricRunnerViewPart extends ViewPart {
 		private final Shell fShell;
 
 		public ImportMetricRunSessionAction(Shell shell) {
-			super(
-					PHPDependMessages.TestRunnerViewPart_ImportTestRunSessionAction_name);
+			super(PHPDependMessages.TestRunnerViewPart_ImportTestRunSessionAction_name);
 			fShell = shell;
 		}
 
@@ -337,8 +318,7 @@ public class MetricRunnerViewPart extends ViewPart {
 			FileDialog importDialog = new FileDialog(fShell, SWT.OPEN);
 			importDialog
 					.setText(PHPDependMessages.TestRunnerViewPart_ImportTestRunSessionAction_title);
-			IDialogSettings dialogSettings = PHPDependPlugin.getDefault()
-					.getDialogSettings();
+			IDialogSettings dialogSettings = PHPDependPlugin.getDefault().getDialogSettings();
 			String lastPath = dialogSettings.get(PREF_LAST_PATH);
 			if (lastPath != null) {
 				importDialog.setFilterPath(lastPath);
@@ -369,10 +349,8 @@ public class MetricRunnerViewPart extends ViewPart {
 		private final MetricRunSession fMetricRunSession;
 		private final Shell fShell;
 
-		public ExportMetricRunSessionAction(Shell shell,
-				MetricRunSession metricRunSession) {
-			super(
-					PHPDependMessages.TestRunnerViewPart_ExportTestRunSessionAction_name);
+		public ExportMetricRunSessionAction(Shell shell, MetricRunSession metricRunSession) {
+			super(PHPDependMessages.TestRunnerViewPart_ExportTestRunSessionAction_name);
 			fShell = shell;
 			fMetricRunSession = metricRunSession;
 		}
@@ -381,8 +359,7 @@ public class MetricRunnerViewPart extends ViewPart {
 			FileDialog exportDialog = new FileDialog(fShell, SWT.SAVE);
 			exportDialog
 					.setText(PHPDependMessages.TestRunnerViewPart_ExportTestRunSessionAction_title);
-			IDialogSettings dialogSettings = PHPDependPlugin.getDefault()
-					.getDialogSettings();
+			IDialogSettings dialogSettings = PHPDependPlugin.getDefault().getDialogSettings();
 			String lastPath = dialogSettings.get(PREF_LAST_PATH);
 			if (lastPath != null) {
 				exportDialog.setFilterPath(lastPath);
@@ -425,12 +402,11 @@ public class MetricRunnerViewPart extends ViewPart {
 
 		public void sessionRemoved(MetricRunSession metricRunSession) {
 			if (metricRunSession.equals(fMetricRunSession)) {
-				List<MetricRunSession> metricRunSessions = PHPDependPlugin
-						.getModel().getMetricRunSessions();
+				List<MetricRunSession> metricRunSessions = PHPDependPlugin.getModel()
+						.getMetricRunSessions();
 				MetricRunSession deactivatedSession;
 				if (!metricRunSessions.isEmpty()) {
-					deactivatedSession = setActiveMetricRunSession(metricRunSessions
-							.get(0));
+					deactivatedSession = setActiveMetricRunSession(metricRunSessions.get(0));
 				} else {
 					deactivatedSession = setActiveMetricRunSession(null);
 				}
@@ -469,16 +445,13 @@ public class MetricRunnerViewPart extends ViewPart {
 		public ClearAction() {
 			setText(PHPDependMessages.TestRunnerViewPart_clear_history_label);
 
-			List metricRunSessions = PHPDependPlugin.getModel()
-					.getMetricRunSessions();
+			List metricRunSessions = PHPDependPlugin.getModel().getMetricRunSessions();
 			setEnabled(metricRunSessions.size() > 0);
 		}
 
 		public void run() {
-			List metricRunSessions = PHPDependPlugin.getModel()
-					.getMetricRunSessions();
-			Object first = metricRunSessions.isEmpty() ? null
-					: metricRunSessions.get(0);
+			List metricRunSessions = PHPDependPlugin.getModel().getMetricRunSessions();
+			Object first = metricRunSessions.isEmpty() ? null : metricRunSessions.get(0);
 			fViewHistory.setHistoryEntries(metricRunSessions, first);
 		}
 	}
@@ -490,24 +463,17 @@ public class MetricRunnerViewPart extends ViewPart {
 			super("", AS_RADIO_BUTTON); //$NON-NLS-1$
 			if (orientation == MetricRunnerViewPart.VIEW_ORIENTATION_HORIZONTAL) {
 				setText(PHPDependMessages.TestRunnerViewPart_toggle_horizontal_label);
-				setImageDescriptor(PHPDependPlugin
-						.getImageDescriptor("elcl16/th_horizontal.gif")); //$NON-NLS-1$
+				setImageDescriptor(PHPDependPlugin.getImageDescriptor("elcl16/th_horizontal.gif")); //$NON-NLS-1$
 			} else if (orientation == MetricRunnerViewPart.VIEW_ORIENTATION_VERTICAL) {
 				setText(PHPDependMessages.TestRunnerViewPart_toggle_vertical_label);
-				setImageDescriptor(PHPDependPlugin
-						.getImageDescriptor("elcl16/th_vertical.gif")); //$NON-NLS-1$
+				setImageDescriptor(PHPDependPlugin.getImageDescriptor("elcl16/th_vertical.gif")); //$NON-NLS-1$
 			} else if (orientation == MetricRunnerViewPart.VIEW_ORIENTATION_AUTOMATIC) {
 				setText(PHPDependMessages.TestRunnerViewPart_toggle_automatic_label);
-				setImageDescriptor(PHPDependPlugin
-						.getImageDescriptor("elcl16/th_automatic.gif")); //$NON-NLS-1$
+				setImageDescriptor(PHPDependPlugin.getImageDescriptor("elcl16/th_automatic.gif")); //$NON-NLS-1$
 			}
 			fActionOrientation = orientation;
-			PlatformUI
-					.getWorkbench()
-					.getHelpSystem()
-					.setHelp(
-							this,
-							IPHPDependHelpContextIds.RESULTS_VIEW_TOGGLE_ORIENTATION_ACTION);
+			PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
+					IPHPDependHelpContextIds.RESULTS_VIEW_TOGGLE_ORIENTATION_ACTION);
 		}
 
 		public int getOrientation() {
@@ -535,8 +501,7 @@ public class MetricRunnerViewPart extends ViewPart {
 		public FailuresOnlyFilterAction() {
 			super("Show Elements in Hierachy", AS_CHECK_BOX);
 			setToolTipText(PHPDependMessages.TestRunnerViewPart_show_failures_only);
-			setImageDescriptor(PHPDependPlugin
-					.getImageDescriptor("obj16/failures.gif")); //$NON-NLS-1$
+			setImageDescriptor(PHPDependPlugin.getImageDescriptor("obj16/failures.gif")); //$NON-NLS-1$
 		}
 
 		public void run() {
@@ -547,10 +512,8 @@ public class MetricRunnerViewPart extends ViewPart {
 	private class ShowMetricHierarchyAction extends Action {
 
 		public ShowMetricHierarchyAction() {
-			super(PHPDependMessages.TestRunnerViewPart_hierarchical_layout,
-					IAction.AS_CHECK_BOX);
-			setImageDescriptor(PHPDependPlugin
-					.getImageDescriptor("elcl16/hierarchicalLayout.gif")); //$NON-NLS-1$
+			super(PHPDependMessages.TestRunnerViewPart_hierarchical_layout, IAction.AS_CHECK_BOX);
+			setImageDescriptor(PHPDependPlugin.getImageDescriptor("elcl16/hierarchicalLayout.gif")); //$NON-NLS-1$
 		}
 
 		public void run() {
@@ -561,8 +524,7 @@ public class MetricRunnerViewPart extends ViewPart {
 
 	private class ActivateOnErrorAction extends Action {
 		public ActivateOnErrorAction() {
-			super(
-					PHPDependMessages.TestRunnerViewPart_activate_on_failure_only,
+			super(PHPDependMessages.TestRunnerViewPart_activate_on_failure_only,
 					IAction.AS_CHECK_BOX);
 			//setImageDescriptor(PHPDependPlugin.getImageDescriptor("obj16/failures.gif")); //$NON-NLS-1$
 			update();
@@ -575,10 +537,8 @@ public class MetricRunnerViewPart extends ViewPart {
 		public void run() {
 			boolean checked = isChecked();
 			fShowOnErrorOnly = checked;
-			IPreferenceStore store = PHPDependPlugin.getDefault()
-					.getPreferenceStore();
-			store.setValue(PHPDependPreferencesConstants.SHOW_ON_ERROR_ONLY,
-					checked);
+			IPreferenceStore store = PHPDependPlugin.getDefault().getPreferenceStore();
+			store.setValue(PHPDependPreferencesConstants.SHOW_ON_ERROR_ONLY, checked);
 		}
 	}
 
@@ -610,13 +570,11 @@ public class MetricRunnerViewPart extends ViewPart {
 		fMemento = memento;
 		IWorkbenchSiteProgressService progressService = getProgressService();
 		if (progressService != null)
-			progressService
-					.showBusyForFamily(MetricRunnerViewPart.FAMILY_JUNIT_RUN);
+			progressService.showBusyForFamily(MetricRunnerViewPart.FAMILY_JUNIT_RUN);
 	}
 
 	private IWorkbenchSiteProgressService getProgressService() {
-		Object siteService = getSite().getAdapter(
-				IWorkbenchSiteProgressService.class);
+		Object siteService = getSite().getAdapter(IWorkbenchSiteProgressService.class);
 		if (siteService != null)
 			return (IWorkbenchSiteProgressService) siteService;
 		return null;
@@ -637,16 +595,15 @@ public class MetricRunnerViewPart extends ViewPart {
 		memento.putInteger(TAG_RATIO, ratio);
 		memento.putInteger(TAG_ORIENTATION, fOrientation);
 
-		memento.putString(TAG_FAILURES_ONLY, fFailuresOnlyFilterAction
-				.isChecked() ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
+		memento.putString(TAG_FAILURES_ONLY,
+				fFailuresOnlyFilterAction.isChecked() ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
 		memento.putInteger(TAG_LAYOUT, fLayout);
 	}
 
 	private void restoreLayoutState(IMemento memento) {
 		Integer ratio = memento.getInteger(TAG_RATIO);
 		if (ratio != null)
-			fSashForm.setWeights(new int[] { ratio.intValue(),
-					1000 - ratio.intValue() });
+			fSashForm.setWeights(new int[] { ratio.intValue(), 1000 - ratio.intValue() });
 		Integer orientation = memento.getInteger(TAG_ORIENTATION);
 		if (orientation != null)
 			fOrientation = orientation.intValue();
@@ -672,8 +629,7 @@ public class MetricRunnerViewPart extends ViewPart {
 			return;
 		}
 
-		fUpdateJob = new UpdateUIJob(
-				PHPDependMessages.TestRunnerViewPart_jobName);
+		fUpdateJob = new UpdateUIJob(PHPDependMessages.TestRunnerViewPart_jobName);
 		fUpdateJob.schedule(REFRESH_INTERVAL);
 	}
 
@@ -689,8 +645,7 @@ public class MetricRunnerViewPart extends ViewPart {
 		if (fMetricRunSession == null)
 			return false;
 		else
-			return fMetricRunSession.hasErrors()
-					|| fMetricRunSession.hasWarnings();
+			return fMetricRunSession.hasErrors() || fMetricRunSession.hasWarnings();
 	}
 
 	private void processChangesInUI() {
@@ -724,8 +679,7 @@ public class MetricRunnerViewPart extends ViewPart {
 	 * @return deactivated session, or <code>null</code> iff no session got
 	 *         deactivated
 	 */
-	private MetricRunSession setActiveMetricRunSession(
-			MetricRunSession metricRunSession) {
+	private MetricRunSession setActiveMetricRunSession(MetricRunSession metricRunSession) {
 		/*
 		 * - State: fMetricRunSession fTestSessionListener Jobs
 		 * fTestViewer.processChangesInUI(); - UI: fCounterPanel fProgressBar
@@ -760,8 +714,7 @@ public class MetricRunnerViewPart extends ViewPart {
 
 			clearStatus();
 			fMetricList.clear();
-			registerInfoMessage(BasicElementLabels
-					.getPHPElementName(fMetricRunSession.getName()));
+			registerInfoMessage(BasicElementLabels.getPHPElementName(fMetricRunSession.getName()));
 
 			if (fMetricRunSession.isRunning()) {
 				startUpdateJobs();
@@ -775,16 +728,14 @@ public class MetricRunnerViewPart extends ViewPart {
 
 	private void setTitleToolTip() {
 
-		String testRunLabel = BasicElementLabels
-				.getPHPElementName(fMetricRunSession.getName());
+		String testRunLabel = BasicElementLabels.getPHPElementName(fMetricRunSession.getName());
 		setTitleToolTip(testRunLabel);
 	}
 
 	public synchronized void dispose() {
 		fIsDisposed = true;
 		if (fMetricRunSessionListener != null)
-			PHPDependPlugin.getModel().removeMetricRunSessionListener(
-					fMetricRunSessionListener);
+			PHPDependPlugin.getModel().removeMetricRunSessionListener(fMetricRunSessionListener);
 
 		setActiveMetricRunSession(null);
 
@@ -794,8 +745,7 @@ public class MetricRunnerViewPart extends ViewPart {
 		if (fClipboard != null)
 			fClipboard.dispose();
 		if (fViewMenuListener != null) {
-			getViewSite().getActionBars().getMenuManager().removeMenuListener(
-					fViewMenuListener);
+			getViewSite().getActionBars().getMenuManager().removeMenuListener(fViewMenuListener);
 		}
 		if (fDirtyListener != null) {
 			// JavaCore.removeElementChangedListener(fDirtyListener);
@@ -825,16 +775,14 @@ public class MetricRunnerViewPart extends ViewPart {
 	}
 
 	public static void showTestResultsView() {
-		IWorkbenchWindow window = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow();
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (window != null) {
 			IWorkbenchPage page = window.getActivePage();
 			MetricRunnerViewPart testRunner = null;
 
 			if (page != null) {
 				try { // show the result view
-					testRunner = (MetricRunnerViewPart) page
-							.findView(MetricRunnerViewPart.NAME);
+					testRunner = (MetricRunnerViewPart) page.findView(MetricRunnerViewPart.NAME);
 					if (testRunner == null) {
 						IWorkbenchPart activePart = page.getActivePart();
 						testRunner = (MetricRunnerViewPart) page
@@ -869,8 +817,8 @@ public class MetricRunnerViewPart extends ViewPart {
 
 		Composite empty = new Composite(top, SWT.NONE);
 		empty.setLayout(new Layout() {
-			protected Point computeSize(Composite composite, int wHint,
-					int hHint, boolean flushCache) {
+			protected Point computeSize(Composite composite, int wHint, int hHint,
+					boolean flushCache) {
 				return new Point(1, 1); // (0, 0) does not work with
 				// super-intelligent ViewForm
 			}
@@ -939,15 +887,12 @@ public class MetricRunnerViewPart extends ViewPart {
 		fMemento = null;
 
 		fMetricRunSessionListener = new MetricRunSessionListener();
-		PHPDependPlugin.getModel().addMetricRunSessionListener(
-				fMetricRunSessionListener);
-		List<MetricRunSession> sessions = PHPDependPlugin.getModel()
-				.getMetricRunSessions();
+		PHPDependPlugin.getModel().addMetricRunSessionListener(fMetricRunSessionListener);
+		List<MetricRunSession> sessions = PHPDependPlugin.getModel().getMetricRunSessions();
 		if (sessions.size() > 0) {
 			Object lastSession = sessions.get(0);
 			if (lastSession instanceof MetricRunSession)
-				fMetricRunSessionListener
-						.sessionAdded((MetricRunSession) lastSession);
+				fMetricRunSessionListener.sessionAdded((MetricRunSession) lastSession);
 		}
 	}
 
@@ -970,8 +915,7 @@ public class MetricRunnerViewPart extends ViewPart {
 			}
 
 			public int getCurrentPageIndex() {
-				return fViewHistory.getHistoryEntries().indexOf(
-						fViewHistory.getCurrentEntry());
+				return fViewHistory.getHistoryEntries().indexOf(fViewHistory.getCurrentEntry());
 			}
 		};
 	}
@@ -1009,13 +953,11 @@ public class MetricRunnerViewPart extends ViewPart {
 
 		fNextAction = new ShowNextFailureAction(this);
 		fNextAction.setEnabled(false);
-		actionBars.setGlobalActionHandler(ActionFactory.NEXT.getId(),
-				fNextAction);
+		actionBars.setGlobalActionHandler(ActionFactory.NEXT.getId(), fNextAction);
 
 		fPreviousAction = new ShowPreviousFailureAction(this);
 		fPreviousAction.setEnabled(false);
-		actionBars.setGlobalActionHandler(ActionFactory.PREVIOUS.getId(),
-				fPreviousAction);
+		actionBars.setGlobalActionHandler(ActionFactory.PREVIOUS.getId(), fPreviousAction);
 
 		fFailuresOnlyFilterAction = new FailuresOnlyFilterAction();
 
@@ -1073,11 +1015,11 @@ public class MetricRunnerViewPart extends ViewPart {
 
 		if (activePart instanceof IEditorPart) {
 			IEditorPart activeEditorPart = (IEditorPart) activePart;
-			IEditorActionBarContributor contributor = activeEditorPart
-					.getEditorSite().getActionBarContributor();
+			IEditorActionBarContributor contributor = activeEditorPart.getEditorSite()
+					.getActionBarContributor();
 			if (contributor instanceof EditorActionBarContributor)
-				return ((EditorActionBarContributor) contributor)
-						.getActionBars().getStatusLineManager();
+				return ((EditorActionBarContributor) contributor).getActionBars()
+						.getStatusLineManager();
 		}
 		// no active part
 		return getViewSite().getActionBars().getStatusLineManager();
@@ -1147,8 +1089,7 @@ public class MetricRunnerViewPart extends ViewPart {
 		return fTestViewer != null;
 	}
 
-	public void rerunTest(String testId, String className, String testName,
-			String launchMode) {
+	public void rerunTest(String testId, String className, String testName, String launchMode) {
 	}
 
 	private void postSyncProcessChanges() {
@@ -1171,18 +1112,15 @@ public class MetricRunnerViewPart extends ViewPart {
 		boolean horizontal = orientation == VIEW_ORIENTATION_HORIZONTAL;
 		fSashForm.setOrientation(horizontal ? SWT.HORIZONTAL : SWT.VERTICAL);
 		for (int i = 0; i < fToggleOrientationActions.length; ++i)
-			fToggleOrientationActions[i]
-					.setChecked(fOrientation == fToggleOrientationActions[i]
-							.getOrientation());
+			fToggleOrientationActions[i].setChecked(fOrientation == fToggleOrientationActions[i]
+					.getOrientation());
 		fCurrentOrientation = orientation;
 		fParent.layout();
 	}
 
 	private static boolean getShowOnErrorOnly() {
-		IPreferenceStore store = PHPDependPlugin.getDefault()
-				.getPreferenceStore();
-		return store
-				.getBoolean(PHPDependPreferencesConstants.SHOW_ON_ERROR_ONLY);
+		IPreferenceStore store = PHPDependPlugin.getDefault().getPreferenceStore();
+		return store.getBoolean(PHPDependPreferencesConstants.SHOW_ON_ERROR_ONLY);
 	}
 
 	public MetricTrace getFailureTrace() {

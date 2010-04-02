@@ -1,28 +1,9 @@
 /*******************************************************************************
- * Copyright (c) 2010, Sven Kiera
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * - Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- * - Neither the name of the Organisation nor the names of its contributors may
- *   be used to endorse or promote products derived from this software without
- *   specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2010 Sven Kiera
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
 package org.phpsrc.eclipse.pti.tools.phpdepend;
@@ -65,7 +46,8 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	public static final String IMG_METRIC_TYPE_FILE_HIERACHY = "IMG_METRIC_TYPE_FILE_HIERACHY"; //$NON-NLS-1$
 	public static final String IMG_METRIC_TYPE_PACKAGE = "IMG_METRIC_TYPE_FOLDER"; //$NON-NLS-1$
 
-	public static final String ID_EXTENSION_POINT_METRICRUN_LISTENERS = PLUGIN_ID + "." + "metricRunListeners"; //$NON-NLS-1$ //$NON-NLS-2$
+	public static final String ID_EXTENSION_POINT_METRICRUN_LISTENERS = PLUGIN_ID
+			+ "." + "metricRunListeners"; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private static final IPath ICONS_PATH = new Path("$nl$/icons/full"); //$NON-NLS-1$
 	private static final String HISTORY_DIR_NAME = "history"; //$NON-NLS-1$
@@ -103,8 +85,11 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 				.createFromURL(resolvePluginResourceURL("icons/full/obj16/php_depend.gif")));
 		registry.put(IMG_METRIC_TYPE_FILE, ImageDescriptor
 				.createFromURL(resolvePluginResourceURL("icons/full/obj16/type_file.gif")));
-		registry.put(IMG_METRIC_TYPE_FILE_HIERACHY, ImageDescriptor
-				.createFromURL(resolvePluginResourceURL("icons/full/obj16/type_file_hierachy.gif")));
+		registry
+				.put(
+						IMG_METRIC_TYPE_FILE_HIERACHY,
+						ImageDescriptor
+								.createFromURL(resolvePluginResourceURL("icons/full/obj16/type_file_hierachy.gif")));
 		registry.put(IMG_METRIC_TYPE_PACKAGE, ImageDescriptor
 				.createFromURL(resolvePluginResourceURL("icons/full/obj16/type_folder.gif")));
 	}
@@ -141,7 +126,8 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 
 	public IPath[] getPluginIncludePaths(IProject project) {
 		PHPDependPreferences prefs = PHPDependPreferencesFactory.factory(project);
-		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(prefs.getPearLibraryName());
+		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(
+				prefs.getPearLibraryName());
 
 		IPath[] includePaths = new IPath[pearPaths.length + 1];
 		includePaths[0] = resolvePluginResource("/php/tools");
@@ -192,7 +178,8 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	private static ImageDescriptor createImageDescriptor(String pathPrefix, String imageName,
 			boolean useMissingImageDescriptor) {
 		IPath path = ICONS_PATH.append(pathPrefix).append(imageName);
-		return createImageDescriptor(PHPDependPlugin.getDefault().getBundle(), path, useMissingImageDescriptor);
+		return createImageDescriptor(PHPDependPlugin.getDefault().getBundle(), path,
+				useMissingImageDescriptor);
 	}
 
 	/**
@@ -213,7 +200,8 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	 *         image at the given location and
 	 *         <code>useMissingImageDescriptor</code> is <code>true</code>
 	 */
-	private static ImageDescriptor createImageDescriptor(Bundle bundle, IPath path, boolean useMissingImageDescriptor) {
+	private static ImageDescriptor createImageDescriptor(Bundle bundle, IPath path,
+			boolean useMissingImageDescriptor) {
 		URL url = FileLocator.find(bundle, path, null);
 		if (url != null) {
 			return ImageDescriptor.createFromURL(url);

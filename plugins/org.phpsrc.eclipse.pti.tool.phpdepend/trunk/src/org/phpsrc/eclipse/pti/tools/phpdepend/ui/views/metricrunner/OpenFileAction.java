@@ -1,13 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2010 Sven Kiera
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
+
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner;
 
 import org.eclipse.core.resources.IFile;
@@ -53,7 +51,8 @@ public class OpenFileAction extends OpenEditorAction {
 		this(testRunner, className, null, true);
 	}
 
-	private OpenFileAction(MetricRunnerViewPart testRunner, String className, String method, boolean activate) {
+	private OpenFileAction(MetricRunnerViewPart testRunner, String className, String method,
+			boolean activate) {
 		this(testRunner, getFileForClassName(className, method), activate);
 		fMethodName = method;
 		fClassName = className;
@@ -61,7 +60,8 @@ public class OpenFileAction extends OpenEditorAction {
 
 	private OpenFileAction(MetricRunnerViewPart testRunner, IFile file, boolean activate) {
 		super(testRunner, file, activate);
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IPHPDependHelpContextIds.OPENTEST_ACTION);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
+				IPHPDependHelpContextIds.OPENTEST_ACTION);
 	}
 
 	protected void reveal(ITextEditor textEditor) {
@@ -89,10 +89,12 @@ public class OpenFileAction extends OpenEditorAction {
 			}
 
 			if (offset >= 0) {
-				IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
+				IDocument document = textEditor.getDocumentProvider().getDocument(
+						textEditor.getEditorInput());
 				try {
 					int line = document.getLineOfOffset(offset);
-					textEditor.selectAndReveal(document.getLineOffset(line), document.getLineLength(line));
+					textEditor.selectAndReveal(document.getLineOffset(line), document
+							.getLineLength(line));
 				} catch (BadLocationException e) {
 				}
 			}

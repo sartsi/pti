@@ -1,14 +1,9 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2010 Sven Kiera
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Brock Janiczak (brockj@tpg.com.au)
- *         - https://bugs.eclipse.org/bugs/show_bug.cgi?id=102236: [JUnit] display execution time next to each test
  *******************************************************************************/
 
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner;
@@ -55,7 +50,6 @@ import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricFile;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricMethod;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricRunSession;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricSummary;
-import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.IMetricElement.Status;
 
 public class MetricViewer {
 	private final class MetricSelectionListener implements ISelectionChangedListener {
@@ -154,18 +148,20 @@ public class MetricViewer {
 		fTreeViewer.setUseHashlookup(true);
 		fTreeContentProvider = new MetricSessionTreeContentProvider();
 		fTreeViewer.setContentProvider(fTreeContentProvider);
-		fTreeLabelProvider = new MetricSessionLabelProvider(fMetricRunnerPart, MetricRunnerViewPart.LAYOUT_HIERARCHICAL);
+		fTreeLabelProvider = new MetricSessionLabelProvider(fMetricRunnerPart,
+				MetricRunnerViewPart.LAYOUT_HIERARCHICAL);
 		fTreeViewer.setLabelProvider(fTreeLabelProvider);
 
 		fTableViewer = new TableViewer(fViewerbook, SWT.V_SCROLL | SWT.H_SCROLL | SWT.SINGLE);
 		fTableViewer.setUseHashlookup(true);
 		fTableContentProvider = new MetricSessionTableContentProvider();
 		fTableViewer.setContentProvider(fTableContentProvider);
-		fTableLabelProvider = new MetricSessionLabelProvider(fMetricRunnerPart, MetricRunnerViewPart.LAYOUT_FLAT);
+		fTableLabelProvider = new MetricSessionLabelProvider(fMetricRunnerPart,
+				MetricRunnerViewPart.LAYOUT_FLAT);
 		fTableViewer.setLabelProvider(fTableLabelProvider);
 
-		fSelectionProvider = new SelectionProviderMediator(new StructuredViewer[] { fTreeViewer, fTableViewer },
-				fTreeViewer);
+		fSelectionProvider = new SelectionProviderMediator(new StructuredViewer[] { fTreeViewer,
+				fTableViewer }, fTreeViewer);
 		fSelectionProvider.addSelectionChangedListener(new MetricSelectionListener());
 		MetricOpenListener testOpenListener = new MetricOpenListener();
 		fTreeViewer.getTree().addSelectionListener(testOpenListener);
@@ -492,7 +488,8 @@ public class MetricViewer {
 
 		IMetricElement current = null;
 
-		IMetricElement parent = current == null ? null : (IMetricElement) fTreeContentProvider.getParent(current);
+		IMetricElement parent = current == null ? null : (IMetricElement) fTreeContentProvider
+				.getParent(current);
 		if (fAutoClose.isEmpty() || !fAutoClose.getLast().equals(parent)) {
 			// we're in a new branch, so let's close old OK branches:
 			for (ListIterator iter = fAutoClose.listIterator(fAutoClose.size()); iter.hasPrevious();) {
@@ -532,7 +529,7 @@ public class MetricViewer {
 
 		if (selected == null)
 			selected = fMetricRunSession.getSummaryRoot();
-		
+
 		next = getNextFailure(selected, showNext);
 		if (next != null)
 			getActiveViewer().setSelection(new StructuredSelection(next), true);
@@ -542,10 +539,10 @@ public class MetricViewer {
 		IMetricElement nextChild = getNextChildFailure(selected, showNext);
 		if (nextChild != null)
 			return nextChild;
-		
+
 		return getNextFailureSibling(selected, showNext);
 	}
-	
+
 	private IMetricElement getNextFailureSibling(IMetricElement current, boolean showNext) {
 		IMetricElement parent = current.getParent();
 		if (parent == null)
@@ -566,7 +563,7 @@ public class MetricViewer {
 				}
 			}
 		}
-		
+
 		return getNextFailureSibling(parent, showNext);
 	}
 
@@ -584,7 +581,7 @@ public class MetricViewer {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 

@@ -1,15 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2010 Sven Kiera
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Sebastian Davids: sdavids@gmx.de bug 37333, 26653
- *     Johan Walles: walles@mailblocks.com bug 68737
  *******************************************************************************/
+
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner;
 
 import org.eclipse.core.runtime.Assert;
@@ -41,7 +37,8 @@ public class MetricTrace implements IMenuListener {
 	private IMetricElement fElement;
 	private final MetricTableDisplay fMetricTableDisplay;
 
-	public MetricTrace(Composite parent, Clipboard clipboard, MetricRunnerViewPart testRunner, ToolBar toolBar) {
+	public MetricTrace(Composite parent, Clipboard clipboard, MetricRunnerViewPart testRunner,
+			ToolBar toolBar) {
 		Assert.isNotNull(clipboard);
 
 		fTable = new Table(parent, SWT.BORDER | SWT.V_SCROLL | SWT.FULL_SELECTION);
