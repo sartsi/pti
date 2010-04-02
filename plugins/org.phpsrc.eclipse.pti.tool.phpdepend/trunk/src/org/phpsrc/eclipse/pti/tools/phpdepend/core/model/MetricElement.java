@@ -49,17 +49,20 @@ public abstract class MetricElement implements IMetricElement {
 		this.name = name;
 		this.results = results;
 
+		fStatus = Status.OK;
+
 		for (MetricResult r : results) {
 			if (r.hasError()) {
 				setHasErrors(true);
+				fStatus = Status.ERROR;
 			} else if (r.hasWarning()) {
 				setHasWarnings(true);
+				fStatus = Status.WARNING;
 			}
 			if (errors)
 				break;
 		}
 
-		fStatus = Status.NOT_RUN;
 	}
 
 	public String getName() {
