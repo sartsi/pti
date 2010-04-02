@@ -49,7 +49,7 @@ public class MetricList {
 						| Metric.PROPERTY_CLASS | Metric.PROPERTY_INTERFACE),
 				new Metric("nom", "Number Of Methods", Metric.PROPERTY_PROJECT | Metric.PROPERTY_PACKAGE
 						| Metric.PROPERTY_CLASS | Metric.PROPERTY_INTERFACE),
-				new Metric("non", "Number Of Functions", Metric.PROPERTY_PROJECT | Metric.PROPERTY_PACKAGE
+				new Metric("nof", "Number Of Functions", Metric.PROPERTY_PROJECT | Metric.PROPERTY_PACKAGE
 						| Metric.PROPERTY_CLASS | Metric.PROPERTY_INTERFACE),
 				// NodeLOC (Project, Package, Class, Interface, Method,
 				// Function)
