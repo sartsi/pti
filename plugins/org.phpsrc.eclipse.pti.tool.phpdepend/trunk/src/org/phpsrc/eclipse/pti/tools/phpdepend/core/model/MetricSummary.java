@@ -36,14 +36,17 @@ import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 
 public class MetricSummary extends MetricElement {
 
-	private final static Image IMAGE = PHPDependPlugin.getDefault().getImageRegistry().get(
-			PHPDependPlugin.IMG_PHP_DEPEND);
+	private final static Image IMAGE = PHPDependPlugin.getDefault()
+			.getImageRegistry().get(PHPDependPlugin.IMG_PHP_DEPEND);
 
 	protected Date generated;
+	protected String version;
 
-	public MetricSummary(MetricRunSession session, String name, MetricResult[] results, Date generated) {
+	public MetricSummary(MetricRunSession session, String name,
+			MetricResult[] results, Date generated, String version) {
 		super(session, name, results);
 		this.generated = generated;
+		this.version = version;
 	}
 
 	public Image getImage() {
@@ -60,5 +63,9 @@ public class MetricSummary extends MetricElement {
 
 	public Date getGenerated() {
 		return generated;
+	}
+
+	public String getVersion() {
+		return version;
 	}
 }

@@ -14,11 +14,10 @@
 package org.phpsrc.eclipse.pti.tools.phpdepend.core.model;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -40,15 +39,15 @@ public class MetricRunSessionSerializer implements XMLReader {
 	private ContentHandler fHandler;
 	private ErrorHandler fErrorHandler;
 
-	private final NumberFormat timeFormat = new DecimalFormat("0.0##", new DecimalFormatSymbols(Locale.US)); //$NON-NLS-1$ // not localized, parseable by Double.parseDouble(..)
+	private final String dateFormat = "yyyy-MM-dd'T'HH:mm:ss"; //$NON-NLS-1$
 
 	/**
 	 * @param testRunSession
 	 *            the test run session to serialize
 	 */
-	public MetricRunSessionSerializer(MetricRunSession testRunSession) {
-		Assert.isNotNull(testRunSession);
-		fMetricRunSession = testRunSession;
+	public MetricRunSessionSerializer(MetricRunSession metricRunSession) {
+		Assert.isNotNull(metricRunSession);
+		fMetricRunSession = metricRunSession;
 	}
 
 	public void parse(InputSource input) throws IOException, SAXException {
@@ -56,114 +55,79 @@ public class MetricRunSessionSerializer implements XMLReader {
 			throw new SAXException("ContentHandler missing"); //$NON-NLS-1$
 
 		fHandler.startDocument();
-		handleTestRun();
+		handleMetricRun();
 		fHandler.endDocument();
 	}
 
-	private void handleTestRun() throws SAXException {
-		// AttributesImpl atts = new AttributesImpl();
-		// addCDATA(atts, IXMLTags.ATTR_NAME,
-		// fMetricRunSession.getTestRunName());
-		// IProject project = fMetricRunSession.getLaunchedProject();
-		// if (project != null)
-		// addCDATA(atts, IXMLTags.ATTR_PROJECT, project.getName());
-		// addCDATA(atts, IXMLTags.ATTR_TESTS,
-		// fMetricRunSession.getTotalCount());
-		// addCDATA(atts, IXMLTags.ATTR_STARTED,
-		// fMetricRunSession.getStartedCount());
-		// addCDATA(atts, IXMLTags.ATTR_FAILURES,
-		// fMetricRunSession.getFailureCount());
-		// addCDATA(atts, IXMLTags.ATTR_ERRORS,
-		// fMetricRunSession.getErrorCount());
-		// addCDATA(atts, IXMLTags.ATTR_IGNORED,
-		// fMetricRunSession.getIgnoredCount());
-		// startElement(IXMLTags.NODE_TESTRUN, atts);
-		//
-		// TestRoot testRoot = fMetricRunSession.getTestRoot();
-		// ITestElement[] topSuites = testRoot.getChildren();
-		// for (int i = 0; i < topSuites.length; i++) {
-		// handleTestElement(topSuites[i]);
-		// }
-		//
-		// endElement(IXMLTags.NODE_TESTRUN);
+	private void handleMetricRun() throws SAXException {
+		AttributesImpl atts = new AttributesImpl();
+
+		MetricSummary summary = fMetricRunSession.getSummaryRoot();
+
+		Date generated = summary.getGenerated();
+		if (generated != null) {
+			SimpleDateFormat formater = new SimpleDateFormat(dateFormat);
+			addCDATA(atts, IXMLTags.ATTR_GENERATED, formater.format(generated));
+		}
+
+		if (summary.getVersion() != null)
+			addCDATA(atts, IXMLTags.ATTR_PDEPEND, summary.getVersion());
+
+		addMetricResults(atts, summary.getResults());
+
+		startElement(IXMLTags.NODE_METRICS, atts);
+
+		for (IMetricElement element : summary.getChildren()) {
+			handleMetricElement(element);
+		}
+
+		endElement(IXMLTags.NODE_METRICS);
 	}
 
-	private void handleTestElement(IMetricElement testElement) throws SAXException {
-		// if (testElement instanceof TestSuiteElement) {
-		// TestSuiteElement testSuiteElement = (TestSuiteElement) testElement;
-		//
-		// AttributesImpl atts = new AttributesImpl();
-		// addCDATA(atts, IXMLTags.ATTR_NAME,
-		// testSuiteElement.getSuiteTypeName());
-		// if (!Double.isNaN(testSuiteElement.getElapsedTimeInSeconds()))
-		// addCDATA(atts, IXMLTags.ATTR_TIME,
-		// timeFormat.format(testSuiteElement.getElapsedTimeInSeconds()));
-		// if (testElement.getProgressState() != ProgressState.COMPLETED
-		// || testElement.getTestResult(false) != Result.UNDEFINED)
-		// addCDATA(atts, IXMLTags.ATTR_INCOMPLETE, Boolean.TRUE.toString());
-		//
-		// startElement(IXMLTags.NODE_TESTSUITE, atts);
-		// addFailure(testElement);
-		//
-		// ITestElement[] children = testSuiteElement.getChildren();
-		// for (int i = 0; i < children.length; i++) {
-		// handleTestElement(children[i]);
-		// }
-		// endElement(IXMLTags.NODE_TESTSUITE);
-		//
-		// } else if (testElement instanceof TestCaseElement) {
-		// TestCaseElement testCaseElement = (TestCaseElement) testElement;
-		//
-		// AttributesImpl atts = new AttributesImpl();
-		// addCDATA(atts, IXMLTags.ATTR_NAME,
-		// testCaseElement.getTestMethodName());
-		// addCDATA(atts, IXMLTags.ATTR_CLASSNAME,
-		// testCaseElement.getClassName());
-		// if (!Double.isNaN(testCaseElement.getElapsedTimeInSeconds()))
-		// addCDATA(atts, IXMLTags.ATTR_TIME,
-		// timeFormat.format(testCaseElement.getElapsedTimeInSeconds()));
-		// if (testElement.getProgressState() != ProgressState.COMPLETED)
-		// addCDATA(atts, IXMLTags.ATTR_INCOMPLETE, Boolean.TRUE.toString());
-		// if (testCaseElement.isIgnored())
-		// addCDATA(atts, IXMLTags.ATTR_IGNORED, Boolean.TRUE.toString());
-		//
-		// startElement(IXMLTags.NODE_TESTCASE, atts);
-		// addFailure(testElement);
-		//
-		// endElement(IXMLTags.NODE_TESTCASE);
-		//
-		// } else {
-		// throw new IllegalStateException(String.valueOf(testElement));
-		// }
+	private void handleMetricElement(IMetricElement metricElement)
+			throws SAXException {
+		String elementName = null;
+		String nameAttr = null;
 
-	}
+		if (metricElement instanceof MetricPackage) {
+			elementName = IXMLTags.NODE_PACKAGE;
+			nameAttr = metricElement.getName();
+		} else if (metricElement instanceof MetricClass) {
+			elementName = IXMLTags.NODE_CLASS;
+			nameAttr = metricElement.getName();
+		} else if (metricElement instanceof MetricMethod) {
+			elementName = IXMLTags.NODE_METHOD;
+			nameAttr = metricElement.getName();
+		} else if (metricElement instanceof MetricFunction) {
+			elementName = IXMLTags.NODE_FUNCTION;
+			nameAttr = metricElement.getName();
+		} else if (metricElement instanceof MetricFiles) {
+			elementName = IXMLTags.NODE_FILES;
+		} else if (metricElement instanceof MetricFile) {
+			elementName = IXMLTags.NODE_FILE;
+			IResource resource = metricElement.getResource();
+			if (resource != null) {
+				nameAttr = resource.getLocation().toOSString();
+			}
+		}
 
-	private void addFailure(IMetricElement testElement) throws SAXException {
-		// FailureTrace failureTrace = testElement.getFailureTrace();
-		// if (failureTrace != null) {
-		// AttributesImpl failureAtts = new AttributesImpl();
-		// // addCDATA(failureAtts, IXMLTags.ATTR_MESSAGE, xx);
-		// // addCDATA(failureAtts, IXMLTags.ATTR_TYPE, xx);
-		// String failureKind = testElement.getTestResult(false) == Result.ERROR
-		// ? IXMLTags.NODE_ERROR
-		// : IXMLTags.NODE_FAILURE;
-		// startElement(failureKind, failureAtts);
-		// String expected = failureTrace.getExpected();
-		// String actual = failureTrace.getActual();
-		// if (expected != null) {
-		// startElement(IXMLTags.NODE_EXPECTED, NO_ATTS);
-		// fHandler.characters(expected.toCharArray(), 0, expected.length());
-		// endElement(IXMLTags.NODE_EXPECTED);
-		// }
-		// if (actual != null) {
-		// startElement(IXMLTags.NODE_ACTUAL, NO_ATTS);
-		// fHandler.characters(actual.toCharArray(), 0, actual.length());
-		// endElement(IXMLTags.NODE_ACTUAL);
-		// }
-		// String trace = failureTrace.getTrace();
-		// fHandler.characters(trace.toCharArray(), 0, trace.length());
-		// endElement(failureKind);
-		// }
+		if (elementName == null) {
+			throw new IllegalStateException(String.valueOf(metricElement));
+		}
+
+		AttributesImpl atts = new AttributesImpl();
+
+		if (nameAttr != null)
+			addCDATA(atts, IXMLTags.ATTR_NAME, nameAttr);
+		addMetricResults(atts, metricElement.getResults());
+
+		startElement(elementName, atts);
+
+		for (IMetricElement element : metricElement.getChildren()) {
+			handleMetricElement(element);
+		}
+
+		endElement(elementName);
 	}
 
 	private void startElement(String name, Attributes atts) throws SAXException {
@@ -178,8 +142,19 @@ public class MetricRunSessionSerializer implements XMLReader {
 		addCDATA(atts, name, Integer.toString(value));
 	}
 
+	private static void addCDATA(AttributesImpl atts, String name, float value) {
+		addCDATA(atts, name, Float.toString(value));
+	}
+
 	private static void addCDATA(AttributesImpl atts, String name, String value) {
 		atts.addAttribute(EMPTY, EMPTY, name, CDATA, value);
+	}
+
+	private static void addMetricResults(AttributesImpl atts,
+			MetricResult[] results) {
+		for (MetricResult result : results) {
+			addCDATA(atts, result.id, result.value);
+		}
 	}
 
 	public void setContentHandler(ContentHandler handler) {

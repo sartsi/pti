@@ -137,7 +137,8 @@ public final class PHPDependModel {
 
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
 		InputSource inputSource = new InputSource();
-		SAXSource source = new SAXSource(new MetricRunSessionSerializer(metricRunSession), inputSource);
+		SAXSource source = new SAXSource(new MetricRunSessionSerializer(metricRunSession),
+				inputSource);
 		StreamResult result = new StreamResult(out);
 		transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8"); //$NON-NLS-1$
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
@@ -158,7 +159,8 @@ public final class PHPDependModel {
 		transformer.transform(source, result);
 	}
 
-	public static void exportMetricRunSession(MetricRunSession metricRunSession, File file) throws CoreException {
+	public static void exportMetricRunSession(MetricRunSession metricRunSession, File file)
+			throws CoreException {
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
@@ -185,7 +187,8 @@ public final class PHPDependModel {
 		return importMetricRunSession(file, null);
 	}
 
-	public static MetricRunSession importMetricRunSession(File file, IResource dependentResource) throws CoreException {
+	public static MetricRunSession importMetricRunSession(File file, IResource dependentResource)
+			throws CoreException {
 		try {
 			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 			// parserFactory.setValidating(true); // TODO: add DTD and debug
@@ -225,12 +228,15 @@ public final class PHPDependModel {
 	}
 
 	private static void throwExportError(File file, Exception e) throws CoreException {
-		throw new CoreException(new org.eclipse.core.runtime.Status(IStatus.ERROR, PHPDependPlugin.PLUGIN_ID, Messages
-				.format(ModelMessages.JUnitModel_could_not_write, BasicElementLabels.getPathLabel(file)), e));
+		throw new CoreException(new org.eclipse.core.runtime.Status(IStatus.ERROR,
+				PHPDependPlugin.PLUGIN_ID, Messages.format(
+						ModelMessages.JUnitModel_could_not_write, BasicElementLabels
+								.getPathLabel(file)), e));
 	}
 
 	private static void throwImportError(File file, Exception e) throws CoreException {
-		throw new CoreException(new org.eclipse.core.runtime.Status(IStatus.ERROR, PHPDependPlugin.PLUGIN_ID, Messages
-				.format(ModelMessages.JUnitModel_could_not_read, BasicElementLabels.getPathLabel(file)), e));
+		throw new CoreException(new org.eclipse.core.runtime.Status(IStatus.ERROR,
+				PHPDependPlugin.PLUGIN_ID, Messages.format(ModelMessages.JUnitModel_could_not_read,
+						BasicElementLabels.getPathLabel(file)), e));
 	}
 }
