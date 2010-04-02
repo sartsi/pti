@@ -13,15 +13,19 @@
 
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner;
 
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.swt.graphics.Image;
+import org.phpsrc.eclipse.pti.core.PHPToolCorePlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.IMetricElement;
+import org.phpsrc.eclipse.pti.ui.images.OverlayImageIcon;
 
 public class MetricSessionLabelProvider extends LabelProvider implements IStyledLabelProvider {
 
+	private static final ImageRegistry imageRegistry = new ImageRegistry();
 	private final MetricRunnerViewPart fTestRunnerPart;
 	private final int fLayoutMode;
 
@@ -57,11 +61,30 @@ public class MetricSessionLabelProvider extends LabelProvider implements IStyled
 		return label;
 	}
 
-	public Image getImage(Object element) {
-		if (element instanceof IMetricElement) {
-			return ((IMetricElement) element).getImage();
+	public Image getImage(Object obj) {
+		if (obj instanceof IMetricElement) {
+			IMetricElement element = (IMetricElement) obj;
+			String key = element.getClass().getName();
+			if (element.hasErrors())
+				key += "#error";
+			else if (element.hasWarnings())
+				key += "#warning";
+			Image img = imageRegistry.get(key);
+			if (img == null) {
+				if (element.hasErrors())
+					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault().getImageRegistry()
+							.get(PHPToolCorePlugin.IMG_OVERLAY_ERROR), OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
+				else if (element.hasWarnings())
+					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault().getImageRegistry()
+							.get(PHPToolCorePlugin.IMG_OVERLAY_WARNING), OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
+				else
+					img = element.getImage();
+				imageRegistry.put(key, img);
+			}
+
+			return img;
 		} else {
-			throw new IllegalArgumentException(String.valueOf(element));
+			throw new IllegalArgumentException(String.valueOf(obj));
 		}
 	}
 
