@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            description="Commands related to the PHPMD"
+            id="Plugin_org.phpsrc.eclipse.pti.tools.phpmd.command.category"
+            name="PHPMD">
+      </category>
+      <command
+            categoryId="Plugin_org.phpsrc.eclipse.pti.tools.phpmd.command.category"
+            description="Runs the PHPMD"
+            id="Plugin_org.phpsrc.eclipse.pti.tools.phpmd.commands.runMessDetector"
+            name="Run PHPMD">
+      </command>
+   </extension>
+
+</plugin>

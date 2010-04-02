@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: PHP Tool PHPUnit
-Bundle-SymbolicName: Plugin_org.phpsrc.eclipse.pti.tools.phpmd
+Bundle-Name: PHP Tool PHP Mess Detector
+Bundle-SymbolicName: Plugin_org.phpsrc.eclipse.pti.tools.phpmd;singleton:=true
 Bundle-Version: 0.1.0.i20100402000000
 Bundle-Activator: org.phpsrc.eclipse.pti.tools.phpmd.Activator
 Bundle-Vendor: Dejan Spasic
