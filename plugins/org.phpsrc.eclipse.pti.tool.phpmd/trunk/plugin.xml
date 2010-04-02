@@ -44,16 +44,17 @@
          <enabledWhen>
             <with
                   variable="selection">
-               <iterate
-                     ifEmpty="false"
-                     operator="or">
-                  <instanceof
-                        value="org.eclipse.jface.text.ITextSelection">
-                  </instanceof>
+               <count
+                     value="?">
+               </count>
+               <or>
                   <instanceof
                         value="org.eclipse.jface.viewers.IStructuredSelection">
                   </instanceof>
-               </iterate>
+                  <instanceof
+                        value="org.eclipse.jface.text.ITextSelection">
+                  </instanceof>
+               </or>
             </with>
          </enabledWhen>
       </handler>
