@@ -50,11 +50,9 @@ public class MetricRunSession extends MetricElement {
 				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(
 						org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT);
 			} else if (dependentResource instanceof IFolder) {
-				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(
-						ISharedImages.IMG_OBJ_FOLDER);
+				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
 			} else {
-				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(
-						ISharedImages.IMG_OBJ_FILE);
+				fImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
 			}
 		} else {
 			fImage = IMAGE;
@@ -156,5 +154,9 @@ public class MetricRunSession extends MetricElement {
 		warnings = false;
 		errors = false;
 		fSummaryRoot = null;
+	}
+
+	public IResource getDependentResource() {
+		return fDependentResource;
 	}
 }
