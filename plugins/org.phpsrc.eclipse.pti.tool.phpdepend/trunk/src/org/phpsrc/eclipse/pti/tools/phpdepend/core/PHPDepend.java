@@ -113,12 +113,14 @@ public class PHPDepend extends AbstractPHPTool {
 
 		cmdLineArgs = "--summary-xml=" + OperatingSystem.escapeShellFileArg(summaryFile.toString()) + " " + cmdLineArgs;
 
-		cmdLineArgs = "--jdepend-chart="
-				+ OperatingSystem.escapeShellFileArg(summaryFile.toString().replace(TMP_FILE_SUMMARY_XML,
-						TMP_FILE_JDEPEND_CHART)) + " " + cmdLineArgs;
-		cmdLineArgs = "--overview-pyramid="
-				+ OperatingSystem.escapeShellFileArg(summaryFile.toString().replace(TMP_FILE_SUMMARY_XML,
-						TMP_FILE_SUMMARY_PYRAMID)) + " " + cmdLineArgs;
+		// cmdLineArgs = "--jdepend-chart="
+		// +
+		// OperatingSystem.escapeShellFileArg(summaryFile.toString().replace(TMP_FILE_SUMMARY_XML,
+		// TMP_FILE_JDEPEND_CHART)) + " " + cmdLineArgs;
+		// cmdLineArgs = "--overview-pyramid="
+		// +
+		// OperatingSystem.escapeShellFileArg(summaryFile.toString().replace(TMP_FILE_SUMMARY_XML,
+		// TMP_FILE_SUMMARY_PYRAMID)) + " " + cmdLineArgs;
 
 		if (prefs.badDocumentation)
 			cmdLineArgs = "--bad-documentation " + cmdLineArgs;
