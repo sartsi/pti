@@ -36,7 +36,7 @@ public class PHPDependPreferencesConstants {
 	/**
 	 * Maximum number of remembered test runs.
 	 */
-	public static final String MAX_TEST_RUNS = PHPDependPlugin.PLUGIN_ID + ".max_test_runs"; //$NON-NLS-1$
+	public static final String MAX_METRIC_RUNS = PHPDependPlugin.PLUGIN_ID + ".max_metric_runs"; //$NON-NLS-1$
 
 	/**
 	 * Javadoc location for org.hamcrest.core (JUnit 4)

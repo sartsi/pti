@@ -157,7 +157,6 @@ public class MetricInputDialog extends StatusDialog {
 		m.errorMin = text.length() == 0 ? null : Float.parseFloat(text);
 		text = fErrorMax.getText().trim();
 		m.errorMax = text.length() == 0 ? null : Float.parseFloat(text);
-		System.out.println(m.level);
 
 		// m.type = 1; // fType.getSelectionIndex() + 1;
 
