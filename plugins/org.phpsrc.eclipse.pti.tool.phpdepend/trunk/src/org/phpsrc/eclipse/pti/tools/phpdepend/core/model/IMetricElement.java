@@ -71,10 +71,8 @@ public interface IMetricElement {
 		public static final Status RUNNING_FAILURE = new Status("RUNNING_FAILURE", 6); //$NON-NLS-1$
 		public static final Status RUNNING = new Status("RUNNING", 3); //$NON-NLS-1$
 
-		public static final Status ERROR = new Status(
-				"ERROR", /* 1 */IMetricRunListener.STATUS_ERROR); //$NON-NLS-1$
-		public static final Status WARNING = new Status(
-				"WARNING", /* 2 */IMetricRunListener.STATUS_FAILURE); //$NON-NLS-1$
+		public static final Status ERROR = new Status("ERROR", /* 1 */IMetricRunListener.STATUS_ERROR); //$NON-NLS-1$
+		public static final Status WARNING = new Status("WARNING", /* 2 */IMetricRunListener.STATUS_FAILURE); //$NON-NLS-1$
 		public static final Status OK = new Status("OK", /* 0 */IMetricRunListener.STATUS_OK); //$NON-NLS-1$
 		public static final Status NOT_RUN = new Status("NOT_RUN", 4); //$NON-NLS-1$
 
@@ -233,4 +231,6 @@ public interface IMetricElement {
 	public boolean hasWarnings();
 
 	public Status getStatus();
+
+	public int getLevel();
 }

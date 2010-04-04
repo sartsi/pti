@@ -40,6 +40,7 @@ public class MetricInputDialog extends StatusDialog {
 
 	private final StringDialogField fId;
 	private final StringDialogField fName;
+	private final ComboDialogField fLevel;
 	private final StringDialogField fWarningMin;
 	private final StringDialogField fWarningMax;
 	private final StringDialogField fErrorMin;
@@ -49,8 +50,12 @@ public class MetricInputDialog extends StatusDialog {
 	private final List<String> fExistingIds;
 	private final String[] fMetricTypes;
 
+	private Metric fMetric;
+
 	public MetricInputDialog(Shell parent, Metric m, List<Metric> existingEntries) {
 		super(parent);
+
+		fMetric = m;
 
 		fExistingIds = new ArrayList<String>(existingEntries.size());
 		for (int i = 0; i < existingEntries.size(); i++) {
@@ -71,6 +76,9 @@ public class MetricInputDialog extends StatusDialog {
 
 		fName = new StringDialogField();
 		fName.setLabelText("Name:");
+
+		fLevel = new ComboDialogField(SWT.READ_ONLY);
+		fLevel.setLabelText("Level:");
 
 		fWarningMin = new StringDialogField();
 		fWarningMin.setLabelText("Warning min:");
@@ -95,6 +103,24 @@ public class MetricInputDialog extends StatusDialog {
 		fName.setDialogFieldListener(adapter);
 		fName.setText((m != null) ? m.name : ""); //$NON-NLS-1$	
 
+		fLevel.setItems(new String[] { "Project", "Package", "Class", "Method" });
+		if (m != null) {
+			switch (m.level) {
+			case Metric.LEVEL_PROJECT:
+				fLevel.selectItem(0);
+				break;
+			case Metric.LEVEL_PACKAGE:
+				fLevel.selectItem(1);
+				break;
+			case Metric.LEVEL_CLASS:
+				fLevel.selectItem(2);
+				break;
+			case Metric.LEVEL_METHOD:
+				fLevel.selectItem(3);
+				break;
+			}
+		}
+
 		fWarningMin.setDialogFieldListener(adapter);
 		fWarningMin.setText((m != null && m.warningMin != null) ? "" + m.warningMin : ""); //$NON-NLS-1
 		fWarningMax.setDialogFieldListener(adapter);
@@ -111,10 +137,18 @@ public class MetricInputDialog extends StatusDialog {
 	}
 
 	public Metric getResult() {
-		Metric m = new Metric();
+		Metric m;
+		if (fMetric != null) {
+			m = fMetric;
+		} else {
+			m = new Metric();
+			m.enabled = true;
+		}
+
 		m.name = fName.getText().trim();
 		m.id = fId.getText().trim();
-		m.enabled = true;
+		m.level = (int) Math.pow(2, fLevel.getSelectionIndex());
+
 		String text = fWarningMin.getText().trim();
 		m.warningMin = text.length() == 0 ? null : Float.parseFloat(text);
 		text = fWarningMax.getText().trim();
@@ -123,6 +157,7 @@ public class MetricInputDialog extends StatusDialog {
 		m.errorMin = text.length() == 0 ? null : Float.parseFloat(text);
 		text = fErrorMax.getText().trim();
 		m.errorMax = text.length() == 0 ? null : Float.parseFloat(text);
+		System.out.println(m.level);
 
 		// m.type = 1; // fType.getSelectionIndex() + 1;
 
@@ -147,8 +182,10 @@ public class MetricInputDialog extends StatusDialog {
 		fName.postSetFocusOnDialogField(parent.getDisplay());
 		fId.doFillIntoGrid(inner, 3);
 
-		NumberOnlyVerifyListener numberOnlyListener = new NumberOnlyVerifyListener(
-				NumberOnlyVerifyListener.TYPE_FLOAT, NumberOnlyVerifyListener.SIGNED);
+		fLevel.doFillIntoGrid(inner, 3);
+
+		NumberOnlyVerifyListener numberOnlyListener = new NumberOnlyVerifyListener(NumberOnlyVerifyListener.TYPE_FLOAT,
+				NumberOnlyVerifyListener.SIGNED);
 
 		fWarningMin.doFillIntoGrid(inner, 3);
 		fWarningMin.getTextControl(null).addListener(SWT.Verify, numberOnlyListener);
@@ -190,16 +227,14 @@ public class MetricInputDialog extends StatusDialog {
 
 		Float wMin = null;
 		try {
-			wMin = fWarningMin.getText().trim().length() > 0 ? Float.parseFloat(fWarningMin
-					.getText().trim()) : null;
+			wMin = fWarningMin.getText().trim().length() > 0 ? Float.parseFloat(fWarningMin.getText().trim()) : null;
 		} catch (NumberFormatException e) {
 			status.setError("Warning min is not a number");
 		}
 
 		Float wMax = null;
 		try {
-			wMax = fWarningMax.getText().trim().length() > 0 ? Float.parseFloat(fWarningMax
-					.getText().trim()) : null;
+			wMax = fWarningMax.getText().trim().length() > 0 ? Float.parseFloat(fWarningMax.getText().trim()) : null;
 		} catch (NumberFormatException e) {
 			status.setError("Warning max is not a number");
 		}
@@ -209,16 +244,14 @@ public class MetricInputDialog extends StatusDialog {
 
 		Float eMin = null;
 		try {
-			eMin = fErrorMin.getText().trim().length() > 0 ? Float.parseFloat(fErrorMin.getText()
-					.trim()) : null;
+			eMin = fErrorMin.getText().trim().length() > 0 ? Float.parseFloat(fErrorMin.getText().trim()) : null;
 		} catch (NumberFormatException e) {
 			status.setError("Error min is not a number");
 		}
 
 		Float eMax = null;
 		try {
-			eMax = fErrorMax.getText().trim().length() > 0 ? Float.parseFloat(fErrorMax.getText()
-					.trim()) : null;
+			eMax = fErrorMax.getText().trim().length() > 0 ? Float.parseFloat(fErrorMax.getText().trim()) : null;
 		} catch (NumberFormatException e) {
 			status.setError("Error max is not a number");
 		}

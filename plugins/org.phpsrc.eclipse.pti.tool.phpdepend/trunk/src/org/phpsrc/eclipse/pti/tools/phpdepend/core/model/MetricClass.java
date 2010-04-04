@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.dltk.ui.DLTKPluginImages;
 import org.eclipse.swt.graphics.Image;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.Metric;
 
 public class MetricClass extends MetricElement {
 
@@ -55,5 +56,9 @@ public class MetricClass extends MetricElement {
 		}
 
 		return file;
+	}
+
+	public int getLevel() {
+		return Metric.LEVEL_CLASS;
 	}
 }

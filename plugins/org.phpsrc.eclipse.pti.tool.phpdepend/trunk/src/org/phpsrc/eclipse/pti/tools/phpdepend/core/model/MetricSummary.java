@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.swt.graphics.Image;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.Metric;
 
 public class MetricSummary extends MetricElement {
 
@@ -23,8 +24,7 @@ public class MetricSummary extends MetricElement {
 	protected Date generated;
 	protected String version;
 
-	public MetricSummary(MetricRunSession session, String name, MetricResult[] results,
-			Date generated, String version) {
+	public MetricSummary(MetricRunSession session, String name, MetricResult[] results, Date generated, String version) {
 		super(session, name, results);
 		this.generated = generated;
 		this.version = version;
@@ -48,5 +48,9 @@ public class MetricSummary extends MetricElement {
 
 	public String getVersion() {
 		return version;
+	}
+
+	public int getLevel() {
+		return Metric.LEVEL_PROJECT;
 	}
 }

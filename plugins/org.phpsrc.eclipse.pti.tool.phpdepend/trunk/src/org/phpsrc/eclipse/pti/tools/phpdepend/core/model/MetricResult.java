@@ -16,6 +16,7 @@ public class MetricResult {
 	public String id;
 	public float value;
 	public Metric metric;
+	public IMetricElement element;
 	protected boolean error = false;
 	protected boolean warning = false;
 
@@ -24,15 +25,27 @@ public class MetricResult {
 		this.id = m.id;
 		this.value = value;
 		this.metric = m;
-		if ((m.errorMin != null || m.errorMax != null)
-				&& (m.errorMin == null || value >= m.errorMin)
-				&& (m.errorMax == null || value <= m.errorMax))
-			error = true;
-		if ((m.warningMin != null || m.warningMax != null)
-				&& (m.warningMin == null || value >= m.warningMin)
-				&& (m.warningMax == null || value <= m.warningMax))
-			warning = true;
+	}
 
+	public void setElement(IMetricElement element) {
+		Assert.isNotNull(element);
+		this.element = element;
+		if (metric != null && element.getLevel() == metric.level) {
+			checkForErrorAndWarning();
+		}
+	}
+
+	protected void checkForErrorAndWarning() {
+		if (metric.enabled) {
+			if ((metric.errorMin != null || metric.errorMax != null)
+					&& (metric.errorMin == null || value >= metric.errorMin)
+					&& (metric.errorMax == null || value <= metric.errorMax))
+				error = true;
+			if ((metric.warningMin != null || metric.warningMax != null)
+					&& (metric.warningMin == null || value >= metric.warningMin)
+					&& (metric.warningMax == null || value <= metric.warningMax))
+				warning = true;
+		}
 	}
 
 	public MetricResult(String id, float value) {

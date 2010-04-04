@@ -33,15 +33,16 @@ public abstract class MetricElement implements IMetricElement {
 		fStatus = Status.OK;
 
 		for (MetricResult r : results) {
-			if (r.hasError()) {
-				setHasErrors(true);
-				fStatus = Status.ERROR;
-			} else if (r.hasWarning()) {
-				setHasWarnings(true);
-				fStatus = Status.WARNING;
+			r.setElement(this);
+			if (!errors) {
+				if (r.hasError()) {
+					setHasErrors(true);
+					fStatus = Status.ERROR;
+				} else if (r.hasWarning()) {
+					setHasWarnings(true);
+					fStatus = Status.WARNING;
+				}
 			}
-			if (errors)
-				break;
 		}
 
 	}

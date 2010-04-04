@@ -17,13 +17,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.phpsrc.eclipse.pti.tools.phpdepend.core.preferences.Metric;
 
 public class MetricFile extends MetricElement {
 
-	private final static Image IMAGE_PROJECT = PlatformUI.getWorkbench().getSharedImages()
-			.getImage(ISharedImages.IMG_OBJ_FILE);
-	private final static Image IMAGE_NON_PROJECT = PlatformUI.getWorkbench().getSharedImages()
-			.getImage(ISharedImages.IMG_OBJ_FILE);
+	private final static Image IMAGE_PROJECT = PlatformUI.getWorkbench().getSharedImages().getImage(
+			ISharedImages.IMG_OBJ_FILE);
+	private final static Image IMAGE_NON_PROJECT = PlatformUI.getWorkbench().getSharedImages().getImage(
+			ISharedImages.IMG_OBJ_FILE);
 
 	protected IFile file;
 
@@ -31,12 +32,11 @@ public class MetricFile extends MetricElement {
 		super(parent, name, results);
 		Assert.isNotNull(parent);
 
-		IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(
-				new java.io.File(name).toURI());
+		IFile[] files = ResourcesPlugin.getWorkspace().getRoot()
+				.findFilesForLocationURI(new java.io.File(name).toURI());
 		if (files.length > 0) {
 			file = files[0];
-			this.name = file.getProject().getName() + " - "
-					+ file.getProjectRelativePath().toPortableString();
+			this.name = file.getProject().getName() + " - " + file.getProjectRelativePath().toPortableString();
 		}
 	}
 
@@ -58,5 +58,9 @@ public class MetricFile extends MetricElement {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public int getLevel() {
+		return Metric.LEVEL_CLASS;
 	}
 }

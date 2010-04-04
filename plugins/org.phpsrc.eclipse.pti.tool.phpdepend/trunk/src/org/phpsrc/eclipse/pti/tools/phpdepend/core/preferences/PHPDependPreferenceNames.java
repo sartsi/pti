@@ -27,5 +27,6 @@ public class PHPDependPreferenceNames {
 	public static final String PREF_METRICS_ERROR_MIN = "metrics_error_min"; //$NON-NLS-1$
 	public static final String PREF_METRICS_ERROR_MAX = "metrics_error_max"; //$NON-NLS-1$
 	public static final String PREF_METRICS_TYPES = "metrics_types"; //$NON-NLS-1$
+	public static final String PREF_METRICS_LEVELS = "metrics_levels"; //$NON-NLS-1$
 
 }

@@ -9,8 +9,6 @@
 package org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
@@ -22,6 +20,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricResult;
+import org.phpsrc.eclipse.pti.ui.widgets.listener.TableColumnResizeListener;
 
 public class MetricTableDisplay implements IMetricDisplay {
 	private final Table fTable;
@@ -56,16 +55,7 @@ public class MetricTableDisplay implements IMetricDisplay {
 		values.setWidth(70);
 
 		fTable.setRedraw(true);
-		fTable.addControlListener(new ControlListener() {
-			public void controlMoved(ControlEvent e) {
-			}
-
-			public void controlResized(ControlEvent e) {
-				Table table = ((Table) e.widget);
-				TableColumn column = table.getColumn(0);
-				column.setWidth(table.getClientArea().width - 50 - 70);
-			}
-		});
+		fTable.addControlListener(new TableColumnResizeListener());
 	}
 
 	public void addMetricResult(MetricResult result) {
@@ -76,12 +66,10 @@ public class MetricTableDisplay implements IMetricDisplay {
 		if (result.metric != null) {
 			name = result.metric.name;
 			if (result.hasError()) {
-				img = PlatformUI.getWorkbench().getSharedImages().getImage(
-						ISharedImages.IMG_OBJS_ERROR_TSK);
+				img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 				tableItem.setForeground(new Color(tableItem.getDisplay(), 255, 0, 0));
 			} else if (result.hasWarning()) {
-				img = PlatformUI.getWorkbench().getSharedImages().getImage(
-						ISharedImages.IMG_OBJS_WARN_TSK);
+				img = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_WARN_TSK);
 			}
 		}
 

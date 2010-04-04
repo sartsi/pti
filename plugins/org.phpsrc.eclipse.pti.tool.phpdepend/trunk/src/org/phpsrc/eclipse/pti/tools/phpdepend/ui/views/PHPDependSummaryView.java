@@ -58,9 +58,13 @@ import org.phpsrc.eclipse.pti.tools.phpdepend.PHPDependPlugin;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.IMetricElement;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricResult;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricRunSession;
+import org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner.MetricRunnerViewPart;
 import org.phpsrc.eclipse.pti.ui.Logger;
 import org.phpsrc.eclipse.pti.ui.images.OverlayImageIcon;
 
+/**
+ * @deprecated Use {@link MetricRunnerViewPart}
+ */
 public class PHPDependSummaryView extends ViewPart {
 
 	public static final String VIEW_ID = "org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.summary";
@@ -89,13 +93,11 @@ public class PHPDependSummaryView extends ViewPart {
 			Image img = imageRegistry.get(key);
 			if (img == null) {
 				if (element.hasErrors())
-					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault()
-							.getImageRegistry().get(PHPToolCorePlugin.IMG_OVERLAY_ERROR),
-							OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
+					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault().getImageRegistry()
+							.get(PHPToolCorePlugin.IMG_OVERLAY_ERROR), OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
 				else if (element.hasWarnings())
-					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault()
-							.getImageRegistry().get(PHPToolCorePlugin.IMG_OVERLAY_WARNING),
-							OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
+					img = new OverlayImageIcon(element.getImage(), PHPToolCorePlugin.getDefault().getImageRegistry()
+							.get(PHPToolCorePlugin.IMG_OVERLAY_WARNING), OverlayImageIcon.POS_BOTTOM_LEFT).getImage();
 				else
 					img = element.getImage();
 				imageRegistry.put(key, img);
@@ -134,6 +136,10 @@ public class PHPDependSummaryView extends ViewPart {
 
 		public IMarker getFileMarker() {
 			return element.getFileMarker();
+		}
+
+		public int getLevel() {
+			return 0;
 		}
 
 		@Override
@@ -189,8 +195,7 @@ public class PHPDependSummaryView extends ViewPart {
 				if (parentItem == null) {
 					element = summaries.get(showIndex);
 				} else {
-					IMetricElement parentElement = (IMetricElement) parentItem
-							.getData(ELEMENT_DATA_KEY);
+					IMetricElement parentElement = (IMetricElement) parentItem.getData(ELEMENT_DATA_KEY);
 					IMetricElement[] members = parentElement.getChildren();
 					element = members[parentItem.indexOf(item)];
 				}
@@ -228,14 +233,13 @@ public class PHPDependSummaryView extends ViewPart {
 					Tree t = (Tree) e.widget;
 					TreeItem[] items = t.getSelection();
 					if (items.length > 0) {
-						IMetricElement element = (IMetricElement) items[0]
-								.getData(ELEMENT_DATA_KEY);
+						IMetricElement element = (IMetricElement) items[0].getData(ELEMENT_DATA_KEY);
 						if (element != null) {
 							IMarker m = element.getFileMarker();
 							if (m != null) {
 								try {
-									IDE.openEditor(PlatformUI.getWorkbench()
-											.getActiveWorkbenchWindow().getActivePage(), m);
+									IDE.openEditor(
+											PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), m);
 								} catch (PartInitException e1) {
 									Logger.logException(e1);
 								}
@@ -317,8 +321,7 @@ public class PHPDependSummaryView extends ViewPart {
 					ToolItem ti = (ToolItem) e.widget;
 					Menu m = mc.getMenu(ti.getParent());
 					if (m != null) {
-						Point point = ti.getParent().toDisplay(
-								new Point(e.x, e.y + ti.getBounds().height));
+						Point point = ti.getParent().toDisplay(new Point(e.x, e.y + ti.getBounds().height));
 						m.setLocation(point.x, point.y);
 						m.setVisible(true);
 					}

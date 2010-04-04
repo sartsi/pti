@@ -159,4 +159,8 @@ public class MetricRunSession extends MetricElement {
 	public IResource getDependentResource() {
 		return fDependentResource;
 	}
+
+	public int getLevel() {
+		return Metric.LEVEL_PROJECT;
+	}
 }

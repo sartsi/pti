@@ -90,8 +90,7 @@ public class MetricRunHandler extends DefaultHandler {
 	public void startDocument() throws SAXException {
 	}
 
-	public void startElement(String uri, String localName, String qName, Attributes attributes)
-			throws SAXException {
+	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (qName.equals(IXMLTags.NODE_METRICS)) {
 			if (fMetricRunSession == null) {
 				fMetricRunSession = new MetricRunSession(fDependentResource);
@@ -105,24 +104,23 @@ public class MetricRunHandler extends DefaultHandler {
 						.getValue(IXMLTags.ATTR_GENERATED));
 			} catch (ParseException e) {
 			}
-			fMetricElement = new MetricSummary(fMetricRunSession, "Summary",
-					getMetricResults(attributes), generated, attributes
-							.getValue(IXMLTags.ATTR_PDEPEND));
+			fMetricElement = new MetricSummary(fMetricRunSession, "Summary", getMetricResults(attributes), generated,
+					attributes.getValue(IXMLTags.ATTR_PDEPEND));
 		} else if (qName.equals(IXMLTags.NODE_PACKAGE)) {
-			fMetricElement = new MetricPackage(fMetricElement, attributes
-					.getValue(IXMLTags.ATTR_NAME), getMetricResults(attributes));
+			fMetricElement = new MetricPackage(fMetricElement, attributes.getValue(IXMLTags.ATTR_NAME),
+					getMetricResults(attributes));
 		} else if (qName.equals(IXMLTags.NODE_CLASS)) {
-			fMetricElement = new MetricClass(fMetricElement, attributes
-					.getValue(IXMLTags.ATTR_NAME), getMetricResults(attributes));
+			fMetricElement = new MetricClass(fMetricElement, attributes.getValue(IXMLTags.ATTR_NAME),
+					getMetricResults(attributes));
 		} else if (qName.equals(IXMLTags.NODE_METHOD)) {
-			fMetricElement = new MetricMethod(fMetricElement, attributes
-					.getValue(IXMLTags.ATTR_NAME), getMetricResults(attributes));
+			fMetricElement = new MetricMethod(fMetricElement, attributes.getValue(IXMLTags.ATTR_NAME),
+					getMetricResults(attributes));
 		} else if (qName.equals(IXMLTags.NODE_FUNCTION)) {
-			fMetricElement = new MetricFunction(fMetricElement, attributes
-					.getValue(IXMLTags.ATTR_NAME), getMetricResults(attributes));
+			fMetricElement = new MetricFunction(fMetricElement, attributes.getValue(IXMLTags.ATTR_NAME),
+					getMetricResults(attributes));
 		} else if (qName.equals(IXMLTags.NODE_FILE)) {
-			fMetricElement = new MetricFile(fMetricElement,
-					attributes.getValue(IXMLTags.ATTR_NAME), getMetricResults(attributes));
+			fMetricElement = new MetricFile(fMetricElement, attributes.getValue(IXMLTags.ATTR_NAME),
+					getMetricResults(attributes));
 		} else if (qName.equals(IXMLTags.NODE_FILES)) {
 			fMetricElement = new MetricFiles(fMetricElement, "files", getMetricResults(attributes));
 		} else {
@@ -158,17 +156,14 @@ public class MetricRunHandler extends DefaultHandler {
 		ArrayList<MetricResult> results = new ArrayList<MetricResult>(length);
 		for (int i = 0; i < length; i++) {
 			String name = attributes.getQName(i);
-			if (!"".equals(name) && !IXMLTags.ATTR_NAME.equals(name)
-					&& !IXMLTags.ATTR_GENERATED.equals(name) && !IXMLTags.ATTR_PDEPEND.equals(name)) {
+			if (!"".equals(name) && !IXMLTags.ATTR_NAME.equals(name) && !IXMLTags.ATTR_GENERATED.equals(name)
+					&& !IXMLTags.ATTR_PDEPEND.equals(name)) {
 				try {
 					Metric metric = fMetrics.get(name);
 					if (metric != null)
-						results.add(new MetricResult(metric, Float.parseFloat(attributes
-								.getValue(i))));
+						results.add(new MetricResult(metric, Float.parseFloat(attributes.getValue(i))));
 					else
-						results
-								.add(new MetricResult(name, Float
-										.parseFloat(attributes.getValue(i))));
+						results.add(new MetricResult(name, Float.parseFloat(attributes.getValue(i))));
 				} catch (Exception e) {
 					Logger.logException(e);
 				}
