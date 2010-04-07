@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.dltk.validators.core.validator">
+      <validatorType
+            class="org.phpsrc.eclipse.pti.validators.externalchecker.core.ExternalPHPCheckertType"
+            id="org.phpsrc.eclipse.pti.validators.externalPHPChecker"
+            nature="org.eclipse.php.core.PHPNature">
+      </validatorType>
+   </extension>
+   <extension
+         id="org.phpsrc.eclipse.pti.validators.externalchecker.externalphpcheckerproblem"
+         name="External PHP Script"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.dltk.validators.ui.validatorConfigPage">
+      <validatorConfigPage
+            class="org.phpsrc.eclipse.pti.validators.externalchecker.ui.ExternalPHPCheckerConfigurationPage"
+            id="org.phpsrc.eclipse.pti.validators.externalPHPChecker">
+      </validatorConfigPage>
+   </extension>
+</plugin>
