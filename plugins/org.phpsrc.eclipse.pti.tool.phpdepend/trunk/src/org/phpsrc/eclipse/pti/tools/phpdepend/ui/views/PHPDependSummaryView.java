@@ -142,15 +142,11 @@ public class PHPDependSummaryView extends ViewPart {
 			return 0;
 		}
 
-		@Override
 		public org.phpsrc.eclipse.pti.tools.phpdepend.core.model.IMetricElement.Status getStatus() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
-		@Override
 		public boolean hasChildren() {
-			// TODO Auto-generated method stub
 			return false;
 		}
 	}
