@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: PHP Tool PHP Mess Detector
 Bundle-SymbolicName: Plugin_org.phpsrc.eclipse.pti.tools.phpmd;singleton:=true
 Bundle-Version: 0.1.0.i20100402000000
-Bundle-Activator: org.phpsrc.eclipse.pti.tools.phpmd.Activator
+Bundle-Activator: org.phpsrc.eclipse.pti.tools.phpmd.PhpmdPlugin
 Bundle-Vendor: Dejan Spasic
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -12,6 +12,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources;bundle-version="3.5.1",
  org.eclipse.jface.text;bundle-version="3.5.1",
  org.eclipse.ui.ide;bundle-version="3.5.1",
- org.eclipse.dltk.core;bundle-version="1.0.1"
+ org.eclipse.dltk.core;bundle-version="1.0.1",
+ org.eclipse.php.debug.core;bundle-version="2.1.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

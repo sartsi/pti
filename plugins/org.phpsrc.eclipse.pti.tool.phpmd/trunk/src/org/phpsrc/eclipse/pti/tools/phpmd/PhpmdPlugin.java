@@ -10,19 +10,19 @@ import org.phpsrc.eclipse.pti.tools.phpmd.core.Phpmd;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractPHPToolPlugin {
+public class PhpmdPlugin extends AbstractPHPToolPlugin {
 	// The plug-in ID
-	public static final String PLUGIN_ID = "Plugin_org.phpsrc.eclipse.pti.tools.phpmd";
+	public static final String PLUGIN_ID = "org.phpsrc.eclipse.pti.tools.phpmd";
 
 	// The shared instance
-	private static Activator plugin;
+	private static PhpmdPlugin plugin;
 
 	private Phpmd phpmd;
 
 	/**
 	 * The constructor
 	 */
-	public Activator() {
+	public PhpmdPlugin() {
 	}
 
 	/*
@@ -54,7 +54,7 @@ public class Activator extends AbstractPHPToolPlugin {
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static PhpmdPlugin getDefault() {
 		return plugin;
 	}
 
@@ -72,8 +72,7 @@ public class Activator extends AbstractPHPToolPlugin {
 	 * @return the include paths
 	 */
 	public IPath[] getPluginIncludePaths(IProject project) {
-		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault()
-				.getPluginIncludePaths(project);
+		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(project);
 
 		IPath[] includePaths = new IPath[pearPaths.length + 1];
 		includePaths[0] = resolvePluginResource("/php/tools");
