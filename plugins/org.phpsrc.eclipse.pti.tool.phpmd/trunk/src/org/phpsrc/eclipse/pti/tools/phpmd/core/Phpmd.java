@@ -67,7 +67,7 @@ public class Phpmd extends AbstractPHPTool {
 		public void setBaseResoucePath(final String baseResoucePath) {
 			String theBaseResourcePath = baseResoucePath;
 			if (theBaseResourcePath.lastIndexOf("/") == theBaseResourcePath.length()) {
-				theBaseResourcePath.substring(0, theBaseResourcePath.length());
+				theBaseResourcePath = theBaseResourcePath.substring(0, theBaseResourcePath.length());
 			}
 			this.baseResoucePath = theBaseResourcePath;
 		}
