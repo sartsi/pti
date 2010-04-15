@@ -26,40 +26,59 @@ public class StructuredSelectionResourceCollector extends AbstractResourceCollec
 		while (iterator.hasNext()) {
 			Object entry = iterator.next();
 			try {
-				if (entry instanceof IResource) {
-					addResourceToList((IResource) entry);
-				} else if (entry instanceof ISourceModule) {
-					ISourceModule concreteEntry = (ISourceModule) entry;
-					if (concreteEntry.exists()) {
-						IFile file = (IFile) concreteEntry.getCorrespondingResource();
-						if (PHPToolkitUtil.isPhpFile(file)) {
-							addResourceToList(file);
-						}
-					}
-				} else if (entry instanceof IOpenable) {
-					IOpenable concreteEntry = (IOpenable) entry;
-					if (concreteEntry.exists()) {
-						addResourceToList(concreteEntry.getCorrespondingResource());
-					}
-				} else if (entry instanceof IMember) {
-					IMember concreteEntry = (IMember) entry;
-					if (concreteEntry.exists()) {
-						addResourceToList(concreteEntry.getResource());
-					}
-				} else if (entry instanceof IFileEditorInput) {
-					IFileEditorInput concreteEntry = (IFileEditorInput) entry;
-					if (concreteEntry.exists()) {
-						addResourceToList(concreteEntry.getFile());
-					}
-				} else if (entry instanceof IScriptFolder) {
-					IScriptFolder concreteEntry = (IScriptFolder) entry;
-					if (concreteEntry.exists()) {
-						addResourceToList(concreteEntry.getResource());
-					}
-				}
+				handleEntry(entry);
 			} catch (ModelException e) {
 				Logger.logException(e);
 			}
+		}
+	}
+
+	private void handleEntry(Object entry) throws ModelException {
+		if (entry instanceof IResource) {
+			addResource((IResource) entry);
+		} else if (entry instanceof ISourceModule) {
+			addResource((ISourceModule) entry);
+		} else if (entry instanceof IOpenable) {
+			addResource((IOpenable) entry);
+		} else if (entry instanceof IMember) {
+			addResource((IMember) entry);
+		} else if (entry instanceof IFileEditorInput) {
+			addResource((IFileEditorInput) entry);
+		} else if (entry instanceof IScriptFolder) {
+			addResource((IScriptFolder) entry);
+		}
+	}
+
+	private void addResource(ISourceModule entry) throws ModelException {
+		if (entry.exists()) {
+			IFile file = (IFile) entry.getCorrespondingResource();
+			if (PHPToolkitUtil.isPhpFile(file)) {
+				addResource(file);
+			}
+		}
+	}
+
+	private void addResource(IOpenable entry) throws ModelException {
+		if (entry.exists()) {
+			addResource(entry.getCorrespondingResource());
+		}
+	}
+
+	private void addResource(IMember entry) throws ModelException {
+		if (entry.exists()) {
+			addResource(entry.getCorrespondingResource());
+		}
+	}
+
+	private void addResource(IFileEditorInput entry) {
+		if (entry.exists()) {
+			addResource(entry.getFile());
+		}
+	}
+
+	private void addResource(IScriptFolder entry) {
+		if (entry.exists()) {
+			addResource(entry.getResource());
 		}
 	}
 }
