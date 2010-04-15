@@ -82,7 +82,7 @@ public class Phpmd extends AbstractPHPTool {
 			return;
 		}
 
-		String cmdLineArgs = String.format("%s xml %s", path, determineRuleSets());
+		String cmdLineArgs = String.format("%s xml %s", path, getRuleSetsForCmdLine());
 
 		PHPToolLauncher launcher = new PHPToolLauncher(QUALIFIED_NAME, phpExec, getScriptFile(), cmdLineArgs,
 				getPHPINIEntries(resource.getProject(), resource.getLocation()));
@@ -90,7 +90,7 @@ public class Phpmd extends AbstractPHPTool {
 		launcher.launch(resource.getProject());
 	}
 
-	private String determineRuleSets() {
+	private String getRuleSetsForCmdLine() {
 		StringBuffer resultSets = new StringBuffer();
 		resultSets.append(RuleSet.CODESIZE.getFullPathname());
 		resultSets.append(",");
