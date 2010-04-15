@@ -20,6 +20,19 @@ public class PhpmdHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ISelection currentSelection = HandlerUtil.getCurrentSelection(event);
+		final IResource resource = determineFirstResourceOrNull(currentSelection);
+
+		if (null == resource) {
+			return null;
+		}
+
+		Job job = createJob(resource);
+		job.schedule();
+
+		return null;
+	}
+
+	private IResource determineFirstResourceOrNull(ISelection currentSelection) {
 		IResourceCollector collector = ResourceCollectorFactory.factory(currentSelection);
 
 		if (null == collector) {
@@ -33,8 +46,10 @@ public class PhpmdHandler extends AbstractHandler {
 			return null;
 		}
 
-		final IResource resource = resourceList.get(0);
+		return resourceList.get(0);
+	}
 
+	private Job createJob(final IResource resource) {
 		Job job = new Job("PHP Mess Detection") {
 			protected IStatus run(IProgressMonitor monitor) {
 				monitor.beginTask("Begin Mess Detection", 2);
@@ -48,8 +63,6 @@ public class PhpmdHandler extends AbstractHandler {
 		};
 
 		job.setUser(false);
-		job.schedule();
-
-		return null;
+		return job;
 	}
 }
