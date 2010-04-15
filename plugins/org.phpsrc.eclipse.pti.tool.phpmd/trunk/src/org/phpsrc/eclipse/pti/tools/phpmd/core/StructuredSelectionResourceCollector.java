@@ -27,29 +27,34 @@ public class StructuredSelectionResourceCollector extends AbstractResourceCollec
 			Object entry = iterator.next();
 			try {
 				if (entry instanceof IResource) {
-					addResourceToList(resourceList, (IResource) entry);
+					addResourceToList((IResource) entry);
 				} else if (entry instanceof ISourceModule) {
-					if (((ISourceModule) entry).exists()) {
-						IFile file = (IFile) ((ISourceModule) entry).getCorrespondingResource();
+					ISourceModule concreteEntry = (ISourceModule) entry;
+					if (concreteEntry.exists()) {
+						IFile file = (IFile) concreteEntry.getCorrespondingResource();
 						if (PHPToolkitUtil.isPhpFile(file)) {
-							addResourceToList(resourceList, file);
+							addResourceToList(file);
 						}
 					}
 				} else if (entry instanceof IOpenable) {
-					if (((IOpenable) entry).exists()) {
-						addResourceToList(resourceList, ((IOpenable) entry).getCorrespondingResource());
+					IOpenable concreteEntry = (IOpenable) entry;
+					if (concreteEntry.exists()) {
+						addResourceToList(concreteEntry.getCorrespondingResource());
 					}
 				} else if (entry instanceof IMember) {
-					if (((IMember) entry).exists()) {
-						addResourceToList(resourceList, ((IMember) entry).getResource());
+					IMember concreteEntry = (IMember) entry;
+					if (concreteEntry.exists()) {
+						addResourceToList(concreteEntry.getResource());
 					}
 				} else if (entry instanceof IFileEditorInput) {
-					if (((IFileEditorInput) entry).exists()) {
-						addResourceToList(resourceList, ((IFileEditorInput) entry).getFile());
+					IFileEditorInput concreteEntry = (IFileEditorInput) entry;
+					if (concreteEntry.exists()) {
+						addResourceToList(concreteEntry.getFile());
 					}
 				} else if (entry instanceof IScriptFolder) {
-					if (((IScriptFolder) entry).exists()) {
-						addResourceToList(resourceList, ((IScriptFolder) entry).getResource());
+					IScriptFolder concreteEntry = (IScriptFolder) entry;
+					if (concreteEntry.exists()) {
+						addResourceToList(concreteEntry.getResource());
 					}
 				}
 			} catch (ModelException e) {

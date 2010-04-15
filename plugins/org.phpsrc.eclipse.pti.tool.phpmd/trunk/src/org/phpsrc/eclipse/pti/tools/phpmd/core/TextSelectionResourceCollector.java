@@ -12,7 +12,7 @@ public class TextSelectionResourceCollector extends AbstractResourceCollector {
 					.getEditorInput();
 
 			if (input != null && input instanceof IFileEditorInput) {
-				addResourceToList(resourceList, ((IFileEditorInput) input).getFile());
+				addResourceToList(((IFileEditorInput) input).getFile());
 			}
 		} catch (NullPointerException e) {
 		}

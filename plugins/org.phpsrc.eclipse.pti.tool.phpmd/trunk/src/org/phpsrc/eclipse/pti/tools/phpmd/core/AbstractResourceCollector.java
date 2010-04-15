@@ -22,8 +22,8 @@ public abstract class AbstractResourceCollector implements IResourceCollector {
 		return resourceList;
 	}
 
-	protected void addResourceToList(ArrayList<IResource> list, IResource resource) {
-		if (resource != null && resource.exists() && !list.contains(resource))
-			list.add(resource);
+	protected void addResourceToList(IResource resource) {
+		if (resource != null && resource.exists() && !resourceList.contains(resource))
+			resourceList.add(resource);
 	}
 }
