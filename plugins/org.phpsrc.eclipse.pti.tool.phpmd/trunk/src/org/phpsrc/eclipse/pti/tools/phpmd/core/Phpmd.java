@@ -5,7 +5,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.php.internal.debug.core.preferences.PHPexeItem;
-import org.eclipse.php.internal.debug.core.preferences.PHPexes;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
 import org.phpsrc.eclipse.pti.core.launching.OperatingSystem;
 import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
@@ -101,16 +100,6 @@ public class Phpmd extends AbstractPHPTool {
 	}
 
 	// -------------------------
-
-	private PHPexeItem getDefaultPhpExecutable() {
-		PHPexeItem defaultPhpExec = null;
-		for (PHPexeItem phpExec : PHPexes.getInstance().getAllItems()) {
-			if (phpExec.isDefault()) {
-				defaultPhpExec = phpExec;
-			}
-		}
-		return defaultPhpExec;
-	}
 
 	public static IPath getScriptFile() {
 		return PhpmdPlugin.getDefault().resolvePluginResource("/php/tools/phpmd.php");
