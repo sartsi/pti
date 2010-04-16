@@ -4,7 +4,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.php.internal.debug.core.preferences.PHPexeItem;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
 import org.phpsrc.eclipse.pti.core.launching.OperatingSystem;
 import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
@@ -77,7 +81,7 @@ public class Phpmd extends AbstractPHPTool {
 		String path = OperatingSystem.escapeShellFileArg(resource.getLocation().toOSString());
 
 		if (null == phpExec) {
-			System.err.println("No executable php found!");
+			displayNoExecutalbeFoundDialog();
 			return;
 		}
 
@@ -87,6 +91,17 @@ public class Phpmd extends AbstractPHPTool {
 				getPHPINIEntries(resource.getProject(), resource.getLocation()));
 		launcher.setPrintOuput(true);
 		launcher.launch(resource.getProject());
+	}
+
+	private void displayNoExecutalbeFoundDialog() {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				Shell shell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+				MessageDialog.openError(shell, "PHP Mess Detector", "No executable php found");
+				System.err.println("No executable php found!");
+			}
+		});
 	}
 
 	private String getRuleSetsForCmdLine() {
