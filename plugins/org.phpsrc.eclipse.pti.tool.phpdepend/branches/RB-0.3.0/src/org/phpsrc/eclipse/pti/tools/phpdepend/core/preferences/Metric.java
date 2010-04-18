@@ -37,10 +37,19 @@ public class Metric {
 	}
 
 	public Metric(String id, String name, int level) {
+		this(id, name, level, null, null, null, null);
+	}
+
+	public Metric(String id, String name, int level, Float warningMin, Float warningMax,
+			Float errorMin, Float errorMax) {
 		this.enabled = false;
 		this.id = id;
 		this.name = name;
 		this.level = level;
+		this.warningMin = warningMin;
+		this.warningMax = warningMax;
+		this.errorMin = errorMin;
+		this.errorMax = errorMax;
 	}
 
 	public String toString() {

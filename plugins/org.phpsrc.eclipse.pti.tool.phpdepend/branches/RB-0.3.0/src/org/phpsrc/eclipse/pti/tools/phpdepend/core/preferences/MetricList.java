@@ -16,27 +16,36 @@ public class MetricList {
 		ArrayList<Metric> list = new ArrayList<Metric>();
 
 		// ClassLevel (Class)
-		list.add(new Metric("dit", "Depth of Inheritance Tree", Metric.LEVEL_CLASS));
+		list.add(new Metric("dit", "Depth of Inheritance Tree", Metric.LEVEL_CLASS, null, null,
+				new Float(5), null));
 		list.add(new Metric("impl", "Numer of impemented interfaces", Metric.LEVEL_CLASS));
 		list.add(new Metric("cis", "Class interface size", Metric.LEVEL_CLASS));
 		list.add(new Metric("csz", "Class size", Metric.LEVEL_CLASS));
 		list.add(new Metric("vars", "Number of defined class properties", Metric.LEVEL_CLASS));
-		list.add(new Metric("varsi", "Number of own and inherited class properties", Metric.LEVEL_CLASS));
+		list.add(new Metric("varsi", "Number of own and inherited class properties",
+				Metric.LEVEL_CLASS));
 		list.add(new Metric("varsnp", "Number of public class properties", Metric.LEVEL_CLASS));
-		list.add(new Metric("wmc", "Weighted Method per Class", Metric.LEVEL_CLASS));
-		list.add(new Metric("wmci", "Weighted Method per Class + inherited WMC", Metric.LEVEL_CLASS));
-		list.add(new Metric("wmcnp", "Wighted Method per Class for all public class methods", Metric.LEVEL_CLASS));
+		list.add(new Metric("wmc", "Weighted Method per Class", Metric.LEVEL_CLASS, new Float(20),
+				new Float(49), new Float(50), null));
+		list
+				.add(new Metric("wmci", "Weighted Method per Class + inherited WMC",
+						Metric.LEVEL_CLASS));
+		list.add(new Metric("wmcnp", "Wighted Method per Class for all public class methods",
+				Metric.LEVEL_CLASS));
 
 		// CodeRank (Class, Package)
 		list.add(new Metric("cr", "Code rank", Metric.LEVEL_CLASS));
 		list.add(new Metric("rcr", "Reverse code rank", Metric.LEVEL_CLASS));
 
 		// Coupling (Project)
-		list.add(new Metric("calls", "Number of called methods and functions", Metric.LEVEL_PROJECT));
+		list
+				.add(new Metric("calls", "Number of called methods and functions",
+						Metric.LEVEL_PROJECT));
 		list.add(new Metric("fanout", "Number of referenced types", Metric.LEVEL_PROJECT));
 
 		// Cyclomatic Complexity (Project, Method, Function)
-		list.add(new Metric("ccn", "Cyclomatic Complexity", Metric.LEVEL_METHOD));
+		list.add(new Metric("ccn", "Cyclomatic Complexity", Metric.LEVEL_METHOD, new Float(7),
+				new Float(10), new Float(11), null));
 		list.add(new Metric("ccn2", "Extended Cyclomatic Complexity", Metric.LEVEL_METHOD));
 
 		// Dependency (Package)
@@ -49,7 +58,8 @@ public class MetricList {
 		// Hierachy (Project)
 		list.add(new Metric("clsa", "Number of abstract classes", Metric.LEVEL_PROJECT));
 		list.add(new Metric("clsc", "Number of concrete classes", Metric.LEVEL_PROJECT));
-		list.add(new Metric("roots", "Number of root classes within the analyzed system", Metric.LEVEL_PROJECT));
+		list.add(new Metric("roots", "Number of root classes within the analyzed system",
+				Metric.LEVEL_PROJECT));
 		list.add(new Metric("leafs", "Number of leaf classes", Metric.LEVEL_PROJECT));
 		list.add(new Metric("maxDIT", "Max Depth of Inheritance Tree value", Metric.LEVEL_PROJECT));
 

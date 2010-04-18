@@ -29,7 +29,6 @@ public class PHPDependProblemMarkerListener implements IMetricRunSessionListener
 	private static int DEFAULT_LINE_NUMBER = 1;
 	private static ISourceRange DEFAULT_SOURCE_RANGE = new SourceRange(0, 0);
 
-	@Override
 	public void sessionAdded(MetricRunSession metricRunSession) {
 		if (metricRunSession != null && metricRunSession.getDependentResource() != null) {
 			try {
@@ -42,7 +41,6 @@ public class PHPDependProblemMarkerListener implements IMetricRunSessionListener
 		}
 	}
 
-	@Override
 	public void sessionRemoved(MetricRunSession metricRunSession) {
 	}
 
