@@ -34,7 +34,6 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.php.internal.ui.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
@@ -78,6 +77,7 @@ import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.IMetricElement;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.IMetricRunSessionListener;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.MetricRunSession;
 import org.phpsrc.eclipse.pti.tools.phpdepend.core.model.PHPDependModel;
+import org.phpsrc.eclipse.pti.ui.Logger;
 import org.phpsrc.eclipse.pti.ui.viewsupport.BasicElementLabels;
 import org.phpsrc.eclipse.pti.ui.viewsupport.ViewHistory;
 

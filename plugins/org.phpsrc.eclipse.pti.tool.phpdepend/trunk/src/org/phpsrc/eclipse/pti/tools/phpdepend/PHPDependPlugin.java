@@ -47,8 +47,7 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	public static final String IMG_METRIC_TYPE_FILE_HIERACHY = "IMG_METRIC_TYPE_FILE_HIERACHY"; //$NON-NLS-1$
 	public static final String IMG_METRIC_TYPE_PACKAGE = "IMG_METRIC_TYPE_FOLDER"; //$NON-NLS-1$
 
-	public static final String ID_EXTENSION_POINT_METRICRUN_LISTENERS = PLUGIN_ID
-			+ "." + "metricRunListeners"; //$NON-NLS-1$ //$NON-NLS-2$
+	public static final String ID_EXTENSION_POINT_METRICRUN_LISTENERS = PLUGIN_ID + "." + "metricRunListeners"; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private static final IPath ICONS_PATH = new Path("$nl$/icons/full"); //$NON-NLS-1$
 	private static final String HISTORY_DIR_NAME = "history"; //$NON-NLS-1$
@@ -88,11 +87,8 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 				.createFromURL(resolvePluginResourceURL("icons/full/obj16/php_depend.gif")));
 		registry.put(IMG_METRIC_TYPE_FILE, ImageDescriptor
 				.createFromURL(resolvePluginResourceURL("icons/full/obj16/type_file.gif")));
-		registry
-				.put(
-						IMG_METRIC_TYPE_FILE_HIERACHY,
-						ImageDescriptor
-								.createFromURL(resolvePluginResourceURL("icons/full/obj16/type_file_hierachy.gif")));
+		registry.put(IMG_METRIC_TYPE_FILE_HIERACHY, ImageDescriptor
+				.createFromURL(resolvePluginResourceURL("icons/full/obj16/type_file_hierachy.gif")));
 		registry.put(IMG_METRIC_TYPE_PACKAGE, ImageDescriptor
 				.createFromURL(resolvePluginResourceURL("icons/full/obj16/type_folder.gif")));
 	}
@@ -130,8 +126,7 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 
 	public IPath[] getPluginIncludePaths(IProject project) {
 		PHPDependPreferences prefs = PHPDependPreferencesFactory.factory(project);
-		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(
-				prefs.getPearLibraryName());
+		IPath[] pearPaths = PHPLibraryPEARPlugin.getDefault().getPluginIncludePaths(prefs.getPearLibraryName());
 
 		IPath[] includePaths = new IPath[pearPaths.length + 1];
 		includePaths[0] = resolvePluginResource("/php/tools");
@@ -182,8 +177,7 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	private static ImageDescriptor createImageDescriptor(String pathPrefix, String imageName,
 			boolean useMissingImageDescriptor) {
 		IPath path = ICONS_PATH.append(pathPrefix).append(imageName);
-		return createImageDescriptor(PHPDependPlugin.getDefault().getBundle(), path,
-				useMissingImageDescriptor);
+		return createImageDescriptor(PHPDependPlugin.getDefault().getBundle(), path, useMissingImageDescriptor);
 	}
 
 	/**
@@ -204,8 +198,7 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	 *         image at the given location and
 	 *         <code>useMissingImageDescriptor</code> is <code>true</code>
 	 */
-	private static ImageDescriptor createImageDescriptor(Bundle bundle, IPath path,
-			boolean useMissingImageDescriptor) {
+	private static ImageDescriptor createImageDescriptor(Bundle bundle, IPath path, boolean useMissingImageDescriptor) {
 		URL url = FileLocator.find(bundle, path, null);
 		if (url != null) {
 			return ImageDescriptor.createFromURL(url);

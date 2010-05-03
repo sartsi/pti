@@ -30,11 +30,16 @@ public class MetricRunSession extends MetricElement {
 	private final static Image IMAGE = PHPDependPlugin.getDefault().getImageRegistry().get(
 			PHPDependPlugin.IMG_PHP_DEPEND);
 
+	private final static String FILE_NAME_JDEPEND_CHART = "jdepend.svg";
+	private final static String FILE_NAME_PYRAMID_SUMMARY = "pyramid.svg";
+
 	volatile boolean fIsRunning;
 	private final IResource fDependentResource;
 	private final Image fImage;
 	private Date fGenerated;
 	private MetricSummary fSummaryRoot;
+	private File jdependChartFile;
+	private File summaryPyramidFile;
 
 	public MetricRunSession() {
 		this(null);
@@ -147,6 +152,20 @@ public class MetricRunSession extends MetricElement {
 		return new File(historyDir, swapFileName);
 	}
 
+	private File createSessionFile(File source, String fileName) {
+		if (source == null || !source.exists())
+			return null;
+
+		File historyDir = PHPDependPlugin.getHistoryDirectory();
+		String isoTime = new SimpleDateFormat("yyyyMMdd-HHmmss.SSS").format(getGenerated()); //$NON-NLS-1$
+		String swapFileName = isoTime + "." + fileName; //$NON-NLS-1$
+		source.renameTo(new File(historyDir, swapFileName));
+
+		System.out.println(source);
+
+		return source;
+	}
+
 	public void reset() {
 		metrics = new Metric[0];
 		members.clear();
@@ -162,5 +181,21 @@ public class MetricRunSession extends MetricElement {
 
 	public int getLevel() {
 		return Metric.LEVEL_PROJECT;
+	}
+
+	public void setJDependChartFile(File jdependChartFile) {
+		this.jdependChartFile = createSessionFile(jdependChartFile, FILE_NAME_JDEPEND_CHART);
+	}
+
+	public void setSummaryPyramidFile(File summaryPyramidFile) {
+		this.summaryPyramidFile = createSessionFile(summaryPyramidFile, FILE_NAME_PYRAMID_SUMMARY);
+	}
+
+	public File getJDependChartFile() {
+		return jdependChartFile;
+	}
+
+	public File getSummaryPyramidFile() {
+		return summaryPyramidFile;
 	}
 }

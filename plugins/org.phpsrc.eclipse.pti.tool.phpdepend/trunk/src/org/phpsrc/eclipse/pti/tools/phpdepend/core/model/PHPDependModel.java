@@ -183,6 +183,11 @@ public final class PHPDependModel {
 	}
 
 	public static MetricRunSession importMetricRunSession(File file, IResource dependentResource) throws CoreException {
+		return importMetricRunSession(file, null, null, dependentResource);
+	}
+
+	public static MetricRunSession importMetricRunSession(File file, File jdependChartFile, File summaryPyramidFile,
+			IResource dependentResource) throws CoreException {
 		try {
 			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 			// parserFactory.setValidating(true); // TODO: add DTD and debug
@@ -191,6 +196,9 @@ public final class PHPDependModel {
 			MetricRunHandler handler = new MetricRunHandler(dependentResource);
 			parser.parse(file, handler);
 			MetricRunSession session = handler.getMetricRunSession();
+			session.setJDependChartFile(jdependChartFile);
+			session.setSummaryPyramidFile(summaryPyramidFile);
+
 			PHPDependPlugin.getModel().addMetricRunSession(session);
 			return session;
 		} catch (ParserConfigurationException e) {
