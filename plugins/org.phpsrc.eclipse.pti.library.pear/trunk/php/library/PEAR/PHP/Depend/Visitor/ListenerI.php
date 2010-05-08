@@ -55,7 +55,7 @@
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://pdepend.org/
  */
 interface PHP_Depend_Visitor_ListenerI
@@ -77,24 +77,6 @@ interface PHP_Depend_Visitor_ListenerI
      * @return void
      */
     function endVisitClass(PHP_Depend_Code_Class $class);
-
-    /**
-     * Is called when the visitor starts a new closure instance.
-     *
-     * @param PHP_Depend_Code_Closure $closure The context closure instance.
-     *
-     * @return void
-     */
-    function startVisitClosure(PHP_Depend_Code_Closure $closure);
-
-    /**
-     * Is called when the visitor ends with a closure instance.
-     *
-     * @param PHP_Depend_Code_Closure $closure The context closure instance.
-     *
-     * @return void
-     */
-    function endVisitClosure(PHP_Depend_Code_Closure $closure);
 
     /**
      * Is called when the visitor starts a new file instance.

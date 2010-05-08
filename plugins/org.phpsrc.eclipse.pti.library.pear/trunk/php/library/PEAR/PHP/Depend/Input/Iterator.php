@@ -57,7 +57,7 @@ require_once 'PHP/Depend/Input/FilterI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Input_Iterator extends FilterIterator

@@ -42,7 +42,7 @@
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: AbstractCallable.php 602 2009-01-04 15:10:10Z mapi $
+ * @version    SVN: $Id$
  * @link       http://pdepend.org/
  */
 
@@ -68,7 +68,7 @@ require_once 'PHP/Depend/Code/ClassOrInterfaceReferenceIterator.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://pdepend.org/
  */
 abstract class PHP_Depend_Code_AbstractCallable extends PHP_Depend_Code_AbstractItem
@@ -120,6 +120,22 @@ abstract class PHP_Depend_Code_AbstractCallable extends PHP_Depend_Code_Abstract
      * @since 0.9.6
      */
     private $_nodes = array();
+
+    /**
+     * The start line number of the method or function declaration.
+     *
+     * @var integer
+     * @since 0.9.12
+     */
+    private $_startLine = 0;
+
+    /**
+     * The end line number of the method or function declaration.
+     *
+     * @var integer
+     * @since 0.9.12
+     */
+    private $_endLine = 0;
 
     /**
      * Adds a parsed child node to this node.
@@ -211,6 +227,9 @@ abstract class PHP_Depend_Code_AbstractCallable extends PHP_Depend_Code_Abstract
      */
     public function setTokens(array $tokens)
     {
+        $this->_startLine = reset($tokens)->startLine;
+        $this->_endLine   = end($tokens)->endLine;
+        
         $storage = PHP_Depend_StorageRegistry::get(PHP_Depend::TOKEN_STORAGE);
         $storage->store($tokens, $this->getUUID(), get_class($this));
     }
@@ -223,9 +242,7 @@ abstract class PHP_Depend_Code_AbstractCallable extends PHP_Depend_Code_Abstract
      */
     public function getStartLine()
     {
-        $tokens = $this->getTokens();
-        assert(($token = reset($tokens)) instanceof PHP_Depend_Token);
-        return $token->startLine;
+        return $this->_startLine;
     }
 
     /**
@@ -236,9 +253,7 @@ abstract class PHP_Depend_Code_AbstractCallable extends PHP_Depend_Code_Abstract
      */
     public function getEndLine()
     {
-        $tokens = $this->getTokens();
-        assert(($token = end($tokens)) instanceof PHP_Depend_Token);
-        return $token->endLine;
+        return $this->_endLine;
     }
 
     /**
@@ -261,21 +276,6 @@ abstract class PHP_Depend_Code_AbstractCallable extends PHP_Depend_Code_Abstract
         return new PHP_Depend_Code_ClassOrInterfaceReferenceIterator(
             $classReferences
         );
-    }
-
-    /**
-     * Adds a reference holder for a class or interface used by this callable
-     * object.
-     *
-     * @param PHP_Depend_Code_ASTClassOrInterfaceReference $reference Referenced
-     *        class or interface used by this callable object.
-     *
-     * @return void
-     */
-    public function addDependencyClassReference(
-        PHP_Depend_Code_ASTClassOrInterfaceReference $reference
-    ) {
-        $this->_dependencyClassReferences[] = $reference;
     }
 
     /**
@@ -452,188 +452,50 @@ abstract class PHP_Depend_Code_AbstractCallable extends PHP_Depend_Code_Abstract
         $this->_parameters = new PHP_Depend_Code_NodeIterator($parameters);
     }
 
+    /**
+     * This method can be called by the PHP_Depend runtime environment or a
+     * utilizing component to free up memory. This methods are required for
+     * PHP version < 5.3 where cyclic references can not be resolved
+     * automatically by PHP's garbage collector.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function free()
+    {
+        $this->_removeReferencesToParameters();
+        $this->_removeReferencesToNodes();
+    }
+
+    /**
+     * Free memory consumed by parameters associated with this callable instance.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferencesToParameters()
+    {
+        $this->getParameters()->free();
+        $this->_parameters = array();
+    }
+
+    /**
+     * Free memory consumed by the ast nodes associated with this callable
+     * instance.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferencesToNodes()
+    {
+        foreach ($this->_nodes as $i => $node) {
+            $node->free();
+        }
+        $this->_nodes = array();
+    }
+
     // DEPRECATED METHODS AND PROPERTIES
     // @codeCoverageIgnoreStart
-
-    /**
-     * The return type for this callable. By default and for scalar types this
-     * will be <b>null</b>.
-     *
-     * @var PHP_Depend_Code_AbstractClassOrInterface $_returnType
-     * @deprecated Since version 0.9.5
-     */
-    private $_returnType = null;
-
-    /**
-     * Returns the return type of this callable. By default and for scalar types
-     * this will be <b>null</b>.
-     *
-     * @return PHP_Depend_Code_AbstractClassOrInterface
-     * @deprecated Since version 0.9.5, use getReturnValueClass() instead.
-     */
-    public function getReturnType()
-    {
-        fwrite(STDERR, 'Since 0.9.5 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-        return $this->_returnType;
-    }
-
-    /**
-     * Sets the return type of this callable.
-     *
-     * @param PHP_Depend_Code_AbstractClassOrInterface $returnType The return
-     *        type of this.
-     *
-     * @return void
-     * @deprecated Since version 0.9.5, use setReturnClassReference() instead.
-     */
-    public function setReturnType(
-        PHP_Depend_Code_AbstractClassOrInterface $returnType
-    ) {
-        fwrite(STDERR, 'Since 0.9.5 setReturnType() is deprecated.' . PHP_EOL);
-        $this->_returnType = $returnType;
-    }
-
-    /**
-     * A list of all thrown exception types.
-     *
-     * @var array(PHP_Depend_Code_AbstractClassOrInterface) $_exceptionTypes
-     * @deprecated Since version 0.9.5
-     */
-    private $_exceptionTypes = array();
-
-    /**
-     * Returns an iterator with all thrown exception types.
-     *
-     * @return PHP_Depend_Code_NodeIterator
-     * @deprecated Since version 0.9.5, use getExceptionClasses() instead.
-     */
-    public function getExceptionTypes()
-    {
-        fwrite(STDERR, 'Since 0.9.5 getExceptionTypes() is deprecated.' . PHP_EOL);
-        return new PHP_Depend_Code_NodeIterator($this->_exceptionTypes);
-    }
-
-    /**
-     * Returns an unfiltered, raw array of
-     * {@link PHP_Depend_Code_AbstractClassOrInterface} objects this function
-     * may throw. This method is only for internal usage.
-     *
-     * @return array(PHP_Depend_Code_AbstractClassOrInterface)
-     * @access private
-     * @deprecated Since version 0.9.5
-     */
-    public function getUnfilteredRawExceptionTypes()
-    {
-        fwrite(STDERR, 'Since 0.9.5 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-        return $this->_exceptionTypes;
-    }
-
-    /**
-     * Adds an exception to the list of thrown exception types.
-     *
-     * @param PHP_Depend_Code_AbstractClassOrInterface $exceptionType Thrown
-     *        exception.
-     *
-     * @return void
-     * @deprecated Since version 0.9.5, use addExceptionClass() instead.
-     */
-    public function addExceptionType(
-        PHP_Depend_Code_AbstractClassOrInterface $exceptionType
-    ) {
-        fwrite(STDERR, 'Since 0.9.5 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-        if (in_array($exceptionType, $this->_exceptionTypes, true) === false) {
-            $this->_exceptionTypes[] = $exceptionType;
-        }
-    }
-
-    /**
-     * Removes an exception from the list of thrown exception types.
-     *
-     * @param PHP_Depend_Code_AbstractClassOrInterface $exceptionType Thrown
-     *        exception.
-     *
-     * @return void
-     * @deprecated Since version 0.9.5
-     */
-    public function removeExceptionType(
-        PHP_Depend_Code_AbstractClassOrInterface $exceptionType
-    ) {
-        fwrite(STDERR, 'Since 0.9.5 removeExceptionType() is deprecated.' . PHP_EOL);
-        $index = array_search($exceptionType, $this->_exceptionTypes, true);
-        if ($index !== false) {
-            unset($this->_exceptionTypes[$index]);
-        }
-    }
-
-    /**
-     * List of {@link PHP_Depend_Code_AbstractClassOrInterface} objects this
-     * function depends on.
-     *
-     * @var array(PHP_Depend_Code_AbstractClassOrInterface) $dependencies
-     */
-    protected $dependencies = array();
-
-    /**
-     * Returns an unfiltered, raw array of
-     * {@link PHP_Depend_Code_AbstractClassOrInterface} objects this function
-     * depends on. This method is only for internal usage.
-     *
-     * @return array(PHP_Depend_Code_AbstractClassOrInterface)
-     * @access private
-     * @deprecated Since version 0.9.5
-     */
-    public function getUnfilteredRawDependencies()
-    {
-        fwrite(STDERR, 'Since 0.9.5 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-        $dependencies = $this->dependencies;
-        foreach ($this->_parameters as $parameter) {
-            // Skip all scalar parameters
-            if (($type = $parameter->getClass()) === null) {
-                continue;
-            }
-            // Add only once
-            if (in_array($type, $dependencies, true) === false) {
-                $dependencies[] = $type;
-            }
-        }
-        return $dependencies;
-    }
-
-    /**
-     * Adds the given {@link PHP_Depend_Code_AbstractClassOrInterface} object as
-     * dependency.
-     *
-     * @param PHP_Depend_Code_AbstractClassOrInterface $type A type this function
-     *        depends on.
-     *
-     * @return void
-     * @deprecated Since version 0.9.5, use addDependencyClassReference() instead.
-     */
-    public function addDependency(PHP_Depend_Code_AbstractClassOrInterface $type)
-    {
-        fwrite(STDERR, 'Since 0.9.5 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-        if (in_array($type, $this->dependencies, true) === false) {
-            $this->dependencies[] = $type;
-        }
-    }
-
-    /**
-     * Removes the given {@link PHP_Depend_Code_AbstractClassOrInterface} object
-     * from the dependency list.
-     *
-     * @param PHP_Depend_Code_AbstractClassOrInterface $type A type to remove.
-     *
-     * @return void
-     * @deprecated Since version 0.9.5
-     */
-    public function removeDependency(PHP_Depend_Code_AbstractClassOrInterface $type)
-    {
-        fwrite(STDERR, 'Since 0.9.5 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-        if (($i = array_search($type, $this->dependencies, true)) !== false) {
-            // Remove from internal list
-            unset($this->dependencies[$i]);
-        }
-    }
 
     /**
      * Sets the start line for this item.

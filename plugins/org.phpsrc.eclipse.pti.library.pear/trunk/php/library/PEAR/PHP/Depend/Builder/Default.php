@@ -67,11 +67,19 @@ require_once 'PHP/Depend/Util/Type.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
 {
+    /**
+     * This property holds all packages found during the parsing phase.
+     *
+     * @param array(PHP_Depend_Code_Package)
+     * @since 0.9.12
+     */
+    private $_preparedPackages = null;
+
     /**
      * Default package which contains all functions and classes with an unknown
      * scope.
@@ -525,13 +533,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTFieldDeclaration()
     {
-        include_once 'PHP/Depend/Code/ASTFieldDeclaration.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTFieldDeclaration()'
-        );
-
-        return new PHP_Depend_Code_ASTFieldDeclaration();
+        return $this->_buildASTNodeInstance('ASTFieldDeclaration');
     }
 
     /**
@@ -544,13 +546,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTVariableDeclarator($image)
     {
-        include_once 'PHP/Depend/Code/ASTVariableDeclarator.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTVariableDeclarator(' . $image . ')'
-        );
-
-        return new PHP_Depend_Code_ASTVariableDeclarator($image);
+        return $this->_buildASTNodeInstance('ASTVariableDeclarator', $image);
     }
 
     /**
@@ -563,13 +559,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTStaticVariableDeclaration($image)
     {
-        include_once 'PHP/Depend/Code/ASTStaticVariableDeclaration.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTStaticVariableDeclaration(' . $image . ')'
-        );
-
-        return new PHP_Depend_Code_ASTStaticVariableDeclaration($image);
+        return $this->_buildASTNodeInstance('ASTStaticVariableDeclaration', $image);
     }
 
     /**
@@ -582,13 +572,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTConstant($image)
     {
-        include_once 'PHP/Depend/Code/ASTConstant.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTConstant(' . $image . ')'
-        );
-
-        return new PHP_Depend_Code_ASTConstant($image);
+        return $this->_buildASTNodeInstance('ASTConstant', $image);
     }
 
     /**
@@ -601,13 +585,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTVariable($image)
     {
-        include_once 'PHP/Depend/Code/ASTVariable.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTVariable(' . $image . ')'
-        );
-
-        return new PHP_Depend_Code_ASTVariable($image);
+        return $this->_buildASTNodeInstance('ASTVariable', $image);
     }
 
     /**
@@ -620,13 +598,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTVariableVariable($image)
     {
-        include_once 'PHP/Depend/Code/ASTVariableVariable.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTVariableVariable(' . $image . ')'
-        );
-
-        return new PHP_Depend_Code_ASTVariableVariable($image);
+        return $this->_buildASTNodeInstance('ASTVariableVariable', $image);
     }
 
     /**
@@ -639,13 +611,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTCompoundVariable($image)
     {
-        include_once 'PHP/Depend/Code/ASTCompoundVariable.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTCompoundVariable(' . $image . ')'
-        );
-
-        return new PHP_Depend_Code_ASTCompoundVariable($image);
+        return $this->_buildASTNodeInstance('ASTCompoundVariable', $image);
     }
 
     /**
@@ -656,13 +622,18 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTCompoundExpression()
     {
-        include_once 'PHP/Depend/Code/ASTCompoundExpression.php';
+        return $this->_buildASTNodeInstance('ASTCompoundExpression');
+    }
 
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTCompoundExpression()'
-        );
-        
-        return new PHP_Depend_Code_ASTCompoundExpression();
+    /**
+     * Builds a new closure node.
+     *
+     * @return PHP_Depend_Code_ASTClosure
+     * @since 0.9.12
+     */
+    public function buildASTClosure()
+    {
+        return $this->_buildASTNodeInstance('ASTClosure');
     }
 
     /**
@@ -673,13 +644,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTFormalParameters()
     {
-        include_once 'PHP/Depend/Code/ASTFormalParameters.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTFormalParameters()'
-        );
-
-        return new PHP_Depend_Code_ASTFormalParameters();
+        return $this->_buildASTNodeInstance('ASTFormalParameters');
     }
 
     /**
@@ -690,13 +655,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTFormalParameter()
     {
-        include_once 'PHP/Depend/Code/ASTFormalParameter.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTFormalParameter()'
-        );
-
-        return new PHP_Depend_Code_ASTFormalParameter();
+        return $this->_buildASTNodeInstance('ASTFormalParameter');
     }
 
     /**
@@ -707,11 +666,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTExpression()
     {
-        include_once 'PHP/Depend/Code/ASTExpression.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTExpression');
-
-        return new PHP_Depend_Code_ASTExpression();
+        return $this->_buildASTNodeInstance('ASTExpression');
     }
 
     /**
@@ -724,13 +679,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTAssignmentExpression($image)
     {
-        include_once 'PHP/Depend/Code/ASTAssignmentExpression.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTAssignmentExpression'
-        );
-
-        return new PHP_Depend_Code_ASTAssignmentExpression($image);
+        return $this->_buildASTNodeInstance('ASTAssignmentExpression', $image);
     }
 
     /**
@@ -743,13 +692,110 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTAllocationExpression($image)
     {
-        include_once 'PHP/Depend/Code/ASTAllocationExpression.php';
+        return $this->_buildASTNodeInstance('ASTAllocationExpression', $image);
+    }
 
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTAllocationExpression()'
-        );
+    /**
+     * Builds a new eval-expression node.
+     *
+     * @param string $image The source image of this expression.
+     *
+     * @return PHP_Depend_Code_ASTEvalExpression
+     * @since 0.9.12
+     */
+    public function buildASTEvalExpression($image)
+    {
+        return $this->_buildASTNodeInstance('ASTEvalExpression', $image);
+    }
 
-        return new PHP_Depend_Code_ASTAllocationExpression($image);
+    /**
+     * Builds a new exit-expression instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTExitExpression
+     * @since 0.9.12
+     */
+    public function buildASTExitExpression($image)
+    {
+        return $this->_buildASTNodeInstance('ASTExitExpression', $image);
+    }
+
+    /**
+     * Builds a new clone-expression node.
+     *
+     * @param string $image The source image of this expression.
+     *
+     * @return PHP_Depend_Code_ASTCloneExpression
+     * @since 0.9.12
+     */
+    public function buildASTCloneExpression($image)
+    {
+        return $this->_buildASTNodeInstance('ASTCloneExpression', $image);
+    }
+
+    /**
+     * Builds a new list-expression node.
+     *
+     * @param string $image The source image of this expression.
+     *
+     * @return PHP_Depend_Code_ASTListExpression
+     * @author Joey Mazzarelli
+     * @since 0.9.12
+     */
+    public function buildASTListExpression($image)
+    {
+        return $this->_buildASTNodeInstance('ASTListExpression', $image);
+    }
+
+    /**
+     * Builds a new include- or include_once-expression.
+     *
+     * @return PHP_Depend_Code_ASTIncludeExpression
+     * @since 0.9.12
+     */
+    public function buildASTIncludeExpression()
+    {
+        return $this->_buildASTNodeInstance('ASTIncludeExpression');
+    }
+
+    /**
+     * Builds a new require- or require_once-expression.
+     *
+     * @return PHP_Depend_Code_ASTRequireExpression
+     * @since 0.9.12
+     */
+    public function buildASTRequireExpression()
+    {
+        return $this->_buildASTNodeInstance('ASTRequireExpression');
+    }
+
+    /**
+     * Builds a new array-expression node.
+     *
+     * @return PHP_Depend_Code_ASTArrayIndexExpression
+     * @since 0.9.12
+     */
+    public function buildASTArrayIndexExpression()
+    {
+        return $this->_buildASTNodeInstance('ASTArrayIndexExpression');
+    }
+
+    /**
+     * Builds a new string-expression node.
+     *
+     * <code>
+     * //     --------
+     * $string{$index}
+     * //     --------
+     * </code>
+     *
+     * @return PHP_Depend_Code_ASTStringIndexExpression
+     * @since 0.9.12
+     */
+    public function buildASTStringIndexExpression()
+    {
+        return $this->_buildASTNodeInstance('ASTStringIndexExpression');
     }
 
     /**
@@ -762,13 +808,30 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTInstanceOfExpression($image)
     {
-        include_once 'PHP/Depend/Code/ASTInstanceOfExpression.php';
+        return $this->_buildASTNodeInstance('ASTInstanceOfExpression', $image);
+    }
 
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTInstanceOfExpression()'
-        );
-
-        return new PHP_Depend_Code_ASTInstanceOfExpression($image);
+    /**
+     * Builds a new isset-expression node.
+     *
+     * <code>
+     * //  -----------
+     * if (isset($foo)) {
+     * //  -----------
+     * }
+     *
+     * //  -----------------------
+     * if (isset($foo, $bar, $baz)) {
+     * //  -----------------------
+     * }
+     * </code>
+     *
+     * @return PHP_Depend_Code_ASTIssetExpression
+     * @since 0.9.12
+     */
+    public function buildASTIssetExpression()
+    {
+        return $this->_buildASTNodeInstance('ASTIssetExpression');
     }
 
     /**
@@ -785,13 +848,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTConditionalExpression()
     {
-        include_once 'PHP/Depend/Code/ASTConditionalExpression.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTConditionalExpression'
-        );
-
-        return new PHP_Depend_Code_ASTConditionalExpression('?');
+        return $this->_buildASTNodeInstance('ASTConditionalExpression', '?');
     }
 
     /**
@@ -802,13 +859,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTBooleanAndExpression()
     {
-        include_once 'PHP/Depend/Code/ASTBooleanAndExpression.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTBooleanAndExpression'
-        );
-
-        return new PHP_Depend_Code_ASTBooleanAndExpression('&&');
+        return $this->_buildASTNodeInstance('ASTBooleanAndExpression', '&&');
     }
 
     /**
@@ -819,13 +870,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTBooleanOrExpression()
     {
-        include_once 'PHP/Depend/Code/ASTBooleanOrExpression.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTBooleanOrExpression'
-        );
-        
-        return new PHP_Depend_Code_ASTBooleanOrExpression('||');
+        return $this->_buildASTNodeInstance('ASTBooleanOrExpression', '||');
     }
 
     /**
@@ -836,13 +881,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTLogicalAndExpression()
     {
-        include_once 'PHP/Depend/Code/ASTLogicalAndExpression.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTLogicalAndExpression'
-        );
-
-        return new PHP_Depend_Code_ASTLogicalAndExpression('and');
+        return $this->_buildASTNodeInstance('ASTLogicalAndExpression', 'and');
     }
 
     /**
@@ -853,13 +892,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTLogicalOrExpression()
     {
-        include_once 'PHP/Depend/Code/ASTLogicalOrExpression.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTLogicalOrExpression'
-        );
-
-        return new PHP_Depend_Code_ASTLogicalOrExpression('or');
+        return $this->_buildASTNodeInstance('ASTLogicalOrExpression', 'or');
     }
 
     /**
@@ -870,13 +903,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTLogicalXorExpression()
     {
-        include_once 'PHP/Depend/Code/ASTLogicalXorExpression.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTLogicalXorExpression'
-        );
-
-        return new PHP_Depend_Code_ASTLogicalXorExpression('xor');
+        return $this->_buildASTNodeInstance('ASTLogicalXorExpression', 'xor');
     }
 
     /**
@@ -887,13 +914,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTSwitchStatement()
     {
-        include_once 'PHP/Depend/Code/ASTSwitchStatement.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTSwitchStatement'
-        );
-
-        return new PHP_Depend_Code_ASTSwitchStatement('switch');
+        return $this->_buildASTNodeInstance('ASTSwitchStatement');
     }
 
     /**
@@ -906,11 +927,29 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTSwitchLabel($image)
     {
-        include_once 'PHP/Depend/Code/ASTSwitchLabel.php';
+        return $this->_buildASTNodeInstance('ASTSwitchLabel', $image);
+    }
 
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTSwitchLabel');
+    /**
+     * Builds a new global-statement instance.
+     *
+     * @return PHP_Depend_Code_ASTGlobalStatement
+     * @since 0.9.12
+     */
+    function buildASTGlobalStatement()
+    {
+        return $this->_buildASTNodeInstance('ASTGlobalStatement');
+    }
 
-        return new PHP_Depend_Code_ASTSwitchLabel($image);
+    /**
+     * Builds a new unset-statement instance.
+     *
+     * @return PHP_Depend_Code_ASTUnsetStatement
+     * @since 0.9.12
+     */
+    public function buildASTUnsetStatement()
+    {
+        return $this->_buildASTNodeInstance('ASTUnsetStatement');
     }
 
     /**
@@ -923,11 +962,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTCatchStatement($image)
     {
-        include_once 'PHP/Depend/Code/ASTCatchStatement.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTCatchStatement()');
-
-        return new PHP_Depend_Code_ASTCatchStatement($image);
+        return $this->_buildASTNodeInstance('ASTCatchStatement', $image);
     }
 
     /**
@@ -940,11 +975,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTIfStatement($image)
     {
-        include_once 'PHP/Depend/Code/ASTIfStatement.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTIfStatement()');
-
-        return new PHP_Depend_Code_ASTIfStatement($image);
+        return $this->_buildASTNodeInstance('ASTIfStatement', $image);
     }
 
     /**
@@ -957,11 +988,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTElseIfStatement($image)
     {
-        include_once 'PHP/Depend/Code/ASTElseIfStatement.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTElseIfStatement()');
-        
-        return new PHP_Depend_Code_ASTElseIfStatement($image);
+        return $this->_buildASTNodeInstance('ASTElseIfStatement', $image);
     }
 
     /**
@@ -974,11 +1001,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTForStatement($image)
     {
-        include_once 'PHP/Depend/Code/ASTForStatement.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTForStatement()');
-        
-        return new PHP_Depend_Code_ASTForStatement($image);
+        return $this->_buildASTNodeInstance('ASTForStatement', $image);
     }
 
     /**
@@ -995,11 +1018,24 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTForInit()
     {
-        include_once 'PHP/Depend/Code/ASTForInit.php';
+        return $this->_buildASTNodeInstance('ASTForInit');
+    }
 
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTForInit()');
-
-        return new PHP_Depend_Code_ASTForInit();
+    /**
+     * Builds a new for-update node.
+     *
+     * <code>
+     *                                        -------------------------------
+     * for ($x = 0, $y = 23, $z = 42; $x < $y; ++$x, $y = $x + 1, $z = $x + 2) {}
+     *                                        -------------------------------
+     * </code>
+     *
+     * @return PHP_Depend_Code_ASTForUpdate
+     * @since 0.9.12
+     */
+    public function buildASTForUpdate()
+    {
+        return $this->_buildASTNodeInstance('ASTForUpdate');
     }
 
     /**
@@ -1012,13 +1048,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTForeachStatement($image)
     {
-        include_once 'PHP/Depend/Code/ASTForeachStatement.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTForeachStatement()'
-        );
-
-        return new PHP_Depend_Code_ASTForeachStatement($image);
+        return $this->_buildASTNodeInstance('ASTForeachStatement', $image);
     }
 
     /**
@@ -1031,11 +1061,20 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTWhileStatement($image)
     {
-        include_once 'PHP/Depend/Code/ASTWhileStatement.php';
+        return $this->_buildASTNodeInstance('ASTWhileStatement', $image);
+    }
 
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTWhileStatement()');
-        
-        return new PHP_Depend_Code_ASTWhileStatement($image);
+    /**
+     * Builds a new do/while-statement node.
+     *
+     * @param string $image The source image of this statement.
+     *
+     * @return PHP_Depend_Code_ASTDoWhileStatement
+     * @since 0.9.12
+     */
+    public function buildASTDoWhileStatement($image)
+    {
+        return $this->_buildASTNodeInstance('ASTDoWhileStatement', $image);
     }
 
     /**
@@ -1066,13 +1105,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTMemberPrimaryPrefix($image)
     {
-        include_once 'PHP/Depend/Code/ASTMemberPrimaryPrefix.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTMemberPrimaryPrefix()'
-        );
-
-        return new PHP_Depend_Code_ASTMemberPrimaryPrefix($image);
+        return $this->_buildASTNodeInstance('ASTMemberPrimaryPrefix', $image);
     }
 
     /**
@@ -1085,11 +1118,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTIdentifier($image)
     {
-        include_once 'PHP/Depend/Code/ASTIdentifier.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTIdentifier()');
-
-        return new PHP_Depend_Code_ASTIdentifier($image);
+        return $this->_buildASTNodeInstance('ASTIdentifier', $image);
     }
 
     /**
@@ -1112,11 +1141,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTFunctionPostfix($image)
     {
-        include_once 'PHP/Depend/Code/ASTFunctionPostfix.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTFunctionPostfix()');
-
-        return new PHP_Depend_Code_ASTFunctionPostfix($image);
+        return $this->_buildASTNodeInstance('ASTFunctionPostfix', $image);
     }
 
     /**
@@ -1139,11 +1164,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTMethodPostfix($image)
     {
-        include_once 'PHP/Depend/Code/ASTMethodPostfix.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTMethodPostfix()');
-
-        return new PHP_Depend_Code_ASTMethodPostfix($image);
+        return $this->_buildASTNodeInstance('ASTMethodPostfix', $image);
     }
 
     /**
@@ -1162,11 +1183,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTConstantPostfix($image)
     {
-        include_once 'PHP/Depend/Code/ASTConstantPostfix.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTConstantPostfix()');
-
-        return new PHP_Depend_Code_ASTConstantPostfix($image);
+        return $this->_buildASTNodeInstance('ASTConstantPostfix', $image);
     }
 
     /**
@@ -1189,11 +1206,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTPropertyPostfix($image)
     {
-        include_once 'PHP/Depend/Code/ASTPropertyPostfix.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTPropertyPostfix()');
-
-        return new PHP_Depend_Code_ASTPropertyPostfix($image);
+        return $this->_buildASTNodeInstance('ASTPropertyPostfix', $image);
     }
 
     /**
@@ -1214,11 +1227,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTArguments()
     {
-        include_once 'PHP/Depend/Code/ASTArguments.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTArguments()');
-
-        return new PHP_Depend_Code_ASTArguments();
+        return $this->_buildASTNodeInstance('ASTArguments');
     }
 
     /**
@@ -1229,11 +1238,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTArrayType()
     {
-        include_once 'PHP/Depend/Code/ASTArrayType.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTArrayType()');
-
-        return new PHP_Depend_Code_ASTArrayType();
+        return $this->_buildASTNodeInstance('ASTArrayType');
     }
 
     /**
@@ -1246,11 +1251,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTPrimitiveType($image)
     {
-        include_once 'PHP/Depend/Code/ASTPrimitiveType.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTPrimitiveType()');
-
-        return new PHP_Depend_Code_ASTPrimitiveType($image);
+        return $this->_buildASTNodeInstance('ASTPrimitiveType', $image);
     }
 
     /**
@@ -1263,11 +1264,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTLiteral($image)
     {
-        include_once 'PHP/Depend/Code/ASTLiteral.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTLiteral()');
-
-        return new PHP_Depend_Code_ASTLiteral($image);
+        return $this->_buildASTNodeInstance('ASTLiteral', $image);
     }
 
     /**
@@ -1290,11 +1287,18 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTString()
     {
-        include_once 'PHP/Depend/Code/ASTString.php';
+        return $this->_buildASTNodeInstance('ASTString');
+    }
 
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTString');
-
-        return new PHP_Depend_Code_ASTString();
+    /**
+     * Builds a new heredoc node.
+     *
+     * @return PHP_Depend_Code_ASTHeredoc
+     * @since 0.9.12
+     */
+    public function buildASTHeredoc()
+    {
+        return $this->_buildASTNodeInstance('ASTHeredoc');
     }
 
     /**
@@ -1316,13 +1320,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTConstantDefinition($image)
     {
-        include_once 'PHP/Depend/Code/ASTConstantDefinition.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTConstantDefinition()'
-        );
-
-        return new PHP_Depend_Code_ASTConstantDefinition($image);
+        return $this->_buildASTNodeInstance('ASTConstantDefinition', $image);
     }
 
     /**
@@ -1363,13 +1361,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTConstantDeclarator($image)
     {
-        include_once 'PHP/Depend/Code/ASTConstantDeclarator.php';
-
-        PHP_Depend_Util_Log::debug(
-            'Creating: PHP_Depend_Code_ASTConstantDeclarator(' . $image . ')'
-        );
-
-        return new PHP_Depend_Code_ASTConstantDeclarator($image);
+        return $this->_buildASTNodeInstance('ASTConstantDeclarator', $image);
     }
 
     /**
@@ -1382,11 +1374,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTComment($cdata)
     {
-        include_once 'PHP/Depend/Code/ASTComment.php';
-
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTComment()');
-
-        return new PHP_Depend_Code_ASTComment($cdata);
+        return $this->_buildASTNodeInstance('ASTComment', $cdata);
     }
 
     /**
@@ -1399,11 +1387,144 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function buildASTUnaryExpression($image)
     {
-        include_once 'PHP/Depend/Code/ASTUnaryExpression.php';
+        return $this->_buildASTNodeInstance('ASTUnaryExpression', $image);
+    }
 
-        PHP_Depend_Util_Log::debug('Creating: PHP_Depend_Code_ASTUnaryExpression()');
+    /**
+     * Builds a new function/method scope instance.
+     *
+     * @return PHP_Depend_Code_ASTScope
+     * @since 0.9.12
+     */
+    public function buildASTScope()
+    {
+        return $this->_buildASTNodeInstance('ASTScope');
+    }
 
-        return new PHP_Depend_Code_ASTUnaryExpression($image);
+    /**
+     * Builds a new statement instance.
+     *
+     * @return PHP_Depend_Code_ASTStatement
+     * @since 0.9.12
+     */
+    public function buildASTStatement()
+    {
+        return $this->_buildASTNodeInstance('ASTStatement');
+    }
+
+    /**
+     * Builds a new return statement node instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTReturnStatement
+     * @since 0.9.12
+     */
+    public function buildASTReturnStatement($image)
+    {
+        return $this->_buildASTNodeInstance('ASTReturnStatement', $image);
+    }
+
+    /**
+     * Builds a new break-statement node instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTBreakStatement
+     * @since 0.9.12
+     */
+    public function buildASTBreakStatement($image)
+    {
+        return $this->_buildASTNodeInstance('ASTBreakStatement', $image);
+    }
+
+    /**
+     * Builds a new continue-statement node instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTContinueStatement
+     * @since 0.9.12
+     */
+    public function buildASTContinueStatement($image)
+    {
+        return $this->_buildASTNodeInstance('ASTContinueStatement', $image);
+    }
+
+    /**
+     * Builds a new scope-statement instance.
+     *
+     * @return PHP_Depend_Code_ASTScopeStatement
+     * @since 0.9.12
+     */
+    public function buildASTScopeStatement()
+    {
+        return $this->_buildASTNodeInstance('ASTScopeStatement');
+    }
+
+    /**
+     * Builds a new try-statement instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTTryStatement
+     * @since 0.9.12
+     */
+    public function buildASTTryStatement($image)
+    {
+        return $this->_buildASTNodeInstance('ASTTryStatement', $image);
+    }
+
+    /**
+     * Builds a new throw-statement instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTThrowStatement
+     * @since 0.9.12
+     */
+    public function buildASTThrowStatement($image)
+    {
+        return $this->_buildASTNodeInstance('ASTThrowStatement', $image);
+    }
+
+    /**
+     * Builds a new goto-statement instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTGotoStatement
+     * @since 0.9.12
+     */
+    public function buildASTGotoStatement($image)
+    {
+        return $this->_buildASTNodeInstance('ASTGotoStatement', $image);
+    }
+
+    /**
+     * Builds a new label-statement instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTLabelStatement
+     * @since 0.9.12
+     */
+    public function buildASTLabelStatement($image)
+    {
+        return $this->_buildASTNodeInstance('ASTLabelStatement', $image);
+    }
+
+    /**
+     * Builds a new exit-statement instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTEchoStatement
+     * @since 0.9.12
+     */
+    public function buildASTEchoStatement($image)
+    {
+        return $this->_buildASTNodeInstance('ASTEchoStatement', $image);
     }
 
     /**
@@ -1425,6 +1546,21 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
      */
     public function getPackages()
     {
+        if ($this->_preparedPackages === null) {
+            $this->_preparedPackages = $this->_getPreparedPackages();
+        }
+        return new PHP_Depend_Code_NodeIterator($this->_preparedPackages);
+    }
+
+    /**
+     * Returns an iterator with all generated {@link PHP_Depend_Code_Package}
+     * objects.
+     *
+     * @return PHP_Depend_Code_NodeIterator
+     * @since 0.9.12
+     */
+    private function _getPreparedPackages()
+    {
         // Create a package array copy
         $packages = $this->_packages;
 
@@ -1434,7 +1570,7 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
         ) {
             unset($packages[self::DEFAULT_PACKAGE]);
         }
-        return new PHP_Depend_Code_NodeIterator($packages);
+        return $packages;
     }
 
     /**
@@ -1775,86 +1911,31 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
     protected function extractPackageName($qualifiedName)
     {
         if (($pos = strrpos($qualifiedName, '\\')) !== false) {
-            // Extract namespace part from qualified name
-            $namespaceName = substr($qualifiedName, 0, $pos);
-            // Check for leading backslash
-            if (strpos($namespaceName, '\\') === 0) {
-                return substr($namespaceName, 1);
-            }
-            return $namespaceName;
+            return ltrim(substr($qualifiedName, 0, $pos), '\\');
         } else if (PHP_Depend_Util_Type::isInternalType($qualifiedName)) {
             return PHP_Depend_Util_Type::getTypePackage($qualifiedName);
         }
         return self::DEFAULT_PACKAGE;
     }
 
-    // DEPRECATED METHODS AND PROPERTIES
-    // @codeCoverageIgnoreStart
-
     /**
-     * Generic build class for classes and interfaces. This method should be used
-     * in cases when it is not clear what type is used in the current situation.
-     * This could happen if the parser analyzes a method signature. The default
-     * return type is {@link PHP_Depend_Code_Class}, but if there is already an
-     * interface for this name, the method will return this instance.
+     * Creates a {@link PHP_Depend_Code_ASTNode} instance.
      *
-     * <code>
-     *   $builder->buildInterface('PHP_DependI');
+     * @param string $className Local name of the ast node class.
+     * @param string $image     Optional image for the created ast node.
      *
-     *   // Returns an instance of PHP_Depend_Code_Interface
-     *   $builder->buildClassOrInterface('PHP_DependI');
-     *
-     *   // Returns an instance of PHP_Depend_Code_Class
-     *   $builder->buildClassOrInterface('PHP_Depend');
-     * </code>
-     *
-     * @param string $name The class name.
-     *
-     * @return PHP_Depend_Code_Class|PHP_Depend_Code_Interface
-     *         The created class or interface instance.
-     * @deprecated Since version 0.9.5, use getClassOrInterface() instead.
+     * @return PHP_Depend_Code_ASTNode
+     * @since 0.9.12
      */
-    public function buildClassOrInterface($name)
+    private function _buildASTNodeInstance($className, $image = null)
     {
-        fwrite(STDERR, 'Since 0.9.5 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-        
-        $cls = $this->extractTypeName($name);
-        $pkg = $this->extractPackageName($name);
+        $fileName  = "PHP/Depend/Code/{$className}.php";
+        $className = "PHP_Depend_Code_{$className}";
 
-        $typeID = strtolower($cls);
+        include_once $fileName;
 
-        if (isset($this->_classes[$typeID][$pkg])) {
-            $instance = $this->_classes[$typeID][$pkg];
-        } else if (isset($this->_interfaces[$typeID][$pkg])) {
-            $instance = $this->_interfaces[$typeID][$pkg];
-        } else if (isset($this->_classes[$typeID])) {
-            $instance = reset($this->_classes[$typeID]);
-        } else if (isset($this->_interfaces[$typeID])) {
-            $instance = reset($this->_interfaces[$typeID]);
-        } else {
-            $instance = $this->buildClass($name);
-        }
-        return $instance;
+        PHP_Depend_Util_Log::debug("Creating: {$className}({$image})");
+
+        return new $className($image);
     }
-
-    /**
-     * Builds a new code class constant instance.
-     *
-     * @param string $name The constant name.
-     *
-     * @return PHP_Depend_Code_TypeConstant The created constant object.
-     * @deprecated Since version 0.9.6
-     */
-    public function buildTypeConstant($name)
-    {
-        fwrite(STDERR, 'Since 0.9.6 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-
-        // Include class definition
-        include_once 'PHP/Depend/Code/TypeConstant.php';
-
-        // Create new constant instance.
-        return new PHP_Depend_Code_TypeConstant($name);
-    }
-
-    // @codeCoverageIgnoreEnd
 }

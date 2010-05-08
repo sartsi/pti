@@ -67,7 +67,7 @@ require_once 'PHP/Depend/Metrics/ProjectAwareI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Metrics_Inheritance_Analyzer
@@ -89,7 +89,8 @@ class PHP_Depend_Metrics_Inheritance_Analyzer
           M_DEPTH_OF_INHERITANCE_TREE      = 'dit',
           M_NUMBER_OF_ADDED_METHODS        = 'noam',
           M_NUMBER_OF_OVERWRITTEN_METHODS  = 'noom',
-          M_NUMBER_OF_DERIVED_CLASSES      = 'nocc';
+          M_NUMBER_OF_DERIVED_CLASSES      = 'nocc',
+          M_MAXIMUM_INHERITANCE_DEPTH      = 'maxDIT';
 
     /**
      * Contains the max inheritance depth for all root classes within the
@@ -99,6 +100,13 @@ class PHP_Depend_Metrics_Inheritance_Analyzer
      * @var array(integer)
      */
     private $_rootClasses = null;
+
+    /**
+     * The maximum depth of inheritance tree value within the analyzed source code.
+     *
+     * @var integer $_maxDIT
+     */
+    private $_maxDIT = 0;
 
     /**
      * The average number of derived classes.
@@ -168,7 +176,8 @@ class PHP_Depend_Metrics_Inheritance_Analyzer
     {
         return array(
             self::M_AVERAGE_NUMBER_DERIVED_CLASSES  =>  $this->_andc,
-            self::M_AVERAGE_HIERARCHY_HEIGHT        =>  $this->_ahh
+            self::M_AVERAGE_HIERARCHY_HEIGHT        =>  $this->_ahh,
+            self::M_MAXIMUM_INHERITANCE_DEPTH       =>  $this->_maxDIT,
         );
     }
 
@@ -284,6 +293,9 @@ class PHP_Depend_Metrics_Inheritance_Analyzer
             ++$dit;
             $root = $class->getUUID();
         }
+        
+        // Collect max dit value
+        $this->_maxDIT = max($this->_maxDIT, $dit);
 
         if (empty($this->_rootClasses[$root]) || $this->_rootClasses[$root] < $dit) {
             $this->_rootClasses[$root] = $dit;

@@ -57,7 +57,7 @@ require_once 'PHP/Depend/Code/AbstractCallable.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://www.pdepend.org/
  */
 class PHP_Depend_Code_Closure extends PHP_Depend_Code_AbstractCallable
@@ -79,6 +79,6 @@ class PHP_Depend_Code_Closure extends PHP_Depend_Code_AbstractCallable
      */
     public function accept(PHP_Depend_VisitorI $visitor)
     {
-        $visitor->visitClosure($this);
+        // DEPRECATED
     }
 }

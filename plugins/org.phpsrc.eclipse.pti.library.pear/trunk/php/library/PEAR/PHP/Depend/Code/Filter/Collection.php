@@ -42,11 +42,11 @@
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
+ * @version    SVN: $Id: Collection.php 1030 2010-01-01 12:06:13Z mapi $
  * @link       http://pdepend.org/
  */
 
-require_once 'PHP/Depend/Code/Filter/Composite.php';
+require_once 'PHP/Depend/Code/FilterI.php';
 
 /**
  * Static composite filter for code nodes. This class is used for an overall
@@ -58,11 +58,10 @@ require_once 'PHP/Depend/Code/Filter/Composite.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://pdepend.org/
  */
-final class PHP_Depend_Code_Filter_Collection
-    extends PHP_Depend_Code_Filter_Composite
+final class PHP_Depend_Code_Filter_Collection implements PHP_Depend_Code_FilterI
 {
     /**
      * Singleton instance of this filter.
@@ -85,21 +84,45 @@ final class PHP_Depend_Code_Filter_Collection
     }
 
     /**
-     * Clears all registered filters.
-     *
-     * @return void
-     */
-    public function clear()
-    {
-        foreach ($this->getIterator() as $filter) {
-            $this->removeFilter($filter);
-        }
-    }
-
-    /**
      * Constructs a new static filter.
      */
     private function __construct()
     {
+    }
+
+    /**
+     * An optional configured filter instance.
+     *
+     * @var PHP_Depend_Code_FilterI
+     */
+    private $_filter = null;
+
+    /**
+     * Sets the used filter instance.
+     *
+     * @param PHP_Depend_Code_FilterI $filter The new filter instance.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function setFilter(PHP_Depend_Code_FilterI $filter = null)
+    {
+        $this->_filter = $filter;
+    }
+
+    /**
+     * Returns <b>true</b> if the given node should be part of the node iterator,
+     * otherwise this method will return <b>false</b>.
+     *
+     * @param PHP_Depend_Code_NodeI $node The context node instance.
+     *
+     * @return boolean
+     */
+    public function accept(PHP_Depend_Code_NodeI $node)
+    {
+        if ($this->_filter === null) {
+            return true;
+        }
+        return $this->_filter->accept($node);
     }
 }

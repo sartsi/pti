@@ -58,7 +58,7 @@ require_once 'PHP/Depend/Code/NodeIterator.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_Package implements PHP_Depend_Code_NodeI
@@ -313,5 +313,48 @@ class PHP_Depend_Code_Package implements PHP_Depend_Code_NodeI
     public function accept(PHP_Depend_VisitorI $visitor)
     {
         $visitor->visitPackage($this);
+    }
+
+    /**
+     * This method can be called by the PHP_Depend runtime environment or a
+     * utilizing component to free up memory. This methods are required for
+     * PHP version < 5.3 where cyclic references can not be resolved
+     * automatically by PHP's garbage collector.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function free()
+    {
+        $this->_removeReferenceToTypes();
+        $this->_removeReferenceToFunctions();
+    }
+
+    /**
+     * Removes the reference to all functions that belong to this package.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferenceToFunctions()
+    {
+        foreach ($this->functions as $function) {
+            $function->free();
+        }
+        $this->functions = array();
+    }
+
+    /**
+     * Removes the reference to all types that belong to this package.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferenceToTypes()
+    {
+        foreach ($this->types as $type) {
+            $type->free();
+        }
+        $this->types = array();
     }
 }

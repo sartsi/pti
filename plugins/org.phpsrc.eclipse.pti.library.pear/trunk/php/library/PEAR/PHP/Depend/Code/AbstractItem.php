@@ -57,7 +57,7 @@ require_once 'PHP/Depend/Code/NodeI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://pdepend.org/
  */
 abstract class PHP_Depend_Code_AbstractItem implements PHP_Depend_Code_NodeI
@@ -133,6 +133,19 @@ abstract class PHP_Depend_Code_AbstractItem implements PHP_Depend_Code_NodeI
     public function getUUID()
     {
         return $this->uuid;
+    }
+
+    /**
+     * Sets the unique identifier for this node instance.
+     *
+     * @param string $uuid Identifier for this node.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function setUUID($uuid)
+    {
+        $this->uuid = $uuid;
     }
 
     /**

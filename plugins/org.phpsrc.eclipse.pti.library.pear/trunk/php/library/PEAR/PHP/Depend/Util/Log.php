@@ -55,16 +55,11 @@
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://www.pdepend.org/
  */
 final class PHP_Depend_Util_Log
 {
-    /**
-     * Log nothing.
-     */
-    const NONE = 0;
-
     /**
      * Log debug messages.
      */
@@ -73,16 +68,16 @@ final class PHP_Depend_Util_Log
     /**
      * The log output stream, defaults for the moment to stderr.
      *
-     * @var resource $_stream
+     * @var resource
      */
     private static $_stream = STDERR;
 
     /**
-     * The log severity levels, this can be an OR combined list of valid severities.
+     * Are debugging messages activated?
      *
-     * @var integer $_severity
+     * @var boolean
      */
-    private static $_severity = self::NONE;
+    private static $_debug = false;
 
     /**
      * Sets the log severity levels, this can be an OR combined list of valid
@@ -94,7 +89,7 @@ final class PHP_Depend_Util_Log
      */
     public static function setSeverity($severity)
     {
-        self::$_severity = $severity;
+        self::$_debug = ((self::DEBUG & $severity) === $severity);
     }
 
     /**
@@ -106,22 +101,20 @@ final class PHP_Depend_Util_Log
      */
     public static function debug($message)
     {
-        self::log(self::DEBUG, $message);
+        if (self::$_debug) {
+            self::log($message);
+        }
     }
 
     /**
      * Generic log method for all severities.
      *
-     * @param integer $severity The log severity.
-     * @param string  $message  The log message.
+     * @param string $message The log message.
      *
      * @return void
      */
-    public static function log($severity, $message)
+    public static function log($message)
     {
-        if ((self::$_severity & $severity) === $severity) {
-            fwrite(self::$_stream, PHP_EOL . $message);
-        }
+        fwrite(self::$_stream, PHP_EOL . $message);
     }
 }
-?>

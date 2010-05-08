@@ -61,7 +61,7 @@ require_once 'PHP/Depend/Input/ExtensionFilter.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://pdepend.org/
  */
 class PHP_Depend_TextUI_Runner
@@ -147,13 +147,6 @@ class PHP_Depend_TextUI_Runner
      * @var boolean $_withoutAnnotations
      */
     private $_withoutAnnotations = false;
-
-    /**
-     * Should PHP_Depend treat <b>+global</b> as a regular project package?
-     *
-     * @var boolean $_supportBadDocumentation
-     */
-    private $_supportBadDocumentation = false;
 
     /**
      * List of log identifiers and log files.
@@ -259,18 +252,6 @@ class PHP_Depend_TextUI_Runner
     }
 
     /**
-     * Should PHP_Depend support projects with a bad documentation. If this
-     * option is set to <b>true</b>, PHP_Depend will treat the default package
-     * <b>+global</b> as a regular project package.
-     *
-     * @return void
-     */
-    public function setSupportBadDocumentation()
-    {
-        $this->_supportBadDocumentation = true;
-    }
-
-    /**
      * Adds a logger to this runner.
      *
      * @param string $loggerID    The logger identifier.
@@ -345,14 +326,11 @@ class PHP_Depend_TextUI_Runner
         if (count($this->_excludePackages) > 0) {
             $exclude = $this->_excludePackages;
             $filter  = new PHP_Depend_Code_Filter_Package($exclude);
-            $pdepend->addCodeFilter($filter);
+            $pdepend->setCodeFilter($filter);
         }
 
         if ($this->_withoutAnnotations === true) {
             $pdepend->setWithoutAnnotations();
-        }
-        if ($this->_supportBadDocumentation === true) {
-            $pdepend->setSupportBadDocumentation();
         }
 
         // Try to set all source directories.
@@ -424,4 +402,31 @@ class PHP_Depend_TextUI_Runner
     {
         return $this->_parseErrors;
     }
+
+    // Deprecated Stuff
+    // @codeCoverageIgnoreStart
+
+    /**
+     * Should PHP_Depend treat <b>+global</b> as a regular project package?
+     *
+     * @var boolean
+     * @deprecated since 0.9.12
+     */
+    private $_supportBadDocumentation = false;
+
+    /**
+     * Should PHP_Depend support projects with a bad documentation. If this
+     * option is set to <b>true</b>, PHP_Depend will treat the default package
+     * <b>+global</b> as a regular project package.
+     *
+     * @return void
+     * @deprecated since 0.9.12
+     */
+    public function setSupportBadDocumentation()
+    {
+        fwrite(STDERR, __METHOD__ . '() is deprecated since 0.9.12.' . PHP_EOL);
+        $this->_supportBadDocumentation = true;
+    }
+
+    // @codeCoverageIgnoreEnd
 }

@@ -60,7 +60,7 @@ require_once 'PHP/Depend/Code/ASTNode.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://www.pdepend.org/
  * @since      0.9.6
  */
@@ -99,5 +99,20 @@ class PHP_Depend_Code_ASTVariableDeclarator extends PHP_Depend_Code_ASTNode
     public function setValue(PHP_Depend_Code_Value $value)
     {
         $this->value = $value;
+    }
+
+    /**
+     * Accept method of the visitor design pattern. This method will be called
+     * by a visitor during tree traversal.
+     *
+     * @param PHP_Depend_Code_ASTVisitorI $visitor The calling visitor instance.
+     * @param mixed                       $data    Optional previous calculated data.
+     *
+     * @return mixed
+     * @since 0.9.12
+     */
+    public function accept(PHP_Depend_Code_ASTVisitorI $visitor, $data = null)
+    {
+        return $visitor->visitVariableDeclarator($this, $data);
     }
 }

@@ -57,7 +57,7 @@ require_once 'PHP/Depend/Code/Filter/Collection.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_NodeIterator implements Iterator, Countable
@@ -109,27 +109,13 @@ class PHP_Depend_Code_NodeIterator implements Iterator, Countable
     }
 
     /**
-     * Appends a filter to this iterator.
-     *
-     * A call to this method will reset the internal pointer.
-     *
-     * @param PHP_Depend_Code_FilterI $filter The filter instance.
-     *
-     * @return void
-     */
-    public function addFilter(PHP_Depend_Code_FilterI $filter)
-    {
-        $this->_init($filter);
-    }
-
-    /**
      * Returns the number of {@link PHP_Depend_Code_NodeI} objects in this iterator.
      *
      * @return integer
      */
     public function count()
     {
-        return $this->_count;
+        return count($this->_nodes);
     }
 
     /**
@@ -183,5 +169,22 @@ class PHP_Depend_Code_NodeIterator implements Iterator, Countable
     public function valid()
     {
         return ($this->_offset < $this->_count);
+    }
+
+    /**
+     * This method can be called by the PHP_Depend runtime environment or a
+     * utilizing component to free up memory. This methods are required for
+     * PHP version < 5.3 where cyclic references can not be resolved
+     * automatically by PHP's garbage collector.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function free()
+    {
+        foreach ($this->_nodes as $i => $node) {
+            $node->free();
+        }
+        $this->_nodes = array();
     }
 }

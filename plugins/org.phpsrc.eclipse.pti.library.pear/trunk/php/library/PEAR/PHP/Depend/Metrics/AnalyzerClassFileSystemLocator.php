@@ -59,7 +59,7 @@ require_once 'PHP/Depend/Metrics/AnalyzerClassLocator.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.12
  * @link       http://pdepend.org/
  * @since      0.9.10
  */
@@ -81,24 +81,23 @@ class PHP_Depend_Metrics_AnalyzerClassFileSystemLocator
     private $_analyzers = null;
 
     /**
+     * Regular expression that matches possible analyzer source files.
+     *
+     * @var string
+     */
+    private $_classRegexp = '(Metrics[/\\\\][a-zA-Z0-9_]+[/\\\\]Analyzer\.php$)';
+
+    /**
      * Constructs a new locator instance.
      *
-     * @param string $classPath   The root search directory.
-     * @param string $classPrefix Prefix used for analyzer classes.
+     * @param string $classPath The root search directory.
      */
-    public function __construct($classPath = null, $classPrefix = null)
+    public function __construct($classPath = null)
     {
         if ($classPath === null) {
-            $this->_classPath = dirname(__FILE__) . DIRECTORY_SEPARATOR;
-        } else {
-            $this->_classPath = realpath($classPath) . DIRECTORY_SEPARATOR;
+            $classPath = dirname(__FILE__) . '/../../../';
         }
-
-        if ($classPrefix === null) {
-            $this->_classPrefix = 'PHP_Depend_Metrics_';
-        } else {
-            $this->_classPrefix = $classPrefix;
-        }
+        $this->_classPath = realpath($classPath) . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -124,17 +123,33 @@ class PHP_Depend_Metrics_AnalyzerClassFileSystemLocator
     {
         $result = array();
 
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($this->_classPath)
-        );
+        $paths = explode(PATH_SEPARATOR, get_include_path());
 
-        foreach ($iterator as $file) {
-            if ($file->getFilename() === 'Analyzer.php') {
-                include_once $file->getPathname();
+        foreach ($paths as $path) {
+            $dir = $path.'/PHP/Depend/Metrics/';
 
-                $className = $this->_createClassNameFromPath($file->getPathname());
-                if ($this->_isAnalyzerClass($className)) {
-                    $result[] = new ReflectionClass($className);
+            if (!is_dir($dir)) {
+                continue;
+            }
+
+            $this->_classPath = $dir;
+
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dir)
+            );
+
+            foreach ($iterator as $file) {
+                if ($file->getFilename() === 'Analyzer.php') {
+                    $className = $this->_createClassNameFromPath(
+                        $dir, $file->getPathname()
+                    );
+                    if (!class_exists($className)) {
+                        include_once $file->getPathname();
+                    }
+
+                    if ($this->_isAnalyzerClass($className)) {
+                        $result[] = new ReflectionClass($className);
+                    }
                 }
             }
         }
@@ -145,14 +160,15 @@ class PHP_Depend_Metrics_AnalyzerClassFileSystemLocator
      * Creates a possible analyzer class name from a given absolute file path
      * name.
      *
-     * @param string $path Path of a possible analyzer class.
+     * @param string $classPath The currently processed class path.
+     * @param string $path      Path of a possible analyzer class.
      *
      * @return string
      */
-    private function _createClassNameFromPath($path)
+    private function _createClassNameFromPath($classPath, $path)
     {
-        $localPath = substr($path, strlen($this->_classPath), -4);
-        return $this->_classPrefix . strtr($localPath, DIRECTORY_SEPARATOR, '_');
+        $localPath = substr($path, strlen($classPath), -4);
+        return 'PHP_Depend_Metrics_' . strtr($localPath, DIRECTORY_SEPARATOR, '_');
     }
 
     /**
