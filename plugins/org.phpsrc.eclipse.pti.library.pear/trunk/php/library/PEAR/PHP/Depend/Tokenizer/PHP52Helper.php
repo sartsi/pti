@@ -38,7 +38,7 @@
  *
  * @category   PHP
  * @package    PHP_Depend
- * @subpackage Code
+ * @subpackage Tokenizer
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -46,39 +46,78 @@
  * @link       http://www.pdepend.org/
  */
 
-require_once 'PHP/Depend/Code/AbstractCallable.php';
-
 /**
- * This class represents a declared closure in the analyzed source code.
+ * Utility class that can be used to handle PHP's namespace separator in all
+ * PHP environments lower than 5.3alpha3
  *
  * @category   PHP
  * @package    PHP_Depend
- * @subpackage Code
+ * @subpackage Tokenizer
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    Release: 0.9.13
  * @link       http://www.pdepend.org/
+ *
+ * @todo Rename this class into PHP52Helper and make methods none static.
  */
-class PHP_Depend_Code_Closure extends PHP_Depend_Code_AbstractCallable
+final class PHP_Depend_Tokenizer_PHP52Helper
 {
     /**
-     * Constructs a new closure instance.
+     * This method implements a workaround for all PHP versions lower 5.3alpha3
+     * that do not handle the namespace separator char.
+     *
+     * @param string $source The raw source code.
+     *
+     * @return array The tokens.
      */
-    public function  __construct()
+    public static function tokenize($source)
     {
-        parent::__construct('#closure');
+        // Replace backslash with valid token
+        $source = preg_replace(
+            array('#\\\\([^"\'`\\\\])#i', '(<<<(\s*)(["\'])([\w\d]+)\2)'),
+            array(':::\\1', '<<<\1\3'),
+            $source
+        );
+
+        $tokens = self::_tokenize($source);
+
+        $result = array();
+        for ($i = 0, $c = count($tokens); $i < $c; ++$i) {
+            if (is_string($tokens[$i])) {
+                $result[] = str_replace(':::', '\\', $tokens[$i]);
+            } else if ($tokens[$i][0] !== T_DOUBLE_COLON) {
+                $tokens[$i][1] = str_replace(':::', '\\', $tokens[$i][1]);
+                $result[]      = $tokens[$i];
+            } else if (!isset($tokens[$i + 1]) || $tokens[$i + 1] !== ':') {
+                $tokens[$i][1] = str_replace(':::', '\\', $tokens[$i][1]);
+                $result[]      = $tokens[$i];
+            } else {
+                $result[] = '\\';
+                ++$i;
+            }
+        }
+
+        return $result;
     }
 
     /**
-     * Visitor method for node tree traversal.
+     * Executes the internal tokenizer function and decorates it with some
+     * exception handling.
      *
-     * @param PHP_Depend_VisitorI $visitor The context visitor implementation.
+     * @param string $source The raw php source code.
      *
-     * @return void
+     * @return array
+     * @todo Exception should be moved into a general package.
      */
-    public function accept(PHP_Depend_VisitorI $visitor)
+    private static function _tokenize($source)
     {
-        // DEPRECATED
+        $error  = error_get_last();
+        $tokens = @token_get_all($source);
+        
+        if ($error == error_get_last()) {
+            return $tokens;
+        }
+        throw new PHP_Depend_Parser_TokenException($error['message']);
     }
 }

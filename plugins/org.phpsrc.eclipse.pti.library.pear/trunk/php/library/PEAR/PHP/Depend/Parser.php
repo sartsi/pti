@@ -85,7 +85,7 @@ require_once 'PHP/Depend/Parser/UnexpectedTokenException.php';
  * @author    Manuel Pichler <mapi@pdepend.org>
  * @copyright 2008-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.9.12
+ * @version   Release: 0.9.13
  * @link      http://pdepend.org/
  */
 class PHP_Depend_Parser implements PHP_Depend_ConstantsI
@@ -353,7 +353,7 @@ class PHP_Depend_Parser implements PHP_Depend_ConstantsI
     {
         $this->setUpEnvironment();
 
-       // Get currently parsed source file
+        // Get currently parsed source file
         $this->_sourceFile = $this->_tokenizer->getSourceFile();
         $this->_sourceFile->setUUID(
             $this->_uuidBuilder->forFile($this->_sourceFile)
@@ -679,9 +679,7 @@ class PHP_Depend_Parser implements PHP_Depend_ConstantsI
                     $defaultModifier
                 );
 
-                if ($methodOrProperty instanceof PHP_Depend_Code_Method) {
-                    $type->addMethod($methodOrProperty);
-                } else {
+                if ($methodOrProperty instanceof PHP_Depend_Code_ASTNode) {
                     $type->addChild($methodOrProperty);
                 }
                 
@@ -795,7 +793,6 @@ class PHP_Depend_Parser implements PHP_Depend_ConstantsI
 
             case self::T_FUNCTION:
                 $method = $this->_parseMethodDeclaration();
-                $method->setParent($this->_classOrInterface);
                 $method->setModifiers($modifiers);
                 $method->setSourceFile($this->_sourceFile);
                 $method->setUUID($this->_uuidBuilder->forMethod($method));
@@ -1016,6 +1013,8 @@ class PHP_Depend_Parser implements PHP_Depend_ConstantsI
         $method = $this->_builder->buildMethod($methodName);
         $method->setDocComment($this->_docComment);
         $method->setSourceFile($this->_sourceFile);
+
+        $this->_classOrInterface->addMethod($method);
 
         $this->_parseCallableDeclaration($method);
         $this->_prepareCallable($method);

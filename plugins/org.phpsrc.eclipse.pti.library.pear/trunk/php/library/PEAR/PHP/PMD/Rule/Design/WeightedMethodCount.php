@@ -1,10 +1,10 @@
 <?php
 /**
- * This file is part of PHP_Depend.
+ * This file is part of PHP_PMD.
  *
  * PHP Version 5
  *
- * Copyright (c) 2008-2010, Manuel Pichler <mapi@pdepend.org>.
+ * Copyright (c) 2009-2010, Manuel Pichler <mapi@phpmd.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,48 +37,52 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @category   PHP
- * @package    PHP_Depend
- * @subpackage Code
- * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2010 Manuel Pichler. All rights reserved.
+ * @package    PHP_PMD
+ * @subpackage Rule_Design
+ * @author     Manuel Pichler <mapi@phpmd.org>
+ * @copyright  2009-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
- * @link       http://www.pdepend.org/
+ * @link       http://phpmd.org
+ * @since      0.2.5
  */
 
-require_once 'PHP/Depend/Code/AbstractCallable.php';
+require_once 'PHP/PMD/AbstractRule.php';
+require_once 'PHP/PMD/Rule/IClassAware.php';
 
 /**
- * This class represents a declared closure in the analyzed source code.
+ * This rule checks a given class against a configured weighted method count
+ * threshold.
  *
  * @category   PHP
- * @package    PHP_Depend
- * @subpackage Code
- * @author     Manuel Pichler <mapi@pdepend.org>
- * @copyright  2008-2010 Manuel Pichler. All rights reserved.
+ * @package    PHP_PMD
+ * @subpackage Rule_Design
+ * @author     Manuel Pichler <mapi@phpmd.org>
+ * @copyright  2009-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.13
- * @link       http://www.pdepend.org/
+ * @version    Release: 0.2.5
+ * @link       http://phpmd.org
+ * @since      0.2.5
  */
-class PHP_Depend_Code_Closure extends PHP_Depend_Code_AbstractCallable
+class PHP_PMD_Rule_Design_WeightedMethodCount
+       extends PHP_PMD_AbstractRule
+    implements PHP_PMD_Rule_IClassAware
 {
     /**
-     * Constructs a new closure instance.
-     */
-    public function  __construct()
-    {
-        parent::__construct('#closure');
-    }
-
-    /**
-     * Visitor method for node tree traversal.
+     * This method checks the weighted method count for the given class against
+     * a configured threshold.
      *
-     * @param PHP_Depend_VisitorI $visitor The context visitor implementation.
+     * @param PHP_PMD_AbstractNode $node The context class node.
      *
      * @return void
      */
-    public function accept(PHP_Depend_VisitorI $visitor)
+    public function apply(PHP_PMD_AbstractNode $node)
     {
-        // DEPRECATED
+        $threshold = $this->getIntProperty('maximum');
+        $actual    = $node->getMetric('wmc');
+
+        if ($actual >= $threshold) {
+            $this->addViolation($node, array($node->getName(), $actual, $threshold));
+        }
     }
 }

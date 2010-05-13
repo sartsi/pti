@@ -55,7 +55,7 @@
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.12
+ * @version    Release: 0.9.13
  * @link       http://www.pdepend.org/
  */
 interface PHP_Depend_Storage_EngineI
@@ -126,7 +126,7 @@ interface PHP_Depend_Storage_EngineI
      *
      * @return void
      */
-    function store($data, $key, $group, $version = '0.9.12');
+    function store($data, $key, $group, $version = '0.9.13');
 
     /**
      * This method will restore a record and return it to the calling client.
@@ -140,6 +140,6 @@ interface PHP_Depend_Storage_EngineI
      *
      * @return mixed
      */
-    function restore($key, $group, $version = '0.9.12');
+    function restore($key, $group, $version = '0.9.13');
 }
 ?>

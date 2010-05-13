@@ -20,7 +20,7 @@
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   CVS: $Id: CommandLine.php 287636 2009-08-24 13:14:06Z izi $
+ * @version   CVS: $Id: CommandLine.php 297057 2010-03-29 09:42:19Z rquadling $
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     Class available since release 0.1.0
  * @filesource
@@ -55,7 +55,7 @@ require_once 'Console/CommandLine/MessageProvider/Default.php';
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   Release: 1.1.1
+ * @version   Release: 1.1.3
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     File available since release 0.1.0
  * @example   docs/examples/ex1.php
@@ -643,47 +643,62 @@ class Console_CommandLine
     // displayError() {{{
 
     /**
-     * Displays an error to the user and exit with $exitCode.
+     * Displays an error to the user via stderr and exit with $exitCode if its
+     * value is not equals to false.
      *
      * @param string $error    The error message
-     * @param int    $exitCode The exit code number
+     * @param int    $exitCode The exit code number (default: 1). If set to
+     *                         false, the exit() function will not be called
      *
      * @return void
      */
     public function displayError($error, $exitCode = 1)
     {
         $this->outputter->stderr($this->renderer->error($error));
-        exit($exitCode);
+        if ($exitCode !== false) {
+            exit($exitCode);
+        }
     }
 
     // }}}
     // displayUsage() {{{
 
     /**
-     * Displays the usage help message to the user and exit with $exitCode
+     * Displays the usage help message to the user via stdout and exit with
+     * $exitCode if its value is not equals to false.
      *
-     * @param int $exitCode The exit code number
+     * @param int $exitCode The exit code number (default: 0). If set to
+     *                      false, the exit() function will not be called
      *
      * @return void
      */
-    public function displayUsage($exitCode = 1)
+    public function displayUsage($exitCode = 0)
     {
-        $this->outputter->stderr($this->renderer->usage());
-        exit($exitCode);
+        $this->outputter->stdout($this->renderer->usage());
+        if ($exitCode !== false) {
+            exit($exitCode);
+        }
     }
 
     // }}}
     // displayVersion() {{{
 
     /**
-     * Displays the program version to the user
+     * Displays the program version to the user via stdout and exit with
+     * $exitCode if its value is not equals to false.
+     *
+     *
+     * @param int $exitCode The exit code number (default: 0). If set to
+     *                      false, the exit() function will not be called
      *
      * @return void
      */
-    public function displayVersion()
+    public function displayVersion($exitCode = 0)
     {
         $this->outputter->stdout($this->renderer->version());
-        exit(0);
+        if ($exitCode !== false) {
+            exit($exitCode);
+        }
     }
 
     // }}}
@@ -850,7 +865,7 @@ class Console_CommandLine
             array_shift($argv);
             $argc--;
         }
-        // will contain aruments
+        // will contain arguments
         $args = array();
         foreach ($this->options as $name=>$option) {
             $result->options[$name] = $option->default;
@@ -870,6 +885,8 @@ class Console_CommandLine
                 throw $exc;
             }
         }
+        // Parse a null token to allow any undespatched actions to be despatched.
+        $this->parseToken(null, $result, $args, 0);
         // Check if an invalid subcommand was specified. If there are
         // subcommands and no arguments, but an argument was provided, it is
         // an invalid subcommand.
@@ -937,7 +954,6 @@ class Console_CommandLine
         static $lastopt  = false;
         static $stopflag = false;
         $last  = $argc === 0;
-        $token = trim($token);
         if (!$stopflag && $lastopt) {
             if (substr($token, 0, 1) == '-') {
                 if ($lastopt->argument_optional) {
@@ -964,10 +980,14 @@ class Console_CommandLine
                 if ($lastopt->action == 'StoreArray' && 
                     !empty($result->options[$lastopt->name]) &&
                     count($this->args) > ($argc + count($args))) {
-                    $args[] = $token;
+                    if (!is_null($token)) {
+                        $args[] = $token;
+                    }
                     return;
                 }
-                $this->_dispatchAction($lastopt, $token, $result);
+                if (!is_null($token) || $lastopt->action == 'Password') {
+                    $this->_dispatchAction($lastopt, $token, $result);
+                }
                 if ($lastopt->action != 'StoreArray') {
                     $lastopt = false;
                 }
@@ -1085,7 +1105,9 @@ class Console_CommandLine
             if (!$stopflag && $this->force_posix) {
                 $stopflag = true;
             }
-            $args[] = $token;
+            if (!is_null($token)) {
+                $args[] = $token;
+            }
         }
     }
 
@@ -1152,7 +1174,7 @@ class Console_CommandLine
                             $opt->short_name : $opt->long_name;
                         foreach ($value as $v) {
                             if ($opt->expectsArgument()) {
-                                $argv[] = isset($_GET[$key]) ? urldecode($v) : $v;
+                                $argv[] = isset($_REQUEST[$key]) ? urldecode($v) : $v;
                             } else if ($v == '0' || $v == 'false') {
                                 array_pop($argv);
                             }
@@ -1160,7 +1182,7 @@ class Console_CommandLine
                     } else if (isset($this->args[$key])) {
                         // match a configured argument
                         foreach ($value as $v) {
-                            $argv[] = isset($_GET[$key]) ? urldecode($v) : $v;
+                            $argv[] = isset($_REQUEST[$key]) ? urldecode($v) : $v;
                         }
                     }
                 }

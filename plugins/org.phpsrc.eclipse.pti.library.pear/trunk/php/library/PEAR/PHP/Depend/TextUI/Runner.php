@@ -61,7 +61,7 @@ require_once 'PHP/Depend/Input/ExtensionFilter.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.12
+ * @version    Release: 0.9.13
  * @link       http://pdepend.org/
  */
 class PHP_Depend_TextUI_Runner
@@ -83,8 +83,8 @@ class PHP_Depend_TextUI_Runner
     const OPTIMZATION_BEST = 'best';
 
     /**
-     * Marks the passthru optimization strategy that will consume most memory and
-     * will perform all actions without caching.
+     * Marks the pass through optimization strategy that will consume most
+     * memory and will perform all actions without caching.
      */
     const OPTIMZATION_NONE = 'none';
 

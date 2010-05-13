@@ -60,7 +60,7 @@ require_once 'PHP/Depend/Code/Method.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.12
+ * @version    Release: 0.9.13
  * @link       http://pdepend.org/
  */
 abstract class PHP_Depend_Code_AbstractClassOrInterface
@@ -434,32 +434,11 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
      */
     public function addMethod(PHP_Depend_Code_Method $method)
     {
-        if ($method->getParent() !== null) {
-            $method->getParent()->removeMethod($method);
-        }
-        // Set this as owner type
         $method->setParent($this);
-        // Store method
+
         $this->_methods[] = $method;
 
         return $method;
-    }
-
-    /**
-     * Removes the given method from this class.
-     *
-     * @param PHP_Depend_Code_Method $method The method to remove.
-     *
-     * @return void
-     */
-    public function removeMethod(PHP_Depend_Code_Method $method)
-    {
-        if (($i = array_search($method, $this->_methods, true)) !== false) {
-            // Remove this as owner
-            $method->setParent(null);
-            // Remove from internal list
-            unset($this->_methods[$i]);
-        }
     }
 
     /**

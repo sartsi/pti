@@ -54,7 +54,7 @@
  * @author    Manuel Pichler <mapi@phpmd.org>
  * @copyright 2009-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.2.4
+ * @version   Release: 0.2.5
  * @link      http://phpmd.org
  */
 class PHP_PMD_Report
@@ -100,6 +100,17 @@ class PHP_PMD_Report
         }
 
         $this->_ruleViolations[$fileName][$beginLine][] = $violation;
+    }
+
+    /**
+     * Returns <b>true</b> when this report does not contain any errors.
+     *
+     * @return boolean
+     * @since 0.2.5
+     */
+    public function isEmpty()
+    {
+        return (count($this->_ruleViolations) === 0);
     }
 
     /**

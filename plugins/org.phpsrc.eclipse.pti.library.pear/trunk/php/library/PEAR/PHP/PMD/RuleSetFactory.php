@@ -60,7 +60,7 @@ require_once 'PHP/PMD/RuleSetNotFoundException.php';
  * @author    Manuel Pichler <mapi@phpmd.org>
  * @copyright 2009-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.2.4
+ * @version   Release: 0.2.5
  * @link      http://phpmd.org
  */
 class PHP_PMD_RuleSetFactory
@@ -446,9 +446,28 @@ class PHP_PMD_RuleSetFactory
         SimpleXMLElement $node
     ) {
         $name  = trim($node['name']);
-        $value = trim($node['value']);
+        $value = trim($this->_getPropertyValue($node));
         if ($name !== '' && $value !== '') {
             $rule->addProperty($name, $value);
         }
+    }
+
+    /**
+     * Returns the value of a property node. This value can be expressed in
+     * two different notations. First version is an attribute named <b>value</b>
+     * and the second valid notation is a child element named <b>value</b> that
+     * contains the value as character data.
+     *
+     * @param SimpleXMLElement $propertyNode The raw xml property node.
+     *
+     * @return string
+     * @since 0.2.5
+     */
+    private function _getPropertyValue(SimpleXMLElement $propertyNode)
+    {
+        if (isset($propertyNode->value)) {
+            return (string) $propertyNode->value;
+        }
+        return (string) $propertyNode['value'];
     }
 }

@@ -59,7 +59,7 @@ require_once 'PHP/Depend/Input/ExtensionFilter.php';
  * @author    Manuel Pichler <mapi@phpmd.org>
  * @copyright 2009-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.2.4
+ * @version   Release: 0.2.5
  * @link      http://phpmd.org
  */
 class PHP_PMD_ParserFactory
@@ -87,7 +87,6 @@ class PHP_PMD_ParserFactory
     private function _createInstance()
     {
         $pdepend = new PHP_Depend();
-        $pdepend->setSupportBadDocumentation();
         $pdepend->setStorage(PHP_Depend::TOKEN_STORAGE, $this->_createEngine());
         $pdepend->setStorage(PHP_Depend::PARSER_STORAGE, $this->_createEngine());
 

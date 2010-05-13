@@ -57,7 +57,7 @@ require_once 'PHP/PMD/Node/AbstractNode.php';
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.2.4
+ * @version    Release: 0.2.5
  * @link       http://phpmd.org
  */
 abstract class PHP_PMD_Node_AbstractCallable extends PHP_PMD_Node_AbstractNode

@@ -58,7 +58,7 @@ require_once 'PHP/Depend/Util/FileUtil.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.12
+ * @version    Release: 0.9.13
  * @link       http://www.pdepend.org/
  */
 class PHP_Depend_Storage_FileEngine extends PHP_Depend_Storage_AbstractEngine
@@ -118,7 +118,7 @@ class PHP_Depend_Storage_FileEngine extends PHP_Depend_Storage_AbstractEngine
      *
      * @return void
      */
-    public function store($data, $key, $group, $version = '0.9.12')
+    public function store($data, $key, $group, $version = '0.9.13')
     {
         $pathname = $this->_createPathname($key, $group, $version);
 
@@ -141,7 +141,7 @@ class PHP_Depend_Storage_FileEngine extends PHP_Depend_Storage_AbstractEngine
      *
      * @return mixed
      */
-    public function restore($key, $group, $version = '0.9.12')
+    public function restore($key, $group, $version = '0.9.13')
     {
         $pathname = $this->_createPathname($key, $group, $version);
         if (file_exists($pathname)) {
