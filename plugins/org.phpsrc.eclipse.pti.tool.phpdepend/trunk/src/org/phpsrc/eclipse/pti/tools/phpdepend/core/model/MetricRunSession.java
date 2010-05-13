@@ -143,6 +143,10 @@ public class MetricRunSession extends MetricElement {
 		File swapFile = getSwapFile();
 		if (swapFile.exists())
 			swapFile.delete();
+		if (jdependChartFile != null && jdependChartFile.exists())
+			jdependChartFile.delete();
+		if (summaryPyramidFile != null && summaryPyramidFile.exists())
+			summaryPyramidFile.delete();
 	}
 
 	private File getSwapFile() throws IllegalStateException {
@@ -159,11 +163,10 @@ public class MetricRunSession extends MetricElement {
 		File historyDir = PHPDependPlugin.getHistoryDirectory();
 		String isoTime = new SimpleDateFormat("yyyyMMdd-HHmmss.SSS").format(getGenerated()); //$NON-NLS-1$
 		String swapFileName = isoTime + "." + fileName; //$NON-NLS-1$
-		source.renameTo(new File(historyDir, swapFileName));
+		File sessionFile = new File(historyDir, swapFileName);
+		source.renameTo(sessionFile);
 
-		System.out.println(source);
-
-		return source;
+		return sessionFile;
 	}
 
 	public void reset() {

@@ -116,6 +116,9 @@ public class MetricRunnerViewPart extends ViewPart {
 	protected Clipboard fClipboard;
 	protected volatile String fInfoMessage;
 
+	final Image fMetricRunOKIcon;
+	final Image fMetricRunFailIcon;
+
 	private MetricTrace fMetricList;
 
 	private MetricViewer fTestViewer;
@@ -537,6 +540,9 @@ public class MetricRunnerViewPart extends ViewPart {
 		fImagesToDispose = new ArrayList();
 
 		fStackViewIcon = createManagedPHPDependImage("eview16/stackframe.gif");//$NON-NLS-1$
+
+		fMetricRunOKIcon = createManagedImage("eview16/phpdependsucc.gif"); //$NON-NLS-1$
+		fMetricRunFailIcon = createManagedImage("eview16/phpdependerr.gif"); //$NON-NLS-1$
 	}
 
 	private Image createManagedImage(String path) {
@@ -644,6 +650,8 @@ public class MetricRunnerViewPart extends ViewPart {
 
 		doShowInfoMessage();
 
+		updateViewTitleProgress();
+
 		boolean hasErrorsOrFailures = hasErrorsPlusWarnings();
 		fNextAction.setEnabled(hasErrorsOrFailures);
 		fPreviousAction.setEnabled(hasErrorsOrFailures);
@@ -713,6 +721,17 @@ public class MetricRunnerViewPart extends ViewPart {
 				fTestViewer.expandFirstLevel();
 			}
 		}
+
+		try {
+			IViewPart chartView = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(
+					MetricRunnerChartsViewPart.NAME);
+			if (chartView != null && chartView instanceof MetricRunnerChartsViewPart) {
+				((MetricRunnerChartsViewPart) chartView).setActiveMetricRunSession(metricRunSession);
+			}
+		} catch (PartInitException e) {
+			Logger.logException(e);
+		}
+
 		return deactivatedSession;
 	}
 
@@ -1123,5 +1142,39 @@ public class MetricRunnerViewPart extends ViewPart {
 		fLayout = layoutMode;
 		fFailuresOnlyFilterAction.setChecked(failuresOnly);
 		fTestViewer.setShowFailuresOnly(failuresOnly, layoutMode);
+	}
+
+	private boolean hasErrorsOrFailures() {
+		if (fMetricRunSession == null)
+			return false;
+		else
+			return fMetricRunSession.hasErrors() || fMetricRunSession.hasWarnings();
+	}
+
+	private void resetViewIcon() {
+		fViewImage = fOriginalViewImage;
+		firePropertyChange(IWorkbenchPart.PROP_TITLE);
+	}
+
+	private void updateViewIcon() {
+		if (fMetricRunSession == null)
+			fViewImage = fOriginalViewImage;
+		else if (hasErrorsOrFailures())
+			fViewImage = fMetricRunFailIcon;
+		else
+			fViewImage = fMetricRunOKIcon;
+		firePropertyChange(IWorkbenchPart.PROP_TITLE);
+	}
+
+	private void updateViewTitleProgress() {
+		if (fMetricRunSession != null) {
+			if (fMetricRunSession.isRunning()) {
+				resetViewIcon();
+			} else {
+				updateViewIcon();
+			}
+		} else {
+			resetViewIcon();
+		}
 	}
 }

@@ -112,12 +112,18 @@
 			category="org.eclipse.php.ui.views"
 			class="org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner.MetricRunnerViewPart"
 			icon="icons/full/obj16/php_depend.gif" />
+		<view id="org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunnercharts"
+			name="PHP Depend Charts"
+			category="org.eclipse.php.ui.views"
+			class="org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner.MetricRunnerChartsViewPart"
+			icon="icons/full/obj16/php_depend.gif" />
 	</extension>
 
 	<extension point="org.eclipse.ui.perspectiveExtensions">
 		<perspectiveExtension targetID="org.eclipse.php.perspective">
 			<actionSet id="org.phpsrc.eclipse.pti.tools.phpdepend.ui.actionSet" />
 			<viewShortcut id="org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunner" />
+			<viewShortcut id="org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunnercharts" />
 		</perspectiveExtension>
 	</extension>
 

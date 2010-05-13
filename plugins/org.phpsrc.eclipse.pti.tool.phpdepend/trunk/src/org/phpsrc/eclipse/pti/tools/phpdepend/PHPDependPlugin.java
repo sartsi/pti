@@ -101,12 +101,20 @@ public class PHPDependPlugin extends AbstractPHPToolPlugin {
 	 * )
 	 */
 	public void stop(BundleContext context) throws Exception {
+		try {
+			for (File file : getHistoryDirectory().listFiles()) {
+				if (file.isFile())
+					file.delete();
+			}
+		} catch (Exception e) {
+		}
+
 		fIsStopped = true;
-		plugin = null;
 		try {
 			fPHPDependModel.removeMetricRunSessionListener(fProblemListener);
 			fPHPDependModel.stop();
 		} finally {
+			plugin = null;
 			super.stop(context);
 		}
 	}
