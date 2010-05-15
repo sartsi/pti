@@ -14,6 +14,25 @@
 		<attribute name="severity"/>
 		<super type="org.eclipse.core.resources.problemmarker"/>
  	</extension>
+ 	<extension
+		point="org.eclipse.wst.validation.validatorV2"
+		id="PHPUnitAutomaticTestExecutionValidatorForPHP"
+		name="PHPDepend Metrics Validator (for PHP Files)">
+		<validator
+			class="org.phpsrc.eclipse.pti.tools.phpdepend.validator.PHPDependValidator"
+			build="false"
+			manual="false"
+			markerId="org.phpsrc.eclipse.pti.tools.phpdepend.validator.phpToolPHPDependMarker"
+			sourceid="org.eclipse.php.core.phpsource"
+			version="1">
+			<include>
+				<rules>
+					<contentType exactMatch="true" id="org.eclipse.php.core.phpsource"></contentType>
+				</rules>
+			</include>
+			<group id="org.eclipse.wst.sse.core.structuredModelGroup" />
+		</validator>
+	</extension>
 	<extension
 		point="org.eclipse.ui.preferencePages">
 		<page
@@ -127,5 +146,4 @@
 			<viewShortcut id="org.phpsrc.eclipse.pti.tools.phpdepend.ui.views.metricrunnercharts" />
 		</perspectiveExtension>
 	</extension>
-
 </plugin>
