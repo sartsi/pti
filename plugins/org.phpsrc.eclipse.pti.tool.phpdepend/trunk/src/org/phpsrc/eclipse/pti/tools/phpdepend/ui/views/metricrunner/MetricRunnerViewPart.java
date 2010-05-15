@@ -722,14 +722,10 @@ public class MetricRunnerViewPart extends ViewPart {
 			}
 		}
 
-		try {
-			IViewPart chartView = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(
-					MetricRunnerChartsViewPart.NAME);
-			if (chartView != null && chartView instanceof MetricRunnerChartsViewPart) {
-				((MetricRunnerChartsViewPart) chartView).setActiveMetricRunSession(metricRunSession);
-			}
-		} catch (PartInitException e) {
-			Logger.logException(e);
+		IViewPart chartView = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(
+				MetricRunnerChartsViewPart.NAME);
+		if (chartView != null && chartView instanceof MetricRunnerChartsViewPart) {
+			((MetricRunnerChartsViewPart) chartView).setActiveMetricRunSession(metricRunSession);
 		}
 
 		return deactivatedSession;
