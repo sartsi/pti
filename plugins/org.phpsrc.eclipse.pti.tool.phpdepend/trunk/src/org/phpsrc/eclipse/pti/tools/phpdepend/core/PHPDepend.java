@@ -45,8 +45,14 @@ public class PHPDepend extends AbstractPHPTool {
 	protected final static String ATTR_FILE_JDEPEND_CHART = "ATTR_FILE_JDEPEND_CHART";
 
 	private static PHPDepend instance;
+	private PHPDependOptions options;
 
 	protected PHPDepend() {
+		options = new PHPDependOptions();
+	}
+
+	public PHPDependOptions getOptions() {
+		return options;
 	}
 
 	public static PHPDepend getInstance() {
@@ -62,8 +68,8 @@ public class PHPDepend extends AbstractPHPTool {
 		String summaryFile = launcher.getAttribute(ATTR_FILE_SUMMARY_XML);
 		String jdependChartFile = launcher.getAttribute(ATTR_FILE_JDEPEND_CHART);
 		String summaryPyramidFile = launcher.getAttribute(ATTR_FILE_SUMMARY_PYRAMID);
-		importMetricRunSession(new File(summaryFile), new File(jdependChartFile), new File(summaryPyramidFile),
-				resource);
+		importMetricRunSession(new File(summaryFile), jdependChartFile != null ? new File(jdependChartFile) : null,
+				summaryPyramidFile != null ? new File(summaryPyramidFile) : null, resource);
 
 		return problems.toArray(new IProblem[0]);
 	}
@@ -117,12 +123,19 @@ public class PHPDepend extends AbstractPHPTool {
 
 		cmdLineArgs = "--summary-xml=" + OperatingSystem.escapeShellFileArg(summaryFile.toString()) + " " + cmdLineArgs;
 
-		String jdependChartFile = summaryFile.toString().replace(TMP_FILE_SUMMARY_XML, TMP_FILE_JDEPEND_CHART);
-		String summaryPyramidFile = summaryFile.toString().replace(TMP_FILE_SUMMARY_XML, TMP_FILE_SUMMARY_PYRAMID);
+		String jdependChartFile = null;
+		String summaryPyramidFile = null;
 
-		cmdLineArgs = "--jdepend-chart=" + OperatingSystem.escapeShellFileArg(jdependChartFile) + " " + cmdLineArgs;
-		cmdLineArgs = "--overview-pyramid=" + OperatingSystem.escapeShellFileArg(summaryPyramidFile) + " "
-				+ cmdLineArgs;
+		if (options.get(PHPDependOptions.OPTION_GENERATE_JDEPEND_CHART).booleanValue()) {
+			jdependChartFile = summaryFile.toString().replace(TMP_FILE_SUMMARY_XML, TMP_FILE_JDEPEND_CHART);
+			cmdLineArgs = "--jdepend-chart=" + OperatingSystem.escapeShellFileArg(jdependChartFile) + " " + cmdLineArgs;
+		}
+
+		if (options.get(PHPDependOptions.OPTION_GENERATE_SUMMARY_PYRAMID).booleanValue()) {
+			summaryPyramidFile = summaryFile.toString().replace(TMP_FILE_SUMMARY_XML, TMP_FILE_SUMMARY_PYRAMID);
+			cmdLineArgs = "--overview-pyramid=" + OperatingSystem.escapeShellFileArg(summaryPyramidFile) + " "
+					+ cmdLineArgs;
+		}
 
 		if (prefs.badDocumentation)
 			cmdLineArgs = "--bad-documentation " + cmdLineArgs;
@@ -141,8 +154,11 @@ public class PHPDepend extends AbstractPHPTool {
 				getScriptFile(), cmdLineArgs, getPHPINIEntries(project, fileIncludePath));
 
 		launcher.setAttribute(ATTR_FILE_SUMMARY_XML, summaryFile.toString());
-		launcher.setAttribute(ATTR_FILE_SUMMARY_PYRAMID, summaryPyramidFile);
-		launcher.setAttribute(ATTR_FILE_JDEPEND_CHART, jdependChartFile);
+
+		if (summaryPyramidFile != null)
+			launcher.setAttribute(ATTR_FILE_SUMMARY_PYRAMID, summaryPyramidFile);
+		if (jdependChartFile != null)
+			launcher.setAttribute(ATTR_FILE_JDEPEND_CHART, jdependChartFile);
 
 		launcher.setPrintOuput(prefs.isPrintOutput());
 

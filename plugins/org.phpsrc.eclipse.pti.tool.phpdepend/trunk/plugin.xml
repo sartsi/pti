@@ -101,6 +101,7 @@
 				toolbarPath="org.phpsrc.eclipse.pti.tools.phpdepend.ui.actionSet"
 				tooltip="Run PHP Depend"
 				class="org.phpsrc.eclipse.pti.tools.phpdepend.ui.actions.ValidateResourcesAction"
+				style="pulldown"
 				enablesFor="*">
 			</action>
 		</actionSet>
