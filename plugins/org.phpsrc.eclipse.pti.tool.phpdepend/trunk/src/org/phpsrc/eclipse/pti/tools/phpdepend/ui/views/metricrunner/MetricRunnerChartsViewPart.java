@@ -66,8 +66,10 @@ public class MetricRunnerChartsViewPart extends ViewPart {
 			try {
 				RenderedImage image = RenderedImageFactory.getInstance(file.toURI().toURL());
 				Image swtImage = image.getSWTImage();
-				imageCanvas.setImageData(swtImage.getImageData());
-				return true;
+				if (swtImage != null) {
+					imageCanvas.setImageData(swtImage.getImageData());
+					return true;
+				}
 			} catch (MalformedURLException e) {
 				Logger.logException(e);
 			}
