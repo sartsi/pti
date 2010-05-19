@@ -55,7 +55,7 @@ public class MetricList {
 		list.add(new Metric("i", "Instability", Metric.LEVEL_PACKAGE));
 		list.add(new Metric("d", "Distance", Metric.LEVEL_PACKAGE));
 
-		// Hierachy (Project)
+		// Hierarchy (Project)
 		list.add(new Metric("clsa", "Number of abstract classes", Metric.LEVEL_PROJECT));
 		list.add(new Metric("clsc", "Number of concrete classes", Metric.LEVEL_PROJECT));
 		list.add(new Metric("roots", "Number of root classes within the analyzed system",
