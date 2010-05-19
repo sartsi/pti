@@ -78,6 +78,7 @@ public class MetricList {
 		list.add(new Metric("loc", "Lines of code", Metric.LEVEL_METHOD));
 		list.add(new Metric("cloc", "Comment lines of code", Metric.LEVEL_METHOD));
 		list.add(new Metric("ncloc", "Non-comment lines of code", Metric.LEVEL_METHOD));
+		list.add(new Metric("lloc", "Logical lines of code", Metric.LEVEL_METHOD));
 
 		// Other
 		list.add(new Metric("eloc", "Executable lines of code", Metric.LEVEL_METHOD));
