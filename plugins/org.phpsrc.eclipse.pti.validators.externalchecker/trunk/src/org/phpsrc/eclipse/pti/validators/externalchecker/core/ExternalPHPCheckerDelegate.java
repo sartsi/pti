@@ -25,9 +25,11 @@ import org.phpsrc.eclipse.pti.core.launching.PHPToolLauncher;
 /**
  * Delegate implementation of execution of external validators.
  */
+@SuppressWarnings("restriction")
 class ExternalPHPCheckerDelegate {
 
-	public static final String MARKER_ID = ExternalPHPCheckerPlugin.PLUGIN_ID + ".externalphpcheckerproblem"; // $NON-NLS-1$
+	public static final String MARKER_ID = ExternalPHPCheckerPlugin.PLUGIN_ID
+			+ ".externalphpcheckerproblem"; // $NON-NLS-1$
 
 	private final String arguments;
 	private final String command;
@@ -36,7 +38,7 @@ class ExternalPHPCheckerDelegate {
 	private final IEnvironment environment;
 	private final IExecutionEnvironment execEnvironment;
 	private final String[] extensions;
-	private final List rules = new ArrayList();
+	private final List<Rule> rules = new ArrayList<Rule>();
 
 	static interface IExternalReporterDelegate {
 		void report(IValidatorProblem problem) throws CoreException;
@@ -44,7 +46,8 @@ class ExternalPHPCheckerDelegate {
 
 	public ExternalPHPCheckerDelegate(IEnvironment environment, ExternalPHPChecker externalChecker) {
 		this.environment = environment;
-		this.execEnvironment = (IExecutionEnvironment) environment.getAdapter(IExecutionEnvironment.class);
+		this.execEnvironment = (IExecutionEnvironment) environment
+				.getAdapter(IExecutionEnvironment.class);
 
 		for (int i = 0; i < externalChecker.getNRules(); ++i) {
 			rules.add(externalChecker.getRule(i));
@@ -54,12 +57,12 @@ class ExternalPHPCheckerDelegate {
 		this.extensions = prepareExtensions(externalChecker.getExtensions());
 		this.command = prepareCommand(externalChecker.getCommand(), environment);
 
-		this.launcher = new PHPToolLauncher(getQualifiedName(environment.getId()), getPHPExecutable(externalChecker
-				.getPhpExecutable()), Path.fromOSString(this.command), this.arguments.replaceFirst("%f",
-				PHPToolLauncher.COMMANDLINE_PLACEHOLDER_FILE).replaceFirst("%d",
-				PHPToolLauncher.COMMANDLINE_PLACEHOLDER_FOLDER));
-		// this.launcher.setPrintOuput(externalChecker.getPrintOutput());
-		this.launcher.setPrintOuput(true);
+		this.launcher = new PHPToolLauncher(getQualifiedName(environment.getId()),
+				getPHPExecutable(externalChecker.getPhpExecutable()), Path
+						.fromOSString(this.command), this.arguments.replaceFirst("%f",
+						PHPToolLauncher.COMMANDLINE_PLACEHOLDER_FILE).replaceFirst("%d",
+						PHPToolLauncher.COMMANDLINE_PLACEHOLDER_FOLDER));
+		this.launcher.setPrintOuput(externalChecker.getPrintOutput());
 	}
 
 	public IValidatorReporter createValidatorReporter() {
@@ -92,8 +95,8 @@ class ExternalPHPCheckerDelegate {
 		return false;
 	}
 
-	public void runValidator(IResource resource, IValidatorOutput console, IExternalReporterDelegate delegate)
-			throws CoreException {
+	public void runValidator(IResource resource, IValidatorOutput console,
+			IExternalReporterDelegate delegate) throws CoreException {
 		if (resource instanceof IFile) {
 
 			String output = this.launcher.launch((IFile) resource);
@@ -117,7 +120,7 @@ class ExternalPHPCheckerDelegate {
 	}
 
 	private IValidatorProblem parseProblem(String problem) {
-		List wlist = ExternalPHPCheckerWildcardManager.loadCustomWildcards();
+		List<?> wlist = ExternalPHPCheckerWildcardManager.loadCustomWildcards();
 
 		for (int i = 0; i < rules.size(); i++) {
 			Rule rule = (Rule) this.rules.get(i);
@@ -167,6 +170,7 @@ class ExternalPHPCheckerDelegate {
 	}
 
 	public static QualifiedName getQualifiedName(String checkerId) {
-		return new QualifiedName(ExternalPHPCheckerPlugin.PLUGIN_ID, "external_checker#" + checkerId);
+		return new QualifiedName(ExternalPHPCheckerPlugin.PLUGIN_ID, "external_checker#"
+				+ checkerId);
 	}
 }

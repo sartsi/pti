@@ -58,7 +58,6 @@ public class ExternalPHPChecker extends AbstractValidator {
 		this.arguments = "%f"; //$NON-NLS-1$
 		this.paths = newEmptyPath();
 		this.extensions = "*"; //$NON-NLS-1$
-		this.phpExecutable = phpExecutable;
 	}
 
 	private Map newEmptyPath() {
