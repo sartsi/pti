@@ -13,7 +13,7 @@
  * @category   PHP
  * @package PHP_Beautifier
  * @author Claudio Bustos <cdx@users.sourceforge.com>
- * @copyright  2004-2006 Claudio Bustos
+ * @copyright  2004-2010 Claudio Bustos
  * @link     http://pear.php.net/package/PHP_Beautifier
  * @link     http://beautifyphp.sourceforge.net
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
@@ -73,11 +73,11 @@ include_once 'Beautifier/StreamWrapper.php';
  * @category   PHP
  * @package PHP_Beautifier
  * @author Claudio Bustos <cdx@users.sourceforge.com>
- * @copyright  2004-2006 Claudio Bustos
+ * @copyright  2004-2010 Claudio Bustos
  * @link     http://pear.php.net/package/PHP_Beautifier
  * @link     http://beautifyphp.sourceforge.net
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    Release: 0.1.14
+ * @version    Release: 0.1.15
  */
 class PHP_Beautifier implements PHP_Beautifier_Interface
 {
@@ -181,9 +181,15 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
     public $currentWhitespace = '';
     /**
      * Association $aTokens=>$aOut
-     * @var string
+     * @var array
      */
     public $aAssocs = array();
+    /**
+     * Current token. Could be changed by a filter (See Lowercase)
+     * @var array
+     */
+    public $aCurrentToken = array();
+    
     // private
     
     /**
@@ -231,6 +237,8 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
     private $sBeforeNewLine = null;
     /** Activate or deactivate 'no delete previous space' */
     private $bNdps = false;
+    /** Mark the begin of the end of a DoWhile sequence **/
+    private $doWhileBeginEnd;
     // Methods
     
     /**
@@ -297,6 +305,7 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
             '|' => 'T_OPERATOR',
             '^' => 'T_OPERATOR',
             '~' => 'T_OPERATOR',
+            '!' => 'T_OPERATOR_NEGATION',
             T_SL => 'T_OPERATOR',
             T_SR => 'T_OPERATOR',
             T_OBJECT_OPERATOR => 'T_OBJECT_OPERATOR',
@@ -364,6 +373,9 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
             T_ENDDECLARE => 'T_END_SUFFIX',
             T_ENDSWITCH => 'T_END_SUFFIX',
             T_ENDIF => 'T_END_SUFFIX',
+            // for PHP 5.3
+            T_NAMESPACE => 'T_INCLUDE', 
+            T_USE => 'T_INCLUDE', 
         );
         foreach($aTokensToChange as $iToken => $sFunction) {
             $this->aTokenFunctions[$iToken] = $sFunction;
@@ -412,7 +424,7 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
     {
         return $this->aFilterDirs;
     }
-    private function addFilterObject(PHP_Beautifier_Filter $oFilter) 
+    public function addFilterObject(PHP_Beautifier_Filter $oFilter) 
     {
         array_unshift($this->aFilters, $oFilter);
         return true;
@@ -540,6 +552,7 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
      */
     private function getFilterList_FilterName(&$sFile) 
     {
+        $aMatch=array();
         preg_match("/\/([^\/]*?)\.filter\.php/", $sFile, $aMatch);
         $sFile = $aMatch[1];
     }
@@ -550,6 +563,10 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
     public function getIndentNumber() 
     {
         return $this->iIndentNumber;
+    }
+    public function getIndent() 
+    {
+        return $this->iIndent;
     }
     public function getNewLine() 
     {
@@ -694,7 +711,7 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
         if ($this->sFileType == 'php') {
             $this->aTokens = token_get_all($this->sText);
         } else {
-            $sClass = 'PHP_Beautifier_Tokeniker_' . ucfirst($this->sFileType);
+            $sClass = 'PHP_Beautifier_Tokenizer_' . ucfirst($this->sFileType);
             if (class_exists($sClass)) {
                 $oTokenizer = new $sClass($this->sText);
                 $this->aTokens = $oTokenizer->getTokens();
@@ -725,10 +742,11 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
             $this->controlToken($aCurrentToken);
             $iFirstOut = count($this->aOut); //5
             $bError = false;
+            $this->aCurrentToken=$aCurrentToken;
             if ($this->bBeautify) {
                 foreach($this->aFilters as $oFilter) {
                     $bError = true;
-                    if ($oFilter->handleToken($aCurrentToken) !== FALSE) {
+                    if ($oFilter->handleToken($this->aCurrentToken) !== FALSE) {
                         $this->oLog->log('Filter:' . $oFilter->getName() , PEAR_LOG_DEBUG);
                         $bError = false;
                         break;
@@ -857,6 +875,7 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
         switch ($aCurrentToken[0]) {
             case T_COMMENT:
                 // callback!
+                $aMatch=array();
                 if (preg_match("/\/\/\s*(.*?)->((.*)\((.*)\))/", $aCurrentToken[1], $aMatch)) {
                     try {
                         $this->processCallback($aMatch);
@@ -936,8 +955,38 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
                 if ($this->getMode('string_index')) {
                     $this->unsetMode('string_index');
                 } else {
-                    $this->oLog->log('end bracket:' . $this->getPreviousTokenContent() , PEAR_LOG_DEBUG);
-                    if ($this->getPreviousTokenContent() == ';' or $this->getPreviousTokenContent() == '}' or $this->getPreviousTokenContent() == '{') {
+                    $prevIndex = 1;
+                    while ($this->isPreviousTokenConstant(array(T_COMMENT, T_DOC_COMMENT), $prevIndex)) {
+                        $prevIndex ++;
+                    }
+
+                    $this->oLog->log('end bracket:' . $this->getPreviousTokenContent($prevIndex) , PEAR_LOG_DEBUG);
+                    
+                    if ($this->isPreviousTokenContent(array(';','}','{'), $prevIndex)) {
+                        if (end($this->aControlSeq)!=T_DO) {
+                            $this->popControlSeq();
+                        } else {
+                            $this->DoWhileBeginEnd=true;
+                        }
+                    }
+                }
+                break;
+
+            case ';':
+                // If is a while in a do while structure
+                if (isset($this->aControlSeq) && (end($this->aControlSeq)==T_WHILE)) {
+                    $counter = 0;
+                    $openParenthesis = 0;
+                    do {
+                        $counter++;
+                        $prevToken = $this->getPreviousTokenContent($counter);
+                        if ($prevToken == "(") { $openParenthesis++; }
+                    } while($prevToken!="{" && $prevToken!="while");
+                    if ($prevToken=="while" && $openParenthesis==1) {
+                        if ($this->DoWhileBeginEnd) {
+                            $this->popControlSeq();
+                            $this->DoWhileBeginEnd=false;
+                        }
                         $this->popControlSeq();
                     }
                 }
@@ -1026,7 +1075,7 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
      * @see removeWhitespace()
      * @see PHP_Beautifier_Filter_NewLines
      */
-    function setNoDeletePreviousSpaceHack($bFlag = true) 
+    public function setNoDeletePreviousSpaceHack($bFlag = true) 
     {
         $this->bNdps = $bFlag;
     }
@@ -1355,6 +1404,8 @@ class PHP_Beautifier implements PHP_Beautifier_Interface
     public function getPreviousWhitespace() 
     {
         $sWhiteSpace = '';
+        $aMatch=array();
+
         for ($x = $this->iCount-1 ; $x >= 0 ; $x--) {
             $this->oLog->log("sp n:$x", PEAR_LOG_DEBUG);
             $aToken = $this->getToken($x);

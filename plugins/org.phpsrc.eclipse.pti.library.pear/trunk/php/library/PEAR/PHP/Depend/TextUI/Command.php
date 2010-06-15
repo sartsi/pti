@@ -62,7 +62,7 @@ require_once 'PHP/Depend/Util/Log.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.13
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 class PHP_Depend_TextUI_Command
@@ -379,7 +379,7 @@ class PHP_Depend_TextUI_Command
      */
     protected function printVersion()
     {
-        echo 'PHP_Depend 0.9.13 by Manuel Pichler', PHP_EOL, PHP_EOL;
+        echo 'PHP_Depend 0.9.14 by Manuel Pichler', PHP_EOL, PHP_EOL;
     }
 
     /**

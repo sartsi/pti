@@ -56,7 +56,7 @@
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.13
+ * @version    Release: 0.9.14
  * @link       http://www.pdepend.org/
  *
  * @todo Rename this class into PHP52Helper and make methods none static.
@@ -112,12 +112,14 @@ final class PHP_Depend_Tokenizer_PHP52Helper
      */
     private static function _tokenize($source)
     {
-        $error  = error_get_last();
+        ini_set('track_errors', 'on');
+        $php_errormsg = null;
+
         $tokens = @token_get_all($source);
-        
-        if ($error == error_get_last()) {
+
+        if ($php_errormsg === null) {
             return $tokens;
         }
-        throw new PHP_Depend_Parser_TokenException($error['message']);
+        throw new PHP_Depend_Parser_TokenException($php_errormsg);
     }
 }

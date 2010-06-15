@@ -9,7 +9,7 @@ ConsoleTools 1.6.1   stable
 INSTALLED PACKAGES, CHANNEL PEAR.PDEPEND.ORG:
 =============================================
 PACKAGE    VERSION STATE
-PHP_Depend 0.9.13  beta
+PHP_Depend 0.9.14  beta
 INSTALLED PACKAGES, CHANNEL PEAR.PHP.NET:
 =========================================
 PACKAGE             VERSION   STATE
@@ -36,7 +36,7 @@ Mail                1.2.0     stable
 Net_SMTP            1.4.2     stable
 Net_Socket          1.0.9     stable
 PEAR                1.9.1     stable
-PHP_Beautifier      0.1.14    beta
+PHP_Beautifier      0.1.15    beta
 PHP_CodeSniffer     1.2.2     stable
 PHP_Compat          1.5.0     stable
 PHP_CompatInfo      1.9.0     stable
