@@ -43,7 +43,7 @@
 // | Author: Lukas Smith <smith@pooteeweet.org>                           |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlite.php,v 1.62 2007/03/28 16:58:54 quipo Exp $
+// $Id: sqlite.php,v 1.67 2008/02/22 19:58:06 quipo Exp $
 //
 
 require_once 'MDB2/Driver/Datatype/Common.php';
@@ -57,6 +57,22 @@ require_once 'MDB2/Driver/Datatype/Common.php';
  */
 class MDB2_Driver_Datatype_sqlite extends MDB2_Driver_Datatype_Common
 {
+    // {{{ _getCollationFieldDeclaration()
+
+    /**
+     * Obtain DBMS specific SQL code portion needed to set the COLLATION
+     * of a field declaration to be used in statements like CREATE TABLE.
+     *
+     * @param string $collation name of the collation
+     *
+     * @return string DBMS specific SQL code portion needed to set the COLLATION
+     *                of a field declaration.
+     */
+    function _getCollationFieldDeclaration($collation)
+    {
+        return 'COLLATE '.$collation;
+    }
+
     // }}}
     // {{{ getTypeDeclaration()
 
@@ -196,8 +212,6 @@ class MDB2_Driver_Datatype_sqlite extends MDB2_Driver_Datatype_Common
                 $field['default'] = empty($field['notnull']) ? null : 0;
             }
             $default = ' DEFAULT '.$this->quote($field['default'], 'integer');
-        } elseif (empty($field['notnull'])) {
-            $default = ' DEFAULT NULL';
         }
 
         $notnull = empty($field['notnull']) ? '' : ' NOT NULL';
@@ -211,11 +225,6 @@ class MDB2_Driver_Datatype_sqlite extends MDB2_Driver_Datatype_Common
 
     /**
      * build a pattern matching string
-     *
-     * EXPERIMENTAL
-     *
-     * WARNING: this function is experimental and may change signature at
-     * any time until labelled as non-experimental
      *
      * @access public
      *
@@ -318,6 +327,9 @@ class MDB2_Driver_Datatype_sqlite extends MDB2_Driver_Datatype_Common
             $length = 8;
             break;
         case 'clob':
+            $type[] = 'clob';
+            $fixed  = false;
+            break;
         case 'tinytext':
         case 'mediumtext':
         case 'longtext':
@@ -334,6 +346,7 @@ class MDB2_Driver_Datatype_sqlite extends MDB2_Driver_Datatype_Common
                 }
             } elseif (strstr($db_type, 'text')) {
                 $type[] = 'clob';
+                $type = array_reverse($type);
             }
             if ($fixed !== false) {
                 $fixed = true;
@@ -379,7 +392,6 @@ class MDB2_Driver_Datatype_sqlite extends MDB2_Driver_Datatype_Common
             if (PEAR::isError($db)) {
                 return $db;
             }
-
             return $db->raiseError(MDB2_ERROR_UNSUPPORTED, null, null,
                 'unknown database attribute type: '.$db_type, __FUNCTION__);
         }
@@ -390,6 +402,8 @@ class MDB2_Driver_Datatype_sqlite extends MDB2_Driver_Datatype_Common
 
         return array($type, $length, $unsigned, $fixed);
     }
+
+    // }}}
 }
 
 ?>
