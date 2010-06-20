@@ -60,7 +60,7 @@ require_once 'PHP/Depend/Code/AbstractItem.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_Property 
@@ -288,17 +288,6 @@ class PHP_Depend_Code_Property
     }
 
     /**
-     * Returns the source tokens used for this property declaration.
-     *
-     * @return array(PHP_Depend_Token)
-     * @since 0.9.6
-     */
-    public function getTokens()
-    {
-        return $this->_variableDeclarator->getTokens();
-    }
-
-    /**
      * Returns the line number where the property declaration can be found.
      *
      * @return integer
@@ -471,6 +460,44 @@ class PHP_Depend_Code_Property
     }
 
     /**
+     * This method can be called by the PHP_Depend runtime environment or a
+     * utilizing component to free up memory. This methods are required for
+     * PHP version < 5.3 where cyclic references can not be resolved
+     * automatically by PHP's garbage collector.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function free()
+    {
+        $this->_removeReferenceToDeclaringClass();
+        $this->_removeReferencesToNodes();
+    }
+
+    /**
+     * Removes the reference to the declaring class of this property instance.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferenceToDeclaringClass()
+    {
+        $this->_declaringClass = null;
+    }
+
+    /**
+     * Removes all references to ast nodes associated with property instance.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferencesToNodes()
+    {
+        $this->_formalParameter    = null;
+        $this->_variableDeclarator = null;
+    }
+
+    /**
      * This method returns a string representation of this parameter.
      *
      * @return string
@@ -507,50 +534,6 @@ class PHP_Depend_Code_Property
     // @codeCoverageIgnoreStart
 
     /**
-     * Sets the visibility for this node.
-     *
-     * The given <b>$visibility</b> value must equal to one of the defined
-     * constants, otherwith this method will fail with an exception.
-     *
-     * @param integer $visibility The node visibility.
-     *
-     * @return void
-     * @throws InvalidArgumentException If the given visibility is not equal to
-     *                                  one of the defined visibility constants.
-     * @deprecated Since version 0.9.4, use setModifiers() instead.
-     */
-    public function setVisibility($visibility)
-    {
-        fwrite(STDERR, 'Since 0.9.4 setVisibility() is deprecated.' . PHP_EOL);
-    }
-
-    /**
-     * Returns the type of this property. This method will return <b>null</b>
-     * for all scalar type, only class properties will have a type.
-     *
-     * @return PHP_Depend_Code_AbstractClassOrInterface
-     * @deprecated Since version 0.9.5, use getClass() instead.
-     */
-    public function getType()
-    {
-        fwrite(STDERR, 'Since 0.9.5 getType() is deprecated.' . PHP_EOL);
-        return $this->getClass();
-    }
-
-    /**
-     * Sets the type of this property.
-     *
-     * @param PHP_Depend_Code_AbstractClassOrInterface $type The property type.
-     *
-     * @return void
-     * @deprecated Since version 0.9.5, use setASTClassReference() instead.
-     */
-    public function setType(PHP_Depend_Code_AbstractClassOrInterface $type)
-    {
-        fwrite(STDERR, 'Since 0.9.5 setType() is deprecated.' . PHP_EOL);
-    }
-
-    /**
      * Returns the parent class object or <b>null</b>
      *
      * @return PHP_Depend_Code_Class
@@ -574,6 +557,19 @@ class PHP_Depend_Code_Property
     {
         fwrite(STDERR, 'Since 0.9.6 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
         $this->setDeclaringClass($parent);
+    }
+
+    /**
+     * Returns the source tokens used for this property declaration.
+     *
+     * @return array(PHP_Depend_Token)
+     * @since 0.9.6
+     * @deprecated Since version 0.9.12, use setDeclaringClass() instead.
+     */
+    public function getTokens()
+    {
+        fwrite(STDERR, 'Since 0.9.12 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
+        return $this->_variableDeclarator->getTokens();
     }
 
     // @codeCoverageIgnoreEnd

@@ -3,7 +3,7 @@
  * $Header$
  * $Horde: horde/lib/Log.php,v 1.15 2000/06/29 23:39:45 jon Exp $
  *
- * @version $Revision: 293929 $
+ * @version $Revision: 299917 $
  * @package Log
  */
 
@@ -456,7 +456,7 @@ class Log
         $class = isset($bt[$depth+1]['class']) ? $bt[$depth+1]['class'] : null;
         if ($class !== null && strcasecmp($class, 'Log_composite') == 0) {
             $depth++;
-            $class = isset($bt[$depth + 1]) ? $bt[$depth + 1]['class'] : null;
+            $class = isset($bt[$depth+1]['class']) ? $bt[$depth+1]['class'] : null;
         }
 
         /*

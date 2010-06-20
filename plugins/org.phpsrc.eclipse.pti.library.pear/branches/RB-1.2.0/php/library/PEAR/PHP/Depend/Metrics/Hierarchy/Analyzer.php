@@ -68,7 +68,7 @@ require_once 'PHP/Depend/Metrics/ProjectAwareI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Metrics_Hierarchy_Analyzer
@@ -89,16 +89,7 @@ class PHP_Depend_Metrics_Hierarchy_Analyzer
     const M_NUMBER_OF_ABSTRACT_CLASSES = 'clsa',
           M_NUMBER_OF_CONCRETE_CLASSES = 'clsc',
           M_NUMBER_OF_ROOT_CLASSES     = 'roots',
-          M_NUMBER_OF_LEAF_CLASSES     = 'leafs',
-          M_INHERITANCE_DEPTH          = 'dit',
-          M_MAXIMUM_INHERITANCE_DEPTH  = 'maxDIT';
-
-    /**
-     * Number of all analyzed packages.
-     *
-     * @var integer $_pkgs
-     */
-    private $_pkgs = 0;
+          M_NUMBER_OF_LEAF_CLASSES     = 'leafs';
 
     /**
      * Number of all analyzed functions.
@@ -148,13 +139,6 @@ class PHP_Depend_Metrics_Hierarchy_Analyzer
      * @var array(string=>boolean) $_noneLeafs
      */
     private $_noneLeafs = array();
-
-    /**
-     * The maximum depth of inheritance tree value within the analyzed source code.
-     *
-     * @var integer $_maxDIT
-     */
-    private $_maxDIT = 0;
 
     /**
      * Hash with all calculated node metrics.
@@ -219,7 +203,6 @@ class PHP_Depend_Metrics_Hierarchy_Analyzer
             self::M_NUMBER_OF_CONCRETE_CLASSES  =>  $this->_cls - $this->_clsa,
             self::M_NUMBER_OF_ROOT_CLASSES      =>  count($this->_roots),
             self::M_NUMBER_OF_LEAF_CLASSES      =>  $this->_cls - $noneLeafs,
-            self::M_MAXIMUM_INHERITANCE_DEPTH   =>  $this->_maxDIT,
         );
     }
 
@@ -266,15 +249,8 @@ class PHP_Depend_Metrics_Hierarchy_Analyzer
             $this->_noneLeafs[$parentClass->getUUID()] = true;
         }
 
-        // Get class dit value
-        $dit = $this->getClassDIT($class);
         // Store node metric
-        $this->_nodeMetrics[$class->getUUID()] = array(
-            self::M_INHERITANCE_DEPTH  =>  $dit
-        );
-        
-        // Collect max dit value
-        $this->_maxDIT = max($this->_maxDIT, $dit);
+        $this->_nodeMetrics[$class->getUUID()] = array();
 
         foreach ($class->getMethods() as $method) {
             $method->accept($this);
@@ -347,9 +323,11 @@ class PHP_Depend_Metrics_Hierarchy_Analyzer
      */
     public function visitPackage(PHP_Depend_Code_Package $package)
     {
-        $this->fireStartPackage($package);
+        if (!$package->isUserDefined()) {
+            //return;
+        }
 
-        ++$this->_pkgs;
+        $this->fireStartPackage($package);
 
         foreach ($package->getTypes() as $type) {
             $type->accept($this);
@@ -360,21 +338,5 @@ class PHP_Depend_Metrics_Hierarchy_Analyzer
         }
 
         $this->fireEndPackage($package);
-    }
-
-    /**
-     * Returns the depth of inheritance tree value for the given class.
-     *
-     * @param PHP_Depend_Code_Class $class The context code class instance.
-     *
-     * @return integer
-     */
-    protected function getClassDIT(PHP_Depend_Code_Class $class)
-    {
-        $dit = 0;
-        while (($class = $class->getParentClass()) !== null) {
-            ++$dit;
-        }
-        return $dit;
     }
 }

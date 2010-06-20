@@ -92,7 +92,7 @@ require_once 'PHP/Depend/ConstantsI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 interface PHP_Depend_TokenizerI extends PHP_Depend_ConstantsI
@@ -128,6 +128,15 @@ interface PHP_Depend_TokenizerI extends PHP_Depend_ConstantsI
      * @return integer
      */
     function peek();
+    
+    /**
+     * Returns the type of next token, after the current token. This method
+     * ignores all comments between the current and the next token.
+     *
+     * @return integer
+     * @since 0.9.12
+     */
+    function peekNext();
 
     /**
      * Returns the previous token type or {@link PHP_Depend_TokenizerI::T_BOF}

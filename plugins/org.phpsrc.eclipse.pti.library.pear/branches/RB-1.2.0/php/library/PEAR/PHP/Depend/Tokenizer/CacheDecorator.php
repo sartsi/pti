@@ -59,7 +59,7 @@ require_once 'PHP/Depend/Code/File.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://www.pdepend.org/
  */
 class PHP_Depend_Tokenizer_CacheDecorator implements PHP_Depend_TokenizerI
@@ -100,6 +100,13 @@ class PHP_Depend_Tokenizer_CacheDecorator implements PHP_Depend_TokenizerI
     private $_count = 0;
 
     /**
+     * Type of the next token.
+     *
+     * @var integer
+     */
+    private $_peek = 0;
+
+    /**
      * Constructs a new tokenizer decorator instance.
      *
      * @param PHP_Depend_TokenizerI $tokenizer The decorated tokenizer instance.
@@ -130,7 +137,7 @@ class PHP_Depend_Tokenizer_CacheDecorator implements PHP_Depend_TokenizerI
     {
         $storage = PHP_Depend_StorageRegistry::get(PHP_Depend::PARSER_STORAGE);
 
-        $id    = '$Id$-0.9.11';
+        $id    = '$Id$-0.9.14';
         $key   = md5_file($sourceFile);
         $group = get_class($this->_tokenizer);
 
@@ -149,18 +156,24 @@ class PHP_Depend_Tokenizer_CacheDecorator implements PHP_Depend_TokenizerI
         $this->_tokens = $tokens;
         $this->_index  = 0;
         $this->_count  = count($tokens);
+        $this->_peek   = ($this->_count === 0 ? self::T_EOF : $tokens[0]->type);
     }
 
     /**
      * Returns the next token or {@link PHP_Depend_TokenizerI::T_EOF} if
      * there is no next token.
      *
-     * @return array|integer
+     * @return PHP_Depend_Token|integer
      */
     public function next()
     {
+        $this->_peek = self::T_EOF;
         if ($this->_index < $this->_count) {
-            return $this->_tokens[$this->_index++];
+            $token = $this->_tokens[$this->_index++];
+            if ($this->_index < $this->_count) {
+                $this->_peek = $this->_tokens[$this->_index]->type;
+            }
+            return $token;
         }
         return self::T_EOF;
     }
@@ -173,10 +186,23 @@ class PHP_Depend_Tokenizer_CacheDecorator implements PHP_Depend_TokenizerI
      */
     public function peek()
     {
-        if ($this->_index < $this->_count) {
-            return $this->_tokens[$this->_index]->type;
-        }
-        return self::T_EOF;
+        return $this->_peek;
+    }
+
+    /**
+     * Returns the type of next token, after the current token. This method
+     * ignores all comments between the current and the next token.
+     *
+     * @return integer
+     * @since 0.9.12
+     */
+    public function peekNext()
+    {
+        $offset = 0;
+        do {
+            $type = $this->_tokens[$this->_index + ++$offset]->type;
+        } while ($type == self::T_COMMENT || $type == self::T_DOC_COMMENT);
+        return $type;
     }
 
     /**
@@ -193,4 +219,3 @@ class PHP_Depend_Tokenizer_CacheDecorator implements PHP_Depend_TokenizerI
         return self::T_BOF;
     }
 }
-?>

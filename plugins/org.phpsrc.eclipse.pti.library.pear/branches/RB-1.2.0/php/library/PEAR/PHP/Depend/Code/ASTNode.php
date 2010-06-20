@@ -58,7 +58,7 @@ require_once 'PHP/Depend/Code/ASTNodeI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://www.pdepend.org/
  * @since      0.9.6
  */
@@ -142,21 +142,39 @@ abstract class PHP_Depend_Code_ASTNode implements PHP_Depend_Code_ASTNodeI
     }
 
     /**
+     * Sets the start line for this ast node.
+     *
+     * @param integer $startLine The node start line.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function setStartLine($startLine)
+    {
+        $this->_startLine = $startLine;
+    }
+
+    /**
      * Returns the start line for this ast node.
      *
      * @return integer
      */
     public function getStartLine()
     {
-        if ($this->_startLine > 0) {
-            return $this->_startLine;
-        }
-        
-        $tokens = $this->getTokens();
-        $token  = reset($tokens);
+        return $this->_startLine;
+    }
 
-        assert($token instanceof PHP_Depend_Token);
-        return $token->startLine;
+    /**
+     * Sets the start column for this ast node.
+     *
+     * @param integer $startColumn The node start column.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function setStartColumn($startColumn)
+    {
+        $this->_startColumn = $startColumn;
     }
 
     /**
@@ -166,15 +184,20 @@ abstract class PHP_Depend_Code_ASTNode implements PHP_Depend_Code_ASTNodeI
      */
     public function getStartColumn()
     {
-        if ($this->_startColumn > 0) {
-            return $this->_startColumn;
-        }
+        return $this->_startColumn;
+    }
 
-        $tokens = $this->getTokens();
-        $token  = reset($tokens);
-
-        assert($token instanceof PHP_Depend_Token);
-        return $token->startColumn;
+    /**
+     * Sets the node's end line.
+     *
+     * @param integer $endLine The node's end line.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function setEndLine($endLine)
+    {
+        $this->_endLine = $endLine;
     }
 
     /**
@@ -184,15 +207,20 @@ abstract class PHP_Depend_Code_ASTNode implements PHP_Depend_Code_ASTNodeI
      */
     public function getEndLine()
     {
-        if ($this->_endLine > 0) {
-            return $this->_endLine;
-        }
+        return $this->_endLine;
+    }
 
-        $tokens = $this->getTokens();
-        $token  = end($tokens);
-
-        assert($token instanceof PHP_Depend_Token);
-        return $token->endLine;
+    /**
+     * Sets the node's end column.
+     *
+     * @param integer $endColumn The node's end column.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function setEndColumn($endColumn)
+    {
+        $this->_endColumn = $endColumn;
     }
 
     /**
@@ -202,35 +230,31 @@ abstract class PHP_Depend_Code_ASTNode implements PHP_Depend_Code_ASTNodeI
      */
     public function getEndColumn()
     {
-        if ($this->_endColumn > 0) {
-            return $this->_endColumn;
-        }
-
-        $tokens = $this->getTokens();
-        $token  = end($tokens);
-
-        assert($token instanceof PHP_Depend_Token);
-        return $token->endColumn;
+        return $this->_endColumn;
     }
 
     /**
      * For better performance we have moved the single setter methods for the
      * node columns and lines into this configure method.
      *
-     * @param array(PHP_Depend_Token) $tokens The tokens of this node.
+     * @param integer $startLine   The node's start line.
+     * @param integer $endLine     The node's end line.
+     * @param integer $startColumn The node's start column.
+     * @param integer $endColumn   The node's end column.
      *
      * @return void
      * @since 0.9.10
      */
-    public function configureLinesAndColumns(array $tokens)
-    {
-        $startToken = $tokens[0];
-        $this->_startLine   = $startToken->startLine;
-        $this->_startColumn = $startToken->startColumn;
-
-        $endToken = end($tokens);
-        $this->_endLine   = $endToken->endLine;
-        $this->_endColumn = $endToken->endColumn;
+    public function configureLinesAndColumns(
+        $startLine,
+        $endLine,
+        $startColumn,
+        $endColumn
+    ) {
+        $this->_startLine   = $startLine;
+        $this->_startColumn = $startColumn;
+        $this->_endLine     = $endLine;
+        $this->_endColumn   = $endColumn;
     }
 
     /**
@@ -394,47 +418,42 @@ abstract class PHP_Depend_Code_ASTNode implements PHP_Depend_Code_ASTNodeI
     }
 
     /**
-     * This method will return the source tokens parsed for this node.
-     *
-     * @return array(PHP_Depend_Token)
-     */
-    public function getTokens()
-    {
-        $storage = PHP_Depend_StorageRegistry::get(PHP_Depend::TOKEN_STORAGE);
-        return (array) $storage->restore(spl_object_hash($this), get_class($this));
-    }
-
-    /**
-     * Sets the source tokens parsed for this node.
-     *
-     * @param array(PHP_Depend_Token) $tokens The source tokens of this node.
+     * This method can be called by the PHP_Depend runtime environment or a
+     * utilizing component to free up memory. This methods are required for
+     * PHP version < 5.3 where cyclic references can not be resolved
+     * automatically by PHP's garbage collector.
      *
      * @return void
+     * @since 0.9.12
      */
-    public function setTokens(array $tokens)
+    public function free()
     {
-        $storage = PHP_Depend_StorageRegistry::get(PHP_Depend::TOKEN_STORAGE);
-        $storage->store($tokens, spl_object_hash($this), get_class($this));
+        $this->_removeReferenceToParentNode();
+        $this->_removeReferencesToChildNodes();
     }
 
     /**
-     * Accept method of the visitor design pattern. This method will be called
-     * by a visitor during tree traversal.
+     * Removes the reference to the parent node instance.
      *
-     * @param PHP_Depend_Code_ASTVisitorI $visitor The calling visitor instance.
-     * @param array(string=>integer)      $data    Optional previous calculated data.
-     *
-     * @return mixed
-     * @since 0.9.8
+     * @return void
+     * @since 0.9.12
      */
-    public function accept(PHP_Depend_Code_ASTVisitorI $visitor, $data = null)
+    private function _removeReferenceToParentNode()
     {
-        $data = $visitor->visitBefore($this, $data);
+        $this->parent = null;
+    }
 
+    /**
+     * Removes the reference between this node and its child nodes.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferencesToChildNodes()
+    {
         foreach ($this->nodes as $node) {
-            $data = $node->accept($visitor, $data);
+            $node->free();
         }
-
-        return $visitor->visitAfter($this, $data);
+        $this->nodes = array();
     }
 }

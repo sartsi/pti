@@ -62,7 +62,7 @@ require_once 'PHP/Depend/Util/Log.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 class PHP_Depend_TextUI_Command
@@ -335,8 +335,7 @@ class PHP_Depend_TextUI_Command
 
         // Check for the bad documentation option
         if (isset($this->_options['--bad-documentation'])) {
-            // Enable bad documentation support
-            $this->_runner->setSupportBadDocumentation();
+            echo "Option --bad-documentation is ambiguous.", PHP_EOL;
             // Remove from options array
             unset($this->_options['--bad-documentation']);
         }
@@ -380,7 +379,7 @@ class PHP_Depend_TextUI_Command
      */
     protected function printVersion()
     {
-        echo 'PHP_Depend 0.9.11 by Manuel Pichler', PHP_EOL, PHP_EOL;
+        echo 'PHP_Depend 0.9.14 by Manuel Pichler', PHP_EOL, PHP_EOL;
     }
 
     /**
@@ -433,11 +432,6 @@ class PHP_Depend_TextUI_Command
         $this->_printOption(
             '--without-annotations',
             'Do not parse doc comment annotations.', 
-            $l
-        );
-        $this->_printOption(
-            '--bad-documentation',
-            'Fallback for projects with bad doc comments.', 
             $l
         );
         echo PHP_EOL;

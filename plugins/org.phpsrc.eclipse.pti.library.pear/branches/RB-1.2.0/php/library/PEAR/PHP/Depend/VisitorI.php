@@ -65,7 +65,7 @@ require_once 'PHP/Depend/Code/Property.php';
  * @author    Manuel Pichler <mapi@pdepend.org>
  * @copyright 2008-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.9.11
+ * @version   Release: 0.9.14
  * @link      http://pdepend.org/
  */
 interface PHP_Depend_VisitorI
@@ -87,15 +87,6 @@ interface PHP_Depend_VisitorI
      * @return void
      */
     function visitClass(PHP_Depend_Code_Class $class);
-
-    /**
-     * Visits a closure node.
-     *
-     * @param PHP_Depend_Code_Closure $closure The current closure node.
-     *
-     * @return void
-     */
-    function visitClosure(PHP_Depend_Code_Closure $closure);
 
     /**
      * Visits a file node.

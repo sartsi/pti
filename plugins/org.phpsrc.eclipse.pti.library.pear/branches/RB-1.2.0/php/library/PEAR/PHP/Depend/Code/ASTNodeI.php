@@ -58,7 +58,7 @@ require_once 'PHP/Depend/Code/ASTVisitorI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://www.pdepend.org/
  * @since      0.9.6
  */
@@ -185,4 +185,15 @@ interface PHP_Depend_Code_ASTNodeI
      * @since 0.9.8
      */
     function accept(PHP_Depend_Code_ASTVisitorI $visitor, $data = null);
+
+    /**
+     * This method can be called by the PHP_Depend runtime environment or a
+     * utilizing component to free up memory. This methods are required for
+     * PHP version < 5.3 where cyclic references can not be resolved
+     * automatically by PHP's garbage collector.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    function free();
 }

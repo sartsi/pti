@@ -49,7 +49,7 @@ require_once 'PHP/Depend/Parser.php';
 require_once 'PHP/Depend/StorageRegistry.php';
 require_once 'PHP/Depend/VisitorI.php';
 require_once 'PHP/Depend/Builder/Default.php';
-require_once 'PHP/Depend/Code/Filter/Composite.php';
+require_once 'PHP/Depend/Code/Filter/Null.php';
 require_once 'PHP/Depend/Metrics/AnalyzerLoader.php';
 require_once 'PHP/Depend/Metrics/AnalyzerClassFileSystemLocator.php';
 require_once 'PHP/Depend/Tokenizer/CacheDecorator.php';
@@ -68,7 +68,7 @@ require_once 'PHP/Depend/Input/Iterator.php';
  * @author    Manuel Pichler <mapi@pdepend.org>
  * @copyright 2008-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.9.11
+ * @version   Release: 0.9.14
  * @link      http://pdepend.org/
  */
 class PHP_Depend
@@ -126,9 +126,9 @@ class PHP_Depend
     private $_fileFilter = null;
 
     /**
-     * A composite filter for source packages.
+     * A filter for source packages.
      *
-     * @var PHP_Depend_Code_Filter_Composite $_codeFilter
+     * @var PHP_Depend_Code_FilterI $_codeFilter
      */
     private $_codeFilter = null;
 
@@ -183,7 +183,7 @@ class PHP_Depend
      */
     public function __construct()
     {
-        $this->_codeFilter = new PHP_Depend_Code_Filter_Composite();
+        $this->_codeFilter = new PHP_Depend_Code_Filter_Null();
         $this->_fileFilter = new PHP_Depend_Input_CompositeFilter();
     }
 
@@ -280,16 +280,16 @@ class PHP_Depend
     }
 
     /**
-     * Adds an additional code filter. These filters could be used to hide
+     * Sets an additional code filter. These filters could be used to hide
      * external libraries and global stuff from the PDepend output.
      *
      * @param PHP_Depend_Code_FilterI $filter The code filter.
      *
      * @return void
      */
-    public function addCodeFilter(PHP_Depend_Code_FilterI $filter)
+    public function setCodeFilter(PHP_Depend_Code_FilterI $filter)
     {
-        $this->_codeFilter->addFilter($filter);
+        $this->_codeFilter = $filter;
     }
 
     /**
@@ -312,18 +312,6 @@ class PHP_Depend
     public function setWithoutAnnotations()
     {
         $this->_withoutAnnotations = true;
-    }
-
-    /**
-     * Should PHP_Depend support projects with a bad documentation. If this
-     * option is set to <b>true</b>, PHP_Depend will treat the default package
-     * <b>+global</b> as a regular project package.
-     *
-     * @return void
-     */
-    public function setSupportBadDocumentation()
-    {
-        $this->_supportBadDocumentation = true;
     }
 
     /**
@@ -356,23 +344,18 @@ class PHP_Depend
 
         // Get global filter collection
         $collection = PHP_Depend_Code_Filter_Collection::getInstance();
-        $collection->addFilter($this->_codeFilter);
+        $collection->setFilter($this->_codeFilter);
 
         if ($this->_builder->getPackages()->count() === 0) {
-            $message = "The parser doesn't detect package informations "
-                     . "within the analyzed project, please check the "
-                     . "documentation blocks for @package-annotations or use "
-                     . "the --bad-documentation option.";
-
-            throw new RuntimeException($message);
+            return ($this->_packages = $this->_builder->getPackages());
         }
 
-        $collection->removeFilter($this->_codeFilter);
+        $collection->setFilter();
 
         $this->_performAnalyzeProcess();
 
         // Set global filter for logging
-        $collection->addFilter($this->_codeFilter);
+        $collection->setFilter($this->_codeFilter);
 
         $packages = $this->_builder->getPackages();
 
@@ -388,12 +371,25 @@ class PHP_Depend
 
         $this->fireEndLogProcess();
 
-        // Remove global filter
-        // $collection->removeFilter($this->_codeFilter);
+        return ($this->_packages = $packages);
+    }
 
-        $this->_packages = $packages;
-
-        return $packages;
+    /**
+     * Helper method for PHP version < 5.3, this method can be used to
+     * unwire the complex object graph created by PHP_Depend, so that the
+     * garbage collector can free memory consumed by PHP_Depend. Please
+     * remember that this method will destroy all the data calculated by
+     * PHP_Depend, so it is unusable after a call to <b>free()</b>.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function free()
+    {
+        if (is_object($this->_packages)) {
+            $this->_packages->free();
+        }
+        unset($this->_builder, $this->_packages);
     }
 
     /**
@@ -608,6 +604,7 @@ class PHP_Depend
             $tokenizer->setSourceFile($file);
 
             $parser = new PHP_Depend_Parser($tokenizer, $this->_builder);
+            $parser->setMaxNestingLevel(1024);
 
             // Disable annotation parsing?
             if ($this->_withoutAnnotations === true) {
@@ -642,23 +639,25 @@ class PHP_Depend
 
         $this->fireStartAnalyzeProcess();
 
+        ini_set('xdebug.max_nesting_level', 1024);
+
         foreach ($analyzerLoader as $analyzer) {
             // Add filters if this analyzer is filter aware
             if ($analyzer instanceof PHP_Depend_Metrics_FilterAwareI) {
-                $collection->addFilter($this->_codeFilter);
+                $collection->setFilter($this->_codeFilter);
             }
 
             $analyzer->analyze($this->_builder->getPackages());
 
             // Remove filters if this analyzer is filter aware
-            if ($analyzer instanceof PHP_Depend_Metrics_FilterAwareI) {
-                $collection->removeFilter($this->_codeFilter);
-            }
+            $collection->setFilter();
 
             foreach ($this->_loggers as $logger) {
                 $logger->log($analyzer);
             }
         }
+
+        ini_restore('xdebug.max_nesting_level');
 
         $this->fireEndAnalyzeProcess();
     }
@@ -784,4 +783,23 @@ class PHP_Depend
 
         return $this->_initAnalyseListeners($loader);
     }
+
+    // Deprecated Stuff
+    // @codeCoverageIgnoreStart
+
+    /**
+     * Should PHP_Depend support projects with a bad documentation. If this
+     * option is set to <b>true</b>, PHP_Depend will treat the default package
+     * <b>+global</b> as a regular project package.
+     *
+     * @return void
+     * @deprecated since 0.9.12
+     */
+    public function setSupportBadDocumentation()
+    {
+        fwrite(STDERR, __METHOD__ . '() is deprecated since 0.9.12.' . PHP_EOL);
+        $this->_supportBadDocumentation = true;
+    }
+
+    // @codeCoverageIgnoreEnd
 }

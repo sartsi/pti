@@ -42,7 +42,7 @@
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: Parameter.php 675 2009-03-05 07:40:28Z mapi $
+ * @version    SVN: $Id$
  * @link       http://pdepend.org/
  */
 
@@ -74,7 +74,7 @@ require_once 'PHP/Depend/Code/NodeI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_Parameter
@@ -84,21 +84,21 @@ class PHP_Depend_Code_Parameter
     /**
      * The unique identifier for this function.
      *
-     * @var string $_uuid
+     * @var string
      */
     private $_uuid = null;
 
     /**
      * The parent function or method instance.
      *
-     * @var PHP_Depend_Code_AbstractCallable $_declaringFunction
+     * @var PHP_Depend_Code_AbstractCallable
      */
     private $_declaringFunction = null;
 
     /**
      * The parameter position.
      *
-     * @var integer $_position
+     * @var integer
      */
     private $_position = 0;
 
@@ -112,16 +112,16 @@ class PHP_Depend_Code_Parameter
     /**
      * The wrapped formal parameter instance.
      *
-     * @var PHP_Depend_Code_ASTFormalParameter $_formalParameter
+     * @var PHP_Depend_Code_ASTFormalParameter
      */
     private $_formalParameter = null;
 
     /**
      * The wrapped variable declarator instance.
      *
-     * @var PHP_Depend_Code_ASTVariableDeclarator $_ASTVariableDeclarator
+     * @var PHP_Depend_Code_ASTVariableDeclarator
      */
-    private $_ASTVariableDeclarator = null;
+    private $_variableDeclarator = null;
 
     /**
      * Constructs a new parameter instance for the given AST node.
@@ -132,7 +132,7 @@ class PHP_Depend_Code_Parameter
     public function __construct(PHP_Depend_Code_ASTFormalParameter $formalParameter)
     {
         $this->_formalParameter    = $formalParameter;
-        $this->_ASTVariableDeclarator = $formalParameter->getFirstChildOfType(
+        $this->_variableDeclarator = $formalParameter->getFirstChildOfType(
             PHP_Depend_Code_ASTVariableDeclarator::CLAZZ
         );
 
@@ -146,7 +146,7 @@ class PHP_Depend_Code_Parameter
      */
     public function getName()
     {
-        return $this->_ASTVariableDeclarator->getImage();
+        return $this->_variableDeclarator->getImage();
     }
 
     /**
@@ -260,20 +260,6 @@ class PHP_Depend_Code_Parameter
     }
 
     /**
-     * Returns a value holder for the class or interface type declared for this
-     * parameter or <b>null</b> when no parameter type hint was declared.
-     *
-     * @return PHP_Depend_Code_ASTClassOrInterfaceReference
-     * @since 0.9.5
-     */
-    public function getClassReference()
-    {
-        return $this->_formalParameter->getFirstChildOfType(
-            PHP_Depend_Code_ASTClassOrInterfaceReference::CLAZZ
-        );
-    }
-
-    /**
      * This method will return <b>true</b> when the parameter is passed by
      * reference.
      *
@@ -358,7 +344,7 @@ class PHP_Depend_Code_Parameter
      */
     public function isDefaultValueAvailable()
     {
-        $value = $this->_ASTVariableDeclarator->getValue();
+        $value = $this->_variableDeclarator->getValue();
         if ($value === null) {
             return false;
         }
@@ -377,7 +363,7 @@ class PHP_Depend_Code_Parameter
      */
     public function getDefaultValue()
     {
-        $value = $this->_ASTVariableDeclarator->getValue();
+        $value = $this->_variableDeclarator->getValue();
         if ($value === null) {
             return null;
         }
@@ -387,14 +373,51 @@ class PHP_Depend_Code_Parameter
     /**
      * Visitor method for node tree traversal.
      *
-     * @param PHP_Depend_VisitorI $visitor The context visitor
-     *                                              implementation.
+     * @param PHP_Depend_VisitorI $visitor The context visitor implementation.
      *
      * @return void
      */
     public function accept(PHP_Depend_VisitorI $visitor)
     {
         $visitor->visitParameter($this);
+    }
+
+    /**
+     * This method can be called by the PHP_Depend runtime environment or a
+     * utilizing component to free up memory. This methods are required for
+     * PHP version < 5.3 where cyclic references can not be resolved
+     * automatically by PHP's garbage collector.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function free()
+    {
+        $this->_removeReferenceToDeclaringFunction();
+        $this->_removeReferencesToNodes();
+    }
+
+    /**
+     * Removes the reference to the declaring function of this parameter instance.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferenceToDeclaringFunction()
+    {
+        $this->_declaringFunction = null;
+    }
+
+    /**
+     * Removes all references to ast nodes associated with parameter instance.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferencesToNodes()
+    {
+        $this->_formalParameter    = null;
+        $this->_variableDeclarator = null;
     }
 
     /**
@@ -467,56 +490,19 @@ class PHP_Depend_Code_Parameter
     // @codeCoverageIgnoreStart
 
     /**
-     * Returns the type of this property. This method will return <b>null</b>
-     * for all scalar type, only class properties will have a type.
+     * Returns a value holder for the class or interface type declared for this
+     * parameter or <b>null</b> when no parameter type hint was declared.
      *
-     * @return PHP_Depend_Code_AbstractClassOrInterface
-     * @deprecated since 0.9.5
+     * @return PHP_Depend_Code_ASTClassOrInterfaceReference
+     * @since 0.9.5
+     * @deprecated since 0.9.12
      */
-    public function getType()
+    public function getClassReference()
     {
-        fwrite(STDERR, __METHOD__ . '() is deprecated since 0.9.5.' . PHP_EOL);
-        return $this->getClass();
-    }
-
-    /**
-     * Sets the type of this property.
-     *
-     * @param PHP_Depend_Code_AbstractClassOrInterface $type The property type.
-     *
-     * @return void
-     * @deprecated since 0.9.5
-     */
-    public function setType(PHP_Depend_Code_AbstractClassOrInterface $type)
-    {
-        fwrite(STDERR, __METHOD__ . '() is deprecated since 0.9.5.' . PHP_EOL);
-        $this->setClass($type);
-    }
-
-    /**
-     * Returns the parent function or method instance or <b>null</b>
-     *
-     * @return PHP_Depend_Code_AbstractCallable|null
-     * @deprecated since 0.9.5
-     */
-    public function getParent()
-    {
-        fwrite(STDERR, __METHOD__ . '() is deprecated since 0.9.5.' . PHP_EOL);
-        return $this->getDeclaringFunction();
-    }
-
-    /**
-     * Sets the parent function or method object.
-     *
-     * @param PHP_Depend_Code_AbstractCallable $parent The parent callable.
-     *
-     * @return void
-     * @deprecated since 0.9.5
-     */
-    public function setParent(PHP_Depend_Code_AbstractCallable $parent = null)
-    {
-        fwrite(STDERR, __METHOD__ . '() is deprecated since 0.9.5.' . PHP_EOL);
-        $this->setDeclaringFunction($parent);
+        fwrite(STDERR, __METHOD__ . '() is deprecated since 0.9.12.' . PHP_EOL);
+        return $this->_formalParameter->getFirstChildOfType(
+            PHP_Depend_Code_ASTClassOrInterfaceReference::CLAZZ
+        );
     }
 
     /**

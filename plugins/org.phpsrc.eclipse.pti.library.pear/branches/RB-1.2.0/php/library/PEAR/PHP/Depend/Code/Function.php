@@ -57,7 +57,7 @@ require_once 'PHP/Depend/Code/AbstractCallable.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_Function extends PHP_Depend_Code_AbstractCallable
@@ -65,9 +65,9 @@ class PHP_Depend_Code_Function extends PHP_Depend_Code_AbstractCallable
     /**
      * The parent package for this function.
      *
-     * @var PHP_Depend_Code_Package $package
+     * @var PHP_Depend_Code_Package
      */
-    protected $package = null;
+    private $_package = null;
 
     /**
      * Returns the parent package for this function.
@@ -76,7 +76,7 @@ class PHP_Depend_Code_Function extends PHP_Depend_Code_AbstractCallable
      */
     public function getPackage()
     {
-        return $this->package;
+        return $this->_package;
     }
 
     /**
@@ -88,7 +88,7 @@ class PHP_Depend_Code_Function extends PHP_Depend_Code_AbstractCallable
      */
     public function setPackage(PHP_Depend_Code_Package $package = null)
     {
-        $this->package = $package;
+        $this->_package = $package;
     }
 
     /**
@@ -102,5 +102,32 @@ class PHP_Depend_Code_Function extends PHP_Depend_Code_AbstractCallable
     public function accept(PHP_Depend_VisitorI $visitor)
     {
         $visitor->visitFunction($this);
+    }
+
+    /**
+     * This method can be called by the PHP_Depend runtime environment or a
+     * utilizing component to free up memory. This methods are required for
+     * PHP version < 5.3 where cyclic references can not be resolved
+     * automatically by PHP's garbage collector.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function free()
+    {
+        parent::free();
+
+        $this->_removeReferenceToPackage();
+    }
+
+    /**
+     * Free memory consumed by the parent package of this function instance.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferenceToPackage()
+    {
+        $this->_package = null;
     }
 }

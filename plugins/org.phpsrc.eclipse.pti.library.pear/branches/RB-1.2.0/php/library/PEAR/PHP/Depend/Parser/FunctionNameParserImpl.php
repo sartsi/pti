@@ -60,7 +60,7 @@ require_once 'PHP/Depend/Parser/UnexpectedTokenException.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://www.pdepend.org/
  */
 class PHP_Depend_Parser_FunctionNameParserImpl
@@ -138,6 +138,9 @@ class PHP_Depend_Parser_FunctionNameParserImpl
         case PHP_Depend_TokenizerI::T_EOF:
             throw new PHP_Depend_Parser_TokenStreamEndException($this->_tokenizer);
         }
-        throw new PHP_Depend_Parser_UnexpectedTokenException($this->_tokenizer);
+        throw new PHP_Depend_Parser_UnexpectedTokenException(
+            $this->_tokenizer->next(),
+            $this->_tokenizer->getSourceFile()
+        );
     }
 }

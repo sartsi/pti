@@ -46,7 +46,7 @@
  * @link       http://pdepend.org/
  */
 
-require_once 'PHP/Depend/Code/AbstractType.php';
+require_once 'PHP/Depend/Code/AbstractItem.php';
 require_once 'PHP/Depend/Code/ASTClassReference.php';
 require_once 'PHP/Depend/Code/ASTInterfaceReference.php';
 require_once 'PHP/Depend/Code/Method.php';
@@ -60,20 +60,12 @@ require_once 'PHP/Depend/Code/Method.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 abstract class PHP_Depend_Code_AbstractClassOrInterface
-    extends PHP_Depend_Code_AbstractType
+    extends PHP_Depend_Code_AbstractItem
 {
-    /**
-     * List of {@link PHP_Depend_Code_AbstractClassOrInterface} objects this
-     * type depends on.
-     *
-     * @var array(PHP_Depend_Code_AbstractClassOrInterface) $_dependencies
-     */
-    private $_dependencies = array();
-
     /**
      * The parent for this class node.
      *
@@ -129,6 +121,22 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
     private $_nodes = array();
 
     /**
+     * The start line number of the class or interface declaration.
+     *
+     * @var integer
+     * @since 0.9.12
+     */
+    private $_startLine = 0;
+
+    /**
+     * The end line number of the class or interface declaration.
+     *
+     * @var integer
+     * @since 0.9.12
+     */
+    private $_endLine = 0;
+
+    /**
      * Adds a parsed child node to this node.
      *
      * @param PHP_Depend_Code_ASTNodeI $node A parsed child node instance.
@@ -140,6 +148,17 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
     public function addChild(PHP_Depend_Code_ASTNodeI $node)
     {
         $this->_nodes[] = $node;
+    }
+
+    /**
+     * Returns all child nodes of this class.
+     *
+     * @return array(PHP_Depend_Code_ASTNodeI)
+     * @since 0.9.12
+     */
+    public function getChildren()
+    {
+        return $this->_nodes;
     }
 
     /**
@@ -415,32 +434,11 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
      */
     public function addMethod(PHP_Depend_Code_Method $method)
     {
-        if ($method->getParent() !== null) {
-            $method->getParent()->removeMethod($method);
-        }
-        // Set this as owner type
         $method->setParent($this);
-        // Store method
+
         $this->_methods[] = $method;
 
         return $method;
-    }
-
-    /**
-     * Removes the given method from this class.
-     *
-     * @param PHP_Depend_Code_Method $method The method to remove.
-     *
-     * @return void
-     */
-    public function removeMethod(PHP_Depend_Code_Method $method)
-    {
-        if (($i = array_search($method, $this->_methods, true)) !== false) {
-            // Remove this as owner
-            $method->setParent(null);
-            // Remove from internal list
-            unset($this->_methods[$i]);
-        }
     }
 
     /**
@@ -479,6 +477,9 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
      */
     public function setTokens(array $tokens)
     {
+        $this->_startLine = reset($tokens)->startLine;
+        $this->_endLine   = end($tokens)->endLine;
+        
         $storage = PHP_Depend_StorageRegistry::get(PHP_Depend::TOKEN_STORAGE);
         $storage->store($tokens, $this->getUUID(), get_class($this));
     }
@@ -491,11 +492,7 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
      */
     public function getStartLine()
     {
-        $tokens = $this->getTokens();
-        if (isset($tokens[0]) === false) {
-            return 0;
-        }
-        return reset($tokens)->startLine;
+        return $this->_startLine;
     }
 
     /**
@@ -506,11 +503,7 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
      */
     public function getEndLine()
     {
-        $tokens = $this->getTokens();
-        if (isset($tokens[0]) === false) {
-            return 0;
-        }
-        return end($tokens)->endLine;
+        return $this->_endLine;
     }
 
     /**
@@ -598,7 +591,77 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
                 $this->_constants[$image] = $value;
             }
         }
-        //$this->_constants = new PHP_Depend_Code_NodeIterator($constants);
+    }
+
+    /**
+     * This method can be called by the PHP_Depend runtime environment or a
+     * utilizing component to free up memory. This methods are required for
+     * PHP version < 5.3 where cyclic references can not be resolved
+     * automatically by PHP's garbage collector.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function free()
+    {
+        $this->_removeReferenceToPackage();
+        $this->_removeReferencesToMethods();
+        $this->_removeReferencesToNodes();
+        $this->_removeReferencesToReferences();
+    }
+
+    /**
+     * Free memory consumed by the methods associated with this class/interface
+     * instance.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferencesToMethods()
+    {
+        $this->getMethods()->free();
+        $this->_methods = array();
+    }
+
+    /**
+     * Free memory consumed by the ast nodes associated with this class/interface
+     * instance.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferencesToNodes()
+    {
+        foreach ($this->_nodes as $i => $node) {
+            $node->free();
+        }
+        $this->_nodes = array();
+    }
+
+    /**
+     * Free memory consumed by the parent package of this class/interface
+     * instance.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferenceToPackage()
+    {
+        $this->_package = null;
+    }
+
+    /**
+     * Free memory consumed by references to/from this class/interface instance.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    private function _removeReferencesToReferences()
+    {
+        $this->getDependencies()->free();
+
+        $this->_interfaceReferences  = array();
+        $this->_parentClassReference = null;
     }
 
     // DEPRECATED METHODS AND PROPERTIES
@@ -631,74 +694,6 @@ abstract class PHP_Depend_Code_AbstractClassOrInterface
         fwrite(STDERR, 'Since 0.9.6 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
         $this->endLine = $endLine;
     }
-
-    /**
-     * Adds the given {@link PHP_Depend_Code_AbstractClassOrInterface} object as
-     * dependency.
-     *
-     * @param PHP_Depend_Code_AbstractClassOrInterface $type A type this
-     *        function depends on.
-     *
-     * @return void
-     * @deprecated Since version 0.9.5, use addParentClassReference() and
-     *             addInterfaceReference() instead.
-     */
-    public function addDependency(PHP_Depend_Code_AbstractClassOrInterface $type)
-    {
-        fwrite(STDERR, 'Since 0.9.5 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-        if (array_search($type, $this->_dependencies, true) === false) {
-            // Store type dependency
-            $this->_dependencies[] = $type;
-        }
-    }
-
-    /**
-     * Removes the given {@link PHP_Depend_Code_AbstractClassOrInterface} object
-     * from the dependency list.
-     *
-     * @param PHP_Depend_Code_AbstractClassOrInterface $type A type to remove.
-     *
-     * @return void
-     * @deprecated Since version 0.9.5
-     */
-    public function removeDependency(PHP_Depend_Code_AbstractClassOrInterface $type)
-    {
-        fwrite(STDERR, 'Since 0.9.5 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-        if (($i = array_search($type, $this->_dependencies, true)) !== false) {
-            // Remove from internal list
-            unset($this->_dependencies[$i]);
-        }
-    }
-
-    /**
-     * Returns an unfiltered, raw array of
-     * {@link PHP_Depend_Code_AbstractClassOrInterface} objects this type
-     * depends on. This method is only for internal usage.
-     *
-     * @return array(PHP_Depend_Code_AbstractClassOrInterface)
-     * @access private
-     */
-    public function getUnfilteredRawDependencies()
-    {
-        fwrite(STDERR, 'Since 0.9.5 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-        $dependencies = $this->_dependencies;
-        foreach ($this->_interfaceReferences as $interfaceReference) {
-            $interface = $interfaceReference->getType();
-            if (in_array($interface, $dependencies, true) === false) {
-                $dependencies[] = $interface;
-            }
-        }
-
-        // No parent? Then use the parent implementation
-        if ($this->getParentClass() === null) {
-            return $dependencies;
-        }
-
-        $dependencies[] = $this->getParentClass();
-
-        return $dependencies;
-    }
     
     // @codeCoverageIgnoreEnd
-    
 }

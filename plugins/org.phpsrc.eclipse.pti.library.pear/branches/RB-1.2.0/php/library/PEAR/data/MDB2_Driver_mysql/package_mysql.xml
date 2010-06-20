@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.5.3" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package packagerversion="1.7.2" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>MDB2_Driver_mysql</name>
  <channel>pear.php.net</channel>
  <summary>mysql MDB2 driver</summary>
@@ -16,26 +16,24 @@
   <email>l.alberton@quipo.it</email>
   <active>yes</active>
  </lead>
- <date>2007-05-03</date>
- <time>20:54:52</time>
+ <date>2009-01-14</date>
+ <time>15:41:13</time>
  <version>
-  <release>1.4.1</release>
-  <api>1.4.1</api>
+  <release>1.5.0b2</release>
+  <api>1.5.0b2</api>
  </version>
  <stability>
-  <release>stable</release>
-  <api>stable</api>
+  <release>beta</release>
+  <api>beta</api>
  </stability>
  <license>BSD License</license>
- <notes>- fixed bug #10378: incorrect query rewrite in setLimit() when using &quot;FOR UPDATE&quot;
-  or &quot;LOCK IN SHARE MODE&quot; (thanks to priyadi) or &quot;INTO OUTFILE&quot; or &quot;INTO DUMPFILE&quot;
-- return length as &quot;precision,scale&quot; for NUMERIC and DECIMAL fields in mapNativeDatatype()
-- in getTableIndexDefinition() and getTableConstraintDefinition() in the Reverse
-  module, also return the field position in the index/constraint
-- fixed bug #10636: transactions broken in release 2.4.0 because of some properties
-  being reset (thanks to Conor Kerr)
-- fixed bug #10807: connect() Method Incorrectly Caches Connections [fornax]
-- fixed bug #10895: setLimit() does not work properly when a subquery uses LIMIT
+ <notes>- fixed bug #12117: disconnect() does not work as documented
+- fixed bug #13412: sometimes getTableConstraintDefinition() fails for FOREIGN KEYs
+- fixed bug #13581: wrong query in beginTransaction() for certain MySQL versions
+- request #13657: in setCharset(), use mysql_set_charset() if available [cwiedmann]
+- fixed bug #13928: Invalid triggers created for &apos;ON UPDATE&apos;
+- fixed bug #15051: Cannot create constraints with field length
+- add index on FK column(s) or a FK constraint cannot be created in some cases
 
 note:
 - the multi_query test failes because this is not supported by ext/mysql
@@ -93,7 +91,7 @@ open todo items:
    <package>
     <name>MDB2</name>
     <channel>pear.php.net</channel>
-    <min>2.4.1</min>
+    <min>2.5.0b2</min>
    </package>
    <extension>
     <name>mysql</name>
@@ -102,6 +100,127 @@ open todo items:
  </dependencies>
  <phprelease />
  <changelog>
+  <release>
+   <version>
+    <release>1.5.0b2</release>
+    <api>1.5.0b2</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2009-01-14</date>
+   <license>BSD License</license>
+   <notes>- fixed bug #12117: disconnect() does not work as documented
+- fixed bug #13412: sometimes getTableConstraintDefinition() fails for FOREIGN KEYs
+- fixed bug #13581: wrong query in beginTransaction() for certain MySQL versions
+- request #13657: in setCharset(), use mysql_set_charset() if available [cwiedmann]
+- fixed bug #13928: Invalid triggers created for &apos;ON UPDATE&apos;
+- fixed bug #15051: Cannot create constraints with field length
+- add index on FK column(s) or a FK constraint cannot be created in some cases
+
+note:
+- the multi_query test failes because this is not supported by ext/mysql
+
+open todo items:
+- use a trigger to emulate setting default now()</notes>
+  </release>
+  <release>
+   <version>
+    <release>1.5.0b1</release>
+    <api>1.5.0b1</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2008-03-15</date>
+   <license>BSD License</license>
+   <notes>- fixed bug #11831: createTable() now supports tables with a multi-field PRIMARY KEY
+  where one field is defined as AUTO_INCREMENT
+- request #11204: support AUTO_INCREMENT for FLOAT data type and UNSIGNED option
+  for FLOAT and DECIMAL data type [afz]
+- fixed bug #11692: value of $db-&gt;supports(&apos;transactions&apos;) changes after query [afz]
+- request #12731: added truncateTable() in the Manager module
+- request #12732: added vacuum() in the Manager module for OPTIMIZE/VACUUM TABLE abstraction
+- request #12800: added alterDatabase() in the Manager module [afz]
+- fixed quoting in createDatabase() in the Manager module
+- fixed bug #12924: correctly handle internal expected errors even with custom error handling
+- added standaloneQuery() and databaseExists()
+- request #13106: added unixtimestamp() in the Function module
+- fixed regexp in listTableConstraints() in the Manager module to list FOREIGN KEY constraints
+- fixed bug #13180: MySQL driver tells SAVEPOINT is supported for MyISAM tables
+- fixed bug #13283: replace() doesn&apos;t respect quote_identifiers option
+- request #13313: setCharSet() supports &apos;COLLATE&apos; too
+- fixed bug #13370: some capabilities depend on user options, so check them after
+  a setOption() call
+- when triggers are supported, two triggers are created to emulate ON UPDATE / ON DELETE actions
+  for FOREIGN KEY constraints. Known limitation: since mysql doesn&apos;t support multiple triggers
+  with the same action time and event for one table, if there are multiple table referencing
+  the same table, only the first one will have the triggers created.
+
+note:
+- the multi_query test failes because this is not supported by ext/mysql
+
+open todo items:
+- use a trigger to emulate setting default now()</notes>
+  </release>
+  <release>
+   <version>
+    <release>1.5.0a2</release>
+    <api>1.5.0a2</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2007-12-06</date>
+   <license>BSD License</license>
+   <notes>- fixed bug #12516: error in FK constraint creation query
+- request #12012: added charset/collation support in createDatabase()
+
+note:
+- the multi_query test failes because this is not supported by ext/mysql
+
+open todo items:
+- use a trigger to emulate setting default now()</notes>
+  </release>
+  <release>
+   <version>
+    <release>1.5.0a1</release>
+    <api>1.5.0a1</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2007-10-28</date>
+   <license>BSD License</license>
+   <notes>- fixed bug #10024: Added new option &apos;lob_allow_url_include&apos; (default false) to
+  [dis]allow inserting a LOB from an url (file, http, ...).
+- fixed bug #10986: Using more random statement names (request #11625)
+- fixed bug #11055: Using placeholders with := variable assignment fails [bekarau]
+- initial support for FOREIGN KEY constraints in the Manager and Reverse modules
+- request #11389: added many new MySQL 5.1 error codes in errorInfo()
+- fixed bug #11428: propagate quote() errors with invalid data types
+- fixed bug #11590: _getServerCapabilities() has to be called once per connection
+- fixed bug #11790: avoid array_diff() because it has a memory leak in PHP 5.1.x
+- fixed some E_STRICT errors with PHP5
+- fixed bug #12010: MDB2_PORTABILITY_RTRIM option was ignored
+- fixed bug #12083: createTable() in the Manager module now returns MDB2_OK on success,
+  as documented
+- fixed bug #12217: mysql_num_rows() returns FALSE on failure, not NULL (thanks to zaa@zaa.pp.ru)
+- fixed bug #12242: missing charset info in the Reverse module (patch by Carsten Wiedmann)
+- fixed bug #12269: tableInfo() in the Reverse module detect &apos;clob&apos; data type
+  as first option
+- fixed bug #12336: supply default value for NOT NULL timestamp fields
+
+note:
+- the multi_query test failes because this is not supported by ext/mysql
+
+open todo items:
+- use a trigger to emulate setting default now()</notes>
+  </release>
   <release>
    <version>
     <release>1.4.1</release>

@@ -62,7 +62,7 @@ require_once 'PHP/Depend/Code/NodeIterator.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_Class extends PHP_Depend_Code_AbstractClassOrInterface
@@ -224,34 +224,36 @@ class PHP_Depend_Code_Class extends PHP_Depend_Code_AbstractClassOrInterface
         $visitor->visitClass($this);
     }
 
-    // DEPRECATED METHODS
-    // @codeCoverageIgnoreStart
-
     /**
-     * Marks this as an abstract class or interface.
-     *
-     * @param boolean $abstract Set this to <b>true</b> for an abstract class.
+     * This method can be called by the PHP_Depend runtime environment or a
+     * utilizing component to free up memory. This methods are required for
+     * PHP version < 5.3 where cyclic references can not be resolved
+     * automatically by PHP's garbage collector.
      *
      * @return void
-     * @deprecated Since version 0.9.4, use setModifiers() instead.
+     * @since 0.9.12
      */
-    public function setAbstract($abstract)
+    public function free()
     {
-        fwrite(STDERR, 'Since 0.9.4 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-        $this->_modifiers |= PHP_Depend_ConstantsI::IS_EXPLICIT_ABSTRACT;
+        parent::free();
+
+        $this->_removeReferencesToProperties();
     }
 
     /**
-     * Returns a node iterator with all implemented interfaces.
+     * Free memory consumed by the properties associated with this class instance.
      *
-     * @return PHP_Depend_Code_NodeIterator
-     * @deprecated Since version 0.9.5, use getInterfaces() instead.
+     * @return void
+     * @since 0.9.12
      */
-    public function getImplementedInterfaces()
+    private function _removeReferencesToProperties()
     {
-        fwrite(STDERR, 'Since 0.9.5 ' . __METHOD__ . '() is deprecated.' . PHP_EOL);
-        return $this->getInterfaces();
+        $this->getProperties()->free();
+        $this->_properties = array();
     }
+
+    // DEPRECATED METHODS
+    // @codeCoverageIgnoreStart
 
     /**
      * Adds a new property to this class instance.

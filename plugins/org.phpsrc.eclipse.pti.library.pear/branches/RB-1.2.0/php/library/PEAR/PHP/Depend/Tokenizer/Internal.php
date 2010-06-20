@@ -49,7 +49,7 @@
 require_once 'PHP/Depend/Token.php';
 require_once 'PHP/Depend/TokenizerI.php';
 require_once 'PHP/Depend/Code/File.php';
-require_once 'PHP/Depend/Tokenizer/PHP53NamespaceHelper.php';
+require_once 'PHP/Depend/Tokenizer/PHP52Helper.php';
 
 /**
  * This tokenizer uses the internal {@link token_get_all()} function as token stream
@@ -61,7 +61,7 @@ require_once 'PHP/Depend/Tokenizer/PHP53NamespaceHelper.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  *
  */
@@ -411,6 +411,22 @@ class PHP_Depend_Tokenizer_Internal
     }
 
     /**
+     * Returns the type of next token, after the current token. This method
+     * ignores all comments between the current and the next token.
+     *
+     * @return integer
+     * @since 0.9.12
+     */
+    public function peekNext()
+    {
+        $offset = 0;
+        do {
+            $type = $this->tokens[$this->index + ++$offset]->type;
+        } while ($type == self::T_COMMENT || $type == self::T_DOC_COMMENT);
+        return $type;
+    }
+
+    /**
      * Returns the previous token type or {@link PHP_Depend_TokenizerI::T_BOF}
      * if there is no previous token.
      *
@@ -472,7 +488,7 @@ class PHP_Depend_Tokenizer_Internal
         );
 
         if (version_compare(phpversion(), '5.3.0alpha3') < 0) {
-            $tokens = PHP_Depend_Tokenizer_PHP53NamespaceHelper::tokenize($source);
+            $tokens = PHP_Depend_Tokenizer_PHP52Helper::tokenize($source);
         } else {
             $tokens = token_get_all($source);
         }

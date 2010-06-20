@@ -48,8 +48,9 @@
  */
 
 /**
- * Base interface for an ast visitor. An implementation of this interface that
- * provides the <b>visitBefore()</b> and <b>visitAfter()</b> methods.
+ * Base interface for an ast visitor. An implementation of this interface must
+ * provide PHP's magic <b>__call()</b> to allow invocations to various variants
+ * of <b>visit$NodeName()</b> methods.
  *
  * @category   PHP
  * @package    PHP_Depend
@@ -57,33 +58,34 @@
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://www.pdepend.org/
  * @since      0.9.8
  */
 interface PHP_Depend_Code_ASTVisitorI
 {
     /**
-     * Generic visit method that can be used as a dispatcher to concrete visit
-     * methods. This method will be called before the regular tree traversal
-     * begins.
+     * Magic call method used to provide simplified visitor implementations.
+     * With this method we can call <b>visit${NodeClassName}</b> on each node.
      *
-     * @param PHP_Depend_Code_ASTNodeI $node The current node to visit.
-     * @param array(string=>integer)   $data Optional data, previously calculated.
+     * <code>
+     * $visitor->visitAllocationExpression($alloc);
+     *
+     * $visitor->visitStatement($stmt);
+     * </code>
+     *
+     * All visit methods takes two argument. The first argument is the current
+     * context ast node and the second argument is a data array or object that
+     * is used to collect data.
+     *
+     * The return value of this method is the second input argument, modified
+     * by the concrete visit method.
+     *
+     * @param string $method Name of the called method.
+     * @param array  $args   Array with method argument.
      *
      * @return mixed
+     * @since 0.9.12
      */
-    function visitBefore(PHP_Depend_Code_ASTNodeI $node, $data = null);
-
-    /**
-     * Generic visit method that can be used as a dispatcher to concrete visit
-     * methods. This method will be called when the regular tree traversal was
-     * finished.
-     *
-     * @param PHP_Depend_Code_ASTNodeI $node The current node to visit.
-     * @param array(string=>integer)   $data Optional data, previously calculated.
-     *
-     * @return mixed
-     */
-    function visitAfter(PHP_Depend_Code_ASTNodeI $node, $data = null);
+    function __call($method, $args);
 }

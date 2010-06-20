@@ -57,7 +57,7 @@ require_once 'PHP/Depend/Code/AbstractClassOrInterface.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_Interface extends PHP_Depend_Code_AbstractClassOrInterface
@@ -141,21 +141,4 @@ class PHP_Depend_Code_Interface extends PHP_Depend_Code_AbstractClassOrInterface
     {
         $visitor->visitInterface($this);
     }
-
-    // DEPRECATED METHODS
-    // @codeCoverageIgnoreStart
-
-    /**
-     * Returns an iterator with all parent, parent parent etc. interfaces.
-     *
-     * @return PHP_Depend_Code_NodeIterator
-     * @deprecated Since version 0.9.5, use getInterfaces() instead.
-     */
-    public function getParentInterfaces()
-    {
-        fwrite(STDERR, 'Since 0.9.5 getParentInterfaces() is deprecated.' . PHP_EOL);
-        return $this->getInterfaces();
-    }
-
-    // @codeCoverageIgnoreEnd
 }

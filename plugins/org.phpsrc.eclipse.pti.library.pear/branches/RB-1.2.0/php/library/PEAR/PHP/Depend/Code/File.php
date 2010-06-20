@@ -57,7 +57,7 @@ require_once 'PHP/Depend/Code/NodeI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_File implements PHP_Depend_Code_NodeI
@@ -91,13 +91,6 @@ class PHP_Depend_Code_File implements PHP_Depend_Code_NodeI
     private $_loc = null;
 
     /**
-     * The tokens for this file.
-     *
-     * @var array(array) $_tokens
-     */
-    private $_tokens = array();
-
-    /**
      * The comment for this type.
      *
      * @var string $_docComment
@@ -114,8 +107,6 @@ class PHP_Depend_Code_File implements PHP_Depend_Code_NodeI
         if ($fileName !== null) {
             $this->_fileName = realpath($fileName);
         }
-
-        $this->_uuid = spl_object_hash($this);
     }
 
     /**
@@ -149,6 +140,19 @@ class PHP_Depend_Code_File implements PHP_Depend_Code_NodeI
     }
 
     /**
+     * Sets the unique identifier for this file instance.
+     *
+     * @param string $uuid Identifier for this file.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function setUUID($uuid)
+    {
+        $this->_uuid = $uuid;
+    }
+
+    /**
      * Returns the lines of code with stripped whitespaces.
      *
      * @return array(integer=>string)
@@ -178,7 +182,7 @@ class PHP_Depend_Code_File implements PHP_Depend_Code_NodeI
     public function getTokens()
     {
         $storage = PHP_Depend_StorageRegistry::get(PHP_Depend::TOKEN_STORAGE);
-        return (array) $storage->restore($this->getUUID(), __CLASS__);
+        return (array) $storage->restore(md5($this->_fileName), __CLASS__);
     }
 
     /**
@@ -191,7 +195,7 @@ class PHP_Depend_Code_File implements PHP_Depend_Code_NodeI
     public function setTokens(array $tokens)
     {
         $storage = PHP_Depend_StorageRegistry::get(PHP_Depend::TOKEN_STORAGE);
-        $storage->store($tokens, $this->getUUID(), __CLASS__);
+        $storage->store($tokens, md5($this->_fileName), __CLASS__);
     }
 
     /**
@@ -227,6 +231,20 @@ class PHP_Depend_Code_File implements PHP_Depend_Code_NodeI
     public function accept(PHP_Depend_VisitorI $visitor)
     {
         $visitor->visitFile($this);
+    }
+
+    /**
+     * This method can be called by the PHP_Depend runtime environment or a
+     * utilizing component to free up memory. This methods are required for
+     * PHP version < 5.3 where cyclic references can not be resolved
+     * automatically by PHP's garbage collector.
+     *
+     * @return void
+     * @since 0.9.12
+     */
+    public function free()
+    {
+        // Nothing todo here
     }
 
     /**

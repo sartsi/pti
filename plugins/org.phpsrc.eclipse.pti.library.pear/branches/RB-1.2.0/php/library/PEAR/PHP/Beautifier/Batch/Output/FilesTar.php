@@ -14,7 +14,7 @@
 * @package PHP_Beautifier
 * @subpackage Batch
 * @author Claudio Bustos <cdx@users.sourceforge.com>
-* @copyright  2004-2006 Claudio Bustos
+* @copyright  2004-2010 Claudio Bustos
 * @link     http://pear.php.net/package/PHP_Beautifier
 * @link     http://beautifyphp.sourceforge.net
 * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
@@ -29,11 +29,11 @@ include_once 'Archive/Tar.php';
 * @category   PHP
 * @package PHP_Beautifier
 * @author Claudio Bustos <cdx@users.sourceforge.com>
-* @copyright  2004-2006 Claudio Bustos
+* @copyright  2004-2010 Claudio Bustos
 * @link     http://pear.php.net/package/PHP_Beautifier
 * @link     http://beautifyphp.sourceforge.net
 * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
-* @version    Release: 0.1.14
+* @version    Release: 0.1.15
 */
 class PHP_Beautifier_Batch_Output_FilesTar extends PHP_Beautifier_Batch_Output {
     protected $oTar;

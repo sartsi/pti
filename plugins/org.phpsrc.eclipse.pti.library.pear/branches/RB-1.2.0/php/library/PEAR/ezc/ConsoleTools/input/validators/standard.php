@@ -3,8 +3,8 @@
  * File containing the ezcConsoleStandardInputValidator class.
  *
  * @package ConsoleTools
- * @version 1.6
- * @copyright Copyright (C) 2005-2009 eZ Systems AS. All rights reserved.
+ * @version 1.6.1
+ * @copyright Copyright (C) 2005-2010 eZ Systems AS. All rights reserved.
  * @license http://ez.no/licenses/new_bsd New BSD License
  * @filesource
  */
@@ -12,7 +12,7 @@
  * Validates ezcConsoleOption in terms of dependencies/exclusion and more.
  * 
  * @package ConsoleTools
- * @version 1.6
+ * @version 1.6.1
  *
  * @access private
  */
@@ -48,7 +48,7 @@ class ezcConsoleStandardInputValidator implements ezcConsoleInputValidator
                 throw new ezcConsoleOptionMandatoryViolationException( $option );
             }
 
-            $this->validateDependencies( $option);
+            $this->validateDependencies( $option );
             $this->validateExclusions( $option );
 
             if ( $option->arguments === false && $option->value !== false && $hasArguments )
@@ -95,8 +95,7 @@ class ezcConsoleStandardInputValidator implements ezcConsoleInputValidator
         {
             throw new ezcConsoleOptionDependencyViolationException(
                 $srcOpt,
-                $dep->option,
-                implode( ', ', $dep->values )
+                $dep->option
             );
         }
 

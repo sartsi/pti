@@ -55,36 +55,12 @@ require_once 'PHP/Depend/ConstantsI.php';
  * @author    Manuel Pichler <mapi@pdepend.org>
  * @copyright 2008-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.9.11
+ * @version   Release: 0.9.14
  * @link      http://pdepend.org/
  */
 interface PHP_Depend_BuilderI
     extends PHP_Depend_ConstantsI, IteratorAggregate
 {
-    /**
-     * Generic build class for classes and interfaces. This method should be used
-     * in cases when it is not clear what type is used in the current situation.
-     * This could happen if the parser analyzes a method signature. The default
-     * return type is {@link PHP_Depend_Code_Class}, but if there is already an
-     * interface for this name, the method will return this instance.
-     *
-     * <code>
-     *   $builder->buildInterface('PHP_DependI');
-     *
-     *   // Returns an instance of PHP_Depend_Code_Interface
-     *   $builder->buildClassOrInterface('PHP_DependI');
-     *
-     *   // Returns an instance of PHP_Depend_Code_Class
-     *   $builder->buildClassOrInterface('PHP_Depend');
-     * </code>
-     *
-     * @param string $name The class name.
-     *
-     * @return PHP_Depend_Code_Class|PHP_Depend_Code_Interface
-     *         The created class or interface instance.
-     */
-    function buildClassOrInterface($name);
-
     /**
      * This method will try to find an already existing instance for the given
      * qualified name. It will create a new {@link PHP_Depend_Code_Class}
@@ -317,6 +293,14 @@ interface PHP_Depend_BuilderI
     function buildASTStaticVariableDeclaration($image);
 
     /**
+     * Builds a new closure node.
+     *
+     * @return PHP_Depend_Code_ASTClosure
+     * @since 0.9.12
+     */
+    function buildASTClosure();
+
+    /**
      * Builds a new formal parameters node.
      *
      * @return PHP_Depend_Code_ASTFormalParameters
@@ -361,7 +345,86 @@ interface PHP_Depend_BuilderI
     function buildASTAllocationExpression($image);
 
     /**
-     * Builds a new instanceof expression node.
+     * Builds a new eval-expression node.
+     *
+     * @param string $image The source image of this expression.
+     *
+     * @return PHP_Depend_Code_ASTEvalExpression
+     * @since 0.9.12
+     */
+    function buildASTEvalExpression($image);
+
+    /**
+     * Builds a new exit-expression instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTExitExpression
+     * @since 0.9.12
+     */
+    function buildASTExitExpression($image);
+
+    /**
+     * Builds a new clone-expression node.
+     *
+     * @param string $image The source image of this expression.
+     *
+     * @return PHP_Depend_Code_ASTCloneExpression
+     * @since 0.9.12
+     */
+    function buildASTCloneExpression($image);
+
+    /**
+     * Builds a new list-expression node.
+     *
+     * @param string $image The source image of this expression.
+     *
+     * @return PHP_Depend_Code_ASTListExpression
+     * @author Joey Mazzarelli
+     * @since 0.9.12
+     */
+    function buildASTListExpression($image);
+
+    /**
+     * Builds a new include- or include_once-expression.
+     *
+     * @return PHP_Depend_Code_ASTIncludeExpression
+     * @since 0.9.12
+     */
+    function buildASTIncludeExpression();
+
+    /**
+     * Builds a new require- or require_once-expression.
+     *
+     * @return PHP_Depend_Code_ASTRequireExpression
+     * @since 0.9.12
+     */
+    function buildASTRequireExpression();
+
+    /**
+     * Builds a new array-expression node.
+     *
+     * @return PHP_Depend_Code_ASTArrayIndexExpression
+     * @since 0.9.12
+     */
+    function buildASTArrayIndexExpression();
+
+    /**
+     * Builds a new string-expression node.
+     *
+     * <code>
+     * //     --------
+     * $string{$index}
+     * //     --------
+     * </code>
+     *
+     * @return PHP_Depend_Code_ASTStringIndexExpression
+     * @since 0.9.12
+     */
+    function buildASTStringIndexExpression();
+
+    /**
+     * Builds a new instanceof-expression node.
      *
      * @param string $image The source image of this expression.
      *
@@ -369,6 +432,26 @@ interface PHP_Depend_BuilderI
      * @since 0.9.6
      */
     function buildASTInstanceOfExpression($image);
+
+    /**
+     * Builds a new isset-expression node.
+     *
+     * <code>
+     * //  -----------
+     * if (isset($foo)) {
+     * //  -----------
+     * }
+     *
+     * //  -----------------------
+     * if (isset($foo, $bar, $baz)) {
+     * //  -----------------------
+     * }
+     * </code>
+     *
+     * @return PHP_Depend_Code_ASTIssetExpression
+     * @since 0.9.12
+     */
+    function buildASTIssetExpression();
 
     /**
      * Builds a new boolean conditional-expression.
@@ -497,6 +580,20 @@ interface PHP_Depend_BuilderI
     function buildASTForInit();
 
     /**
+     * Builds a new for-update node.
+     *
+     * <code>
+     *                                        -------------------------------
+     * for ($x = 0, $y = 23, $z = 42; $x < $y; ++$x, $y = $x + 1, $z = $x + 2) {}
+     *                                        -------------------------------
+     * </code>
+     *
+     * @return PHP_Depend_Code_ASTForUpdate
+     * @since 0.9.12
+     */
+    function buildASTForUpdate();
+
+    /**
      * Builds a new foreach-statement node.
      *
      * @param string $image The source image of this statement.
@@ -515,6 +612,16 @@ interface PHP_Depend_BuilderI
      * @since 0.9.8
      */
     function buildASTWhileStatement($image);
+
+    /**
+     * Builds a new do/while-statement node.
+     *
+     * @param string $image The source image of this statement.
+     *
+     * @return PHP_Depend_Code_ASTDoWhileStatement
+     * @since 0.9.12
+     */
+    function buildASTDoWhileStatement($image);
 
     /**
      * Builds a new member primary expression node.
@@ -697,6 +804,14 @@ interface PHP_Depend_BuilderI
     function buildASTString();
 
     /**
+     * Builds a new heredoc node.
+     *
+     * @return PHP_Depend_Code_ASTHeredoc
+     * @since 0.9.12
+     */
+    function buildASTHeredoc();
+
+    /**
      * Builds a new constant definition node.
      *
      * <code>
@@ -764,12 +879,132 @@ interface PHP_Depend_BuilderI
     function buildASTComment($cdata);
 
     /**
-     * Builds a new code class constant instance.
+     * Builds a new unary expression node instance.
      *
-     * @param string $name The constant name.
+     * @param string $image The unary expression image/character.
      *
-     * @return PHP_Depend_Code_TypeConstant The created constant object.
-     * @deprecated Since version 0.9.6
+     * @return PHP_Depend_Code_ASTUnaryExpression
+     * @since 0.9.11
      */
-    function buildTypeConstant($name);
+    function buildASTUnaryExpression($image);
+
+    /**
+     * Builds a new function/method scope instance.
+     *
+     * @return PHP_Depend_Code_ASTScope
+     * @since 0.9.12
+     */
+    function buildASTScope();
+
+    /**
+     * Builds a new statement instance.
+     *
+     * @return PHP_Depend_Code_ASTStatement
+     * @since 0.9.12
+     */
+    function buildASTStatement();
+
+    /**
+     * Builds a new return-statement node instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTReturnStatement
+     * @since 0.9.12
+     */
+    function buildASTReturnStatement($image);
+
+    /**
+     * Builds a new break-statement node instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTBreakStatement
+     * @since 0.9.12
+     */
+    function buildASTBreakStatement($image);
+
+    /**
+     * Builds a new continue-statement node instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTContinueStatement
+     * @since 0.9.12
+     */
+    function buildASTContinueStatement($image);
+
+    /**
+     * Builds a new scope-statement instance.
+     *
+     * @return PHP_Depend_Code_ASTScopeStatement
+     * @since 0.9.12
+     */
+    function buildASTScopeStatement();
+
+    /**
+     * Builds a new try-statement instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTTryStatement
+     * @since 0.9.12
+     */
+    function buildASTTryStatement($image);
+
+    /**
+     * Builds a new throw-statement instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTThrowStatement
+     * @since 0.9.12
+     */
+    function buildASTThrowStatement($image);
+
+    /**
+     * Builds a new goto-statement instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTGotoStatement
+     * @since 0.9.12
+     */
+    function buildASTGotoStatement($image);
+
+    /**
+     * Builds a new label-statement instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTLabelStatement
+     * @since 0.9.12
+     */
+    function buildASTLabelStatement($image);
+
+    /**
+     * Builds a new global-statement instance.
+     *
+     * @return PHP_Depend_Code_ASTGlobalStatement
+     * @since 0.9.12
+     */
+    function buildASTGlobalStatement();
+
+    /**
+     * Builds a new unset-statement instance.
+     *
+     * @return PHP_Depend_Code_ASTUnsetStatement
+     * @since 0.9.12
+     */
+    function buildASTUnsetStatement();
+
+    /**
+     * Builds a new exit-statement instance.
+     *
+     * @param string $image The source code image for this node.
+     *
+     * @return PHP_Depend_Code_ASTEchoStatement
+     * @since 0.9.12
+     */
+    function buildASTEchoStatement($image);
 }

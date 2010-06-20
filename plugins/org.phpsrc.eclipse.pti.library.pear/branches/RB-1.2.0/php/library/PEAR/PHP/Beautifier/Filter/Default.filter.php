@@ -14,7 +14,7 @@
  * @package PHP_Beautifier
  * @subpackage Filter
  * @author Claudio Bustos <cdx@users.sourceforge.com>
- * @copyright  2004-2006 Claudio Bustos
+ * @copyright  2004-2010 Claudio Bustos
  * @link     http://pear.php.net/package/PHP_Beautifier
  * @link     http://beautifyphp.sourceforge.net
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
@@ -24,7 +24,7 @@
  * Default Filter: Handle all the tokens. Uses K & R style
  *
  * This filters is loaded by default in {@link PHP_Beautifier}. Can handle all the tokens.
- * If one of the tokens doesn't have a function, is added wihout modification (See {@link __call()})
+ * If one of the tokens doesn't have a function, is added without modification (See {@link __call()})
  * The most important modifications are:
  * - All the statements inside control structures, functions and class are indented with K&R style
  * <CODE>
@@ -38,11 +38,11 @@
  * @package PHP_Beautifier
  * @subpackage Filter
  * @author Claudio Bustos <cdx@users.sourceforge.com>
- * @copyright  2004-2006 Claudio Bustos
+ * @copyright  2004-2010 Claudio Bustos
  * @link     http://pear.php.net/package/PHP_Beautifier
  * @link     http://beautifyphp.sourceforge.net
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    Release: 0.1.14
+ * @version    Release: 0.1.15
  */
 final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
 {
@@ -154,7 +154,11 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
             }
             $this->oBeaut->addNewLineIndent();
             $this->oBeaut->add($sTag);
-            $this->oBeaut->addNewLineIndent();
+            if ($this->oBeaut->getControlSeq() == T_DO) {
+                $this->oBeaut->add(' ');
+            }else{
+                $this->oBeaut->addNewLineIndent();
+            }
         }
     }
     function t_semi_colon($sTag) 
@@ -229,8 +233,28 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
             $this->oBeaut->addNewLineIndent();
         } else {
             $aLines = explode("\n", $sTag);
+
+            $allWithAsterisk=true;
+            for($x=1;$x<(count($aLines)-1);$x++) {
+                if (substr(trim($aLines[$x]),0,1)!="*") {
+                    $allWithAsterisk=false;
+                }
+            }
+
             foreach($aLines as $sLinea) {
-                $this->oBeaut->add(trim($sLinea));
+                if (substr(trim($sLinea),0,2)=="/*") {
+                    $this->oBeaut->add(trim($sLinea));
+                } elseif (substr(trim($sLinea),0,2)=="*/") {
+                    $this->oBeaut->add(trim($sLinea));
+                } elseif ($allWithAsterisk) {
+                    $this->oBeaut->add(" ".trim($sLinea));
+                } else {
+                    if (trim(substr($sLinea,0,$this->oBeaut->getIndent()))=="") {
+                        $this->oBeaut->add(substr($sLinea,$this->oBeaut->getIndent()));
+                    } else {
+                        $this->oBeaut->add(trim($sLinea));
+                    }
+                }
                 $this->oBeaut->addNewLineIndent();
             }
         }
@@ -284,6 +308,10 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
     {
         $this->oBeaut->removeWhitespace();
         $this->oBeaut->add(' ' . $sTag . ' ');
+    }
+    function t_foreach($sTag) 
+    {
+        $this->oBeaut->add($sTag . ' ');
     }
     function t_for($sTag) 
     {
@@ -349,6 +377,13 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
         } else {
             $this->oBeaut->add($sTag);
         }
+        if ($this->oBeaut->isNextTokenConstant(T_LNUMBER)) {
+            $this->oBeaut->add(" ");
+        }
+    }
+    function t_continue($sTag) 
+    {
+        $this->oBeaut->add($sTag);
         if ($this->oBeaut->isNextTokenConstant(T_LNUMBER)) {
             $this->oBeaut->add(" ");
         }
@@ -433,6 +468,6 @@ final class PHP_Beautifier_Filter_Default extends PHP_Beautifier_Filter
             default:
                 $this->oBeaut->add(' ' . $sTag . ' ');
         }
-    }    
+    }
 }
 ?>

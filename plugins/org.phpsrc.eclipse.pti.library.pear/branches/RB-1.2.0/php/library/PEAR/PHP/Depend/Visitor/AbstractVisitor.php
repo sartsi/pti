@@ -58,7 +58,7 @@ require_once 'PHP/Depend/VisitorI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 abstract class PHP_Depend_Visitor_AbstractVisitor
@@ -117,21 +117,6 @@ abstract class PHP_Depend_Visitor_AbstractVisitor
         }
 
         $this->fireEndClass($class);
-    }
-
-    /**
-     * Visits a closure node.
-     *
-     * @param PHP_Depend_Code_Closure $closure The current closure node.
-     *
-     * @return void
-     * @see PHP_Depend_VisitorI::visitClosure()
-     */
-    public function visitClosure(PHP_Depend_Code_Closure $closure)
-    {
-        $this->fireStartClosure($closure);
-
-        $this->fireEndClosure($closure);
     }
 
     /**
@@ -286,34 +271,6 @@ abstract class PHP_Depend_Visitor_AbstractVisitor
     {
         foreach ($this->_listeners as $listener) {
             $listener->endVisitClass($class);
-        }
-    }
-
-    /**
-     * Sends a start closure event.
-     *
-     * @param PHP_Depend_Code_Closure $closure The context closure instance.
-     *
-     * @return void
-     */
-    protected function fireStartClosure(PHP_Depend_Code_Closure $closure)
-    {
-        foreach ($this->_listeners as $listener) {
-            $listener->startVisitClosure($closure);
-        }
-    }
-
-    /**
-     * Sends a end closure event.
-     *
-     * @param PHP_Depend_Code_Closure $closure The context closure instance.
-     *
-     * @return void
-     */
-    protected function fireEndClosure(PHP_Depend_Code_Closure $closure)
-    {
-        foreach ($this->_listeners as $listener) {
-            $listener->endVisitClosure($closure);
         }
     }
 

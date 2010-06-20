@@ -57,7 +57,7 @@ require_once 'PHP/Depend/Parser/TokenException.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://www.pdepend.org/
  */
 class PHP_Depend_Parser_UnexpectedTokenException
@@ -66,24 +66,19 @@ class PHP_Depend_Parser_UnexpectedTokenException
     /**
      * Constructs a new unexpected token exception.
      *
-     * @param PHP_Depend_TokenizerI $tokenizer The context tokenizer instance.
+     * @param PHP_Depend_Token $token    The last parsed token instance.
+     * @param string           $fileName The file where the exception occured.
      */
-    public function __construct(PHP_Depend_TokenizerI $tokenizer)
+    public function __construct(PHP_Depend_Token $token, $fileName)
     {
-        // Get wrong token
-        $token = $tokenizer->next();
-        // The parser must take care for this
-        assert($token instanceof PHP_Depend_Token);
-
         $message = sprintf(
             'Unexpected token: %s, line: %d, col: %d, file: %s.',
             $token->image,
             $token->startLine,
             $token->startColumn,
-            $tokenizer->getSourceFile()
+            $fileName
         );
 
         parent::__construct($message);
     }
 }
-?>

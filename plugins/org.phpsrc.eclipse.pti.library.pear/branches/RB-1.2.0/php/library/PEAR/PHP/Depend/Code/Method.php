@@ -57,7 +57,7 @@ require_once 'PHP/Depend/Code/AbstractCallable.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.11
+ * @version    Release: 0.9.14
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Code_Method extends PHP_Depend_Code_AbstractCallable
@@ -216,41 +216,31 @@ class PHP_Depend_Code_Method extends PHP_Depend_Code_AbstractCallable
     {
         $visitor->visitMethod($this);
     }
-    
-    // DEPRECATED METHODS
-    // @codeCoverageIgnoreStart
 
     /**
-     * Marks this as an abstract method.
-     *
-     * @param boolean $abstract Set this to <b>true</b> for an abstract method.
+     * This method can be called by the PHP_Depend runtime environment or a
+     * utilizing component to free up memory. This methods are required for
+     * PHP version < 5.3 where cyclic references can not be resolved
+     * automatically by PHP's garbage collector.
      *
      * @return void
-     * @deprecated Since version 0.9.4, use setModifiers() instead.
+     * @since 0.9.12
      */
-    public function setAbstract($abstract)
+    public function free()
     {
-        fwrite(STDERR, 'Since 0.9.4 setAbstract() is deprecated.' . PHP_EOL);
-        $this->_modifiers |= PHP_Depend_ConstantsI::IS_ABSTRACT;
+        parent::free();
+        
+        $this->_removeReferenceToParentClass();
     }
 
     /**
-     * Sets the visibility for this node.
-     *
-     * The given <b>$visibility</b> value must equal to one of the defined
-     * constants, otherwith this method will fail with an exception.
-     *
-     * @param integer $visibility The node visibility.
+     * Removes the reference to the parent class.
      *
      * @return void
-     * @throws InvalidArgumentException If the given visibility is not equal to
-     *                                  one of the defined visibility constants.
-     * @deprecated Since version 0.9.4, use setModifiers() instead.
+     * @since 0.9.12
      */
-    public function setVisibility($visibility)
+    private function _removeReferenceToParentClass()
     {
-        fwrite(STDERR, 'Since 0.9.4 setVisibility() is deprecated.' . PHP_EOL);
+        $this->setParent();
     }
-
-    // @codeCoverageIgnoreEnd
 }
