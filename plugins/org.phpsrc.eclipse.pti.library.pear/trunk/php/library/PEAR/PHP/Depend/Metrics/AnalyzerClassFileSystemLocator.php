@@ -59,7 +59,7 @@ require_once 'PHP/Depend/Metrics/AnalyzerClassLocator.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.14
+ * @version    Release: 0.9.16
  * @link       http://pdepend.org/
  * @since      0.9.10
  */
@@ -148,12 +148,14 @@ class PHP_Depend_Metrics_AnalyzerClassFileSystemLocator
                     }
 
                     if ($this->_isAnalyzerClass($className)) {
-                        $result[] = new ReflectionClass($className);
+                        $result[$className] = new ReflectionClass($className);
                     }
                 }
             }
         }
-        return $result;
+        
+        ksort($result);
+        return array_values($result);
     }
 
     /**

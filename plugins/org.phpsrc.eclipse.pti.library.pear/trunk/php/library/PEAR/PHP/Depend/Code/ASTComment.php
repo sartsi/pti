@@ -57,7 +57,7 @@ require_once 'PHP/Depend/Code/ASTNode.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.14
+ * @version    Release: 0.9.16
  * @link       http://www.pdepend.org/
  */
 class PHP_Depend_Code_ASTComment extends PHP_Depend_Code_ASTNode

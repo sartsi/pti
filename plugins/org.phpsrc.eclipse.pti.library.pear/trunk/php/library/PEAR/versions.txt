@@ -9,7 +9,7 @@ ConsoleTools 1.6.1   stable
 INSTALLED PACKAGES, CHANNEL PEAR.PDEPEND.ORG:
 =============================================
 PACKAGE    VERSION STATE
-PHP_Depend 0.9.14  beta
+PHP_Depend 0.9.16  beta
 INSTALLED PACKAGES, CHANNEL PEAR.PHP.NET:
 =========================================
 PACKAGE             VERSION   STATE

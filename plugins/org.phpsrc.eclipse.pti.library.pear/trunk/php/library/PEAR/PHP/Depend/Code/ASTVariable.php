@@ -62,7 +62,7 @@
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.14
+ * @version    Release: 0.9.16
  * @link       http://www.pdepend.org/
  * @since      0.9.6
  */
@@ -72,6 +72,18 @@ class PHP_Depend_Code_ASTVariable extends PHP_Depend_Code_ASTNode
      * Type of this node class.
      */
     const CLAZZ = __CLASS__;
+
+    /**
+     * This method will return <b>true</b> when this variable instance represents
+     * the <b>$this</b> scope of a class instance.
+     *
+     * @return boolean
+     * @since 0.10.0
+     */
+    public function isThis()
+    {
+        return ($this->image === '$this');
+    }
 
     /**
      * Accept method of the visitor design pattern. This method will be called
