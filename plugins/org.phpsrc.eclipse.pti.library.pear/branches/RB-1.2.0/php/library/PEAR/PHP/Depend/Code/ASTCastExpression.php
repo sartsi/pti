@@ -44,13 +44,43 @@
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://www.pdepend.org/
- * @since      0.9.12
+ * @since      0.9.15
  */
 
-require_once 'PHP/Depend/Code/ASTExpression.php';
+require_once 'PHP/Depend/Code/ASTUnaryExpression.php';
 
 /**
- * This node class represents an exit-expression.
+ * This class represents a cast-expression node.
+ *
+ * <code>
+ * //     ----------
+ * $foo = (int) $bar;
+ * //     ----------
+ *
+ * //     -----------
+ * $foo = (bool) $bar;
+ * //     -----------
+ *
+ * //     ------------
+ * $foo = (array) $bar;
+ * //     ------------
+ *
+ * //     ------------
+ * $foo = (unset) $bar;
+ * //     ------------
+ *
+ * //     -------------
+ * $foo = (double) $bar;
+ * //     -------------
+ *
+ * //     -------------
+ * $foo = (string) $bar;
+ * //     -------------
+ *
+ * //     -------------
+ * $foo = (object) $bar;
+ * //     -------------
+ * </code>
  *
  * @category   PHP
  * @package    PHP_Depend
@@ -60,14 +90,97 @@ require_once 'PHP/Depend/Code/ASTExpression.php';
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    Release: 0.9.16
  * @link       http://www.pdepend.org/
- * @since      0.9.12
+ * @since      0.9.15
  */
-class PHP_Depend_Code_ASTExitExpression extends PHP_Depend_Code_ASTExpression
+class PHP_Depend_Code_ASTCastExpression extends PHP_Depend_Code_ASTUnaryExpression
 {
     /**
-     * The type of this class.
+     * Type of this node class.
      */
     const CLAZZ = __CLASS__;
+
+    /**
+     * Constructs a new cast-expression node.
+     *
+     * @param string $image The original cast image.
+     */
+    public function __construct($image)
+    {
+        parent::__construct(preg_replace('(\s+)', '', strtolower($image)));
+    }
+
+    /**
+     * Returns <b>true</b> when this node represents an array cast-expression.
+     *
+     * @return boolean
+     */
+    public function isArray()
+    {
+        return ($this->image === '(array)');
+    }
+
+    /**
+     * Returns <b>true</b> when this node represents an object cast-expression.
+     *
+     * @return boolean
+     */
+    public function isObject()
+    {
+        return ($this->image === '(object)');
+    }
+
+    /**
+     * Returns <b>true</b> when this node represents a boolean cast-expression.
+     *
+     * @return boolean
+     */
+    public function isBoolean()
+    {
+        return ($this->image === '(bool)' || $this->image === '(boolean)');
+    }
+
+    /**
+     * Returns <b>true</b> when this node represents an integer cast-expression.
+     *
+     * @return boolean
+     */
+    public function isInteger()
+    {
+        return ($this->image === '(int)' || $this->image === '(integer)');
+    }
+
+    /**
+     * Returns <b>true</b> when this node represents a float cast-expression.
+     *
+     * @return boolean
+     */
+    public function isFloat()
+    {
+        return ($this->image === '(real)'
+            || $this->image === '(float)'
+            || $this->image === '(double)'
+        );
+    }
+
+    /**
+     * Returns <b>true</b> when this node represents a string cast-expression.
+     *
+     * @return boolean
+     */
+    public function isString()
+    {
+        return (strcmp('(string)', $this->image) === 0);
+    }
+
+    /**
+     * Returns <b>true</b> when this node represents an unset cast-expression.
+     *
+     * @return boolean
+     */
+    public function isUnset()
+    {
+        return ($this->image === '(unset)');
+    }
 
     /**
      * Accept method of the visitor design pattern. This method will be called
@@ -77,10 +190,9 @@ class PHP_Depend_Code_ASTExitExpression extends PHP_Depend_Code_ASTExpression
      * @param mixed                       $data    Optional previous calculated data.
      *
      * @return mixed
-     * @since 0.9.12
      */
     public function accept(PHP_Depend_Code_ASTVisitorI $visitor, $data = null)
     {
-        return $visitor->visitExitExpression($this, $data);
+        return $visitor->visitCastExpression($this, $data);
     }
 }

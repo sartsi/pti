@@ -67,7 +67,7 @@ require_once 'PHP/Depend/Util/Type.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.14
+ * @version    Release: 0.9.16
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
@@ -1388,6 +1388,54 @@ class PHP_Depend_Builder_Default implements PHP_Depend_BuilderI
     public function buildASTUnaryExpression($image)
     {
         return $this->_buildASTNodeInstance('ASTUnaryExpression', $image);
+    }
+
+    /**
+     * Builds a new cast-expression node instance.
+     *
+     * @param string $image The cast-expression image/character.
+     *
+     * @return PHP_Depend_Code_ASTCastExpression
+     * @since 0.10.0
+     */
+    public function buildASTCastExpression($image)
+    {
+        return $this->_buildASTNodeInstance('ASTCastExpression', $image);
+    }
+
+    /**
+     * Builds a new postfix-expression node instance.
+     *
+     * @param string $image The postfix-expression image/character.
+     *
+     * @return PHP_Depend_Code_ASTPostfixExpression
+     * @since 0.10.0
+     */
+    public function buildASTPostfixExpression($image)
+    {
+        return $this->_buildASTNodeInstance('ASTPostfixExpression', $image);
+    }
+
+    /**
+     * Builds a new pre-increment-expression node instance.
+     *
+     * @return PHP_Depend_Code_ASTPreIncrementExpression
+     * @since 0.10.0
+     */
+    public function buildASTPreIncrementExpression()
+    {
+        return $this->_buildASTNodeInstance('ASTPreIncrementExpression');
+    }
+
+    /**
+     * Builds a new pre-decrement-expression node instance.
+     *
+     * @return PHP_Depend_Code_ASTPreDecrementExpression
+     * @since 0.10.0
+     */
+    public function buildASTPreDecrementExpression()
+    {
+        return $this->_buildASTNodeInstance('ASTPreDecrementExpression');
     }
 
     /**

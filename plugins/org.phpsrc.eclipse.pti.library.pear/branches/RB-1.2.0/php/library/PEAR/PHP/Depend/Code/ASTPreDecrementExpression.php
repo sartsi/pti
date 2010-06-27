@@ -36,50 +36,51 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   QualityAssurance
+ * @category   PHP
  * @package    PHP_Depend
- * @subpackage Metrics
+ * @subpackage Code
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
- * @link       http://pdepend.org/
- * @since      0.9.10
+ * @link       http://www.pdepend.org/
+ * @since      0.10.0
  */
 
+require_once 'PHP/Depend/Code/ASTUnaryExpression.php';
+
 /**
- * Filter iterator that only returns enabled {@link PHP_Depend_Metrics_AnalyzerI}
- * instances.
+ * This node class represents a pre-decrement-expression.
  *
- * @category   QualityAssurance
+ * @category   PHP
  * @package    PHP_Depend
- * @subpackage Metrics
+ * @subpackage Code
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    Release: 0.9.16
- * @link       http://pdepend.org/
- * @since      0.9.10
+ * @link       http://www.pdepend.org/
+ * @since      0.10.0
  */
-class PHP_Depend_Metrics_AnalyzerIterator extends FilterIterator
+class PHP_Depend_Code_ASTPreDecrementExpression 
+    extends PHP_Depend_Code_ASTUnaryExpression
 {
     /**
-     * Constructs a new iterator instance.
-     *
-     * @param array(PHP_Depend_Metrics_AnalyzerI) $analyzers List of found analyzers.
+     * The type of this class.
      */
-    public function __construct(array $analyzers)
-    {
-        parent::__construct(new ArrayIterator($analyzers));
-    }
+    const CLAZZ = __CLASS__;
 
     /**
-     * Returns <b>true</b> when the current analyzer instance is enabled.
+     * Accept method of the visitor design pattern. This method will be called
+     * by a visitor during tree traversal.
      *
-     * @return boolean
+     * @param PHP_Depend_Code_ASTVisitorI $visitor The calling visitor instance.
+     * @param mixed                       $data    Optional previous calculated data.
+     *
+     * @return mixed
      */
-    public function accept()
+    public function accept(PHP_Depend_Code_ASTVisitorI $visitor, $data = null)
     {
-        return $this->getInnerIterator()->current()->isEnabled();
+        return $visitor->visitPreDecrementExpression($this, $data);
     }
 }

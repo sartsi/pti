@@ -68,7 +68,7 @@ require_once 'PHP/Depend/Metrics/ProjectAwareI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.14
+ * @version    Release: 0.9.16
  * @link       http://pdepend.org/
  */
 class PHP_Depend_Metrics_Hierarchy_Analyzer
@@ -233,6 +233,10 @@ class PHP_Depend_Metrics_Hierarchy_Analyzer
      */
     public function visitClass(PHP_Depend_Code_Class $class)
     {
+        if (false === $class->isUserDefined()) {
+            return;
+        }
+
         $this->fireStartClass($class);
 
         ++$this->_cls;

@@ -47,6 +47,8 @@
  * @since      0.9.11
  */
 
+require_once 'PHP/Depend/Code/ASTExpression.php';
+
 /**
  * This class represents an unary expression node.
  *
@@ -70,11 +72,11 @@
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.14
+ * @version    Release: 0.9.16
  * @link       http://www.pdepend.org/
  * @since      0.9.11
  */
-class PHP_Depend_Code_ASTUnaryExpression extends PHP_Depend_Code_ASTNode
+class PHP_Depend_Code_ASTUnaryExpression extends PHP_Depend_Code_ASTExpression
 {
     /**
      * Type of this node class.

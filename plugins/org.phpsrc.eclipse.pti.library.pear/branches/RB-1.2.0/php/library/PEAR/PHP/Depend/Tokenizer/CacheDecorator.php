@@ -59,7 +59,7 @@ require_once 'PHP/Depend/Code/File.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.14
+ * @version    Release: 0.9.16
  * @link       http://www.pdepend.org/
  */
 class PHP_Depend_Tokenizer_CacheDecorator implements PHP_Depend_TokenizerI
@@ -137,7 +137,7 @@ class PHP_Depend_Tokenizer_CacheDecorator implements PHP_Depend_TokenizerI
     {
         $storage = PHP_Depend_StorageRegistry::get(PHP_Depend::PARSER_STORAGE);
 
-        $id    = '$Id$-0.9.14';
+        $id    = '$Id$-0.9.16';
         $key   = md5_file($sourceFile);
         $group = get_class($this->_tokenizer);
 
