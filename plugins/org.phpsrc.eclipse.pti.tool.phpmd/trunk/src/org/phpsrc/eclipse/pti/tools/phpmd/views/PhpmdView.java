@@ -24,6 +24,7 @@ public class PhpmdView extends ViewPart {
 	private void createTableViewer(Composite parent) {
 		tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		tableViewer.setContentProvider(new PhpmdViewContentProvider());
+		tableViewer.setLabelProvider(new PhpmdViewLableProvider());
 		tableViewer.setInput(ViolationManager.getManager());
 	}
 
