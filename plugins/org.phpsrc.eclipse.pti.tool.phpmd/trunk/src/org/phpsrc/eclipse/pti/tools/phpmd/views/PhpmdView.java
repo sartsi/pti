@@ -36,7 +36,7 @@ public class PhpmdView extends ViewPart {
 
 	private TableColumn createNameColumn(Table table) {
 		TableColumn column = new TableColumn(table, SWT.LEFT);
-		column.setText("Type");
+		column.setText("Name");
 		column.setWidth(450);
 		return column;
 	}
