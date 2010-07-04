@@ -6,18 +6,25 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
+import org.phpsrc.eclipse.pti.tools.phpmd.model.ViolationManager;
 
 public class PhpmdView extends ViewPart {
 	private TableViewer tableViewer;
 
 	@Override
 	public void createPartControl(Composite parent) {
-		tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+		createTableViewer(parent);
 
 		final Table table = createTable();
 		createNameColumn(table);
 		createRuleSetColumn(table);
 		createPriorityColumn(table);
+	}
+
+	private void createTableViewer(Composite parent) {
+		tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+		tableViewer.setContentProvider(new PhpmdViewContentProvider());
+		tableViewer.setInput(ViolationManager.getManager());
 	}
 
 	private Table createTable() {
@@ -50,6 +57,5 @@ public class PhpmdView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
 	}
 }
