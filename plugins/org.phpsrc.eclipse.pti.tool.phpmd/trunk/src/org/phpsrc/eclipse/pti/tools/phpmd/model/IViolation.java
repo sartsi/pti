@@ -1,4 +1,4 @@
-package org.phpsrc.eclipse.pti.tools.phpmd.core;
+package org.phpsrc.eclipse.pti.tools.phpmd.model;
 
 import java.net.MalformedURLException;
 import java.net.URL;
