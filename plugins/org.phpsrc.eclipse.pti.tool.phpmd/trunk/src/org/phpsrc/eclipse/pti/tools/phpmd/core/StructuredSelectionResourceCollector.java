@@ -16,7 +16,6 @@ import org.phpsrc.eclipse.pti.core.PHPToolkitUtil;
 import org.phpsrc.eclipse.pti.ui.Logger;
 
 public class StructuredSelectionResourceCollector extends AbstractResourceCollector {
-	@Override
 	public void collect() {
 		IStructuredSelection structuredSelection = (IStructuredSelection) getSelection();
 		resourceList = new ArrayList<IResource>(structuredSelection.size());

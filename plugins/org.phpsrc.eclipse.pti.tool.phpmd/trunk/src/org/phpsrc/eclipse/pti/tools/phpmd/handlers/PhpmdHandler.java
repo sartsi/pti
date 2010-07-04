@@ -17,7 +17,6 @@ import org.phpsrc.eclipse.pti.tools.phpmd.core.IResourceCollector;
 import org.phpsrc.eclipse.pti.tools.phpmd.core.ResourceCollectorFactory;
 
 public class PhpmdHandler extends AbstractHandler {
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ISelection currentSelection = HandlerUtil.getCurrentSelection(event);
 		final IResource resource = determineFirstResourceOrNull(currentSelection);

@@ -42,7 +42,6 @@ public class Phpmd extends AbstractPHPTool {
 
 	private void displayNoExecutalbeFoundDialog() {
 		Display.getDefault().asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				Shell shell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
 				MessageDialog.openError(shell, "PHP Mess Detector", "No executable php found");
