@@ -4,6 +4,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public interface IViolation {
+	public final IViolation[] NONE = new IViolation[] {};
+
 	public void setEndline(final int line);
 
 	public int getEndline();
