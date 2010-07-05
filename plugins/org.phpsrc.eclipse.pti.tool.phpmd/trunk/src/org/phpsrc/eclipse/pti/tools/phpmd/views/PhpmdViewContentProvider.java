@@ -11,6 +11,7 @@ package org.phpsrc.eclipse.pti.tools.phpmd.views;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.widgets.Display;
 import org.phpsrc.eclipse.pti.tools.phpmd.model.IViolationManagerListener;
 import org.phpsrc.eclipse.pti.tools.phpmd.model.ViolationManager;
 import org.phpsrc.eclipse.pti.tools.phpmd.model.ViolationManagerEvent;
@@ -32,14 +33,18 @@ public class PhpmdViewContentProvider implements IStructuredContentProvider, IVi
 			manager.addViolationManagerListener(this);
 	}
 
-	public void violationsChanged(ViolationManagerEvent event) {
-		viewer.getTable().setRedraw(false);
-		try {
-			viewer.remove(event.getRemovedViolations());
-			viewer.add(event.getAddedViolations());
-		} finally {
-			viewer.getTable().setRedraw(true);
-		}
+	public void violationsChanged(final ViolationManagerEvent event) {
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				viewer.getTable().setRedraw(false);
+				try {
+					viewer.remove(event.getRemovedViolations());
+					viewer.add(event.getAddedViolations());
+				} finally {
+					viewer.getTable().setRedraw(true);
+				}
+			}
+		});
 	}
 
 	public void dispose() {
