@@ -64,6 +64,7 @@
       <view
             category="org.eclipse.php.ui.views"
             class="org.phpsrc.eclipse.pti.tools.phpmd.views.PhpmdView"
+            icon="icons/16x16/phpmd.png"
             id="org.phpsrc.eclipse.pti.tools.phpmd.PhpmdView"
             name="PHPMD"
             restorable="true">
