@@ -20,6 +20,7 @@ public class ViolationManager {
 	private List<IViolationManagerListener> listeners = new ArrayList<IViolationManagerListener>();
 
 	private ViolationManager() {
+		violations = new HashSet<IViolation>();
 	}
 
 	public static ViolationManager getManager() {
