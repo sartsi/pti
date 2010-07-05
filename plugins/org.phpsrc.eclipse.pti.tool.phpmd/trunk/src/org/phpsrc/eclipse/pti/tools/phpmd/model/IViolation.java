@@ -14,7 +14,7 @@ public interface IViolation {
 
 	public String getPackageName();
 
-	public void setClassName(final String newCclassName);
+	public void setClassName(final String newClassName);
 
 	public String getClassName();
 
