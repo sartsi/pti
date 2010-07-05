@@ -1,6 +1,7 @@
 package org.phpsrc.eclipse.pti.tools.phpmd.model;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -47,7 +48,6 @@ public class ViolationParser {
 
 	private IViolation[] parse(Document doc) {
 		violations = new HashSet<IViolation>();
-
 		NodeList nodes = doc.getElementsByTagName("file");
 		for (int i = 0; i < nodes.getLength(); ++i)
 			parse((Element) nodes.item(i));
@@ -61,15 +61,22 @@ public class ViolationParser {
 	}
 
 	private void parse(Element violationElement, String fileName) {
-		IViolation newViolation = new Violation();
-		newViolation.setClassName(violationElement.getAttribute("class"));
-		newViolation.setPackageName(violationElement.getAttribute("package"));
-		newViolation.setMethodName(violationElement.getAttribute("method"));
-		newViolation.setFunctionName(violationElement.getAttribute("function"));
-		newViolation.setBeginline(Integer.parseInt(violationElement.getAttribute("beginline")));
-		newViolation.setEndline(Integer.parseInt(violationElement.getAttribute("endline")));
-		newViolation.setRule(violationElement.getAttribute("rule"));
-		newViolation.setDescription(violationElement.getTextContent().trim());
-		violations.add(newViolation);
+		try {
+			IViolation newViolation = new Violation();
+			newViolation.setClassName(violationElement.getAttribute("class"));
+			newViolation.setPackageName(violationElement.getAttribute("package"));
+			newViolation.setMethodName(violationElement.getAttribute("method"));
+			newViolation.setFunctionName(violationElement.getAttribute("function"));
+			newViolation.setBeginline(Integer.parseInt(violationElement.getAttribute("beginline")));
+			newViolation.setEndline(Integer.parseInt(violationElement.getAttribute("endline")));
+			newViolation.setRule(violationElement.getAttribute("rule"));
+			newViolation.setRuleSet(violationElement.getAttribute("ruleset"));
+			newViolation.setPriority(Integer.parseInt(violationElement.getAttribute("priority")));
+			newViolation.setExternalInfoURL(violationElement.getAttribute("externalInfoUrl"));
+			newViolation.setDescription(violationElement.getTextContent().trim());
+			violations.add(newViolation);
+		} catch (MalformedURLException e) {
+			// ignore the item
+		}
 	}
 }
