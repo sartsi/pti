@@ -8,9 +8,9 @@ import org.phpsrc.eclipse.pti.tools.phpmd.model.IViolation;
 public class PhpmdViewLableProvider extends LabelProvider implements ITableLabelProvider {
 	public String getColumnText(Object element, int columnIndex) {
 		switch (columnIndex) {
-		case 0: // Name column
+		case 0: // Class name column
 			if (element instanceof IViolation)
-				return "" + ((IViolation) element).getPriority();
+				return ((IViolation) element).getClassName();
 			if (null != element)
 				return element.toString();
 			return "";
@@ -20,7 +20,7 @@ public class PhpmdViewLableProvider extends LabelProvider implements ITableLabel
 			return "";
 		case 2: // priority column
 			if (element instanceof IViolation)
-				return "" + ((IViolation) element).getPriority();
+				return String.valueOf(((IViolation) element).getPriority());
 			return "";
 		default:
 			return "";
