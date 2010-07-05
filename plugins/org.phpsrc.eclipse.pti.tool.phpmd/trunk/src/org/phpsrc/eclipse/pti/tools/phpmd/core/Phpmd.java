@@ -24,6 +24,8 @@ import org.phpsrc.eclipse.pti.core.php.inifile.INIFileUtil;
 import org.phpsrc.eclipse.pti.core.tools.AbstractPHPTool;
 import org.phpsrc.eclipse.pti.library.pear.PHPLibraryPEARPlugin;
 import org.phpsrc.eclipse.pti.tools.phpmd.PhpmdPlugin;
+import org.phpsrc.eclipse.pti.tools.phpmd.model.ViolationManager;
+import org.phpsrc.eclipse.pti.tools.phpmd.model.ViolationParser;
 
 @SuppressWarnings("restriction")
 public class Phpmd extends AbstractPHPTool {
@@ -45,7 +47,10 @@ public class Phpmd extends AbstractPHPTool {
 
 		PHPToolLauncher launcher = new PHPToolLauncher(QUALIFIED_NAME, phpExec, SCRIPTPATH, cmdLineArgs, iniEntries);
 		launcher.setPrintOuput(true);
-		launcher.launch(resource.getProject());
+		String violationReport = launcher.launch(resource.getProject());
+
+		ViolationParser violationParser = new ViolationParser();
+		ViolationManager.getManager().addViolation(violationParser.parse(violationReport));
 	}
 
 	private void displayNoExecutalbeFoundDialog() {
