@@ -1,17 +1,21 @@
 package org.phpsrc.eclipse.pti.tools.phpmd.model;
 
+import java.io.CharArrayReader;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.HashSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -27,20 +31,41 @@ public class ViolationParser {
 
 	private Document createDocument(InputStream stream) {
 		try {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			db.setErrorHandler(new ErrorHandler() {
-				public void error(SAXParseException exception) throws SAXException {
-				}
-
-				public void fatalError(SAXParseException exception) throws SAXException {
-				}
-
-				public void warning(SAXParseException exception) throws SAXException {
-				}
-			});
-
+			DocumentBuilder db = createDocumentBuilder();
 			return db.parse(stream);
+		} catch (Exception e) {
+		}
+		return null;
+	}
+
+	private DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		DocumentBuilder db = dbf.newDocumentBuilder();
+		db.setErrorHandler(new ErrorHandler() {
+			public void error(SAXParseException exception) throws SAXException {
+			}
+
+			public void fatalError(SAXParseException exception) throws SAXException {
+			}
+
+			public void warning(SAXParseException exception) throws SAXException {
+			}
+		});
+		return db;
+	}
+
+	public IViolation[] parse(String violationReportString) {
+		Document document = createDocument(violationReportString);
+		if (null == document)
+			return new IViolation[] {};
+		return parse(document);
+	}
+
+	private Document createDocument(String violationReportString) {
+		try {
+			DocumentBuilder db = createDocumentBuilder();
+			Reader reader = new CharArrayReader(violationReportString.toCharArray());
+			return db.parse(new InputSource(reader));
 		} catch (Exception e) {
 		}
 		return null;
