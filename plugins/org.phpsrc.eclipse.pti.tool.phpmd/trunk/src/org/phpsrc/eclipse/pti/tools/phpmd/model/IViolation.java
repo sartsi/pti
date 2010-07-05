@@ -6,6 +6,26 @@ import java.net.URL;
 public interface IViolation {
 	public final IViolation[] NONE = new IViolation[] {};
 
+	public void setFileName(final String newFileName);
+
+	public String getFileName();
+
+	public void setPackageName(final String newPackageName);
+
+	public String getPackageName();
+
+	public void setClassName(final String newCclassName);
+
+	public String getClassName();
+
+	public void setFunctionName(final String newFunctionName);
+
+	public String getFunctionName();
+
+	public void setMethodName(final String newMethodName);
+
+	public String getMethodName();
+
 	public void setEndline(final int line);
 
 	public int getEndline();

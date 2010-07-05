@@ -3,15 +3,63 @@ package org.phpsrc.eclipse.pti.tools.phpmd.model;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-
 public abstract class AbstractViolation implements IViolation {
+	private String fileName;
+	private String packageName;
+	private String className;
+	private String functionName;
+	private String methodName;
+
 	private int beginline;
 	private int endline;
+
 	private int priority;
+
 	private String description;
 	private URL externalInfoURL;
+
 	private String rule;
 	private String ruleSet;
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getPackageName() {
+		return packageName;
+	}
+
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
+	}
+
+	public String getFunctionName() {
+		return functionName;
+	}
+
+	public void setFunctionName(String functionName) {
+		this.functionName = functionName;
+	}
+
+	public String getMethodName() {
+		return methodName;
+	}
+
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
 
 	public int getBeginline() {
 		return beginline;
@@ -34,11 +82,11 @@ public abstract class AbstractViolation implements IViolation {
 	}
 
 	public String getRule() {
-		return new String(rule);
+		return rule;
 	}
 
 	public String getRuleSet() {
-		return new String(ruleSet);
+		return ruleSet;
 	}
 
 	public void setBeginline(final int line) {
