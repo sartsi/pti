@@ -61,12 +61,8 @@
    </extension>
    <extension
          point="org.eclipse.ui.views">
-      <category
-            id="org.phpsrc.eclipse.pti.tools.phpmd"
-            name="PHPMD">
-      </category>
       <view
-            category="org.phpsrc.eclipse.pti.tools.phpmd"
+            category="org.eclipse.php.ui.views"
             class="org.phpsrc.eclipse.pti.tools.phpmd.views.PhpmdView"
             id="org.phpsrc.eclipse.pti.tools.phpmd.PhpmdView"
             name="PHPMD"
