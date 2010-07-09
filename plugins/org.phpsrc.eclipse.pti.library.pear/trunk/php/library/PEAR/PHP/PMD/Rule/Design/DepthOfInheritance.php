@@ -38,39 +38,36 @@
  *
  * @category   PHP
  * @package    PHP_PMD
- * @subpackage Rule_Naming
+ * @subpackage Rule_Design
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
- * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://phpmd.org
  */
 
 require_once 'PHP/PMD/AbstractRule.php';
 require_once 'PHP/PMD/Rule/IClassAware.php';
-require_once 'PHP/PMD/Rule/IInterfaceAware.php';
 
 /**
- * This rule detects class/interface constants that do not follow the upper
- * case convention.
+ * This rule will detect classes that are to deep in the inheritance tree.
  *
  * @category   PHP
  * @package    PHP_PMD
- * @subpackage Rule_Naming
+ * @subpackage Rule_Design
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
- * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    Release: 0.2.6
  * @link       http://phpmd.org
  */
-class PHP_PMD_Rule_Naming_ConstantNamingConventions
+class PHP_PMD_Rule_Design_DepthOfInheritance
        extends PHP_PMD_AbstractRule
-    implements PHP_PMD_Rule_IClassAware,
-               PHP_PMD_Rule_IInterfaceAware
+    implements PHP_PMD_Rule_IClassAware
 {
     /**
-     * Extracts all constant declarations from the given node and tests that
-     * the image only contains upper case characters.
+     * This method checks the number of parents for the given class
+     * node.
      *
      * @param PHP_PMD_AbstractNode $node The context source code node.
      *
@@ -78,10 +75,9 @@ class PHP_PMD_Rule_Naming_ConstantNamingConventions
      */
     public function apply(PHP_PMD_AbstractNode $node)
     {
-        foreach ($node->findChildrenOfType('ConstantDeclarator') as $declarator) {
-            if ($declarator->getImage() !== strtoupper($declarator->getImage())) {
-                $this->addViolation($declarator, array($declarator->getImage()));
-            }
+        $dit = $node->getMetric('dit');
+        if ($dit >= $this->getIntProperty('minimum')) {
+            $this->addViolation($node, array($node->getName(), $dit));
         }
     }
 }

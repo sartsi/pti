@@ -57,7 +57,7 @@ require_once 'PHP/PMD/AbstractRenderer.php';
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.2.5
+ * @version    Release: 0.2.6
  * @link       http://phpmd.org
  */
 class PHP_PMD_Renderer_XMLRenderer extends PHP_PMD_AbstractRenderer

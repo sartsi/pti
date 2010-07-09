@@ -38,39 +38,38 @@
  *
  * @category   PHP
  * @package    PHP_PMD
- * @subpackage Rule_Naming
+ * @subpackage Rule_Design
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
- * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    SVN: $Id$
  * @link       http://phpmd.org
  */
 
 require_once 'PHP/PMD/AbstractRule.php';
-require_once 'PHP/PMD/Rule/IClassAware.php';
-require_once 'PHP/PMD/Rule/IInterfaceAware.php';
+require_once 'PHP/PMD/Rule/IMethodAware.php';
+require_once 'PHP/PMD/Rule/IFunctionAware.php';
 
 /**
- * This rule detects class/interface constants that do not follow the upper
- * case convention.
+ * This rule class detects the usage of PHP's eval-expression.
  *
  * @category   PHP
  * @package    PHP_PMD
- * @subpackage Rule_Naming
+ * @subpackage Rule_Design
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
- * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version    Release: 0.2.6
  * @link       http://phpmd.org
  */
-class PHP_PMD_Rule_Naming_ConstantNamingConventions
+class PHP_PMD_Rule_Design_EvalExpression
        extends PHP_PMD_AbstractRule
-    implements PHP_PMD_Rule_IClassAware,
-               PHP_PMD_Rule_IInterfaceAware
+    implements PHP_PMD_Rule_IMethodAware,
+               PHP_PMD_Rule_IFunctionAware
 {
     /**
-     * Extracts all constant declarations from the given node and tests that
-     * the image only contains upper case characters.
+     * This method checks if a given function or method contains an eval-expression
+     * and emits a rule violation when it exists.
      *
      * @param PHP_PMD_AbstractNode $node The context source code node.
      *
@@ -78,10 +77,8 @@ class PHP_PMD_Rule_Naming_ConstantNamingConventions
      */
     public function apply(PHP_PMD_AbstractNode $node)
     {
-        foreach ($node->findChildrenOfType('ConstantDeclarator') as $declarator) {
-            if ($declarator->getImage() !== strtoupper($declarator->getImage())) {
-                $this->addViolation($declarator, array($declarator->getImage()));
-            }
+        foreach ($node->findChildrenOfType('EvalExpression') as $eval) {
+            $this->addViolation($eval, array($node->getType(), $node->getName()));
         }
     }
 }

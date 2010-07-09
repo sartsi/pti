@@ -58,7 +58,7 @@ XML_Util            1.2.1     stable
 INSTALLED PACKAGES, CHANNEL PEAR.PHPMD.ORG:
 ===========================================
 PACKAGE VERSION STATE
-PHP_PMD 0.2.5   alpha
+PHP_PMD 0.2.6   alpha
 
 INSTALLED PACKAGES, CHANNEL PEAR.PHPUNIT.DE:
 ============================================

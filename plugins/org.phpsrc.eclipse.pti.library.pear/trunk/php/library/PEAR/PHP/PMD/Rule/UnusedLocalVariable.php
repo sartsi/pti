@@ -46,7 +46,7 @@
  * @link       http://phpmd.org
  */
 
-require_once 'PHP/PMD/AbstractRule.php';
+require_once 'PHP/PMD/Rule/AbstractLocalVariable.php';
 require_once 'PHP/PMD/Rule/IFunctionAware.php';
 require_once 'PHP/PMD/Rule/IMethodAware.php';
 
@@ -60,36 +60,14 @@ require_once 'PHP/PMD/Rule/IMethodAware.php';
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.2.5
+ * @version    Release: 0.2.6
  * @link       http://phpmd.org
  */
 class PHP_PMD_Rule_UnusedLocalVariable
-       extends PHP_PMD_AbstractRule
+       extends PHP_PMD_Rule_AbstractLocalVariable
     implements PHP_PMD_Rule_IFunctionAware,
                PHP_PMD_Rule_IMethodAware
 {
-    /**
-     * PHP super globals that are available in all php scopes, so that they
-     * can never be unused local variables.
-     *
-     * @var array(string=>boolean)
-     * @since 0.2.5
-     */
-    private static $_superGlobals = array(
-        '$argc'                => true,
-        '$argv'                => true,
-        '$_COOKIE'             => true,
-        '$_ENV'                => true,
-        '$_FILES'              => true,
-        '$_GET'                => true,
-        '$_POST'               => true,
-        '$_REQUEST'            => true,
-        '$_SERVER'             => true,
-        '$_SESSION'            => true,
-        '$GLOBALS'             => true,
-        '$HTTP_RAW_POST_DATA'  => true,
-    );
-
     /**
      * Found variable images within a single method or function.
      *
@@ -111,7 +89,7 @@ class PHP_PMD_Rule_UnusedLocalVariable
 
         $this->_collectVariables($node);
         $this->_removeParameters($node);
-        
+
         foreach ($this->_images as $image => $nodes) {
             if (count($nodes) === 1) {
                 $this->addViolation(reset($nodes), array($image));
@@ -136,7 +114,7 @@ class PHP_PMD_Rule_UnusedLocalVariable
 
         // Now get all declarators in the formal parameters container
         $declarators = $parameters->findChildrenOfType('VariableDeclarator');
-        
+
         foreach ($declarators as $declarator) {
             unset($this->_images[$declarator->getImage()]);
         }
@@ -155,7 +133,7 @@ class PHP_PMD_Rule_UnusedLocalVariable
     private function _collectVariables(PHP_PMD_Node_AbstractCallable $node)
     {
         foreach ($node->findChildrenOfType('Variable') as $variable) {
-            if ($this->_accept($variable)) {
+            if ($this->isLocal($variable)) {
                 $this->_collectVariable($variable);
             }
         }
@@ -177,64 +155,5 @@ class PHP_PMD_Rule_UnusedLocalVariable
             $this->_images[$node->getImage()] = array();
         }
         $this->_images[$node->getImage()][] = $node;
-    }
-
-    /**
-     * This method will return <b>true</b> when the given variable node
-     * should be tracked during the analyze phase.
-     *
-     * @param PHP_PMD_AbstractNode $variable The currently analyzed variable node.
-     *
-     * @return boolean
-     */
-    private function _accept(PHP_PMD_AbstractNode $variable)
-    {
-        return $this->_isNotThis($variable)
-            && $this->_isNotStaticPostfix($variable)
-            && $this->_isNotSuperGlobal($variable);
-    }
-
-    /**
-     * This method will return <b>true</b> when the given variable node
-     * is not a reference to the objects <b>$this</b> context.
-     *
-     * @param PHP_PMD_AbstractNode $variable The currently analyzed variable node.
-     *
-     * @return boolean
-     */
-    private function _isNotThis(PHP_PMD_AbstractNode $variable)
-    {
-        return ($variable->getImage() !== '$this');
-    }
-
-    /**
-     * This method will return <b>true</b> when the given variable node is
-     * not the child of a property postfix node.
-     *
-     * @param PHP_PMD_AbstractNode $variable The currently analyzed variable node.
-     *
-     * @return boolean
-     */
-    private function _isNotStaticPostfix(PHP_PMD_AbstractNode $variable)
-    {
-        $parent = $variable->getParent();
-        if (is_object($parent) && $parent->isInstanceOf('PropertyPostfix')) {
-            return !($parent->getParent()->getImage() === '::');
-        }
-        return true;
-    }
-
-    /**
-     * Tests if the given variable represents one of the PHP super globals
-     * that are available in scopes.
-     *
-     * @param PHP_PMD_AbstractNode $variable The currently analyzed variable node.
-     *
-     * @return boolean
-     * @since 0.2.5
-     */
-    private function _isNotSuperGlobal(PHP_PMD_AbstractNode $variable)
-    {
-        return !isset(self::$_superGlobals[$variable->getImage()]);
     }
 }
