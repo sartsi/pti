@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2004 The PHP Group                                |
+// | Copyright (c) 1997-2006 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -13,10 +13,33 @@
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Authors: Frederic Poeydomenge <fpoeydomenge at free dot fr>          |
+// | Authors: Frederic Poeydomenge <fpoeydomenge@free.fr>                 |
 // +----------------------------------------------------------------------+
-//
-// $Id$
+
+/**
+ * Wrapper for the var_dump function.
+ *
+ * " The var_dump function displays structured information about expressions
+ * that includes its type and value. Arrays are explored recursively
+ * with values indented to show structure. "
+ *
+ * The Var_Dump class captures the output of the var_dump function,
+ * by using output control functions, and then uses external renderer
+ * classes for displaying the result in various graphical ways :
+ * simple text, HTML/XHTML text, HTML/XHTML table, XML, ...
+ *
+ * @category  PHP
+ * @package   Var_Dump
+ * @author    Frederic Poeydomenge <fpoeydomenge@free.fr>
+ * @copyright 1997-2006 The PHP Group
+ * @license   http://www.php.net/license/3_0.txt PHP License 3.0
+ * @version   CVS: $Id: XHTML_Text.php 233111 2007-04-02 09:38:10Z fredericpoeydome $
+ * @link      http://pear.php.net/package/Var_Dump
+ */
+
+/**
+ * Include Text Renderer class
+ */
 
 require_once 'Var_Dump/Renderer/Text.php';
 
@@ -28,9 +51,13 @@ require_once 'Var_Dump/Renderer/Text.php';
  * that are empty by default. You can also directly call the 'Text' renderer
  * with the corresponding configuration options.
  *
- * @package Var_Dump
- * @category PHP
- * @author Frederic Poeydomenge <fpoeydomenge at free dot fr>
+ * @category  PHP
+ * @package   Var_Dump
+ * @author    Frederic Poeydomenge <fpoeydomenge@free.fr>
+ * @copyright 1997-2006 The PHP Group
+ * @license   http://www.php.net/license/3_0.txt PHP License 3.0
+ * @version   CVS: $Id: XHTML_Text.php 233111 2007-04-02 09:38:10Z fredericpoeydome $
+ * @link      http://pear.php.net/package/Var_Dump
  */
 
 class Var_Dump_Renderer_XHTML_Text extends Var_Dump_Renderer_Text
