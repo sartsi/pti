@@ -97,7 +97,7 @@ public class Phpmd extends AbstractPHPTool {
 	}
 
 	private enum RuleSet {
-		CODESIZE("codesize.xml"), UNUSEDCODE("unusedcode.xml"), NAMING("naming.xml");
+		CODESIZE("codesize.xml"), UNUSEDCODE("unusedcode.xml"), NAMING("naming.xml"), DESIGN("design.xml");
 
 		private String ruleSetFilename;
 
