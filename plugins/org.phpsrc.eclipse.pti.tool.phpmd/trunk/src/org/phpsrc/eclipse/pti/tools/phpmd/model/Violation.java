@@ -132,6 +132,6 @@ public class Violation implements IViolation {
 	}
 
 	public void setRuleSet(String ruleSet) {
-		this.ruleSet = rule;
+		this.ruleSet = ruleSet;
 	}
 }
