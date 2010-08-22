@@ -135,11 +135,6 @@ public class ViolationResource implements IViolation {
 		this.ruleSet = ruleSet;
 	}
 
-	// @Override
-	// public int hashCode() {
-	// return resource.hashCode();
-	// }
-
 	@Override
 	public String toString() {
 		return "Violation [priority=" + priority + ", rule=" + rule + ", ruleSet=" + ruleSet + ", filenam)="
