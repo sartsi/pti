@@ -24,9 +24,10 @@ public class PhpmdView extends ViewPart {
 		createTableViewer(parent);
 
 		final Table table = createTable();
-		createNameColumn(table);
-		createRuleSetColumn(table);
+		createFileNameColumn(table);
 		createPriorityColumn(table);
+		createRuleColumn(table);
+		createCategoryColumn(table);
 	}
 
 	private void createTableViewer(Composite parent) {
@@ -43,23 +44,30 @@ public class PhpmdView extends ViewPart {
 		return table;
 	}
 
-	private TableColumn createNameColumn(Table table) {
+	private TableColumn createFileNameColumn(Table table) {
 		TableColumn column = new TableColumn(table, SWT.LEFT);
-		column.setText("Name");
-		column.setWidth(450);
-		return column;
-	}
-
-	private TableColumn createRuleSetColumn(Table table) {
-		TableColumn column = new TableColumn(table, SWT.LEFT);
-		column.setText("Ruleset");
-		column.setWidth(180);
+		column.setText("Filename");
+		column.setWidth(200);
 		return column;
 	}
 
 	private TableColumn createPriorityColumn(Table table) {
 		TableColumn column = new TableColumn(table, SWT.LEFT);
 		column.setText("Priority");
+		column.setWidth(180);
+		return column;
+	}
+
+	private TableColumn createRuleColumn(Table table) {
+		TableColumn column = new TableColumn(table, SWT.LEFT);
+		column.setText("Rule");
+		column.setWidth(180);
+		return column;
+	}
+
+	private TableColumn createCategoryColumn(Table table) {
+		TableColumn column = new TableColumn(table, SWT.LEFT);
+		column.setText("Category");
 		column.setWidth(180);
 		return column;
 	}

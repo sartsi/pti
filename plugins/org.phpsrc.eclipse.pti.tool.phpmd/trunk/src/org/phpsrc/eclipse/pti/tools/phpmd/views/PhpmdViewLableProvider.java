@@ -18,17 +18,21 @@ public class PhpmdViewLableProvider extends LabelProvider implements ITableLabel
 		switch (columnIndex) {
 		case 0: // Class name column
 			if (element instanceof IViolation)
-				return ((IViolation) element).getClassName();
+				return ((IViolation) element).getFileName();
 			if (null != element)
 				return element.toString();
 			return "";
-		case 1: // RuleSet column
-			if (element instanceof IViolation)
-				return ((IViolation) element).getRuleSet();
-			return "";
-		case 2: // priority column
+		case 1: // priority column
 			if (element instanceof IViolation)
 				return String.valueOf(((IViolation) element).getPriority());
+			return "";
+		case 2: // Rule column
+			if (element instanceof IViolation)
+				return ((IViolation) element).getRule();
+			return "";
+		case 3: // Category/RuleSet column
+			if (element instanceof IViolation)
+				return ((IViolation) element).getRuleSet();
 			return "";
 		default:
 			return "";
