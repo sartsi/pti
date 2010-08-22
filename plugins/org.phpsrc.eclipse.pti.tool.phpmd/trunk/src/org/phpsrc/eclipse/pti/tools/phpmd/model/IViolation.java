@@ -11,10 +11,10 @@ package org.phpsrc.eclipse.pti.tools.phpmd.model;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.eclipse.core.resources.IResource;
+
 public interface IViolation {
 	public final IViolation[] NONE = new IViolation[] {};
-
-	public void setFileName(final String newFileName);
 
 	public String getFileName();
 
@@ -63,4 +63,8 @@ public interface IViolation {
 	public void setDescription(final String description);
 
 	public String getDescription();
+
+	public void setResource(IResource resource);
+
+	public IResource getResource();
 }

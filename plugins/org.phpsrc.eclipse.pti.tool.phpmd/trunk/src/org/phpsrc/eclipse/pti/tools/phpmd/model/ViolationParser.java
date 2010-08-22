@@ -19,6 +19,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -89,13 +93,22 @@ public class ViolationParser {
 
 	private void parse(Element file) {
 		NodeList node = file.getElementsByTagName("violation");
+		String workspaceLocation = getWokspaceLocation().toOSString();
+
+		IPath path = new Path(file.getAttribute("name").substring(workspaceLocation.length()));
+		IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+
+		if (null == res)
+			return;
+
 		for (int i = 0; i < node.getLength(); ++i)
-			parse((Element) node.item(i), file.getAttribute("name"));
+			parse((Element) node.item(i), res);
 	}
 
-	private void parse(Element violationElement, String fileName) {
+	private void parse(Element violationElement, IResource resource) {
 		try {
 			IViolation newViolation = new Violation();
+			newViolation.setResource(resource);
 			newViolation.setClassName(violationElement.getAttribute("class"));
 			newViolation.setPackageName(violationElement.getAttribute("package"));
 			newViolation.setMethodName(violationElement.getAttribute("method"));
@@ -109,7 +122,11 @@ public class ViolationParser {
 			newViolation.setDescription(violationElement.getTextContent().trim());
 			violations.add(newViolation);
 		} catch (MalformedURLException e) {
-			// ignore the item
+			// ignore the item for now
 		}
+	}
+
+	private IPath getWokspaceLocation() {
+		return ResourcesPlugin.getWorkspace().getRoot().getLocation();
 	}
 }

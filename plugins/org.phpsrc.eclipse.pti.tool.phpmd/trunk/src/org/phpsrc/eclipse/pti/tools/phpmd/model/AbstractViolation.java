@@ -11,8 +11,10 @@ package org.phpsrc.eclipse.pti.tools.phpmd.model;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.eclipse.core.resources.IResource;
+
 public abstract class AbstractViolation implements IViolation {
-	private String fileName;
+	private IResource resource;
 	private String packageName;
 	private String className;
 	private String functionName;
@@ -29,12 +31,16 @@ public abstract class AbstractViolation implements IViolation {
 	private String rule;
 	private String ruleSet;
 
-	public String getFileName() {
-		return fileName;
+	public void setResource(IResource res) {
+		this.resource = res;
 	}
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	public IResource getResource() {
+		return resource;
+	}
+
+	public String getFileName() {
+		return resource.getLocation().lastSegment();
 	}
 
 	public String getPackageName() {
