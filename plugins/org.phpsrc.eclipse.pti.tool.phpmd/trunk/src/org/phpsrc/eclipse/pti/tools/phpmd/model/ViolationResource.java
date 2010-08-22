@@ -13,7 +13,7 @@ import java.net.URL;
 
 import org.eclipse.core.resources.IResource;
 
-public class Violation implements IViolation {
+public class ViolationResource implements IViolation {
 	private IResource resource;
 	private String packageName;
 	private String className;
@@ -31,7 +31,7 @@ public class Violation implements IViolation {
 	private String rule;
 	private String ruleSet;
 
-	public Violation(IResource resource) {
+	public ViolationResource(IResource resource) {
 		this.resource = resource;
 	}
 
@@ -133,5 +133,28 @@ public class Violation implements IViolation {
 
 	public void setRuleSet(String ruleSet) {
 		this.ruleSet = ruleSet;
+	}
+
+	@Override
+	public int hashCode() {
+		return resource.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object that) {
+		if (null == that)
+			return false;
+		if (this == that)
+			return true;
+		if (this.getClass().getName().equals(that.getClass().getName()) && resource.equals(((ViolationResource) that).resource)) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "Violation [priority=" + priority + ", rule=" + rule + ", ruleSet=" + ruleSet + ", filenam)="
+				+ getFileName() + "]";
 	}
 }
