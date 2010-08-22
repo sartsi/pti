@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Platform;
 
 public class ViolationResource implements IViolation {
 	private IResource resource;
@@ -133,6 +134,12 @@ public class ViolationResource implements IViolation {
 
 	public void setRuleSet(String ruleSet) {
 		this.ruleSet = ruleSet;
+	}
+
+	public Object getAdapter(Class adapter) {
+		if (adapter.isInstance(resource))
+			return resource;
+		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
 	@Override

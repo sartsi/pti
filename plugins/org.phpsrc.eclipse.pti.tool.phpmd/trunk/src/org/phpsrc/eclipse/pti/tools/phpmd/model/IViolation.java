@@ -12,8 +12,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 
-public interface IViolation {
+public interface IViolation extends IAdaptable {
 	public final IViolation[] NONE = new IViolation[] {};
 
 	public String getFileName();
