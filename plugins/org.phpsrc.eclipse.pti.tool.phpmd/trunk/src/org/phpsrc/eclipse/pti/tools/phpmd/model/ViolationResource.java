@@ -135,26 +135,51 @@ public class ViolationResource implements IViolation {
 		this.ruleSet = ruleSet;
 	}
 
-	@Override
-	public int hashCode() {
-		return resource.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object that) {
-		if (null == that)
-			return false;
-		if (this == that)
-			return true;
-		if (this.getClass().getName().equals(that.getClass().getName()) && resource.equals(((ViolationResource) that).resource)) {
-			return true;
-		}
-		return false;
-	}
+	// @Override
+	// public int hashCode() {
+	// return resource.hashCode();
+	// }
 
 	@Override
 	public String toString() {
 		return "Violation [priority=" + priority + ", rule=" + rule + ", ruleSet=" + ruleSet + ", filenam)="
 				+ getFileName() + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + beginline;
+		result = prime * result + endline;
+		result = prime * result + ((resource == null) ? 0 : resource.hashCode());
+		result = prime * result + ((rule == null) ? 0 : rule.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ViolationResource other = (ViolationResource) obj;
+		if (beginline != other.beginline)
+			return false;
+		if (endline != other.endline)
+			return false;
+		if (resource == null) {
+			if (other.resource != null)
+				return false;
+		} else if (!resource.equals(other.resource))
+			return false;
+		if (rule == null) {
+			if (other.rule != null)
+				return false;
+		} else if (!rule.equals(other.rule))
+			return false;
+		return true;
 	}
 }
