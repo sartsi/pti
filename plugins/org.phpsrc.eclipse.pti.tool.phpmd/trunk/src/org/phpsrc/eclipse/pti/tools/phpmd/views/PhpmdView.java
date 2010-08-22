@@ -12,12 +12,16 @@ import java.util.Comparator;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 import org.phpsrc.eclipse.pti.tools.phpmd.model.IViolation;
 import org.phpsrc.eclipse.pti.tools.phpmd.model.ViolationManager;
+
+import util.EditorUtil;
 
 public class PhpmdView extends ViewPart {
 	private TableViewer tableViewer;
@@ -40,6 +44,8 @@ public class PhpmdView extends ViewPart {
 		createCategoryColumn(table);
 
 		createTableSorter();
+
+		hookMouse();
 	}
 
 	private void createTableViewer(Composite parent) {
@@ -124,6 +130,15 @@ public class PhpmdView extends ViewPart {
 				categoryComparator, });
 
 		// tableViewer.setSorter(sorter);
+	}
+
+	private void hookMouse() {
+		tableViewer.getTable().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				EditorUtil.openEditor(getSite().getPage(), tableViewer.getSelection());
+			}
+		});
 	}
 
 	@Override
