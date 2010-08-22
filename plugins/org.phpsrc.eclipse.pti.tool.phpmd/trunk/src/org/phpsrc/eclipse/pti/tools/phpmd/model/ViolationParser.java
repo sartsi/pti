@@ -107,8 +107,7 @@ public class ViolationParser {
 
 	private void parse(Element violationElement, IResource resource) {
 		try {
-			IViolation newViolation = new Violation();
-			newViolation.setResource(resource);
+			IViolation newViolation = new Violation(resource);
 			newViolation.setClassName(violationElement.getAttribute("class"));
 			newViolation.setPackageName(violationElement.getAttribute("package"));
 			newViolation.setMethodName(violationElement.getAttribute("method"));

@@ -64,7 +64,5 @@ public interface IViolation {
 
 	public String getDescription();
 
-	public void setResource(IResource resource);
-
 	public IResource getResource();
 }
