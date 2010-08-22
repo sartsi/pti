@@ -93,6 +93,14 @@ public class ViolationManager {
 		}
 	}
 
+	public void removeAllViolations() {
+		if (0 < violations.size()) {
+			IViolation[] removed = violations.toArray(new IViolation[violations.size()]);
+			violations.clear();
+			fireViolationsChanged(IViolation.NONE, removed);
+		}
+	}
+
 	public void addViolationManagerListener(IViolationManagerListener listener) {
 		if (!listeners.contains(listener))
 			listeners.add(listener);

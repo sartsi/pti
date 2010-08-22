@@ -50,7 +50,10 @@ public class Phpmd extends AbstractPHPTool {
 		String violationReport = launcher.launch(resource.getProject());
 
 		ViolationParser violationParser = new ViolationParser();
-		ViolationManager.getManager().addViolation(violationParser.parse(violationReport));
+
+		ViolationManager violationMgr = ViolationManager.getManager();
+		violationMgr.removeAllViolations();
+		violationMgr.addViolation(violationParser.parse(violationReport));
 	}
 
 	private void displayNoExecutalbeFoundDialog() {
