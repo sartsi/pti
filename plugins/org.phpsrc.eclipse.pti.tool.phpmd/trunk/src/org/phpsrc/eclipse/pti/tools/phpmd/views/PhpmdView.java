@@ -17,6 +17,9 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 import org.phpsrc.eclipse.pti.tools.phpmd.model.IViolation;
 import org.phpsrc.eclipse.pti.tools.phpmd.model.ViolationManager;
@@ -32,6 +35,8 @@ public class PhpmdView extends ViewPart {
 	private TableColumn ruleColumn;
 
 	private PhpmdViewSorter sorter;
+
+	private IMemento memento;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -129,7 +134,10 @@ public class PhpmdView extends ViewPart {
 				categoryColumn, }, new Comparator[] { filenameComparator, priorityComparator, ruleComparator,
 				categoryComparator, });
 
-		// tableViewer.setSorter(sorter);
+		if (null != memento)
+			sorter.init(memento);
+
+		tableViewer.setSorter(sorter);
 	}
 
 	private void hookMouse() {
@@ -139,6 +147,16 @@ public class PhpmdView extends ViewPart {
 				EditorUtil.openEditor(getSite().getPage(), tableViewer.getSelection());
 			}
 		});
+	}
+
+	public void saveState(IMemento memento) {
+		super.saveState(memento);
+		sorter.saveState(memento);
+	}
+
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
+		super.init(site, memento);
+		this.memento = memento;
 	}
 
 	@Override
