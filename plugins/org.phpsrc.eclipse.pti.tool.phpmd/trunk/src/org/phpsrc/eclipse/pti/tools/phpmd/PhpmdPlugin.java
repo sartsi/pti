@@ -14,6 +14,7 @@ import org.osgi.framework.BundleContext;
 import org.phpsrc.eclipse.pti.core.AbstractPHPToolPlugin;
 import org.phpsrc.eclipse.pti.library.pear.PHPLibraryPEARPlugin;
 import org.phpsrc.eclipse.pti.tools.phpmd.core.Phpmd;
+import org.phpsrc.eclipse.pti.tools.phpmd.model.ViolationManager;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -53,6 +54,7 @@ public class PhpmdPlugin extends AbstractPHPToolPlugin {
 	 * )
 	 */
 	public void stop(BundleContext context) throws Exception {
+		ViolationManager.getManager().saveViolations();
 		plugin = null;
 		super.stop(context);
 	}
