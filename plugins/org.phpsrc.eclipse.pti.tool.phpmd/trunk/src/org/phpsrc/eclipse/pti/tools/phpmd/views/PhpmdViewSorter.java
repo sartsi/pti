@@ -8,7 +8,9 @@
 
 package org.phpsrc.eclipse.pti.tools.phpmd.views;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -16,8 +18,14 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.IMemento;
 
 public class PhpmdViewSorter extends ViewerSorter {
+	private static final String TAG_DESCENDING = "descending";
+	private static final String TAG_COLUMN_INDEX = "columnIndex";
+	private static final String TAG_TYPE = "SortInfo";
+	private static final String TAG_TRUE = "true";
+
 	private class SortInfo {
 		int columnIndex;
 		Comparator<Object> comparator;
@@ -74,5 +82,39 @@ public class PhpmdViewSorter extends ViewerSorter {
 			}
 		}
 		return 0;
+	}
+
+	public void saveState(IMemento memento) {
+		for (SortInfo info : sortInfos) {
+			IMemento mem = memento.createChild(TAG_TYPE);
+			mem.putInteger(TAG_COLUMN_INDEX, info.columnIndex);
+			if (info.descending)
+				mem.putString(TAG_DESCENDING, TAG_TRUE);
+		}
+	}
+
+	public void init(IMemento memento) {
+		List<SortInfo> newInfos = new ArrayList<SortInfo>(sortInfos.length);
+		IMemento[] mems = memento.getChildren(TAG_TYPE);
+
+		for (IMemento mem : mems) {
+			Integer value = mem.getInteger(TAG_COLUMN_INDEX);
+			if (null == value)
+				continue;
+			int index = value.intValue();
+			if (index < 0 || index > sortInfos.length)
+				continue;
+			SortInfo info = sortInfos[index];
+			if (newInfos.contains(info))
+				continue;
+			info.descending = TAG_TRUE.equals(mem.getString(TAG_TRUE));
+			newInfos.add(info);
+		}
+
+		for (SortInfo info : sortInfos)
+			if (false == newInfos.contains(info))
+				newInfos.add(info);
+
+		sortInfos = newInfos.toArray(new SortInfo[newInfos.size()]);
 	}
 }
