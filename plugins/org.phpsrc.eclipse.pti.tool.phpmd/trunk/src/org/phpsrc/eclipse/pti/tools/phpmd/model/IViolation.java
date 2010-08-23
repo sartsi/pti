@@ -66,4 +66,6 @@ public interface IViolation extends IAdaptable {
 	public String getDescription();
 
 	public IResource getResource();
+
+	public String getInfo();
 }

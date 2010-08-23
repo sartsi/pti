@@ -136,6 +136,12 @@ public class ViolationResource implements IViolation {
 		this.ruleSet = ruleSet;
 	}
 
+	public String getInfo() {
+		if (null == resource)
+			return "";
+		return resource.getFullPath().toString();
+	}
+
 	public Object getAdapter(Class adapter) {
 		if (adapter.isInstance(resource))
 			return resource;
