@@ -17,6 +17,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
+import org.phpsrc.eclipse.pti.tools.phpmd.PhpmdLog;
 
 public class EditorUtil {
 	public static void openEditor(IWorkbenchPage page, ISelection selection) {
@@ -39,7 +40,7 @@ public class EditorUtil {
 		try {
 			IDE.openEditor(page, file);
 		} catch (PartInitException e) {
-			// log here
+			PhpmdLog.logError(e);
 		}
 	}
 }
