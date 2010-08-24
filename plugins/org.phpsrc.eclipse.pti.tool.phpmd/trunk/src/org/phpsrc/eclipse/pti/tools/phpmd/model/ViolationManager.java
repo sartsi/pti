@@ -11,6 +11,7 @@ package org.phpsrc.eclipse.pti.tools.phpmd.model;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,7 +51,9 @@ public class ViolationManager {
 		FileReader reader = null;
 		try {
 			reader = new FileReader(getViolationFile());
-			loadViolations(XMLMemento.createReadRoot(reader));
+			ViolationMementoManager mementoMgr = new ViolationMementoManager();
+			IViolation[] loadedViolations = mementoMgr.load(XMLMemento.createReadRoot(reader));
+			addViolation(loadedViolations);
 		} catch (FileNotFoundException e) {
 			// no violation exists yet
 		} catch (Exception e) {
@@ -69,19 +72,32 @@ public class ViolationManager {
 		return PhpmdPlugin.getDefault().getStateLocation().append("phpmd_violations.xml").toFile();
 	}
 
-	private void loadViolations(XMLMemento memento) {
-		// IMemento[] children = memento.getChildren(type);
-	}
-
 	public void saveViolations() {
+		if (null == violations)
+			return;
+		ViolationMementoManager mementoMgr = new ViolationMementoManager();
+		XMLMemento memento = mementoMgr.build(violations.toArray(new IViolation[violations.size()]));
+		FileWriter writer = null;
+		try {
+			writer = new FileWriter(getViolationFile());
+			memento.save(writer);
+		} catch (IOException e) {
+			PhpmdLog.logError(e);
+		} finally {
+			try {
+				if (null != writer)
+					writer.close();
+			} catch (IOException e) {
+				PhpmdLog.logError(e);
+			}
+		}
 	}
 
 	private void fireViolationsChanged(IViolation[] violationsAdded, IViolation[] violationsRemoved) {
 		ViolationManagerEvent event = new ViolationManagerEvent(this, violationsAdded, violationsRemoved);
 
-		for (IViolationManagerListener listener : listeners) {
+		for (IViolationManagerListener listener : listeners)
 			listener.violationsChanged(event);
-		}
 	}
 
 	public void addViolation(IViolation newViolation) {
