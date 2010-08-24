@@ -8,6 +8,10 @@
 
 package org.phpsrc.eclipse.pti.tools.phpmd.model;
 
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
@@ -50,16 +54,52 @@ public class ViolationMementoManager {
 		child.putString(TAG_RULE_SET, violation.getRuleSet());
 	}
 
-	// public IViolation[] parse(XMLMemento memento) {
-	// IMemento[] children = memento.getChildren(TAG_VIOLATION);
-	// List<IViolation> violations = new ArrayList<IViolation>(children.length);
-	// for (IMemento child : children) {
-	// violations.add(parse(child));
-	// }
-	// return violations.toArray(new IViolation[violations.size()]);
-	// }
-	//
-	// public IViolation parse(IMemento memento) {
-	//
-	// }
+	public IViolation[] parse(XMLMemento memento) {
+		IMemento[] children = memento.getChildren(TAG_VIOLATION);
+		List<IViolation> violations = new ArrayList<IViolation>(children.length);
+		for (IMemento child : children) {
+			IViolation v = parse(child);
+			if (null != v)
+				violations.add(v);
+		}
+		return violations.toArray(new IViolation[violations.size()]);
+	}
+
+	public IViolation parse(IMemento memento) {
+		String info = memento.getString(TAG_INFO);
+		IViolation violation = ViolationResource.loadViolationByInfo(info);
+
+		if (null == violation)
+			return null;
+
+		Integer value;
+
+		value = memento.getInteger(TAG_BEGINLINE);
+		if (null != value)
+			violation.setBeginline(value.intValue());
+
+		value = memento.getInteger(TAG_ENDLINE);
+		if (null != value)
+			violation.setEndline(value.intValue());
+
+		value = memento.getInteger(TAG_PRIORITY);
+		if (null != value)
+			violation.setPriority(value.intValue());
+
+		try {
+			violation.setExternalInfoURL(memento.getString(TAG_EXTERNAL_INFO_URL));
+		} catch (MalformedURLException e) {
+			// do nothing
+		}
+
+		violation.setPackageName(memento.getString(TAG_PACKAGE_NAME));
+		violation.setClassName(memento.getString(TAG_CLASS_NAME));
+		violation.setFunctionName(memento.getString(TAG_FUNCTION_NAME));
+		violation.setMethodName(memento.getString(TAG_METHOD_NAME));
+		violation.setDescription(memento.getString(TAG_DESCRIPTION));
+		violation.setRule(memento.getString(TAG_RULE));
+		violation.setRuleSet(memento.getString(TAG_RULE_SET));
+
+		return violation;
+	}
 }
