@@ -12,6 +12,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 public class ViolationResource implements IViolation {
@@ -140,6 +142,13 @@ public class ViolationResource implements IViolation {
 		if (null == resource)
 			return "";
 		return resource.getFullPath().toString();
+	}
+
+	public static ViolationResource loadViolationByInfo(String info) {
+		IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(info));
+		if (null == res)
+			return null;
+		return new ViolationResource(res);
 	}
 
 	public Object getAdapter(Class adapter) {
