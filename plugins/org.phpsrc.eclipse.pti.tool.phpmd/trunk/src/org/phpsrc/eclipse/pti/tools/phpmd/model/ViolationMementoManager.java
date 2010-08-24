@@ -54,18 +54,18 @@ public class ViolationMementoManager {
 		child.putString(TAG_RULE_SET, violation.getRuleSet());
 	}
 
-	public IViolation[] parse(XMLMemento memento) {
+	public IViolation[] load(XMLMemento memento) {
 		IMemento[] children = memento.getChildren(TAG_VIOLATION);
 		List<IViolation> violations = new ArrayList<IViolation>(children.length);
 		for (IMemento child : children) {
-			IViolation v = parse(child);
+			IViolation v = load(child);
 			if (null != v)
 				violations.add(v);
 		}
 		return violations.toArray(new IViolation[violations.size()]);
 	}
 
-	public IViolation parse(IMemento memento) {
+	private IViolation load(IMemento memento) {
 		String info = memento.getString(TAG_INFO);
 		IViolation violation = ViolationResource.loadViolationByInfo(info);
 
