@@ -46,7 +46,7 @@
  * @link       http://phpmd.org
  */
 
-require_once 'PHP/PMD/AbstractRule.php';
+require_once 'PHP/PMD/Rule/AbstractLocalVariable.php';
 require_once 'PHP/PMD/Rule/IFunctionAware.php';
 require_once 'PHP/PMD/Rule/IMethodAware.php';
 
@@ -60,11 +60,11 @@ require_once 'PHP/PMD/Rule/IMethodAware.php';
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.2.5
+ * @version    Release: 0.2.6
  * @link       http://phpmd.org
  */
 class PHP_PMD_Rule_UnusedFormalParameter
-       extends PHP_PMD_AbstractRule
+       extends PHP_PMD_Rule_AbstractLocalVariable
     implements PHP_PMD_Rule_IFunctionAware,
                PHP_PMD_Rule_IMethodAware
 {
@@ -148,7 +148,9 @@ class PHP_PMD_Rule_UnusedFormalParameter
     {
         $variables = $node->findChildrenOfType('Variable');
         foreach ($variables as $variable) {
-            unset($this->_nodes[$variable->getImage()]);
+            if ($this->isLocal($variable)) {
+                unset($this->_nodes[$variable->getImage()]);
+            }
         }
     }
 }

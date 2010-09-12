@@ -58,7 +58,7 @@ require_once 'PHP/PMD/Writer/Stream.php';
  * @author    Manuel Pichler <mapi@phpmd.org>
  * @copyright 2009-2010 Manuel Pichler. All rights reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   Release: 0.2.5
+ * @version   Release: 0.2.6
  * @link      http://phpmd.org
  */
 class PHP_PMD
@@ -66,7 +66,7 @@ class PHP_PMD
     /**
      * The current PHP_PMD version.
      */
-    const VERSION = '0.2.5';
+    const VERSION = '0.2.6';
 
     /**
      * List of valid file extensions for analyzed files.

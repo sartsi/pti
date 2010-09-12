@@ -58,7 +58,7 @@ require_once 'PHP/PMD/AbstractRule.php';
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.2.5
+ * @version    Release: 0.2.6
  * @link       http://phpmd.org
  */
 class PHP_PMD_TextUI_CommandLineOptions
@@ -116,6 +116,13 @@ class PHP_PMD_TextUI_CommandLineOptions
      * @var string $_ignore
      */
     private $_ignore = null;
+
+    /**
+     * Should the shell show the current phpmd version?
+     *
+     * @var boolean
+     */
+    private $_version = false;
     
     /**
      * Constructs a new command line options instance.
@@ -127,14 +134,7 @@ class PHP_PMD_TextUI_CommandLineOptions
         // Remove current file name
         array_shift($args);
 
-        if (count($args) < 3) {
-            throw new InvalidArgumentException($this->usage(), self::INPUT_ERROR);
-        }
-
-        $this->_inputPath    = array_shift($args);
-        $this->_reportFormat = array_shift($args);
-        $this->_ruleSets     = array_shift($args);
-
+        $arguments = array();
         while (($arg = array_shift($args)) !== null) {
             switch ($arg) {
 
@@ -147,14 +147,36 @@ class PHP_PMD_TextUI_CommandLineOptions
                 break;
 
             case '--extensions':
+                $this->logDeprecated('extensions', 'suffixes');
+
+            case '--suffixes':
                 $this->_extensions = array_shift($args);
                 break;
 
             case '--ignore':
+                $this->logDeprecated('ignore', 'exclude');
+                
+            case '--exclude':
                 $this->_ignore = array_shift($args);
+                break;
+
+            case '--version':
+                $this->_version = true;
+                return;
+
+            default:
+                $arguments[] = $arg;
                 break;
             }
         }
+
+        if (count($arguments) < 3) {
+            throw new InvalidArgumentException($this->usage(), self::INPUT_ERROR);
+        }
+
+        $this->_inputPath    = (string) array_shift($arguments);
+        $this->_reportFormat = (string) array_shift($arguments);
+        $this->_ruleSets     = (string) array_shift($arguments);
     }
 
     /**
@@ -231,6 +253,16 @@ class PHP_PMD_TextUI_CommandLineOptions
     }
 
     /**
+     * Was the <b>--version</b> passed to PHPMD's command line interface?
+     *
+     * @return boolean
+     */
+    public function hasVersion()
+    {
+        return $this->_version;
+    }
+
+    /**
      * Creates a report renderer instance based on the user's command line
      * argument.
      *
@@ -300,9 +332,28 @@ class PHP_PMD_TextUI_CommandLineOptions
                'priority than this will not be used' . PHP_EOL .
                '--reportfile: send report output to a file; default to STDOUT' .
                PHP_EOL .
-               '--extensions: comma-separated string of valid source code ' .
+               '--suffixes: comma-separated string of valid source code ' .
                'filename extensions' . PHP_EOL .
-               '--ignore: comma-separated string of patterns that are used to ' .
+               '--exclude: comma-separated string of patterns that are used to ' .
                'ignore directories' . PHP_EOL;
+    }
+
+    /**
+     * Logs a deprecated option to the current user interface.
+     *
+     * @param string $deprecatedName Name of the deprecated option.
+     * @param string $newName        Name of the new option.
+     *
+     * @return void
+     */
+    protected function logDeprecated( $deprecatedName, $newName )
+    {
+        $message = sprintf(
+            'The --%s option is deprecated, please use --%s instead.',
+            $deprecatedName,
+            $newName
+        );
+
+        fwrite(STDERR, $message . PHP_EOL . PHP_EOL);
     }
 }
