@@ -62,7 +62,7 @@ require_once 'PHP/Depend/Code/ASTNode.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.17
+ * @version    Release: 0.9.19
  * @link       http://www.pdepend.org/
  * @since      0.9.6
  */

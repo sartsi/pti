@@ -92,7 +92,7 @@ require_once 'PHP/Depend/ConstantsI.php';
  * @author     Manuel Pichler <mapi@pdepend.org>
  * @copyright  2008-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.9.17
+ * @version    Release: 0.9.19
  * @link       http://pdepend.org/
  */
 interface PHP_Depend_TokenizerI extends PHP_Depend_ConstantsI

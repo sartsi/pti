@@ -3,7 +3,7 @@
  * $Header$
  * $Horde: horde/lib/Log.php,v 1.15 2000/06/29 23:39:45 jon Exp $
  *
- * @version $Revision: 299917 $
+ * @version $Revision: 302787 $
  * @package Log
  */
 
@@ -127,8 +127,8 @@ class Log
      * @access public
      * @since Log 1.0
      */
-    function &factory($handler, $name = '', $ident = '', $conf = array(),
-                      $level = PEAR_LOG_DEBUG)
+    public static function factory($handler, $name = '', $ident = '',
+                                   $conf = array(), $level = PEAR_LOG_DEBUG)
     {
         $handler = strtolower($handler);
         $class = 'Log_' . $handler;
@@ -189,16 +189,16 @@ class Log
      * @access public
      * @since Log 1.0
      */
-    function &singleton($handler, $name = '', $ident = '', $conf = array(),
-                        $level = PEAR_LOG_DEBUG)
+    public static function singleton($handler, $name = '', $ident = '',
+                                     $conf = array(), $level = PEAR_LOG_DEBUG)
     {
         static $instances;
         if (!isset($instances)) $instances = array();
 
         $signature = serialize(array($handler, $name, $ident, $conf, $level));
         if (!isset($instances[$signature])) {
-            $instances[$signature] = &Log::factory($handler, $name, $ident,
-                                                   $conf, $level);
+            $instances[$signature] = Log::factory($handler, $name, $ident,
+                                                  $conf, $level);
         }
 
         return $instances[$signature];
@@ -449,14 +449,20 @@ class Log
         /* Start by generating a backtrace from the current call (here). */
         $bt = debug_backtrace();
 
+        /* Store some handy shortcuts to our previous frames. */
+        $bt0 = isset($bt[$depth]) ? $bt[$depth] : null;
+        $bt1 = isset($bt[$depth + 1]) ? $bt[$depth + 1] : null;
+
         /*
          * If we were ultimately invoked by the composite handler, we need to
          * increase our depth one additional level to compensate.
          */
-        $class = isset($bt[$depth+1]['class']) ? $bt[$depth+1]['class'] : null;
+        $class = isset($bt1['class']) ? $bt1['class'] : null;
         if ($class !== null && strcasecmp($class, 'Log_composite') == 0) {
             $depth++;
-            $class = isset($bt[$depth+1]['class']) ? $bt[$depth+1]['class'] : null;
+            $bt0 = isset($bt[$depth]) ? $bt[$depth] : null;
+            $bt1 = isset($bt[$depth + 1]) ? $bt[$depth + 1] : null;
+            $class = isset($bt1['class']) ? $bt1['class'] : null;
         }
 
         /*
@@ -466,9 +472,9 @@ class Log
          * further back to find the name of the encapsulating function from
          * which log() was called.
          */
-        $file = isset($bt[$depth])     ? $bt[$depth]['file'] : null;
-        $line = isset($bt[$depth])     ? $bt[$depth]['line'] : 0;
-        $func = isset($bt[$depth + 1]) ? $bt[$depth + 1]['function'] : null;
+        $file = isset($bt0) ? $bt0['file'] : null;
+        $line = isset($bt0) ? $bt0['line'] : 0;
+        $func = isset($bt1) ? $bt1['function'] : null;
 
         /*
          * However, if log() was called from one of our "shortcut" functions,
@@ -476,17 +482,19 @@ class Log
          */
         if (in_array($func, array('emerg', 'alert', 'crit', 'err', 'warning',
                                   'notice', 'info', 'debug'))) {
-            $file = isset($bt[$depth + 1]) ? $bt[$depth + 1]['file'] : null;
-            $line = isset($bt[$depth + 1]) ? $bt[$depth + 1]['line'] : 0;
-            $func = isset($bt[$depth + 2]) ? $bt[$depth + 2]['function'] : null;
-            $class = isset($bt[$depth + 2]) ? $bt[$depth + 2]['class'] : null;
+            $bt2 = isset($bt[$depth + 2]) ? $bt[$depth + 2] : null;
+
+            $file = is_array($bt1) ? $bt1['file'] : null;
+            $line = is_array($bt1) ? $bt1['line'] : 0;
+            $func = is_array($bt2) ? $bt2['function'] : null;
+            $class = isset($bt2['class']) ? $bt2['class'] : null;
         }
 
         /*
          * If we couldn't extract a function name (perhaps because we were
          * executed from the "main" context), provide a default value.
          */
-        if (is_null($func)) {
+        if ($func === null) {
             $func = '(none)';
         }
 
@@ -596,7 +604,7 @@ class Log
      * @access  public
      * @since   Log 1.7.0
      */
-    function MASK($priority)
+    public static function MASK($priority)
     {
         return (1 << $priority);
     }
@@ -615,7 +623,7 @@ class Log
      *
      * @deprecated deprecated since Log 1.9.4; use Log::MAX() instead
      */
-    function UPTO($priority)
+    public static function UPTO($priority)
     {
         return Log::MAX($priority);
     }
@@ -634,7 +642,7 @@ class Log
      * @access  public
      * @since   Log 1.9.4
      */
-    function MIN($priority)
+    public static function MIN($priority)
     {
         return PEAR_LOG_ALL ^ ((1 << $priority) - 1);
     }
@@ -653,7 +661,7 @@ class Log
      * @access  public
      * @since   Log 1.9.4
      */
-    function MAX($priority)
+    public static function MAX($priority)
     {
         return ((1 << ($priority + 1)) - 1);
     }
