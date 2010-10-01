@@ -34,7 +34,7 @@ File_Find           1.3.0     stable
 HTML_Common         1.2.5     stable
 HTML_Table          1.8.3     stable
 Image_GraphViz      1.3.0RC3  beta
-Log                 1.12.2    stable
+Log                 1.12.3    stable
 MDB2                2.5.0b2   beta
 MDB2_Driver_mysql   1.5.0b2   beta
 MDB2_Driver_mysqli  1.5.0b2   beta
