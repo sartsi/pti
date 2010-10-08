@@ -61,7 +61,7 @@ require_once 'PHP/PMD/Rule/IFunctionAware.php';
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.2.6
+ * @version    Release: 0.2.7
  * @link       http://phpmd.org
  */
 class PHP_PMD_Rule_Naming_LongVariable

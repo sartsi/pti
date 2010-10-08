@@ -60,7 +60,7 @@ require_once 'XML/Parser.php';
  * Class VersionControl_SVN_Log_Parser - XML Parser for Subversion Log output
  *
  * @package  VersionControl_SVN
- * @version  0.3.3
+ * @version  0.3.4
  * @category SCM
  * @author   Clay Loveless <clay@killersoft.com>
  */

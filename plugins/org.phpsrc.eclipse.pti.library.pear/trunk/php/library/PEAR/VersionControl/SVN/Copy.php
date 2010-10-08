@@ -41,7 +41,7 @@
 // | Author: Clay Loveless <clay@killersoft.com>                          |
 // +----------------------------------------------------------------------+
 //
-// $Id: Copy.php 286754 2009-08-03 19:59:41Z mrook $
+// $Id: Copy.php 299780 2010-05-26 11:57:46Z mrook $
 //
 
 /**
@@ -93,7 +93,8 @@
  *                      // Do not cache authentication tokens
  *  'encoding'      =>  'ARG',
  *                      // treat value as being in charset encoding ARG
- *  'config-dir'    =>  'Path to a Subversion configuration directory'
+ *  'config-dir'    =>  'Path to a Subversion configuration directory',
+ *  'parents'       =>  true|false
  * );
  *
  * </code>
@@ -142,7 +143,7 @@
  * </code>
  *
  * @package  VersionControl_SVN
- * @version  0.3.3
+ * @version  0.3.4
  * @category SCM
  * @author   Clay Loveless <clay@killersoft.com>
  */
@@ -172,7 +173,8 @@ class VersionControl_SVN_Copy extends VersionControl_SVN
                                 'F',
                                 'encoding',
                                 'force-log',
-                                'force_log'
+                                'force_log',
+                                'parents',
                                 );
 
     /**
@@ -257,6 +259,7 @@ class VersionControl_SVN_Copy extends VersionControl_SVN
                         $_switches .= "--$switch \"$val\" ";
                         break;
                     case 'quiet':
+                    case 'parents':
                     case 'force-log':
                     case 'no-auth-cache':
                     case 'non-interactive':

@@ -47,7 +47,7 @@
  * @author    Michiel Rook <mrook@php.net>
  * @copyright 2004-2007 Clay Loveless
  * @license   http://www.killersoft.com/LICENSE.txt BSD License
- * @version   SVN: $Id: SVN.php 286963 2009-08-09 19:20:36Z mrook $
+ * @version   SVN: $Id: SVN.php 302158 2010-08-12 18:49:10Z mrook $
  * @link      http://pear.php.net/package/VersionControl_SVN
  */
 
@@ -128,7 +128,7 @@ define('VERSIONCONTROL_SVN_FETCHMODE_ARRAY', 6);
  * @author    Michiel Rook <mrook@php.net>
  * @copyright 2004-2007 Clay Loveless
  * @license   http://www.killersoft.com/LICENSE.txt BSD License
- * @version   0.3.3
+ * @version   0.3.4
  * @link      http://pear.php.net/package/VersionControl_SVN
  * @static
  */
@@ -636,7 +636,9 @@ class VersionControl_SVN
             $this->switches = $switches;
         }
         if (sizeof($args) > 0) {
-            $this->args = $args;
+            foreach (array_keys($args) as $k) {
+                $this->args[$k] = escapeshellarg($args[$k]);
+            }
         }
         
         // Always prepare, allows for obj re-use. (Request #5021)
@@ -651,26 +653,26 @@ class VersionControl_SVN
         // executed as 'cmd /c ""C:\Program Files\SVN\bin\svn.exe" info "C:\Program Files\dev\trunk""
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
         {
-			$cmd = '"' . $cmd . '"';
+            $cmd = str_replace($this->svn_path, escapeshellarg($this->svn_path), $cmd);
+            
+            if (!$this->passthru) {
+                exec("$cmd 2>&1", $out, $ret_var);
+            } else {
+                passthru("$cmd 2>&1", $ret_var);
+            }
+        }
+        else
+        {
+            if ($this->use_escapeshellcmd) {
+                $cmd = escapeshellcmd($cmd);
+            }
 
-			if (!$this->passthru) {
-				exec("$cmd 2>&1", $out, $ret_var);
-			} else {
-				passthru("$cmd 2>&1", $ret_var);
-			}
-		}
-		else
-		{
-			if ($this->use_escapeshellcmd) {
-				$cmd = escapeshellcmd($cmd);
-			}
-
-			if (!$this->passthru) {
-				exec("{$this->prepend_cmd}$cmd 2>&1", $out, $ret_var);
-			} else {
-				passthru("{$this->prepend_cmd}$cmd 2>&1", $ret_var);
-			}
-		}
+            if (!$this->passthru) {
+                exec("{$this->prepend_cmd}$cmd 2>&1", $out, $ret_var);
+            } else {
+                passthru("{$this->prepend_cmd}$cmd 2>&1", $ret_var);
+            }
+        }
 
         if ($ret_var > 0) {
             $params['options']  = $this->options;
@@ -717,7 +719,7 @@ class VersionControl_SVN
      */
     function apiVersion()
     {
-        return '0.3.3';
+        return '0.3.4';
     }
     
     // }}}

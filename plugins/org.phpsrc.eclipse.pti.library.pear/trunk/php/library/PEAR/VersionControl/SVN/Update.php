@@ -41,7 +41,7 @@
 // | Author: Clay Loveless <clay@killersoft.com>                          |
 // +----------------------------------------------------------------------+
 //
-// $Id: Update.php 286753 2009-08-03 19:37:03Z mrook $
+// $Id: Update.php 300848 2010-06-29 07:23:08Z mrook $
 //
 
 /**
@@ -142,7 +142,7 @@
  *
  *
  * @package  VersionControl_SVN
- * @version  0.3.3
+ * @version  0.3.4
  * @category SCM
  * @author   Clay Loveless <clay@killersoft.com>
  */
@@ -164,12 +164,14 @@ class VersionControl_SVN_Update extends VersionControl_SVN
                                 'diff3-cmd',
                                 'username',
                                 'password',
+                                'ignore-externals',
                                 'no-auth-cache',
                                 'no_auth_cache',
                                 'non-interactive',
                                 'non_interactive',
                                 'config-dir',
-                                'config_dir'
+                                'config_dir',
+                                'force'
                                 );
 
     

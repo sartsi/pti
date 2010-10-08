@@ -41,7 +41,7 @@
 // | Author: Clay Loveless <clay@killersoft.com>                          |
 // +----------------------------------------------------------------------+
 //
-// $Id: Diff.php 286760 2009-08-03 20:07:16Z mrook $
+// $Id: Diff.php 292829 2009-12-30 23:16:56Z mrook $
 //
 
 /**
@@ -222,7 +222,7 @@
  * since this class does not operate as an interactive shell session.
  *
  * @package  VersionControl_SVN
- * @version  0.3.3
+ * @version  0.3.4
  * @category SCM
  * @author   Clay Loveless <clay@killersoft.com>
  */
@@ -255,7 +255,8 @@ class VersionControl_SVN_Diff extends VersionControl_SVN
                                 'non-interactive',
                                 'non_interactive',
                                 'config-dir',
-                                'config_dir'
+                                'config_dir',
+                                'summarize'
                                 );
 
     /**
@@ -344,6 +345,7 @@ class VersionControl_SVN_Diff extends VersionControl_SVN
                     case 'notice-ancestry':
                     case 'non-interactive':
                     case 'non-recursive':
+                    case 'summarize':
                         if ($val === true) {
                             $_switches .= "--$switch ";
                         }

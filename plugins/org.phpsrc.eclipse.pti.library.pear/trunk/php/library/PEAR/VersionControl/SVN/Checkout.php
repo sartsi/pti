@@ -41,7 +41,7 @@
 // | Author: Clay Loveless <clay@killersoft.com>                          |
 // +----------------------------------------------------------------------+
 //
-// $Id: Checkout.php 286753 2009-08-03 19:37:03Z mrook $
+// $Id: Checkout.php 299781 2010-05-26 12:08:34Z mrook $
 //
 
 /**
@@ -133,7 +133,7 @@
  * </code>
  *
  * @package  VersionControl_SVN
- * @version  0.3.3
+ * @version  0.3.4
  * @category SCM
  * @author   Clay Loveless <clay@killersoft.com>
  */
@@ -154,6 +154,7 @@ class VersionControl_SVN_Checkout extends VersionControl_SVN
                                 'non_recursive',
                                 'username',
                                 'password',
+                                'ignore-externals',
                                 'no-auth-cache',
                                 'no_auth_cache',
                                 'non-interactive',

@@ -58,7 +58,7 @@ require_once 'PHP/PMD/TextUI/CommandLineOptions.php';
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.2.6
+ * @version    Release: 0.2.7
  * @link       http://phpmd.org
  */
 class PHP_PMD_TextUI_Command
@@ -87,7 +87,7 @@ class PHP_PMD_TextUI_Command
     public function run(PHP_PMD_TextUI_CommandLineOptions $opts)
     {
         if ($opts->hasVersion()) {
-            fwrite(STDOUT, 'PHPMD 0.2.6 by Manuel Pichler' . PHP_EOL);
+            fwrite(STDOUT, 'PHPMD 0.2.7 by Manuel Pichler' . PHP_EOL);
             return self::EXIT_SUCCESS;
         }
 

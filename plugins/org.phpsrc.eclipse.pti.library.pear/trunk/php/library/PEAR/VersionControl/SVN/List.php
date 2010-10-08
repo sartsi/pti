@@ -133,7 +133,7 @@
  * Note: Subversion does not offer an XML output option for this subcommand
  *
  * @package  VersionControl_SVN
- * @version  0.3.3
+ * @version  0.3.4
  * @category SCM
  * @author   Clay Loveless <clay@killersoft.com>
  */

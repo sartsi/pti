@@ -57,7 +57,7 @@ require_once 'PHP/PMD/AbstractWriter.php';
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.2.6
+ * @version    Release: 0.2.7
  * @link       http://phpmd.org
  */
 class PHP_PMD_Writer_Stream extends PHP_PMD_AbstractWriter
@@ -98,7 +98,7 @@ class PHP_PMD_Writer_Stream extends PHP_PMD_AbstractWriter
      */
     public function __destruct()
     {
-        if (is_resource($this->_stream) === true) {
+        if ($this->_stream !== STDOUT && is_resource($this->_stream) === true) {
             @fclose($this->_stream);
         }
         $this->_stream = null;

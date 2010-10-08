@@ -57,7 +57,7 @@ require_once 'PHP/PMD/Node/AbstractType.php';
  * @author     Manuel Pichler <mapi@phpmd.org>
  * @copyright  2009-2010 Manuel Pichler. All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 0.2.6
+ * @version    Release: 0.2.7
  * @link       http://phpmd.org
  */
 class PHP_PMD_Node_Interface extends PHP_PMD_Node_AbstractType
