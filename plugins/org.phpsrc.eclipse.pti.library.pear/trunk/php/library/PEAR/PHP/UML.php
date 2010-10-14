@@ -13,10 +13,10 @@
  * @package  PHP_UML
  * @author   Baptiste Autin <ohlesbeauxjours@yahoo.fr>
  * @license  http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version  SVN: $Revision: 138 $
+ * @version  SVN: $Revision: 154 $
  * @link     http://pear.php.net/package/PHP_UML
  * @link     http://www.baptisteautin.com/projects/PHP_UML/
- * @since    $Date: 2009-12-13 04:23:11 +0100 (dim., 13 déc. 2009) $
+ * @since    $Date: 2010-10-02 00:53:21 +0200 (sam., 02 oct. 2010) $
  */
 
 require_once 'PEAR/Exception.php';
@@ -409,7 +409,19 @@ class PHP_UML
             $e->format    = $format;
             return $e->generate($outputDir);
             break;
+        case 'eclipse':
+            if (empty($this->model->packages)) {
+                throw new PHP_UML_Exception('No model given.');
+            }
+            $format = 'Eclipse';
+            $e      = PHP_UML_Output_ExporterAPI::getExporterObject($format);
+
+            $e->structure = $this->model;
+            $e->format    = $format;
+            return $e->generate($outputDir);
+            break;
         case 'php':
+        case 'dia':
         case 'html':
             if (empty($this->xmiExporter->xmi)) {
                 $this->generateXMI();    // since these formats rely on a XSLT of XMI

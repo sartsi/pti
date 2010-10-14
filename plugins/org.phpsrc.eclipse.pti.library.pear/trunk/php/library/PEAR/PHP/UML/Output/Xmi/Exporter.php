@@ -8,9 +8,9 @@
  * @package  PHP_UML
  * @author   Baptiste Autin <ohlesbeauxjours@yahoo.fr> 
  * @license  http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version  SVN: $Revision: 140 $
+ * @version  SVN: $Revision: 148 $
  * @link     http://pear.php.net/package/PHP_UML
- * @since    $Date: 2009-12-14 00:58:24 +0100 (lun., 14 déc. 2009) $
+ * @since    $Date: 2010-04-18 17:46:57 +0200 (dim., 18 avr. 2010) $
  */
 
 /**
@@ -102,7 +102,7 @@ class PHP_UML_Output_Xmi_Exporter extends PHP_UML_Output_ExporterAPI
             throw new PHP_UML_Exception('No model given');
         }
 
-        $this->builder = PHP_UML_Output_Xmi_AbstractBuilder::factory($this->xmiVersion, $this->xmlEncoding);
+        $this->builder = $this->getXmiFactory();
 
         $this->xmi  = $this->builder->getXmlHeader();
         $this->xmi .= $this->builder->getXmiHeaderOpen();
@@ -136,6 +136,15 @@ class PHP_UML_Output_Xmi_Exporter extends PHP_UML_Output_ExporterAPI
         if (strcasecmp($this->xmlEncoding, 'utf-8')==0) {
             $this->xmi = utf8_encode($this->xmi);
         }
+    }
+    
+    /**
+     * Getter for the XMI factory
+     *
+     */
+    protected function getXmiFactory() {
+
+        return PHP_UML_Output_Xmi_AbstractBuilder::factory($this->xmiVersion, $this->xmlEncoding);	
     }
     
     /**

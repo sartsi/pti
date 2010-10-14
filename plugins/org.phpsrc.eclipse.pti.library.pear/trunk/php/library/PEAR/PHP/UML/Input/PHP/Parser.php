@@ -8,9 +8,9 @@
  * @package  PHP_UML
  * @author   Baptiste Autin <ohlesbeauxjours@yahoo.fr> 
  * @license  http://www.gnu.org/licenses/lgpl.html LGPL License 3
- * @version  SVN: $Revision: 147 $
+ * @version  SVN: $Revision: 152 $
  * @link     http://pear.php.net/package/PHP_UML
- * @since    $Date: 2010-03-19 22:00:18 +0100 (ven., 19 mars 2010) $
+ * @since    $Date: 2010-10-01 23:01:14 +0200 (ven., 01 oct. 2010) $
  */
 
 /**
@@ -176,6 +176,7 @@ class PHP_UML_Input_PHP_Parser
         self::$file->package = $fp;
 
         self::$aliases = array();
+        self::$currentQn = '';
 
         self::$currentPackage = self::$structure->packages;
 
@@ -1012,6 +1013,9 @@ class PHP_UML_Input_PHP_Parser
         if ($alias=='') {
             list($pos, $first, $alias) = self::$structure->getPackagePathParts($namespace, false);
         }
+        if (!$alias)
+            $alias = $first;
+
         if (substr($namespace, 0, 1)==self::T_NS_SEPARATOR)
             self::$aliases[$alias] = substr($namespace, 1);
         else
