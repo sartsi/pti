@@ -46,7 +46,7 @@ MDB2_Driver_mysqli  1.5.0b2   beta
 MDB2_Driver_sqlite  1.5.0b2   beta
 Mail                1.2.0     stable
 Net_SMTP            1.4.3     stable
-Net_Socket          1.0.9     stable
+Net_Socket          1.0.10    stable
 PEAR                1.9.1     stable
 PHP_Beautifier      0.1.15    beta
 PHP_CodeSniffer     1.2.2     stable
