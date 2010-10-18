@@ -108,10 +108,9 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2010 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.9
+ * @version    Release: 3.4.15
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 2.0.0
- * @abstract
  */
 abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing
 {
@@ -519,13 +518,24 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
             $className  = get_class($this);
             $passed     = $this->result->passed();
             $passedKeys = array_keys($passed);
+            $numKeys    = count($passedKeys);
+
+            for ($i = 0; $i < $numKeys; $i++) {
+                $pos = strpos($passedKeys[$i], ' with data set');
+
+                if ($pos !== FALSE) {
+                    $passedKeys[$i] = substr($passedKeys[$i], 0, $pos);
+                }
+            }
+
+            $passedKeys = array_flip(array_unique($passedKeys));
 
             foreach ($this->dependencies as $dependency) {
                 if (strpos($dependency, '::') === FALSE) {
                     $dependency = $className . '::' . $dependency;
                 }
 
-                if (!in_array($dependency, $passedKeys)) {
+                if (!isset($passedKeys[$dependency])) {
                     $result->addError(
                       $this,
                       new PHPUnit_Framework_SkippedTestError(
@@ -538,7 +548,11 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
 
                     return;
                 } else {
-                    $this->dependencyInput[] = $passed[$dependency];
+                    if (isset($passed[$dependency])) {
+                        $this->dependencyInput[] = $passed[$dependency];
+                    } else {
+                        $this->dependencyInput[] = NULL;
+                    }
                 }
             }
         }
@@ -697,6 +711,10 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
         // Run the test.
         try {
             // Set up the fixture.
+            if ($this->inIsolation) {
+                $this->setUpBeforeClass();
+            }
+
             $this->setUp();
 
             // Assert pre-conditions.
@@ -743,6 +761,10 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
         // caught and passed on when no exception was raised before.
         try {
             $this->tearDown();
+
+            if ($this->inIsolation) {
+                $this->tearDownAfterClass();
+            }
         }
 
         catch (Exception $_e) {
@@ -1082,7 +1104,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
      * @param  boolean $callOriginalConstructor
      * @param  boolean $callOriginalClone
      * @param  boolean $callAutoload
-     * @return object
+     * @return PHPUnit_Framework_MockObject_MockObject
      * @throws InvalidArgumentException
      * @since  Method available since Release 3.0.0
      */
@@ -1154,7 +1176,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
      * @param  boolean $callOriginalConstructor
      * @param  boolean $callOriginalClone
      * @param  boolean $callAutoload
-     * @return object
+     * @return PHPUnit_Framework_MockObject_MockObject
      * @since  Method available since Release 3.4.0
      * @throws InvalidArgumentException
      */
@@ -1209,7 +1231,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
      * @param  string  $mockClassName
      * @param  array   $methods
      * @param  boolean $callOriginalConstructor
-     * @return object
+     * @return PHPUnit_Framework_MockObject_MockObject
      * @since  Method available since Release 3.4.0
      */
     protected function getMockFromWsdl($wsdlFile, $originalClassName = '', $mockClassName = '', array $methods = array(), $callOriginalConstructor = TRUE)

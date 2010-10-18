@@ -55,7 +55,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2010 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.9
+ * @version    Release: 3.4.15
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.4.0
  */
@@ -76,7 +76,7 @@ class PHPUnit_Util_InvalidArgumentHelper
 
         return new InvalidArgumentException(
           sprintf(
-            'Argument #%d%sof %s:%s() is no %s',
+            'Argument #%d%sof %s::%s() is no %s',
             $argument,
             $value !== NULL ? ' (' . $value . ')' : ' ',
             $stack[1]['class'],

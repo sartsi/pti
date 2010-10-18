@@ -87,7 +87,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2010 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.9
+ * @version    Release: 3.4.15
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 2.0.0
  */
@@ -143,14 +143,9 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
     protected $numTests = -1;
 
     /**
-     * @var array
+     * @var boolean
      */
-    protected static $setUpBeforeClassCalled = array();
-
-    /**
-     * @var array
-     */
-    protected static $tearDownAfterClassCalled = array();
+    protected $testCase = FALSE;
 
     /**
      * Constructs a new TestSuite:
@@ -250,6 +245,8 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
               )
             );
         }
+
+        $this->testCase = TRUE;
     }
 
     /**
@@ -515,10 +512,32 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
 
             // TestCase($name, $data)
             else {
-                $data   = PHPUnit_Util_Test::getProvidedData($className, $name);
+                try {
+                    $data = PHPUnit_Util_Test::getProvidedData(
+                      $className, $name
+                    );
+                }
+
+                catch (Exception $e) {
+                    $message = sprintf(
+                      'The data provider specified for %s::%s is invalid.',
+                      $className,
+                      $name
+                    );
+
+                    $_message = $e->getMessage();
+
+                    if (!empty($_message)) {
+                        $message .= "\n" . $_message;
+                    }
+
+                    return new PHPUnit_Framework_Warning($message);
+                }
+
                 $groups = PHPUnit_Util_Test::getGroups($className, $name);
 
-                if (is_array($data) || $data instanceof Iterator) {
+                // Test method with @dataProvider.
+                if (isset($data)) {
                     $test = new PHPUnit_Framework_TestSuite_DataProvider(
                       $className . '::' . $name
                     );
@@ -548,7 +567,9 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
 
                         $test->addTest($_test, $groups);
                     }
-                } else {
+                }
+
+                else {
                     $test = new $className;
                 }
             }
@@ -627,8 +648,15 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             $result = $this->createResult();
         }
 
+        $result->startTestSuite($this);
+
         try {
             $this->setUp();
+
+            if ($this->testCase &&
+                method_exists($this->name, 'setUpBeforeClass')) {
+                call_user_func(array($this->name, 'setUpBeforeClass'));
+            }
         }
 
         catch (PHPUnit_Framework_SkippedTestSuiteError $e) {
@@ -640,8 +668,6 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
 
             return $result;
         }
-
-        $result->startTestSuite($this);
 
         if (empty($groups)) {
             $tests = $this->tests;
@@ -656,8 +682,6 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                 }
             }
         }
-
-        $currentClass = '';
 
         foreach ($tests as $test) {
             if ($result->shouldStop()) {
@@ -710,22 +734,6 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                         );
                         $test->setSharedFixture($this->sharedFixture);
                         $test->setRunTestInSeparateProcess($processIsolation);
-
-                        $_currentClass = get_class($test);
-
-                        if ($_currentClass != $currentClass) {
-                            if ($currentClass != '') {
-                                call_user_func(array($currentClass, 'tearDownAfterClass'));
-                                self::$tearDownAfterClassCalled[$currentClass] = TRUE;
-                            }
-
-                            $currentClass = $_currentClass;
-                        }
-
-                        if (!isset(self::$setUpBeforeClassCalled[$currentClass])) {
-                            call_user_func(array($currentClass, 'setUpBeforeClass'));
-                            self::$setUpBeforeClassCalled[$currentClass] = TRUE;
-                        }
                     }
 
                     $this->runTest($test, $result);
@@ -733,14 +741,13 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             }
         }
 
-        if ($currentClass != '' &&
-            !isset(self::$tearDownAfterClassCalled[$currentClass])) {
-            call_user_func(array($currentClass, 'tearDownAfterClass'));
-            self::$tearDownAfterClassCalled[$currentClass] = TRUE;
+        if ($this->testCase &&
+            method_exists($this->name, 'tearDownAfterClass')) {
+            call_user_func(array($this->name, 'tearDownAfterClass'));
         }
 
-        $result->endTestSuite($this);
         $this->tearDown();
+        $result->endTestSuite($this);
 
         return $result;
     }

@@ -63,7 +63,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Mike Lively <m@digitalsandwich.com>
  * @copyright  2010 Mike Lively <m@digitalsandwich.com>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.9
+ * @version    Release: 3.4.15
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.2.0
  */
@@ -73,11 +73,6 @@ class PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection implements PHPUni
      * @var PDO
      */
     protected $connection;
-
-    /**
-     * @var string
-     */
-    protected $schema;
 
     /**
      * The metadata object used to retrieve table meta data from the database.
@@ -92,12 +87,10 @@ class PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection implements PHPUni
      * @param PDO $connection
      * @param string $schema - The name of the database schema you will be testing against.
      */
-    public function __construct(PDO $connection, $schema)
+    public function __construct(PDO $connection, $schema = '')
     {
         $this->connection = $connection;
         $this->metaData = PHPUnit_Extensions_Database_DB_MetaData::createMetaData($connection, $schema);
-        $this->schema = $schema;
-
         $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
@@ -127,7 +120,7 @@ class PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection implements PHPUni
      */
     public function getSchema()
     {
-        return $this->schema;
+        return $this->getMetaData()->getSchema();
     }
 
     /**

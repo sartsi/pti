@@ -63,7 +63,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Mike Lively <m@digitalsandwich.com>
  * @copyright  2010 Mike Lively <m@digitalsandwich.com>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.9
+ * @version    Release: 3.4.15
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.2.0
  */
@@ -153,7 +153,7 @@ abstract class PHPUnit_Extensions_Database_TestCase extends PHPUnit_Framework_Te
      * @param string $schema
      * @return PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection
      */
-    protected function createDefaultDBConnection(PDO $connection, $schema)
+    protected function createDefaultDBConnection(PDO $connection, $schema = '')
     {
         return new PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection($connection, $schema);
     }

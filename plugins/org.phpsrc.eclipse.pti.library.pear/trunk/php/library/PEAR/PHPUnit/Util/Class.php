@@ -60,7 +60,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2010 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.9
+ * @version    Release: 3.4.15
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.1.0
  */
@@ -327,8 +327,22 @@ class PHPUnit_Util_Class
         while ($class) {
             $attributes = $class->getStaticProperties();
 
-            if (array_key_exists($attributeName, $attributes)) {
-                return $attributes[$attributeName];
+            $key = $attributeName;
+
+            if (isset($attributes[$key])) {
+                return $attributes[$key];
+            }
+
+            $key = "\0*\0" . $attributeName;
+
+            if (isset($attributes[$key])) {
+                return $attributes[$key];
+            }
+
+            $key = "\0" . $class->getName() . "\0" . $attributeName;
+
+            if (isset($attributes[$key])) {
+                return $attributes[$key];
             }
 
             $class = $class->getParentClass();

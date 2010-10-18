@@ -50,24 +50,20 @@ require_once 'PHPUnit/Extensions/Database/DB/MetaData/InformationSchema.php';
 PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
 
 /**
- * Provides functionality to retrieve meta data from a database with information_schema support.
+ * Provides functionality to retrieve meta data from a MySQL database.
  *
  * @category   Testing
  * @package    PHPUnit
  * @author     Mike Lively <m@digitalsandwich.com>
  * @copyright  2002-2010 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.9
+ * @version    Release: 3.4.15
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.2.0
  */
 class PHPUnit_Extensions_Database_DB_MetaData_MySQL extends PHPUnit_Extensions_Database_DB_MetaData
 {
     protected $schemaObjectQuoteChar = '`';
-
-    protected $columns = array();
-
-    protected $keys = array();
 
     /**
      * Returns an array containing the names of all the tables in the database.

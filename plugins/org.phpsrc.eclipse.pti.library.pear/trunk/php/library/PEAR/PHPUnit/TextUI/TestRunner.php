@@ -66,7 +66,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2010 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.9
+ * @version    Release: 3.4.15
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 2.0.0
  */
@@ -869,7 +869,11 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
         if ($arguments['filter'] !== FALSE &&
             preg_match('/^[a-zA-Z0-9_]/', $arguments['filter'])) {
-            $arguments['filter'] = '/' . $arguments['filter'] . '/';
+            // Escape delimiters in regular expression. Do NOT use preg_quote,
+            // to keep magic characters.
+            $arguments['filter'] = '/' . str_replace(
+              '/', '\\/', $arguments['filter']
+            ) . '/';
         }
     }
 }

@@ -58,7 +58,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Mike Lively <m@digitalsandwich.com>
  * @copyright  2010 Mike Lively <m@digitalsandwich.com>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.9
+ * @version    Release: 3.4.15
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.2.0
  */
@@ -68,7 +68,8 @@ abstract class PHPUnit_Extensions_Database_DB_MetaData implements PHPUnit_Extens
         'pgsql'  => 'PHPUnit_Extensions_Database_DB_MetaData_PgSQL',
         'mysql'  => 'PHPUnit_Extensions_Database_DB_MetaData_MySQL',
         'oci'    => 'PHPUnit_Extensions_Database_DB_MetaData_Oci',
-        'sqlite' => 'PHPUnit_Extensions_Database_DB_MetaData_Sqlite'
+        'sqlite' => 'PHPUnit_Extensions_Database_DB_MetaData_Sqlite',
+        'sqlite2'=> 'PHPUnit_Extensions_Database_DB_MetaData_Sqlite'
     );
 
     /**
@@ -102,7 +103,7 @@ abstract class PHPUnit_Extensions_Database_DB_MetaData implements PHPUnit_Extens
      * @param PDO $pdo
      * @param string $schema
      */
-    public final function __construct(PDO $pdo, $schema)
+    public final function __construct(PDO $pdo, $schema = '')
     {
         $this->pdo = $pdo;
         $this->schema = $schema;
@@ -116,7 +117,7 @@ abstract class PHPUnit_Extensions_Database_DB_MetaData implements PHPUnit_Extens
      * @param string $schema
      * @return PHPUnit_Extensions_Database_DB_MetaData
      */
-    public static function createMetaData(PDO $pdo, $schema)
+    public static function createMetaData(PDO $pdo, $schema = '')
     {
         $driverName = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         if (isset(self::$metaDataClassMap[$driverName])) {

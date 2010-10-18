@@ -55,7 +55,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2010 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.9
+ * @version    Release: 3.4.15
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.4.0
  */
@@ -153,7 +153,8 @@ class PHPUnit_Util_GlobalState
     {
         self::$globals[$superGlobalArray] = array();
 
-        if (isset($GLOBALS[$superGlobalArray])) {
+        if (isset($GLOBALS[$superGlobalArray]) &&
+            is_array($GLOBALS[$superGlobalArray])) {
             foreach ($GLOBALS[$superGlobalArray] as $key => $value) {
                 self::$globals[$superGlobalArray][$key] = serialize($value);
             }
@@ -162,8 +163,16 @@ class PHPUnit_Util_GlobalState
 
     protected static function restoreSuperGlobalArray($superGlobalArray)
     {
-        if (isset($GLOBALS[$superGlobalArray])) {
-            foreach ($GLOBALS[$superGlobalArray] as $key => $value) {
+        if (isset($GLOBALS[$superGlobalArray]) &&
+            is_array($GLOBALS[$superGlobalArray]) &&
+            isset(self::$globals[$superGlobalArray])) {
+            $keys = array_keys(
+              array_merge(
+                $GLOBALS[$superGlobalArray], self::$globals[$superGlobalArray]
+              )
+            );
+
+            foreach ($keys as $key) {
                 if (isset(self::$globals[$superGlobalArray][$key])) {
                     $GLOBALS[$superGlobalArray][$key] = unserialize(
                       self::$globals[$superGlobalArray][$key]
@@ -218,7 +227,8 @@ class PHPUnit_Util_GlobalState
         $superGlobalArrays = self::getSuperGlobalArrays();
 
         foreach ($superGlobalArrays as $superGlobalArray) {
-            if (isset($GLOBALS[$superGlobalArray])) {
+            if (isset($GLOBALS[$superGlobalArray]) &&
+                is_array($GLOBALS[$superGlobalArray])) {
                 foreach ($GLOBALS[$superGlobalArray] as $key => $value) {
                     $result .= sprintf(
                       '$GLOBALS[\'%s\'][\'%s\'] = %s;' . "\n",

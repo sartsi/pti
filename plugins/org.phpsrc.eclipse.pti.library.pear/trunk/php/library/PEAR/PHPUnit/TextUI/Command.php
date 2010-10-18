@@ -61,7 +61,7 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2010 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.9
+ * @version    Release: 3.4.15
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.0.0
  */
@@ -520,12 +520,6 @@ class PHPUnit_TextUI_Command
                 break;
 
                 case '--repeat': {
-                    $this->showMessage(
-                      'The --repeat functionality is deprecated and will be ' .
-                      'removed in the future.',
-                      FALSE
-                    );
-
                     $this->arguments['repeat'] = (int)$option[1];
                 }
                 break;
@@ -965,6 +959,7 @@ Usage: phpunit [switches] UnitTest [UnitTest.php]
   --list-groups            List available test groups.
 
   --loader <loader>        TestSuiteLoader implementation to use.
+  --repeat <times>         Runs the test(s) repeatedly.
 
   --story                  Report test execution progress in Story/BDD format.
   --tap                    Report test execution progress in TAP format.

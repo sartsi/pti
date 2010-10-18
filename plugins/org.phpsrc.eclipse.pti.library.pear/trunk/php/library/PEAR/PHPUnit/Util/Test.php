@@ -55,14 +55,14 @@ PHPUnit_Util_Filter::addFileToFilter(__FILE__, 'PHPUNIT');
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright  2002-2010 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 3.4.9
+ * @version    Release: 3.4.15
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 3.0.0
  */
 class PHPUnit_Util_Test
 {
-    const REGEX_DATA_PROVIDER      = '/@dataProvider\s+([a-zA-Z0-9._:-\\\]+)/';
-    const REGEX_EXPECTED_EXCEPTION = '(@expectedException\s+([:.\w\\\]+)(?:[\t ]+(\S*))?(?:[\t ]+(\S*))?\s*$)m';
+    const REGEX_DATA_PROVIDER      = '/@dataProvider\s+([a-zA-Z0-9._:-\\\\x7f-\xff]+)/';
+    const REGEX_EXPECTED_EXCEPTION = '(@expectedException\s+([:.\w\\\\x7f-\xff]+)(?:[\t ]+(\S*))?(?:[\t ]+(\S*))?\s*$)m';
 
     private static $annotationCache = array();
 
@@ -236,54 +236,66 @@ class PHPUnit_Util_Test
      * @param  string $className
      * @param  string $methodName
      * @param  string $docComment
-     * @return array
-     * @throws ReflectionException
+     * @return mixed  array|Iterator when a data provider is specified and exists
+     *                false          when a data provider is specified and does not exist
+     *                null           when no data provider is specified
      * @since  Method available since Release 3.2.0
      */
     public static function getProvidedData($className, $methodName)
     {
         $reflector  = new ReflectionMethod($className, $methodName);
         $docComment = $reflector->getDocComment();
+        $data       = NULL;
 
         if (preg_match(self::REGEX_DATA_PROVIDER, $docComment, $matches)) {
-            try {
-                $dataProviderMethodNameNamespace = explode('\\', $matches[1]);
-                $leaf                            = explode('::', array_pop($dataProviderMethodNameNamespace));
-                $dataProviderMethodName          = array_pop($leaf);
+            $dataProviderMethodNameNamespace = explode('\\', $matches[1]);
+            $leaf                            = explode('::', array_pop($dataProviderMethodNameNamespace));
+            $dataProviderMethodName          = array_pop($leaf);
 
-                if (!empty($dataProviderMethodNameNamespace)) {
-                    $dataProviderMethodNameNamespace = join('\\', $dataProviderMethodNameNamespace) . '\\';
-                } else {
-                    $dataProviderMethodNameNamespace = '';
-                }
-
-                if (!empty($leaf)) {
-                    $dataProviderClassName = $dataProviderMethodNameNamespace . array_pop($leaf);
-                } else {
-                    $dataProviderClassName = $className;
-                }
-
-                $dataProviderClass  = new ReflectionClass($dataProviderClassName);
-                $dataProviderMethod = $dataProviderClass->getMethod(
-                  $dataProviderMethodName
-                );
-
-                if ($dataProviderMethod->isStatic()) {
-                    $object = NULL;
-                } else {
-                    $object = $dataProviderClass->newInstance();
-                }
-
-                if ($dataProviderMethod->getNumberOfParameters() == 0) {
-                    return $dataProviderMethod->invoke($object);
-                } else {
-                    return $dataProviderMethod->invoke($object, $methodName);
-                }
+            if (!empty($dataProviderMethodNameNamespace)) {
+                $dataProviderMethodNameNamespace = join('\\', $dataProviderMethodNameNamespace) . '\\';
+            } else {
+                $dataProviderMethodNameNamespace = '';
             }
 
-            catch (ReflectionException $e) {
+            if (!empty($leaf)) {
+                $dataProviderClassName = $dataProviderMethodNameNamespace . array_pop($leaf);
+            } else {
+                $dataProviderClassName = $className;
+            }
+
+            $dataProviderClass  = new ReflectionClass($dataProviderClassName);
+            $dataProviderMethod = $dataProviderClass->getMethod(
+              $dataProviderMethodName
+            );
+
+            if ($dataProviderMethod->isStatic()) {
+                $object = NULL;
+            } else {
+                $object = $dataProviderClass->newInstance();
+            }
+
+            if ($dataProviderMethod->getNumberOfParameters() == 0) {
+                $data = $dataProviderMethod->invoke($object);
+            } else {
+                $data = $dataProviderMethod->invoke($object, $methodName);
             }
         }
+
+        if ($data !== NULL) {
+            foreach ($data as $key => $value) {
+                if (!is_array($value)) {
+                    throw new InvalidArgumentException(
+                      sprintf(
+                        'Data set %s is invalid.',
+                        is_int($key) ? '#' . $key : '"' . $key . '"'
+                      )
+                    );
+                }
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -297,7 +309,7 @@ class PHPUnit_Util_Test
         if (strpos($coveredElement, '::') !== FALSE) {
             list($className, $methodName) = explode('::', $coveredElement);
 
-            if ($methodName{0} == '<') {
+            if ($methodName[0] == '<') {
                 $classes = array($className);
 
                 foreach ($classes as $className)
@@ -315,7 +327,7 @@ class PHPUnit_Util_Test
 
                     $class   = new ReflectionClass($className);
                     $methods = $class->getMethods();
-                    $inverse = isset($methodName{1}) && $methodName{1} == '!';
+                    $inverse = isset($methodName[1]) && $methodName[1] == '!';
 
                     if (strpos($methodName, 'protected')) {
                         $visibility = 'isProtected';
