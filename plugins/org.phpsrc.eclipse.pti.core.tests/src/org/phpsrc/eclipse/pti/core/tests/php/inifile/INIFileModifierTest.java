@@ -13,9 +13,10 @@ import org.phpsrc.eclipse.pti.core.php.inifile.INIFileModifier;
 
 public class INIFileModifierTest {
 	@Test
-	public void testIncludePath() throws IOException, URISyntaxException {
+	public void testWrongSectionIncludePath() throws IOException,
+			URISyntaxException {
 
-		URL iniFile = getClass().getResource("original-php.ini");
+		URL iniFile = getClass().getResource("wrong-section-php.ini");
 		assertNotNull(iniFile);
 
 		INIFileModifier modifier = new INIFileModifier(iniFile.getFile());
@@ -30,7 +31,25 @@ public class INIFileModifierTest {
 		modifier.addEntry("PHP", "include_path", newIncludePath, true, null);
 
 		assertEquals(newIncludePath, modifier.getEntry("PHP", "include_path"));
+	}
 
-		modifier.close();
+	@Test
+	public void testDoubleIncludePath() throws IOException, URISyntaxException {
+
+		URL iniFile = getClass().getResource("double-include_path-php.ini");
+		assertNotNull(iniFile);
+
+		INIFileModifier modifier = new INIFileModifier(iniFile.getFile());
+		String oldIncludePath = modifier.getEntry("PHP", "include_path");
+		assertEquals(
+				"c:\\Programme\\PHP\\PEAR;c:\\Programme\\PHP\\PHPLIB\\FluentDOM;.",
+				oldIncludePath);
+
+		assertTrue(modifier.removeEntry("include_path", null));
+
+		String newIncludePath = oldIncludePath + ";" + "/test/path";
+		modifier.addEntry("PHP", "include_path", newIncludePath, true, null);
+
+		assertEquals(newIncludePath, modifier.getEntry("PHP", "include_path"));
 	}
 }
