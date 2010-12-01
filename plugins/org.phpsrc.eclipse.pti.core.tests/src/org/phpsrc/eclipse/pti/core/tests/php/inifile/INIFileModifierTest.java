@@ -1,5 +1,6 @@
 package org.phpsrc.eclipse.pti.core.tests.php.inifile;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -46,5 +47,15 @@ public class INIFileModifierTest {
 		modifier.addEntry("PHP", "include_path", newIncludePath, true, null);
 
 		assertEquals(newIncludePath, modifier.getEntry("PHP", "include_path"));
+	}
+
+	@Test
+	public void testMultipleExtensionAttributes() throws IOException {
+		URL iniFile = getClass().getResource("multiple-extension-php.ini");
+		assertNotNull(iniFile);
+		INIFileModifier modifier = new INIFileModifier(iniFile.getFile());
+		String[] entries = modifier.getEntries(null, "extension");
+		assertArrayEquals(new String[] { "ming.so", "bz2.so", "curl.so",
+				"exif.so", "gd.so", "imap.so" }, entries);
 	}
 }
